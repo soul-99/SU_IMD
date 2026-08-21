@@ -55,4 +55,11 @@
     <string name="write_secure_settings_message">Copy the command below and run it via ADB to grant the Write Secure Settings permission</string>
     <string name="add_to_favourites">Add to favourites</string>
     <string name="remove_from_favourites">Remove from favourites</string>
+    <!-- Bottom bar captions. Prefixed rather than named "revert": that name is owned by
+         :framework:notification-manager for the notification action, and resources from
+         every module merge into one namespace in :app. -->
+    <string name="action_revert">Revert</string>
+    <string name="action_app_setting">App setting</string>
+    <string name="action_create_shortcut">Create shortcut</string>
+    <string name="action_setting_template">Setting template</string>
 </resources>

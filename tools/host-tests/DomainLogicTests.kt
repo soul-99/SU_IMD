@@ -722,6 +722,41 @@ private fun settingSnapshotTests() {
 
     // The bug this exists for: developer options were already off, the profile hides them,
     // and the configured revert value would switch them on.
+    // The second-launch bug: the app is opened again from a shortcut without reverting
+    // first, so the settings it reads back are the ones it wrote last time.
+    val firstLaunch = mapOf(SettingSnapshot.idOf(SettingType.GLOBAL, "development_settings_enabled") to "1")
+    val secondLaunch = mapOf(SettingSnapshot.idOf(SettingType.GLOBAL, "development_settings_enabled") to "0")
+
+    checkEquals(
+        "a second apply does not overwrite the first reading",
+        firstLaunch,
+        SettingSnapshot.merge(existing = firstLaunch, measured = secondLaunch),
+    )
+    checkEquals(
+        "the first apply records everything",
+        secondLaunch,
+        SettingSnapshot.merge(existing = emptyMap(), measured = secondLaunch),
+    )
+    checkEquals(
+        "a setting added to the profile later still gets its own first reading",
+        mapOf(
+            SettingSnapshot.idOf(SettingType.GLOBAL, "development_settings_enabled") to "1",
+            SettingSnapshot.idOf(SettingType.GLOBAL, "adb_enabled") to "1",
+        ),
+        SettingSnapshot.merge(
+            existing = firstLaunch,
+            measured = secondLaunch + (SettingSnapshot.idOf(SettingType.GLOBAL, "adb_enabled") to "1"),
+        ),
+    )
+    checkEquals(
+        "a recorded null is a record, not a gap to be refilled",
+        mapOf(SettingSnapshot.idOf(SettingType.SECURE, "k") to null),
+        SettingSnapshot.merge(
+            existing = mapOf(SettingSnapshot.idOf(SettingType.SECURE, "k") to null),
+            measured = mapOf(SettingSnapshot.idOf(SettingType.SECURE, "k") to "9"),
+        ),
+    )
+
     checkEquals(
         "revert uses what the setting really was, not what was configured",
         "0",

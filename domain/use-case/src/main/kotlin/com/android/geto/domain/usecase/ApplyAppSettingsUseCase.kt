@@ -120,13 +120,29 @@ class ApplyAppSettingsUseCase @Inject constructor(
      * profile was written. If developer options were already off and the profile hides
      * them, that guess switches them on — a state the user never asked for and, with
      * developer options being what they are, one they then have no screen to undo from.
+     *
+     * Only settings with no record yet are read. Launching the same app again without
+     * reverting in between — the usual pattern with a pinned shortcut — would otherwise
+     * overwrite the original reading with the value this app wrote on the previous launch,
+     * and the revert would put back the applied state instead of the real one.
      */
     private suspend fun recordCurrentValues(
         componentName: String,
         settings: List<AppSetting>,
         userData: UserData,
     ) {
-        val snapshot = settings.associate { setting ->
+        val existing = userData.settingStateBefore[componentName].orEmpty()
+
+        val unrecorded = settings.filterNot { setting ->
+            SettingSnapshot.idOf(settingType = setting.settingType, key = setting.key) in existing
+        }
+
+        // Nothing new to note. Skipping the write matters: a pinned shortcut applies the
+        // same profile every time it is tapped, and this would otherwise rewrite the whole
+        // preferences proto on each launch for no change at all.
+        if (unrecorded.isEmpty()) return
+
+        val measured = unrecorded.associate { setting ->
             SettingSnapshot.idOf(settingType = setting.settingType, key = setting.key) to
                 secureSettingsWrapper.getSecureSettingValue(
                     settingType = setting.settingType,
@@ -135,7 +151,8 @@ class ApplyAppSettingsUseCase @Inject constructor(
         }
 
         userDataRepository.updateSettingStateBefore(
-            states = userData.settingStateBefore + (componentName to snapshot),
+            states = userData.settingStateBefore +
+                (componentName to SettingSnapshot.merge(existing = existing, measured = measured)),
         )
     }
 

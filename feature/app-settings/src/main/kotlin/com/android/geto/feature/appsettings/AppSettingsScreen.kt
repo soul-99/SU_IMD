@@ -18,6 +18,7 @@
 package com.android.geto.feature.appsettings
 
 import androidx.annotation.VisibleForTesting
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,9 +57,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.geto.broadcastreceiver.buildAppliedSettingsNotification
@@ -633,41 +639,39 @@ private fun RowScope.AppSettingsBottomAppBarActions(
     onShortcutIconClick: () -> Unit,
     onSettingsSuggestIconClick: () -> Unit,
 ) {
-    IconButton(onClick = onRefreshIconClick) {
-        Icon(
-            imageVector = GetoIcons.Refresh,
-            contentDescription = null,
-        )
-    }
+    // Every action shares the row equally rather than sitting at its natural width. Four
+    // captions plus the star will not fit side by side at their natural widths on a normal
+    // phone, and equal columns keep the labels centred under their icons on every screen.
+    LabelledAction(
+        modifier = Modifier.weight(1f),
+        icon = GetoIcons.Refresh,
+        label = stringResource(R.string.action_revert),
+        onClick = onRefreshIconClick,
+    )
 
-    IconButton(onClick = onSettingsIconClick) {
-        Icon(
-            GetoIcons.Settings,
-            contentDescription = null,
-        )
-    }
+    LabelledAction(
+        modifier = Modifier.weight(1f),
+        icon = GetoIcons.Settings,
+        label = stringResource(R.string.action_app_setting),
+        onClick = onSettingsIconClick,
+    )
 
-    IconButton(
-        onClick = onShortcutIconClick,
-    ) {
-        Icon(
-            GetoIcons.Shortcut,
-            contentDescription = null,
-        )
-    }
-
-    IconButton(
+    LabelledAction(
+        modifier = Modifier.weight(1f),
+        icon = GetoIcons.SettingsSuggest,
+        label = stringResource(R.string.action_setting_template),
         onClick = onSettingsSuggestIconClick,
-    ) {
-        Icon(
-            imageVector = GetoIcons.SettingsSuggest,
-            contentDescription = null,
-        )
-    }
+    )
 
-    // Pushes the star to the far end so it sits immediately left of the launch FAB.
-    Spacer(modifier = Modifier.weight(1f))
+    LabelledAction(
+        modifier = Modifier.weight(1f),
+        icon = GetoIcons.Shortcut,
+        label = stringResource(R.string.action_create_shortcut),
+        onClick = onShortcutIconClick,
+    )
 
+    // Left unlabelled: a star needs no caption, and it keeps its place immediately before
+    // the launch button.
     IconButton(onClick = onFavouriteIconClick) {
         Icon(
             imageVector = if (isFavourite) GetoIcons.Star else GetoIcons.StarBorder,
@@ -681,6 +685,42 @@ private fun RowScope.AppSettingsBottomAppBarActions(
             } else {
                 MaterialTheme.colorScheme.onSurfaceVariant
             },
+        )
+    }
+}
+
+/** An icon with its name underneath, sized to sit inside a bottom app bar. */
+@Composable
+private fun LabelledAction(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.small)
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp, horizontal = 2.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            modifier = Modifier.size(22.dp),
+            imageVector = icon,
+            contentDescription = null,
+        )
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            textAlign = TextAlign.Center,
+            // Two lines so "Setting template" and "Create shortcut" break rather than
+            // being clipped on a narrow screen.
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            lineHeight = 12.sp,
         )
     }
 }

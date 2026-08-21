@@ -62,6 +62,26 @@ object SettingSnapshot {
     }
 
     /**
+     * Adds readings for settings that have no record yet, and leaves existing ones alone.
+     *
+     * The first apply since the last revert is the one that saw the device untouched, so
+     * it is the only one whose readings mean anything. Launching the same app a second
+     * time — from a shortcut, say — reads back the values this app itself just wrote, and
+     * overwriting with those is how "developer options were off beforehand" turns into
+     * "developer options were off, so leave them off" and the revert quietly stops working.
+     *
+     * Per setting rather than per app, so a setting added to the profile between launches
+     * still gets its own first reading.
+     *
+     * This is the same rule [AccessibilityServicePlan.hold] follows for services, and for
+     * the same reason.
+     */
+    fun merge(
+        existing: Map<String, String?>,
+        measured: Map<String, String?>,
+    ): Map<String, String?> = existing + measured.filterKeys { it !in existing }
+
+    /**
      * What to write when reverting: the recorded value if there is one, otherwise the
      * value the user configured.
      *

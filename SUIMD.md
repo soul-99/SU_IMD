@@ -379,6 +379,15 @@ revert is what lets a retry still get it right.
 - "Never set" and "set to empty" are different, and are stored differently: reverting to
   *unset* is not something the settings API can express, so a setting that had no value
   falls back to the configured one rather than writing an empty string.
+- **Only the first apply since the last revert records anything.** Launching the same app
+  again without reverting first — the normal pattern with a pinned shortcut — reads back
+  the values this app itself wrote last time. Overwriting with those turns "developer
+  options were on beforehand" into "developer options were off, so leave them off", and
+  the revert silently stops working. The record is per setting, so a setting added to the
+  profile between launches still gets its own first reading. Same rule as
+  `AccessibilityServicePlan.hold`, for the same reason.
+- Nothing is read and nothing is written when every setting is already recorded, so a
+  shortcut tapped repeatedly does not rewrite the preferences proto each time.
 - A profile with no record — applied by an older build, or whose record was lost — falls
   back to the configured value and behaves exactly as it used to.
 - **The Re-enable control does not consult this.** It is an explicit "switch these on",
@@ -501,7 +510,7 @@ These were found while working on the above and are not upstream behaviour:
 Google's Maven is unreachable from the environment this was written in, so the project
 could not be compiled here. What was done instead:
 
-- **`tools/host-tests/run.sh`** — 113 assertions over the pure logic in `:domain:model`,
+- **`tools/host-tests/run.sh`** — 117 assertions over the pure logic in `:domain:model`,
   which is a plain JVM library with no dependencies and so runs on a desktop JVM. Covers
   the accessibility hold/release arithmetic (including the two-app interleaved scenario in
   both revert orders), the app-list ordering and search, the favourites ordering, the
