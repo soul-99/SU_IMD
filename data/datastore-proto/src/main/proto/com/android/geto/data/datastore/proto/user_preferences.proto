@@ -1,0 +1,88 @@
+/*
+ *
+ *   Copyright 2023 Einstein Blanco
+ *   Modifications Copyright 2026 soul_99 (suIMD)
+ *
+ *   Licensed under the GNU General Public License v3.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       https://www.gnu.org/licenses/gpl-3.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
+syntax = "proto3";
+
+import "com/android/geto/data/datastore/proto/theme.proto";
+import "com/android/geto/data/datastore/proto/sort_launcher_apps_activity_info.proto";
+import "com/android/geto/data/datastore/proto/sort_order_launcher_apps_activity_info.proto";
+import "com/android/geto/data/datastore/proto/sort_favourite_apps.proto";
+import "com/android/geto/data/datastore/proto/favourite_apps_view.proto";
+import "com/android/geto/data/datastore/proto/favourite_apps_tap_action.proto";
+
+option java_package = "com.android.geto.data.datastore.proto";
+option java_multiple_files = true;
+
+message UserPreferences {
+  ThemeProto theme = 1;
+  bool dynamicTheme = 2;
+  SortLauncherAppsActivityInfoProto sortLauncherAppsActivityInfo = 3;
+  SortOrderLauncherAppsActivityInfoProto sortOrderLauncherAppsActivityInfo = 4;
+  bool showSystem = 5;
+
+  // ---- suIMD additions ----
+
+  // Component names ("pkg/Activity") marked as favourite, in custom order.
+  repeated string favouriteComponentNames = 6;
+  SortFavouriteAppsProto sortFavouriteApps = 7;
+  FavouriteAppsViewProto favouriteAppsView = 8;
+  FavouriteAppsTapActionProto favouriteAppsTapAction = 9;
+
+  // Restart Shizuku after reverting developer options / USB debugging /
+  // wireless debugging.
+  bool restartShizuku = 10;
+  // Auth token from Shizuku's "View intents" screen.
+  string shizukuAuthKey = 11;
+  // Shizuku's package name. Configurable because stealth mode renames it.
+  string shizukuPackageName = 12;
+  // Start action from Shizuku's "View intents" screen. Blank means derive it as
+  // "<shizukuPackageName>.START", which is right unless a rename left the action
+  // pointing at the original package.
+  string shizukuStartAction = 15;
+
+  // Accessibility services the user chose to have suIMD disable when a
+  // "Hide Accessibility Services" app setting is applied.
+  repeated string managedAccessibilityServices = 13;
+  // Which accessibility services each target app currently holds switched off, keyed
+  // by that app's component name; the value is a ":"-joined list of flattened service
+  // component names.
+  //
+  // Per-app rather than one global list: with a single shared list, reverting app A
+  // switches services back on while app B is still in the foreground relying on them
+  // being off, and B's own revert then finds nothing to do. Keyed by app, a service is
+  // only re-enabled once no app is still holding it down.
+  map<string, string> heldAccessibilityServices = 16;
+
+  // Which items the manual "Revert settings" dialog on the Favourites tab had ticked
+  // when it was last used, stored as ManualRevertTarget enum names. Empty means the
+  // dialog has never been used, which the domain reads as "all of them".
+  repeated string manualRevertTargets = 17;
+
+  // What each setting was really set to just before an app's profile was applied, keyed
+  // by that app's component name and encoded by SettingSnapshot. Reverting writes these
+  // back rather than the "value on revert" the user typed, so a profile that hides
+  // developer options cannot switch them on for someone who had them off already.
+  map<string, string> settingStateBefore = 18;
+
+  // Whether the one-time tip shown after setup has been seen.
+  bool tipShown = 19;
+
+  // 14 was a single global suspended-services list, replaced by the map above.
+  reserved 14;
+}

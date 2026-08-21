@@ -1,0 +1,5 @@
+/build
+
+
+# Where Build > Generate Signed App Bundle / APK puts its output.
+/release

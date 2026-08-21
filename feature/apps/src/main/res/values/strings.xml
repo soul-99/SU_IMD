@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <string name="search">Search</string>
+    <string name="sort">Sort</string>
+    <string name="name">Name</string>
+    <string name="update_time">Update</string>
+    <string name="install_time">Install</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="show_system">Show System</string>
+    <string name="show_system_applications">Show system applications</string>
+
+    <!-- Favourites -->
+    <string name="add_to_favourites">Add to favourites</string>
+    <string name="remove_from_favourites">Remove from favourites</string>
+    <string name="favourite_apps_options">Favourites options</string>
+    <string name="no_favourite_apps">No favourites yet</string>
+    <string name="no_matching_favourite_apps">No favourites match that search</string>
+    <string name="no_favourite_apps_subtitle">Tap the star next to an app in All Apps, or the star in its settings screen.</string>
+    <string name="view">View</string>
+    <string name="default_tap">Default tap</string>
+    <string name="custom">Custom</string>
+    <string name="alphabetical">A–Z</string>
+    <string name="list">List</string>
+    <string name="grid">Grid</string>
+    <string name="tap_to_launch">Tap launches</string>
+    <string name="tap_to_modify">Tap modifies</string>
+    <string name="tap_to_launch_description">Tap to launch the app, long press to modify its settings.</string>
+    <string name="tap_to_modify_description">Tap to modify the app\'s settings, long press to launch it.</string>
+    <string name="reorder">Reorder</string>
+    <string name="reorder_favourites">Reorder favourites</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
+    <string name="close">Close</string>
+
+    <!-- Launching a favourite applies its settings first, exactly like a pinned shortcut -->
+    <string name="applied_settings_title">IMD</string>
+    <string name="applied_settings_success">Settings applied</string>
+    <string name="applied_settings_failure">Could not apply settings</string>
+    <string name="applied_settings_invalid">This app has settings with invalid values</string>
+    <!-- Manual revert -->
+    <string name="revert_settings">Re-enable settings/services</string>
+    <string name="cancel">Cancel</string>
+    <!-- Not "revert": :framework:notification-manager owns that name for the
+         notification action, and the two merge into one resource in :app. -->
+    <string name="re_enable">Re-enable</string>
+    <string name="revert_one">Re-enable %1$s now</string>
+    <string name="revert_developer_settings">Developer settings</string>
+    <string name="revert_usb_debugging">USB debugging</string>
+    <string name="revert_wireless_debugging">Wireless debugging</string>
+    <string name="revert_accessibility">Accessibility services</string>
+    <string name="revert_shizuku">Shizuku</string>
+    <string name="revert_done">Re-enabled</string>
+    <string name="revert_partial">Re-enabled %1$d of %2$d — the rest could not be changed</string>
+    <string name="revert_failed">Nothing could be re-enabled</string>
+    <string name="revert_no_permission">Grant WRITE_SECURE_SETTINGS first — see the setup screen</string>
+    <string name="applied_settings_no_permission">Grant WRITE_SECURE_SETTINGS first — see the setup screen</string>
+</resources>

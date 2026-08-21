@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      Rewriting Settings.Secure.enabled_accessibility_services is what actually stops a
+      running accessibility service. Flipping accessibility_enabled on its own does not.
+    -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
+    <!--
+      Listing installed accessibility services and loading their labels is subject to
+      package visibility filtering on Android 11+. Declared here as well as in the Shizuku
+      module so this feature does not quietly degrade if that module is ever dropped.
+    -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+</manifest>

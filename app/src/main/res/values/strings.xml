@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IMD</string>
+    <string name="app_full_form">SU IMD — Shut up! it’s my device</string>
+    <string name="favourite_apps">Favourites</string>
+    <string name="all_apps">All Apps</string>
+    <string name="settings">Settings</string>
+
+    <!-- First-run setup -->
+    <string name="setup_purpose">Open banking and other locked-down apps without turning developer options, USB debugging or your accessibility services off by hand every single time. Pick an app, say what should change while it runs, and this puts everything back afterwards.</string>
+    <string name="setup_step">Step %1$d</string>
+    <string name="setup_granted">Granted</string>
+    <string name="setup_not_granted">Not granted</string>
+    <string name="setup_secure_settings_title">Secure settings access</string>
+    <string name="setup_secure_settings_why">Android will not let any normal app change these settings. The permission is granted once from a shell and survives reboots — but not a reinstall.</string>
+    <string name="setup_adb_command">adb shell pm grant %1$s android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="setup_copy_command">Copy command</string>
+    <string name="setup_check_again">Check again</string>
+    <string name="setup_use_shizuku">Use Shizuku</string>
+    <string name="tip">Tip</string>
+    <string name="tip_got_it">Got it</string>
+    <string name="tip_developer_options">You don\'t need to keep developer options enabled for Shizuku, so you can leave them switched off. When Shizuku starts its service it enables USB debugging on its own, without enabling developer settings, using its own WRITE_SECURE_SETTINGS permission.</string>
+    <string name="setup_shizuku_working">Asking Shizuku…</string>
+    <string name="setup_shizuku_granted">Granted through Shizuku.</string>
+    <string name="setup_shizuku_not_running">No Shizuku service found. Start Shizuku, then try again.</string>
+    <string name="setup_shizuku_denied">Shizuku refused. Allow this app in Shizuku and try again — if you picked “deny and don\'t ask again”, clear it from Shizuku\'s app list first.</string>
+    <string name="setup_shizuku_failed">Shizuku could not run the command. Use the ADB command instead.</string>
+    <string name="setup_shizuku_once">Shizuku is only needed for this one grant. The permission survives reboots, so afterwards you can stop or uninstall Shizuku — unless you also want the optional “Restart Shizuku service” feature in Settings, which uses it again later.</string>
+    <string name="setup_secure_settings_adb">With a PC: enable USB debugging, connect the phone, and run the command above.</string>
+    <string name="setup_secure_settings_shizuku">Without a PC: start Shizuku, then run the same command in any terminal app that supports Shizuku. Nothing here needs root.</string>
+    <string name="setup_notifications_title">Notifications</string>
+    <string name="setup_notifications_why">Every time settings are applied, an ongoing notification appears with a Revert action. That notification is how you put your device back — without it, changes stay applied.</string>
+    <string name="setup_allow_notifications">Allow</string>
+    <string name="setup_open_settings">Open settings</string>
+    <string name="setup_notifications_denied_hint">Already refused twice? Android stops showing the prompt — use Open settings instead.</string>
+    <string name="setup_next">Next</string>
+    <string name="setup_back">Back</string>
+    <string name="setup_finish">Get started</string>
+    <string name="setup_configure_title">Two things to set up yourself</string>
+    <string name="setup_configure_intro">Neither is required to start using the app, but both are silent when left unset — you would not find out until a revert quietly did nothing. Both live in the Settings tab.</string>
+    <string name="setup_configure_shizuku_title">Restart Shizuku service</string>
+    <string name="setup_configure_shizuku_body">If you use Shizuku, hiding developer options or USB debugging takes its service down with them, and turning them back on does not bring it back. Settings → Shizuku → open Advanced, copy the action, package name and authentication key from Shizuku\'s own “View intents” screen, then switch the toggle on. This needs thedjchi\'s Shizuku fork; stock Shizuku has no start intent to send.</string>
+    <string name="setup_configure_accessibility_title">Accessibility services to hide</string>
+    <string name="setup_configure_accessibility_body">The app will not touch any accessibility service until you say which ones. Settings → Accessibility → “Accessibility services to hide”, then tick the ones that should be switched off while a locked-down app is open. They are switched back on when you revert.</string>
+    <string name="setup_blocked">Both steps are required. The app cannot change or restore a single setting without them.</string>
+    <string name="setup_copied">Copied</string>
+    <string name="setup_open_settings_failed">Could not open settings on this device</string>
+</resources>

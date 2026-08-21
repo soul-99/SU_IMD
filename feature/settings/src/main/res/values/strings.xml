@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <string name="settings">Settings</string>
+    <string name="dynamic_theme">Dynamic Theme</string>
+    <string name="cancel">Cancel</string>
+    <string name="change">Change</string>
+    <string name="close">Close</string>
+    <string name="theme">Theme</string>
+    <string name="available_on_android_12">Available on Android 12 +</string>
+    <string name="follow_system">Follow System</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="start_service">Start service</string>
+    <string name="stop_service">Stop service</string>
+    <string name="settings_observer_service">Settings Observer Service</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">Shizuku</string>
+    <string name="restart_shizuku_service">Restart Shizuku service</string>
+    <string name="restart_shizuku_service_description">On reverting any one of these options: hide developer options / USB debugging / wireless debugging, autostart Shizuku service after reverting the settings.</string>
+    <string name="shizuku_needs">Needs</string>
+    <string name="shizuku_fork_link">thedjchi fork of shizuku</string>
+    <string name="shizuku_fill_advanced">Please fill advanced section</string>
+    <string name="advanced">Advanced</string>
+    <string name="show_value">Show</string>
+    <string name="hide_value">Hide</string>
+    <string name="shizuku_view_intents_hint">Go to shizuku app &gt; view intents to copy values</string>
+    <string name="shizuku_start_action">Service start intent (action)</string>
+    <string name="shizuku_package_name">Package name</string>
+    <string name="shizuku_auth_key">Authentication key (extras &gt; auth:)</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility">Accessibility</string>
+    <string name="accessibility_services">Accessibility services to hide</string>
+    <string name="accessibility_services_dialog_description">These services are switched off when an app setting hides accessibility services, and switched back on when you revert it. Only the ones this app turned off are ever restored.</string>
+    <string name="accessibility_services_none_selected">None selected. %1$d currently enabled on this device.</string>
+    <string name="accessibility_services_selected">%1$d selected, %2$d currently enabled on this device.</string>
+    <string name="accessibility_service_enabled">Enabled · %1$s</string>
+    <string name="accessibility_service_disabled">Off · %1$s</string>
+    <string name="no_accessibility_services">No accessibility services are installed on this device.</string>
+
+    <!-- About -->
+    <string name="about">About</string>
+    <string name="about_created_by">App created by</string>
+    <string name="about_author_name">soul_99</string>
+    <string name="about_view_github">View GitHub</string>
+    <string name="about_fork_of">Fork of</string>
+    <string name="about_geto_app">Geto app</string>
+    <string name="about_licence_name">GNU General Public License v3.0</string>
+
+    <string name="long_live_foss">Long live free and open source software!</string>
+</resources>
