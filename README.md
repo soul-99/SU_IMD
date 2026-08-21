@@ -57,7 +57,7 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 
 ## Source
 
-This app is a fork of **[Geto](https://github.com/JackEblan/Geto)** by **Jack Eblan** (Einstein Blanco), licensed GPL-3.0. All of the original design and the great majority of the code are his; the additions above are the difference. Full credit for the app this is built on goes to him.
+This app is a fork of **[Geto](https://github.com/JackEblan/Geto)** by **Jack Eblan**, licensed GPL-3.0. All of the original design and the great majority of the code are his; the additions above are the difference. Full credit for the app this is built on goes to him.
 
 - **Original project:** https://github.com/JackEblan/Geto
 - **This fork:** by soul_99 (Dr. Utkarsh Rajput)
