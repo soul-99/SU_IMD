@@ -26,10 +26,11 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 ## Screenshots
 
 <p>
-  <img src="docs/screenshots/1.png" width="24%" alt="Favourites tab">
-  <img src="docs/screenshots/2.png" width="24%" alt="Re-enable settings dialog">
-  <img src="docs/screenshots/3.png" width="24%" alt="Accessibility services picker">
-  <img src="docs/screenshots/4.png" width="24%" alt="Settings tab">
+  <img src="docs/screenshots/1.png" width="19%" alt="Favourites tab">
+  <img src="docs/screenshots/2.png" width="19%" alt="Settings tab">
+  <img src="docs/screenshots/3.png" width="19%" alt="Accessibility services picker">
+  <img src="docs/screenshots/4.png" width="19%" alt="Re-enable settings dialog">
+  <img src="docs/screenshots/5.png" width="19%" alt="Pinned home-screen shortcuts">
 </p>
 
 ## Functions
@@ -67,7 +68,7 @@ This app is a fork of **[Geto](https://github.com/JackEblan/Geto)** by **Jack Eb
 
 ## The future of this fork
 
-I'm a radiology doctor, not a software developer. Writing software is a hobby, and this app
+I'm a radiology resident doctor, not a software developer. Writing software is a hobby, and this app
 exists because I wanted it to exist for myself — so please don't expect future builds,
 regular updates, or fixes for problems on devices I don't own. If it works for you, good; if
 it breaks, I may well not be able to help.
