@@ -47,12 +47,12 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 
 - Shizuku service restart
 - Working accessibility services flag, with per service enable/disable
-- Android adaptive icon matching shortcut icons
+- Proper previous setting state read with **setting memory**
 - Favourites tab
 - Re-enable settings/services button in favourites tab
+- Matching shortcut icons to android adaptive icon
 - A new better initialisation screen with Shizuku support to grant permissions
-- Working previous setting state memory
-- Closer to Material Design
+- Material Design search box
 
 ## Source
 
