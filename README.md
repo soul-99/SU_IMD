@@ -37,12 +37,10 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 
 ### From the original Geto
 
-- Per-app profiles of Android **system**, **secure** and **global** settings, each with a value to apply on launch and a value to restore on exit.
-- A searchable, sortable list of every installed app (by name, install time or update time; ascending or descending; system apps optionally shown).
-- A browsable copy of the device's current settings, so a key can be found and copied rather than remembered.
-- Launch an app from inside IMD with its profile applied, and an ongoing notification carrying the **Revert** action.
-- **Pinned home-screen shortcuts** per app: tapping one applies the profile and opens the app without going through IMD at all.
-- Material 3 interface with a light/dark/follow-system theme and Android 12+ dynamic colour.
+- Per-app profiles of Android **system**, **secure** and **global** settings.
+- A searchable, sortable list of every installed apps.
+- A browsable copy of the device's current settings
+- Launch app from inside IMD or shortcut with its profile applied, and an ongoing notification carrying the **Revert** action.
 - A settings-observer foreground service.
 
 ### Added in this fork
