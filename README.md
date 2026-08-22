@@ -23,14 +23,8 @@ adb shell pm grant com.soul_99.suIMD android.permission.WRITE_SECURE_SETTINGS
 
 or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that command for you. The screen also shows the command with a copy button and re-checks itself when you come back, so you never have to type it twice. The grant survives reboots but not a reinstall.
 
-## Screenshots
-
 <p>
-  <img src="docs/screenshots/1.png" width="19%" alt="Favourites tab">
-  <img src="docs/screenshots/2.png" width="19%" alt="Settings tab">
-  <img src="docs/screenshots/3.png" width="19%" alt="Accessibility services picker">
-  <img src="docs/screenshots/4.png" width="19%" alt="Re-enable settings dialog">
-  <img src="docs/screenshots/5.png" width="19%" alt="Pinned home-screen shortcuts">
+  <img src="docs/screenshots/poster.png" width="80%" alt="Favourites tab">
 </p>
 
 ## Functions
