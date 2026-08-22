@@ -23,6 +23,8 @@ import com.android.geto.data.datastore.mapper.asFavouriteAppsTapAction
 import com.android.geto.data.datastore.mapper.asFavouriteAppsTapActionProto
 import com.android.geto.data.datastore.mapper.asFavouriteAppsView
 import com.android.geto.data.datastore.mapper.asFavouriteAppsViewProto
+import com.android.geto.data.datastore.mapper.asShizukuForkMode
+import com.android.geto.data.datastore.mapper.asShizukuForkModeProto
 import com.android.geto.data.datastore.mapper.asSortFavouriteApps
 import com.android.geto.data.datastore.mapper.asSortFavouriteAppsProto
 import com.android.geto.data.datastore.mapper.asSortLauncherAppsActivityInfo
@@ -40,6 +42,7 @@ import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.SettingSnapshot
+import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
@@ -61,6 +64,17 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
             favouriteAppsView = it.favouriteAppsView.asFavouriteAppsView(),
             favouriteAppsTapAction = it.favouriteAppsTapAction.asFavouriteAppsTapAction(),
             restartShizuku = it.restartShizuku,
+            // An install upgraded from 1.0 has no fork stored but does have an auth key,
+            // and only thedjchi's fork ever asked for one — so it is already telling us
+            // which family it was set up against. Reading it that way keeps a working
+            // setup working instead of resetting it to "not chosen".
+            shizukuForkMode = it.shizukuForkMode.asShizukuForkMode().let { mode ->
+                if (mode == ShizukuForkMode.Unset && it.shizukuAuthKey.isNotBlank()) {
+                    ShizukuForkMode.Thedjchi
+                } else {
+                    mode
+                }
+            },
             shizukuAuthKey = it.shizukuAuthKey,
             // Empty proto default means "never set", so fall back to stock Shizuku
             // rather than storing the default eagerly.
@@ -189,6 +203,14 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
         userPreferences.updateData {
             it.copy {
                 this.shizukuPackageName = shizukuPackageName.trim()
+            }
+        }
+    }
+
+    suspend fun updateShizukuForkMode(shizukuForkMode: ShizukuForkMode) {
+        userPreferences.updateData {
+            it.copy {
+                this.shizukuForkMode = shizukuForkMode.asShizukuForkModeProto()
             }
         }
     }

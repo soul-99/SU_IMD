@@ -39,6 +39,13 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 
 ### Added in this fork
 
+#### v1.1
+
+- Better Shizuku integeration with auto-fill for default values.
+- Support for Shevery and other Shizuku forks which support start service intents for automation (original RikkaApps fork doesn't support start intents).
+
+#### v1.0
+
 - Shizuku service restart
 - Working accessibility services flag, with per service enable/disable
 - Proper previous setting state read with **setting memory**

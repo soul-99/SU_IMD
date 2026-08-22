@@ -25,6 +25,7 @@ import android.os.Build
 import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers
 import com.android.geto.domain.framework.PackageManagerWrapper
+import com.android.geto.domain.model.InstalledAppData
 import com.android.geto.framework.drawable.AndroidDrawableWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -38,6 +39,11 @@ internal class DefaultPackageManagerWrapper @Inject constructor(
 ) : PackageManagerWrapper {
     private val packageManager = context.packageManager
 
+    private companion object {
+        /** Comfortably covers a 40dp picker row at xxxhdpi. */
+        const val PICKER_ICON_SIZE = 96
+    }
+
     override suspend fun getActivityIcon(componentName: String): ByteArray? = withContext(ioDispatcher) {
         try {
             ComponentName.unflattenFromString(componentName)?.let {
@@ -48,6 +54,41 @@ internal class DefaultPackageManagerWrapper @Inject constructor(
         } catch (_: PackageManager.NameNotFoundException) {
             null
         }
+    }
+
+    override suspend fun getInstalledApps(): List<InstalledAppData> = withContext(ioDispatcher) {
+        val applications = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getInstalledApplications(
+                    PackageManager.ApplicationInfoFlags.of(0),
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.getInstalledApplications(0)
+            }
+        } catch (_: RuntimeException) {
+            // Same binder transaction limit as getLastInstallTimes: an empty picker the
+            // user can still type into beats no Settings screen at all.
+            emptyList()
+        }
+
+        applications.map { applicationInfo ->
+            InstalledAppData(
+                packageName = applicationInfo.packageName,
+                label = runCatching {
+                    packageManager.getApplicationLabel(applicationInfo).toString()
+                }.getOrDefault(applicationInfo.packageName),
+                // PICKER_ICON_SIZE rather than the default: this list can run to several
+                // hundred entries, and rasterising each at 192px costs seconds and
+                // megabytes for rows drawn at 40dp.
+                icon = runCatching {
+                    androidDrawableWrapper.toByteArray(
+                        drawable = packageManager.getApplicationIcon(applicationInfo),
+                        size = PICKER_ICON_SIZE,
+                    )
+                }.getOrNull(),
+            )
+        }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label })
     }
 
     override suspend fun getLastInstallTimes(): Map<String, Long> = withContext(ioDispatcher) {

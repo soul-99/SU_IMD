@@ -30,11 +30,6 @@ import javax.inject.Inject
 internal class DefaultDrawableWrapper @Inject constructor(
     @param:Dispatcher(GetoDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
 ) : AndroidDrawableWrapper {
-    private companion object {
-        /** 192px covers a 56dp icon at xxxhdpi and a notification large icon. */
-        const val ICON_SIZE = 192
-    }
-
     /**
      * Deliberately renders the icon exactly as the system handed it over, with no mask and
      * no plate.
@@ -53,17 +48,17 @@ internal class DefaultDrawableWrapper @Inject constructor(
      * everywhere. This is also what [ShortcutIconFactory] falls back to for legacy icons,
      * so masking here quietly made pinned shortcuts wrong too.
      */
-    override suspend fun toByteArray(drawable: Drawable): ByteArray = withContext(defaultDispatcher) {
+    override suspend fun toByteArray(drawable: Drawable, size: Int): ByteArray = withContext(defaultDispatcher) {
         val stream = ByteArrayOutputStream()
 
-        // Always the same square, rather than the drawable's own intrinsic size capped at
+        // Always a fixed square, rather than the drawable's own intrinsic size capped at
         // it. A legacy icon whose intrinsic size is 48px was being rasterised at 48px and
         // then scaled up to a 50dp slot, which on a high-density screen is four times the
         // pixels it has — the icon read as small and soft next to its neighbours. Rendering
         // every icon at one size costs nothing extra for the ones that were already large.
         //
         // The quality argument is ignored for PNG, which is lossless.
-        drawable.toBitmap(width = ICON_SIZE, height = ICON_SIZE)
+        drawable.toBitmap(width = size, height = size)
             .compress(Bitmap.CompressFormat.PNG, 100, stream)
 
         stream.toByteArray()

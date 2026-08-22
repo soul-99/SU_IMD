@@ -19,12 +19,14 @@ package com.android.geto.data.datastore.mapper
 
 import com.android.geto.data.datastore.proto.FavouriteAppsTapActionProto
 import com.android.geto.data.datastore.proto.FavouriteAppsViewProto
+import com.android.geto.data.datastore.proto.ShizukuForkModeProto
 import com.android.geto.data.datastore.proto.SortFavouriteAppsProto
 import com.android.geto.data.datastore.proto.SortLauncherAppsActivityInfoProto
 import com.android.geto.data.datastore.proto.SortOrderLauncherAppsActivityInfoProto
 import com.android.geto.data.datastore.proto.ThemeProto
 import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
+import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
@@ -186,5 +188,37 @@ internal fun FavouriteAppsTapAction.asFavouriteAppsTapActionProto(): FavouriteAp
 
     FavouriteAppsTapAction.TapToModify -> {
         FavouriteAppsTapActionProto.FavouriteTapModify
+    }
+}
+
+internal fun ShizukuForkModeProto.asShizukuForkMode(): ShizukuForkMode = when (this) {
+    ShizukuForkModeProto.ShizukuForkThedjchi -> {
+        ShizukuForkMode.Thedjchi
+    }
+
+    ShizukuForkModeProto.ShizukuForkOther -> {
+        ShizukuForkMode.Other
+    }
+
+    // An unset value and one this build does not recognise mean the same thing here:
+    // nothing has been chosen, so the picker asks rather than guessing a contract.
+    ShizukuForkModeProto.ShizukuForkUnset,
+    ShizukuForkModeProto.UNRECOGNIZED,
+    -> {
+        ShizukuForkMode.Unset
+    }
+}
+
+internal fun ShizukuForkMode.asShizukuForkModeProto(): ShizukuForkModeProto = when (this) {
+    ShizukuForkMode.Unset -> {
+        ShizukuForkModeProto.ShizukuForkUnset
+    }
+
+    ShizukuForkMode.Thedjchi -> {
+        ShizukuForkModeProto.ShizukuForkThedjchi
+    }
+
+    ShizukuForkMode.Other -> {
+        ShizukuForkModeProto.ShizukuForkOther
     }
 }

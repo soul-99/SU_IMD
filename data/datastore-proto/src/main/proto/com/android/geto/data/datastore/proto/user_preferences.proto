@@ -25,6 +25,7 @@ import "com/android/geto/data/datastore/proto/sort_order_launcher_apps_activity_
 import "com/android/geto/data/datastore/proto/sort_favourite_apps.proto";
 import "com/android/geto/data/datastore/proto/favourite_apps_view.proto";
 import "com/android/geto/data/datastore/proto/favourite_apps_tap_action.proto";
+import "com/android/geto/data/datastore/proto/shizuku_fork_mode.proto";
 
 option java_package = "com.android.geto.data.datastore.proto";
 option java_multiple_files = true;
@@ -82,6 +83,11 @@ message UserPreferences {
 
   // Whether the one-time tip shown after setup has been seen.
   bool tipShown = 19;
+
+  // Which family of Shizuku fork the start broadcast is aimed at. Decides whether an
+  // auth key is part of the contract at all, so it cannot be inferred from the other
+  // fields.
+  ShizukuForkModeProto shizukuForkMode = 20;
 
   // 14 was a single global suspended-services list, replaced by the map above.
   reserved 14;

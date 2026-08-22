@@ -476,6 +476,63 @@ setup, leaving developer options on so Shizuku works, fights every profile that 
 
 ---
 
+### 15. Two fork families, chosen rather than guessed
+
+*(v1.1)*
+
+The Shizuku restart in §1 was written against one fork and quietly assumed it. thedjchi's
+build listens for a broadcast carrying an `auth` token copied out of its own *View intents*
+screen; that token, and the action that goes with it, were the only shape the app knew how
+to send.
+
+That assumption stopped being true. [Shevery](https://github.com/HmnDev-Tech/shevery) and
+the forks alongside it expose a start action with **no token at all**, under a different
+action string. Neither family complains when it receives the other's shape — the broadcast
+is simply ignored — so a Shevery user filling in the old fields got a toggle that looked
+configured and did nothing at all. Upstream RikkaApps Shizuku listens for neither; it has
+no start intent, which is why it cannot be supported however the fields are filled.
+
+Advanced now opens with a mandatory single choice between the two families, and the fields
+follow from it:
+
+| | thedjchi based forks | Shevery / other forks |
+|---|---|---|
+| Package name | picker, preselects **Shizuku** | picker, preselects **Shevery**, else Shizuku |
+| Start action | `moe.shizuku.privileged.api.START` | `moe.shizuku.manager.action.START_SERVER` |
+| Auth key | required | **not shown** |
+
+`ShizukuForkMode` carries a third value, `Unset`, and it is load-bearing rather than
+tidiness. proto3 cannot distinguish an unset enum from one explicitly set to its first
+value, so defaulting to either family would leave every upgraded install pointed at a
+contract it may not speak — and the failure mode is silence. Nothing appears below the two
+radio rows until one is chosen.
+
+**The auth key had to become genuinely optional, not merely hidden.** Three separate places
+refused to send without one — `DefaultShizukuWrapper.startShizuku`, `ManualRevertUseCase`
+and `RevertAppSettingsUseCase` — and hiding the field while leaving those in place would
+have blocked every Shevery user with no message anywhere. They now share a single
+`UserData.isShizukuConfigured` rule that asks for a key only where the chosen fork reads
+one, and the wrapper omits the extra entirely rather than attaching an empty string: an
+absent extra is a token-free contract, an empty one is a misconfigured authenticated
+contract, and the two should not look alike in a bug report.
+
+**Autofill matches on the app's label, not its package name.** The package is the thing
+people change — stealth builds rename it, and a rename is the entire reason that field is
+editable in the first place. Matching on the label finds `com.uzuku` when it is still called
+Shizuku; matching on the package would find nothing and preselect nothing.
+
+The picker lists every installed application rather than only those with a launcher entry,
+because a Shizuku build hiding itself has no launcher icon and is precisely the install
+someone needs to name. Its icons render at 96px rather than the 192px the app lists use: at
+full size, rasterising a few hundred packages costs seconds and megabytes for rows drawn at
+40dp. `AndroidDrawableWrapper.toByteArray` grew a `size` parameter defaulting to the old
+value, so nothing else changed.
+
+An install upgrading from 1.0 has no family stored but does have an auth key — and only
+thedjchi's fork ever asked for one, so the old setup is already saying which family it was
+built against. `UserPreferencesDataSource` reads it that way, and a working configuration
+keeps working instead of resetting to "not chosen".
+
 ## Other fixes made along the way
 
 These were found while working on the above and are not upstream behaviour:
@@ -539,3 +596,43 @@ first CI run.
 - The 1.5 second pause before the start broadcast is a fixed guess, not a poll.
 - A setting unticked *between* applying and reverting is skipped on revert, so it stays at
   its launch value. Revert first, then untick.
+- Nothing checks, at the moment the toggle is switched on, that the configured action
+  actually resolves to a receiver. The wrapper checks at send time and logs when it finds
+  none, but by then the user is not looking. On a fork with no start intent — upstream
+  RikkaApps, or a fork whose action string has changed — the switch turns on and stays
+  silent.
+- Shevery's start action is taken from its documentation, not from a manifest this project
+  has read. If `moe.shizuku.manager.action.START_SERVER` is wrong or has moved, the field is
+  editable, but the default will be wrong for everyone until it is corrected here.
+
+## What might come next
+
+Nothing here is promised — see the note at the end of the README about who maintains this.
+These are the things a next version would be worth spending effort on, written down so the
+reasoning is not lost.
+
+- **Fail loudly when the intent resolves to nothing.** `PackageManager.queryBroadcastReceivers`
+  already tells the wrapper whether anything is listening; running that check when the fork
+  and package are chosen, rather than when the broadcast is sent, would turn the quietest
+  failure in the app into a message next to the field that caused it. This is the single
+  most valuable thing left on the list.
+- **Confirm Shevery's contract against its manifest** rather than its release notes, and do
+  the same for forks derived from it, which may or may not have inherited thedjchi's
+  intents.
+- **Poll for Shizuku instead of waiting a fixed 1.5 seconds** before broadcasting. The delay
+  is a guess at how long `adbd` takes to come back; a short poll on the binder would be both
+  faster on quick devices and more reliable on slow ones.
+- **Enabling and disabling a third-party VPN** has been asked for and is *not* possible the
+  way the rest of the app works. VPN state is not stored in `Settings.System/Secure/Global`
+  at all — a VPN is a `VpnService` in its own app's process, established after the user
+  consents through `VpnService.prepare()`. `WRITE_SECURE_SETTINGS` buys nothing here, and
+  `Settings.Secure.always_on_vpn_app` is not the control surface either: the real setter is
+  `IVpnManager.setAlwaysOnVpnPackage()`, which needs `CONTROL_VPN` — signature|privileged,
+  out of reach of Shizuku's shell UID. Dropping a tunnel through Shizuku is possible
+  (`appops set <pkg> ACTIVATE_VPN ignore`, or `am force-stop <pkg>`), but the asymmetry is
+  the problem: killing a VPN is easy, restoring one is not, because nothing brings the
+  tunnel back except the user reopening the app unless it is configured always-on. It would
+  have to be a non-settings action alongside the accessibility flag and the Shizuku restart,
+  and its wording would have to admit that revert may leave the VPN off. Worth knowing too:
+  apps generally detect VPNs through `NetworkCapabilities.TRANSPORT_VPN` or a `tun0`
+  interface, so this is about genuinely dropping the tunnel, not hiding a flag from them.

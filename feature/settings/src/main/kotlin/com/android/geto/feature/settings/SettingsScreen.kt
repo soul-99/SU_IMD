@@ -33,16 +33,22 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -62,6 +68,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -72,15 +79,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import coil.compose.AsyncImage
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.designsystem.theme.supportsDynamicTheming
 import com.android.geto.domain.model.AccessibilityServiceData
+import com.android.geto.domain.model.InstalledAppData
+import com.android.geto.domain.model.ShizukuForkDefaults
+import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.model.UserData
 import com.android.geto.feature.settings.dialog.AccessibilityServicesDialog
@@ -100,7 +112,8 @@ private const val AUTHOR_EMAIL = "utkarshrajput1999@gmail.com"
 private const val AUTHOR_GITHUB_URL = "https://github.com/soul-99"
 private const val GETO_REPOSITORY_URL = "https://github.com/JackEblan/Geto"
 private const val LICENCE_URL = "https://www.gnu.org/licenses/gpl-3.0"
-private const val SHIZUKU_FORK_URL = "https://github.com/thedjchi/Shizuku/releases"
+private const val SHIZUKU_THEDJCHI_URL = "https://github.com/thedjchi/Shizuku/releases"
+private const val SHIZUKU_SHEVERY_URL = "https://github.com/HmnDev-Tech/shevery/releases"
 
 @Composable
 internal fun SettingsRoute(
@@ -113,6 +126,8 @@ internal fun SettingsRoute(
 
     val accessibilityServices by viewModel.accessibilityServices.collectAsStateWithLifecycle()
 
+    val installedApps by viewModel.installedApps.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         viewModel.refreshAccessibilityServices()
     }
@@ -122,14 +137,17 @@ internal fun SettingsRoute(
         settingsUiState = settingsUiState,
         isServiceRunning = isServiceRunning,
         accessibilityServices = accessibilityServices,
+        installedApps = installedApps,
         onUpdateTheme = viewModel::updateTheme,
         onUpdateDynamicTheme = viewModel::updateDynamicTheme,
         onUpdateRestartShizuku = viewModel::updateRestartShizuku,
+        onUpdateShizukuForkMode = viewModel::updateShizukuForkMode,
         onUpdateShizukuAuthKey = viewModel::updateShizukuAuthKey,
         onUpdateShizukuPackageName = viewModel::updateShizukuPackageName,
         onUpdateShizukuStartAction = viewModel::updateShizukuStartAction,
         onUpdateManagedAccessibilityServices = viewModel::updateManagedAccessibilityServices,
         onRefreshAccessibilityServices = viewModel::refreshAccessibilityServices,
+        onRefreshInstalledApps = viewModel::refreshInstalledApps,
     )
 }
 
@@ -140,14 +158,17 @@ internal fun SettingsScreen(
     settingsUiState: SettingsUiState,
     isServiceRunning: Boolean,
     accessibilityServices: List<AccessibilityServiceData>,
+    installedApps: List<InstalledAppData>,
     onUpdateTheme: (Theme) -> Unit,
     onUpdateDynamicTheme: (Boolean) -> Unit,
     onUpdateRestartShizuku: (Boolean) -> Unit,
+    onUpdateShizukuForkMode: (ShizukuForkMode) -> Unit,
     onUpdateShizukuAuthKey: (String) -> Unit,
     onUpdateShizukuPackageName: (String) -> Unit,
     onUpdateShizukuStartAction: (String) -> Unit,
     onUpdateManagedAccessibilityServices: (List<String>) -> Unit,
     onRefreshAccessibilityServices: () -> Unit,
+    onRefreshInstalledApps: () -> Unit,
 ) {
     // The scroll modifier lives on the content column rather than here: a Box that scrolls
     // measures its child with an infinite height, so it would wrap the spinner and centre
@@ -163,14 +184,17 @@ internal fun SettingsScreen(
                     userData = settingsUiState.userData,
                     isServiceRunning = isServiceRunning,
                     accessibilityServices = accessibilityServices,
+                    installedApps = installedApps,
                     onUpdateDynamicTheme = onUpdateDynamicTheme,
                     onUpdateTheme = onUpdateTheme,
                     onUpdateRestartShizuku = onUpdateRestartShizuku,
+                    onUpdateShizukuForkMode = onUpdateShizukuForkMode,
                     onUpdateShizukuAuthKey = onUpdateShizukuAuthKey,
                     onUpdateShizukuPackageName = onUpdateShizukuPackageName,
                     onUpdateShizukuStartAction = onUpdateShizukuStartAction,
                     onUpdateManagedAccessibilityServices = onUpdateManagedAccessibilityServices,
                     onRefreshAccessibilityServices = onRefreshAccessibilityServices,
+                    onRefreshInstalledApps = onRefreshInstalledApps,
                 )
             }
         }
@@ -183,14 +207,17 @@ private fun Success(
     userData: UserData,
     isServiceRunning: Boolean,
     accessibilityServices: List<AccessibilityServiceData>,
+    installedApps: List<InstalledAppData>,
     onUpdateDynamicTheme: (Boolean) -> Unit,
     onUpdateTheme: (Theme) -> Unit,
     onUpdateRestartShizuku: (Boolean) -> Unit,
+    onUpdateShizukuForkMode: (ShizukuForkMode) -> Unit,
     onUpdateShizukuAuthKey: (String) -> Unit,
     onUpdateShizukuPackageName: (String) -> Unit,
     onUpdateShizukuStartAction: (String) -> Unit,
     onUpdateManagedAccessibilityServices: (List<String>) -> Unit,
     onRefreshAccessibilityServices: () -> Unit,
+    onRefreshInstalledApps: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -238,10 +265,13 @@ private fun Success(
 
         ShizukuSection(
             userData = userData,
+            installedApps = installedApps,
             onUpdateRestartShizuku = onUpdateRestartShizuku,
+            onUpdateShizukuForkMode = onUpdateShizukuForkMode,
             onUpdateShizukuAuthKey = onUpdateShizukuAuthKey,
             onUpdateShizukuPackageName = onUpdateShizukuPackageName,
             onUpdateShizukuStartAction = onUpdateShizukuStartAction,
+            onRefreshInstalledApps = onRefreshInstalledApps,
         )
 
         SectionDivider(title = stringResource(R.string.accessibility))
@@ -298,10 +328,13 @@ private fun Success(
 private fun ShizukuSection(
     modifier: Modifier = Modifier,
     userData: UserData,
+    installedApps: List<InstalledAppData>,
     onUpdateRestartShizuku: (Boolean) -> Unit,
+    onUpdateShizukuForkMode: (ShizukuForkMode) -> Unit,
     onUpdateShizukuAuthKey: (String) -> Unit,
     onUpdateShizukuPackageName: (String) -> Unit,
     onUpdateShizukuStartAction: (String) -> Unit,
+    onRefreshInstalledApps: () -> Unit,
 ) {
     // Seeded once from the stored values and then owned locally. Reading them back out of
     // the preferences flow on every keystroke would fight the cursor.
@@ -318,8 +351,15 @@ private fun ShizukuSection(
 
     var showFillHint by rememberSaveable { mutableStateOf(false) }
 
-    // Nothing can be sent without all three, so the toggle stays inert until they are set.
-    val configured = startAction.isNotBlank() && packageName.isNotBlank() && authKey.isNotBlank()
+    val forkMode = userData.shizukuForkMode
+
+    // The same rule as UserData.isShizukuConfigured, but read off the local edit state so
+    // the switch unlocks the moment the last field is filled rather than half a second
+    // later when the debounced write lands.
+    val configured = forkMode != ShizukuForkMode.Unset &&
+        startAction.isNotBlank() &&
+        packageName.isNotBlank() &&
+        (!forkMode.requiresAuthKey || authKey.isNotBlank())
 
     // Committed on a pause rather than per keystroke: each write is a full proto rewrite
     // plus an emission that recomposes this whole screen. drop(1) skips the seed value so
@@ -340,6 +380,12 @@ private fun ShizukuSection(
         snapshotFlow { authKey }.drop(1).debounce(COMMIT_DEBOUNCE)
             .distinctUntilChanged()
             .collect { onUpdateShizukuAuthKey(it) }
+    }
+
+    // The picker needs the installed-app list to be able to preselect anything, so ask for
+    // it as soon as the panel opens rather than when the dropdown is first tapped.
+    LaunchedEffect(showAdvanced) {
+        if (showAdvanced) onRefreshInstalledApps()
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -398,33 +444,239 @@ private fun ShizukuSection(
         )
 
         if (showAdvanced) {
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                text = stringResource(R.string.shizuku_view_intents_hint),
-                style = MaterialTheme.typography.bodySmall,
+            ForkModeSelector(
+                selected = forkMode,
+                onSelect = { mode ->
+                    if (mode != forkMode) {
+                        // Picking a family is the only moment the app knows enough to fill
+                        // these in, and the two families disagree about every one of them.
+                        // Written into the visible fields rather than applied behind the
+                        // scenes, so a wrong guess is something the user can see and fix.
+                        val suggested = ShizukuForkDefaults.packageFor(
+                            mode = mode,
+                            apps = installedApps,
+                        )
+
+                        packageName = suggested
+
+                        startAction = ShizukuForkDefaults.actionFor(
+                            mode = mode,
+                            selectedLabel = installedApps.labelOf(suggested),
+                        )
+
+                        onUpdateShizukuForkMode(mode)
+                    }
+                },
             )
 
-            ShizukuField(
-                value = startAction,
-                label = stringResource(R.string.shizuku_start_action),
-                onValueChange = { startAction = it },
-            )
+            if (forkMode != ShizukuForkMode.Unset) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    text = stringResource(
+                        if (forkMode == ShizukuForkMode.Thedjchi) {
+                            R.string.shizuku_view_intents_hint
+                        } else {
+                            R.string.shizuku_other_fork_hint
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                )
 
-            ShizukuField(
-                value = packageName,
-                label = stringResource(R.string.shizuku_package_name),
-                onValueChange = { packageName = it },
-            )
+                PackageNameField(
+                    value = packageName,
+                    installedApps = installedApps,
+                    onValueChange = { packageName = it },
+                    onSelectApp = { app ->
+                        packageName = app.packageName
 
-            ShizukuField(
-                value = authKey,
-                label = stringResource(R.string.shizuku_auth_key),
-                secret = true,
-                onValueChange = { authKey = it },
-            )
+                        // Only the "other forks" family derives its action from which app
+                        // was picked; thedjchi's is the same string whatever the package
+                        // has been renamed to.
+                        if (forkMode == ShizukuForkMode.Other) {
+                            startAction = ShizukuForkDefaults.actionFor(
+                                mode = forkMode,
+                                selectedLabel = app.label,
+                            )
+                        }
+                    },
+                )
+
+                ShizukuField(
+                    value = startAction,
+                    label = stringResource(R.string.shizuku_start_action),
+                    onValueChange = { startAction = it },
+                )
+
+                if (forkMode.requiresAuthKey) {
+                    ShizukuField(
+                        value = authKey,
+                        label = stringResource(R.string.shizuku_auth_key),
+                        secret = true,
+                        onValueChange = { authKey = it },
+                    )
+                }
+            }
         }
     }
 }
+
+/**
+ * The two fork families, as a mandatory single choice.
+ *
+ * Radio rows rather than a segmented button: the labels are long enough that a segmented
+ * control would truncate them, and truncating "Shevery / other forks of Shizuku" hides the
+ * only word that tells someone which row is theirs.
+ */
+@Composable
+private fun ForkModeSelector(
+    modifier: Modifier = Modifier,
+    selected: ShizukuForkMode,
+    onSelect: (ShizukuForkMode) -> Unit,
+) {
+    Column(modifier = modifier.selectableGroup()) {
+        ForkModeRow(
+            label = stringResource(R.string.shizuku_fork_mode_thedjchi),
+            selected = selected == ShizukuForkMode.Thedjchi,
+            onSelect = { onSelect(ShizukuForkMode.Thedjchi) },
+        )
+
+        ForkModeRow(
+            label = stringResource(R.string.shizuku_fork_mode_other),
+            selected = selected == ShizukuForkMode.Other,
+            onSelect = { onSelect(ShizukuForkMode.Other) },
+        )
+    }
+}
+
+@Composable
+private fun ForkModeRow(
+    modifier: Modifier = Modifier,
+    label: String,
+    selected: Boolean,
+    onSelect: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onSelect)
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // The row owns the click, so the button itself must not also be clickable or
+        // TalkBack announces two separate controls for one choice.
+        RadioButton(selected = selected, onClick = null)
+
+        Spacer(modifier = Modifier.size(12.dp))
+
+        Text(
+            modifier = Modifier.weight(1f),
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+/**
+ * A package name that can be typed or picked.
+ *
+ * Typed as well as picked because the list is only as good as what the device will admit
+ * to having installed: a Shizuku build hiding itself may not show up at all, and its
+ * package name still has to be enterable by hand.
+ */
+@Composable
+private fun PackageNameField(
+    modifier: Modifier = Modifier,
+    value: String,
+    installedApps: List<InstalledAppData>,
+    onValueChange: (String) -> Unit,
+    onSelectApp: (InstalledAppData) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Typing filters the list rather than just replacing it, so the field doubles as a
+    // search box over a few hundred packages.
+    val matches = remember(installedApps, value) {
+        if (value.isBlank()) {
+            installedApps
+        } else {
+            installedApps.filter {
+                it.label.contains(value, ignoreCase = true) ||
+                    it.packageName.contains(value, ignoreCase = true)
+            }
+        }
+    }
+
+    Box(modifier = modifier) {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp),
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(text = stringResource(R.string.shizuku_package_name)) },
+            singleLine = true,
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontFamily = FontFamily.Monospace,
+            ),
+            trailingIcon = {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = if (expanded) {
+                            GetoIcons.ExpandLess
+                        } else {
+                            GetoIcons.ExpandMore
+                        },
+                        contentDescription = stringResource(R.string.shizuku_choose_app),
+                    )
+                }
+            },
+        )
+
+        DropdownMenu(
+            modifier = Modifier.heightIn(max = 360.dp),
+            expanded = expanded && matches.isNotEmpty(),
+            onDismissRequest = { expanded = false },
+        ) {
+            matches.forEach { app ->
+                DropdownMenuItem(
+                    text = {
+                        Column {
+                            Text(
+                                text = app.label,
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+
+                            Text(
+                                text = app.packageName,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = FontFamily.Monospace,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    },
+                    leadingIcon = {
+                        AsyncImage(
+                            modifier = Modifier.size(36.dp),
+                            model = app.icon,
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        onSelectApp(app)
+
+                        expanded = false
+                    },
+                )
+            }
+        }
+    }
+}
+
+private fun List<InstalledAppData>.labelOf(packageName: String): String? = firstOrNull { it.packageName == packageName }?.label
 
 /**
  * [secret] masks the value like a password and adds a reveal toggle. The auth key is the
@@ -541,7 +793,13 @@ private fun AboutSection(modifier: Modifier = Modifier) {
     }
 }
 
-/** The Shizuku explanation, with the fork name as a link to its release page. */
+/**
+ * The Shizuku explanation, with each named fork linked to its own release page.
+ *
+ * Two links rather than one because the choice between them is the whole point of the
+ * section below, and a reader who has only heard of one of the two forks needs to be able
+ * to go and look at the other.
+ */
 @Composable
 private fun shizukuDescription(): AnnotatedString {
     val linkStyles = linkStyles()
@@ -550,18 +808,27 @@ private fun shizukuDescription(): AnnotatedString {
 
     val needs = stringResource(R.string.shizuku_needs)
 
-    val forkName = stringResource(R.string.shizuku_fork_link)
+    val thedjchi = stringResource(R.string.shizuku_fork_thedjchi)
 
-    return remember(description, needs, forkName, linkStyles) {
+    val shevery = stringResource(R.string.shizuku_fork_shevery)
+
+    val suffix = stringResource(R.string.shizuku_forks_suffix)
+
+    return remember(description, needs, thedjchi, shevery, suffix, linkStyles) {
         buildAnnotatedString {
             append(description)
             append(" ")
             append(needs)
             append(" ")
-            withLink(LinkAnnotation.Url(url = SHIZUKU_FORK_URL, styles = linkStyles)) {
-                append(forkName)
+            withLink(LinkAnnotation.Url(url = SHIZUKU_THEDJCHI_URL, styles = linkStyles)) {
+                append(thedjchi)
             }
-            append(".")
+            append(" / ")
+            withLink(LinkAnnotation.Url(url = SHIZUKU_SHEVERY_URL, styles = linkStyles)) {
+                append(shevery)
+            }
+            append(" ")
+            append(suffix)
         }
     }
 }

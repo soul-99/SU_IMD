@@ -17,8 +17,19 @@
  */
 package com.android.geto.domain.framework
 
+import com.android.geto.domain.model.InstalledAppData
+
 interface PackageManagerWrapper {
     suspend fun getActivityIcon(componentName: String): ByteArray?
+
+    /**
+     * Every installed application, with its label and a small icon, sorted by label.
+     *
+     * Deliberately not limited to packages with a launcher entry: a Shizuku install
+     * hidden by a stealth build has no launcher icon, and that is precisely the install
+     * someone is trying to name in the picker this feeds.
+     */
+    suspend fun getInstalledApps(): List<InstalledAppData>
 
     /**
      * Last-update time for every installed package, keyed by package name.

@@ -29,6 +29,7 @@ data class UserData(
     val favouriteAppsView: FavouriteAppsView,
     val favouriteAppsTapAction: FavouriteAppsTapAction,
     val restartShizuku: Boolean,
+    val shizukuForkMode: ShizukuForkMode,
     val shizukuAuthKey: String,
     val shizukuPackageName: String,
     val shizukuStartAction: String,

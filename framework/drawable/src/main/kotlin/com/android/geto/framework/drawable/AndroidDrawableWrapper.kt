@@ -20,5 +20,15 @@ package com.android.geto.framework.drawable
 import android.graphics.drawable.Drawable
 
 interface AndroidDrawableWrapper {
-    suspend fun toByteArray(drawable: Drawable): ByteArray
+    /**
+     * [size] is the square the icon is rasterised into. It defaults to the size the app
+     * lists and shortcuts need; a picker showing a small row can ask for less rather than
+     * paying for hundreds of full-size bitmaps it will only draw at 40dp.
+     */
+    suspend fun toByteArray(drawable: Drawable, size: Int = DEFAULT_ICON_SIZE): ByteArray
+
+    companion object {
+        /** 192px covers a 56dp icon at xxxhdpi and a notification large icon. */
+        const val DEFAULT_ICON_SIZE = 192
+    }
 }

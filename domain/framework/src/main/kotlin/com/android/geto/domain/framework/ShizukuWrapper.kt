@@ -38,10 +38,11 @@ interface ShizukuWrapper {
     /**
      * Fires the "start Shizuku" broadcast at the Shizuku manager app.
      *
-     * This targets the intent API in thedjchi's Shizuku fork: an explicit broadcast
-     * with action "$packageName.START" carrying the string extra "auth". The token
-     * is the one shown under "View intents" in Shizuku. Vanilla RikkaApps Shizuku
-     * does not listen for this, in which case the broadcast is simply ignored.
+     * Two fork families are supported. thedjchi's listens for an explicit broadcast
+     * carrying the string extra "auth", the token shown under "View intents"; Shevery
+     * and the forks alongside it expose a start action with no token, so [authKey] is
+     * blank and the extra is left off. Vanilla RikkaApps Shizuku listens for neither,
+     * in which case there is no receiver to resolve and this returns false.
      *
      * Returns false when the manager package is not installed or the broadcast
      * could not be sent.

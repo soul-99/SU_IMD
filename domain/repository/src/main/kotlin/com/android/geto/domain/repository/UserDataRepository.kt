@@ -21,6 +21,7 @@ package com.android.geto.domain.repository
 import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.ManualRevertTarget
+import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
@@ -53,6 +54,8 @@ interface UserDataRepository {
     suspend fun updateFavouriteAppsTapAction(favouriteAppsTapAction: FavouriteAppsTapAction)
 
     suspend fun updateRestartShizuku(restartShizuku: Boolean)
+
+    suspend fun updateShizukuForkMode(shizukuForkMode: ShizukuForkMode)
 
     suspend fun updateShizukuAuthKey(shizukuAuthKey: String)
 

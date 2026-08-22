@@ -51,13 +51,19 @@ internal class DefaultShizukuWrapper @Inject constructor(
         action: String,
         authKey: String,
     ): Boolean = withContext(ioDispatcher) {
-        if (packageName.isBlank() || action.isBlank() || authKey.isBlank()) {
+        if (packageName.isBlank() || action.isBlank()) {
             return@withContext false
         }
 
         val intent = Intent(action).apply {
             setPackage(packageName)
-            putExtra(ShizukuWrapper.EXTRA_AUTH, authKey)
+            // Only thedjchi's fork authenticates the broadcast. Shevery and the others
+            // have no token, and sending an empty one is worse than sending none: it
+            // makes an unauthenticated contract look like a misconfigured authenticated
+            // one in a bug report.
+            if (authKey.isNotBlank()) {
+                putExtra(ShizukuWrapper.EXTRA_AUTH, authKey)
+            }
             // Shizuku's manager process is very often not running at this point, and a
             // broadcast is dropped for a stopped package unless this flag is set.
             addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)

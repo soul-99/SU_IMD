@@ -22,6 +22,7 @@ import com.android.geto.data.datastore.UserPreferencesDataSource
 import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.ManualRevertTarget
+import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
@@ -83,6 +84,10 @@ class DefaultUserDataRepository @Inject constructor(
 
     override suspend fun updateRestartShizuku(restartShizuku: Boolean) {
         userPreferencesDataSource.updateRestartShizuku(restartShizuku = restartShizuku)
+    }
+
+    override suspend fun updateShizukuForkMode(shizukuForkMode: ShizukuForkMode) {
+        userPreferencesDataSource.updateShizukuForkMode(shizukuForkMode = shizukuForkMode)
     }
 
     override suspend fun updateShizukuAuthKey(shizukuAuthKey: String) {

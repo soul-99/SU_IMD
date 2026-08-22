@@ -32,7 +32,15 @@ import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.FavouriteAppsOrdering
 import com.android.geto.domain.model.LauncherAppsActivityInfo
+import com.android.geto.domain.model.InstalledAppData
 import com.android.geto.domain.model.SettingType
+import com.android.geto.domain.model.ShizukuForkDefaults
+import com.android.geto.domain.model.ShizukuForkMode
+import com.android.geto.domain.model.Theme
+import com.android.geto.domain.model.UserData
+import com.android.geto.domain.model.FavouriteAppsTapAction
+import com.android.geto.domain.model.FavouriteAppsView
+import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
@@ -799,6 +807,164 @@ private fun settingSnapshotTests() {
     )
 }
 
+// ---------------------------------------------------------------------------------
+// Shizuku fork selection
+// ---------------------------------------------------------------------------------
+
+private fun forkApp(label: String, packageName: String) = InstalledAppData(
+    packageName = packageName,
+    label = label,
+    icon = null,
+)
+
+private val SHIZUKU_APP = forkApp("Shizuku", "moe.shizuku.privileged.api")
+private val SHEVERY_APP = forkApp("Shevery", "com.hamondev.shevery")
+private val RENAMED_SHIZUKU = forkApp("Shizuku", "com.uzuku")
+private val UNRELATED = forkApp("Bitwarden", "com.x8bit.bitwarden")
+
+private fun userData(
+    forkMode: ShizukuForkMode,
+    packageName: String = "moe.shizuku.privileged.api",
+    startAction: String = ShizukuForkDefaults.THEDJCHI_ACTION,
+    authKey: String = "",
+) = UserData(
+    theme = Theme.FOLLOW_SYSTEM,
+    dynamicTheme = false,
+    sortLauncherAppsActivityInfo = SortLauncherAppsActivityInfo.Name,
+    sortOrderLauncherAppsActivityInfo = SortOrderLauncherAppsActivityInfo.Ascending,
+    showSystem = false,
+    favouriteComponentNames = emptyList(),
+    sortFavouriteApps = SortFavouriteApps.Custom,
+    favouriteAppsView = FavouriteAppsView.List,
+    favouriteAppsTapAction = FavouriteAppsTapAction.TapToLaunch,
+    restartShizuku = false,
+    shizukuForkMode = forkMode,
+    shizukuAuthKey = authKey,
+    shizukuPackageName = packageName,
+    shizukuStartAction = startAction,
+    managedAccessibilityServices = emptyList(),
+    heldAccessibilityServices = emptyMap(),
+    manualRevertTargets = emptySet(),
+    settingStateBefore = emptyMap(),
+    tipShown = false,
+)
+
+private fun shizukuForkDefaultsTests() {
+    val forkInstalled = listOf(UNRELATED, SHIZUKU_APP, SHEVERY_APP)
+
+    checkEquals(
+        "thedjchi mode picks the app labelled Shizuku",
+        "moe.shizuku.privileged.api",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Thedjchi, forkInstalled),
+    )
+
+    checkEquals(
+        "other mode prefers Shevery over Shizuku",
+        "com.hamondev.shevery",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Other, forkInstalled),
+    )
+
+    checkEquals(
+        "other mode falls back to Shizuku when Shevery is absent",
+        "moe.shizuku.privileged.api",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Other, listOf(UNRELATED, SHIZUKU_APP)),
+    )
+
+    checkEquals(
+        "a renamed package is still found by its label",
+        "com.uzuku",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Thedjchi, listOf(RENAMED_SHIZUKU)),
+    )
+
+    checkEquals(
+        "nothing plausible installed leaves the field blank",
+        "",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Thedjchi, listOf(UNRELATED)),
+    )
+
+    checkEquals(
+        "unset picks nothing",
+        "",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Unset, forkInstalled),
+    )
+
+    checkEquals(
+        "thedjchi action does not depend on the package label",
+        ShizukuForkDefaults.THEDJCHI_ACTION,
+        ShizukuForkDefaults.actionFor(ShizukuForkMode.Thedjchi, "Shevery"),
+    )
+
+    checkEquals(
+        "Shevery gets its own action",
+        ShizukuForkDefaults.SHEVERY_ACTION,
+        ShizukuForkDefaults.actionFor(ShizukuForkMode.Other, "Shevery"),
+    )
+
+    checkEquals(
+        "a Shizuku-labelled app in other mode gets the Shizuku action",
+        ShizukuForkDefaults.THEDJCHI_ACTION,
+        ShizukuForkDefaults.actionFor(ShizukuForkMode.Other, "Shizuku"),
+    )
+
+    checkEquals(
+        "an unrecognised fork in other mode defaults to Shevery's action",
+        ShizukuForkDefaults.SHEVERY_ACTION,
+        ShizukuForkDefaults.actionFor(ShizukuForkMode.Other, "Something Else"),
+    )
+
+    checkEquals(
+        "a missing label in other mode still yields an action",
+        ShizukuForkDefaults.SHEVERY_ACTION,
+        ShizukuForkDefaults.actionFor(ShizukuForkMode.Other, null),
+    )
+
+    checkEquals(
+        "label matching ignores case and surrounding space",
+        "com.hamondev.shevery",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Other, listOf(forkApp("  shevery ", "com.hamondev.shevery"))),
+    )
+
+    check("only thedjchi authenticates", ShizukuForkMode.Thedjchi.requiresAuthKey)
+    check("other forks do not authenticate", !ShizukuForkMode.Other.requiresAuthKey)
+    check("unset does not authenticate", !ShizukuForkMode.Unset.requiresAuthKey)
+}
+
+private fun shizukuConfiguredTests() {
+    check(
+        "unset is never configured, however full the fields are",
+        !userData(ShizukuForkMode.Unset, authKey = "token").isShizukuConfigured,
+    )
+
+    check(
+        "thedjchi without an auth key is not configured",
+        !userData(ShizukuForkMode.Thedjchi).isShizukuConfigured,
+    )
+
+    check(
+        "thedjchi with an auth key is configured",
+        userData(ShizukuForkMode.Thedjchi, authKey = "token").isShizukuConfigured,
+    )
+
+    check(
+        "other forks need no auth key",
+        userData(
+            ShizukuForkMode.Other,
+            packageName = "com.hamondev.shevery",
+            startAction = ShizukuForkDefaults.SHEVERY_ACTION,
+        ).isShizukuConfigured,
+    )
+
+    check(
+        "a blank package is never configured",
+        !userData(ShizukuForkMode.Other, packageName = "").isShizukuConfigured,
+    )
+
+    check(
+        "a blank action is never configured",
+        !userData(ShizukuForkMode.Other, startAction = "").isShizukuConfigured,
+    )
+}
+
 fun main() {
     accessibilityHoldTests()
     accessibilityReleaseTests()
@@ -811,6 +977,8 @@ fun main() {
     manualRevertTests()
     accessibilityEnableTests()
     settingSnapshotTests()
+    shizukuForkDefaultsTests()
+    shizukuConfiguredTests()
 
     println("passed: $passed")
 

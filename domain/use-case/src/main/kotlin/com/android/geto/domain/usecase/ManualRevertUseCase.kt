@@ -27,13 +27,14 @@ import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.ManualRevertResult
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.SettingType
+import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.repository.UserDataRepository
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /** Same reason as the automatic revert: adbd has to restart and re-advertise first. */
 private const val SHIZUKU_START_DELAY_MILLIS = 1_500L
@@ -163,7 +164,7 @@ class ManualRevertUseCase @Inject constructor(
     private suspend fun startShizuku(waitForAdbd: Boolean): Boolean {
         val userData = userDataRepository.userData.first()
 
-        if (userData.shizukuAuthKey.isBlank()) return false
+        if (!userData.isShizukuConfigured) return false
 
         if (waitForAdbd) delay(SHIZUKU_START_DELAY_MILLIS)
 
