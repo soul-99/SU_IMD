@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -130,6 +131,15 @@ internal fun SettingsToHideDialog(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // First, and in the error colour, because it is the one note here that means
+            // "you may be in the wrong place entirely". Everything else in this dialog is
+            // device-wide by design; someone who wanted per-app settings will otherwise
+            // tick these boxes and wonder why every app gets the same treatment.
+            InfoLine(
+                text = AnnotatedString(stringResource(R.string.settings_to_hide_info_per_app)),
+                color = MaterialTheme.colorScheme.error,
+            )
+
             InfoLine(text = AnnotatedString(stringResource(R.string.settings_to_hide_info_all)))
 
             InfoLine(
@@ -197,13 +207,17 @@ private fun SettingToHideRow(
  * A note that is about the list as a whole rather than about one row.
  *
  * Marked with an information icon rather than indented or italicised, so it cannot be read
- * as another item to tick — the first of these is specifically warning against ticking
- * only one of them.
+ * as another item to tick — one of these is specifically warning against ticking only one
+ * of them.
+ *
+ * [color] tints the icon and the text together. Anything other than the default reads as a
+ * warning, so it should stay rare: three coloured lines in a row would tell the eye nothing.
  */
 @Composable
 private fun InfoLine(
     modifier: Modifier = Modifier,
     text: AnnotatedString,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     Row(
         modifier = modifier
@@ -214,7 +228,7 @@ private fun InfoLine(
             modifier = Modifier.size(16.dp),
             imageVector = GetoIcons.Info,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = color,
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -222,7 +236,7 @@ private fun InfoLine(
         Text(
             text = text,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = color,
         )
     }
 }

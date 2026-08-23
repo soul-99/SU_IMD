@@ -1,0 +1,33 @@
+Some apps refuse to start — or quietly disable parts of themselves — when they notice that developer options are on, that an ADB connection is active, or that an accessibility service is running. Banking apps are the usual culprits. The usual workaround is to go into Android's settings, switch those things off, open the app, and switch them all back on afterwards. Every single time.
+
+(SU) IMD does that part for you. Pick an app, say which settings should change while it runs, and launch it from IMD. The settings are applied, the app opens, and an ongoing notification with a Revert action puts your device back the way it was.
+
+IMD services manager
+
+The other half of the app is one dialog showing the live state of developer settings, USB debugging, wireless debugging, your managed accessibility services and the Shizuku service, with a switch on each and a Revert to default button at the bottom. It opens from a Quick Settings tile, a homescreen shortcut or the Favourites tab, without the app itself having to be open — which is what you reach for when an app has just refused to start and you would rather not go hunting through Android's settings to find out why.
+
+Features
+
+* Per-app profiles of Android system, secure and global settings.
+* Two ways back: setting memory, which restores exactly what each app changed, or Revert to default, which returns everything to one state you configure once.
+* Accessibility services can be hidden per service, and are actually stopped rather than only listed.
+* Shizuku service restart, including forks that support start-service intents.
+* A Favourites tab: short press opens an app with its settings applied, long press creates a homescreen shortcut for it.
+* Quick Settings tiles and homescreen shortcuts for both the services manager and Revert to default.
+* A searchable, sortable list of every installed app, and a browsable copy of the device's current settings.
+
+Setup
+
+IMD needs the WRITE_SECURE_SETTINGS permission, granted once from a PC:
+
+adb shell pm grant com.soul_99.suIMD android.permission.WRITE_SECURE_SETTINGS
+
+With no PC available, tap Use Shizuku on the first-run screen and it runs that command for you. The grant survives reboots, but not a reinstall. No root is required.
+
+Privacy
+
+The app has no internet permission at all, so it cannot talk to a network even if it wanted to. There are no ads, no analytics, no trackers, no accounts and nothing to sign in to. Because it has no network access it also cannot check for its own updates — Obtainium or your F-Droid client is how you find out there is one.
+
+Credit
+
+(SU) IMD is a fork of Geto by Jack Eblan, licensed GPL-3.0. The original design and the great majority of the code are his. This fork rebuilds the parts that did not survive real use: Shizuku dying along with USB debugging, accessibility services that were listed but never stopped, and a quick way to put everything back from outside the app.

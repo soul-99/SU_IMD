@@ -120,6 +120,7 @@
     <string name="settings_to_hide_description">These settings are hidden when you launch an app.</string>
     <string name="settings_to_hide_summary">%1$d of %2$d switched on</string>
     <string name="settings_to_hide_usb_note">stopping USB debugging will also kill Shizuku service(if running), please configure Shizuku settings under IMD app to restart the Shizuku service after Revert</string>
+    <string name="settings_to_hide_info_per_app">If you want to hide different settings per individual app, please use memory function in IMD settings &gt; Advanced &gt; Notification function</string>
     <string name="settings_to_hide_info_all">Hiding only developer settings does not turn off USB and wireless debugging, and some apps might still detect that as developer settings turned on, so it is recommended to select all three</string>
     <string name="settings_to_hide_info_shizuku">to hide Shizuku from apps use the Hide Shizuku from other apps function within the Shizuku app.</string>
     <string name="settings_to_hide_name_shizuku_hide">Hide Shizuku from other apps</string>

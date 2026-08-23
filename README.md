@@ -4,10 +4,6 @@
 
 ## Description
 
-<p>
-  <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the Favourites tab, creating a shortcut, the IMD services manager, the settings screen and the Quick Settings tiles">
-</p>
-
 Open banking and other locked-down apps without turning developer options, USB debugging, wireless debugging or your accessibility services off by hand every single time.
 
 Some apps refuse to run — or quietly disable parts of themselves — when they detect developer options, an ADB connection or an active accessibility service. The usual workaround is to go and switch those things off before opening the app and switch them back on afterwards, every time. IMD does that for you: pick an app, say which settings should change while it runs, and launch it from here. The settings are applied, the app opens, and an ongoing notification with a **Revert** action puts your device back the way it was.
@@ -39,6 +35,9 @@ adb shell pm grant com.soul_99.suIMD android.permission.WRITE_SECURE_SETTINGS
 
 or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that command for you. The screen also shows the command with a copy button and re-checks itself when you come back, so you never have to type it twice. The grant survives reboots but not a reinstall.
 
+<p>
+  <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the Favourites tab, creating a shortcut, the IMD services manager, the settings screen and the Quick Settings tiles">
+</p>
 
 ## Functions
 
@@ -105,9 +104,11 @@ This app is a fork of **[Geto](https://github.com/JackEblan/Geto)** by **Jack Eb
 ## The future of this fork
 
 I'm a radiology resident doctor, not a software developer. Writing software is a hobby, and this app
-exists because I wanted it to exist for myself — so please don't expect future builds,
-regular updates, or fixes for problems on devices I don't own. If it works for you, good; if
-it breaks, I may well not be able to help.
+exists because I wanted it to exist for myself. I have made multiple revisions after testing every
+build, fixing bugs and adding features, making the app what it is now — on par with my expectations.
+Please know that it will take some time for me to reply to queries, fix bugs and add new features in
+future builds, so please be patient. But I do plan to maintain this app for the near future, until
+someone else makes a better app for the same purpose.
 
 The source is all here under the GPL-3.0. Use it freely for your own purposes — build it,
 change it, fork it, keep the changes to yourself or pass them on. That is what it is for.

@@ -1,0 +1,1 @@
+Open banking and other apps that refuse to run with developer options on

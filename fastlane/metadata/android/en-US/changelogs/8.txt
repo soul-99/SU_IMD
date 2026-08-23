@@ -1,0 +1,8 @@
+v1.6
+
+* Default configuration for both Settings to hide and Settings to unhide on Revert.
+* Favourites: short press opens the app, long press creates a shortcut.
+* Services manager: long press Revert to default to configure it; the Accessibility toggle greys out when no services are selected.
+* Settings reorganised — App functions is now Default IMD settings and opens expanded.
+* Shortcut labels autofilled with the app's own name.
+* Notifications now say IMD.
