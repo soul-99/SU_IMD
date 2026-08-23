@@ -1,0 +1,3 @@
+v1.6.1
+
+* The Settings to hide dialog now says, in red, that it applies to every app, and points to the memory function under Advanced > Notification function for anyone who wants different settings hidden per app.
