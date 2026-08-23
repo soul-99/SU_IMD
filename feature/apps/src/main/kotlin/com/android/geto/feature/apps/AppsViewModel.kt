@@ -20,13 +20,19 @@ package com.android.geto.feature.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.geto.domain.framework.PackageManagerWrapper
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
 import com.android.geto.domain.repository.UserDataRepository
+import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
+import com.android.geto.domain.usecase.ApplySettingsToHideUseCase
 import com.android.geto.domain.usecase.GetLauncherAppsActivityInfosUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -36,9 +42,30 @@ import javax.inject.Inject
 @HiltViewModel
 class AppsViewModel @Inject constructor(
     getLauncherAppsActivityInfosUseCase: GetLauncherAppsActivityInfosUseCase,
+    private val applyAppSettingsUseCase: ApplyAppSettingsUseCase,
+    private val applySettingsToHideUseCase: ApplySettingsToHideUseCase,
+    private val packageManagerWrapper: PackageManagerWrapper,
     private val userDataRepository: UserDataRepository,
 ) : ViewModel() {
     private var _textFlow = MutableStateFlow<String?>(null)
+
+    private val _appLaunch = MutableStateFlow<FavouriteAppLaunch?>(null)
+    val appLaunch = _appLaunch.asStateFlow()
+
+    /**
+     * Which mode the list is in, for deciding what a long press offers.
+     *
+     * Exposed on its own rather than folded into [appsUiState] because it changes nothing
+     * about the list itself -- the rows, their order and their search are identical either
+     * way, and only the gesture behind them differs.
+     */
+    val notificationFunction = userDataRepository.userData
+        .map { it.notificationFunction }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            NotificationFunction.Default,
+        )
 
     val appsUiState =
         getLauncherAppsActivityInfosUseCase(textFlow = _textFlow).map(AppsUiState::Success).stateIn(
@@ -46,6 +73,44 @@ class AppsViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             AppsUiState.Loading,
         )
+
+    /**
+     * The same launch the Favourites tab performs, for the same reason: opening an app from
+     * a list inside this app without first hiding what it objects to would look exactly
+     * like the app not working.
+     *
+     * All apps could not launch anything before -- tapping a row opened its profile screen.
+     * With one device-wide configuration there is no profile to open for most people, so
+     * the tap has to do the useful thing instead.
+     */
+    fun launchApp(componentName: String) {
+        viewModelScope.launch {
+            val notificationFunction = userDataRepository.userData.first().notificationFunction
+
+            val result = when (notificationFunction) {
+                NotificationFunction.RevertToDefault -> applySettingsToHideUseCase()
+
+                NotificationFunction.Memory -> {
+                    applyAppSettingsUseCase(componentName = componentName)
+                }
+            }
+
+            val icon = packageManagerWrapper.getActivityIcon(componentName = componentName)
+
+            _appLaunch.update {
+                FavouriteAppLaunch(
+                    componentName = componentName,
+                    result = result,
+                    icon = icon,
+                    notificationFunction = notificationFunction,
+                )
+            }
+        }
+    }
+
+    fun consumeAppLaunch() {
+        _appLaunch.update { null }
+    }
 
     fun search(text: String) {
         _textFlow.update { text }

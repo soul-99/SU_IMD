@@ -330,6 +330,7 @@ internal fun AppSettingsScreen(
         GetPinShortcutResult.RequestPinShortcut -> {
             RequestPinShortcutDialog(
                 icon = activityIcon,
+                activityLabel = appSettingsRouteData.activityLabel,
                 onDismissRequest = onResetGetPinShortcutResult,
                 onRequestPinShortcut = onRequestPinShortcut,
             )

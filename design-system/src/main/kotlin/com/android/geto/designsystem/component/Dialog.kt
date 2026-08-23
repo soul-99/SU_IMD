@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 @Composable
 fun DialogContainer(
@@ -32,10 +33,17 @@ fun DialogContainer(
     shape: Shape = AlertDialogDefaults.shape,
     containerColor: Color = AlertDialogDefaults.containerColor,
     tonalElevation: Dp = AlertDialogDefaults.TonalElevation,
+    fullScreen: Boolean = false,
     onDismissRequest: () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    Dialog(onDismissRequest = onDismissRequest) {
+    // usePlatformDefaultWidth is what caps a dialog at the platform's dialog width. Left
+    // on, a "full screen" dialog is still an inset box; turned off, the caller's own
+    // fillMaxSize decides, which is what the help page needs.
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(usePlatformDefaultWidth = !fullScreen),
+    ) {
         Surface(
             modifier = modifier,
             shape = shape,

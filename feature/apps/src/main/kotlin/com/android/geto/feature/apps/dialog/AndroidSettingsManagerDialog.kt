@@ -18,7 +18,10 @@
  */
 package com.android.geto.feature.apps.dialog
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +40,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -75,6 +79,7 @@ private const val SHIZUKU_ATTEMPTS_BEFORE_HELP = 2
  * button was two steps to do what one switch now does directly, and the switches have to
  * exist anyway to show the live state.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun AndroidSettingsManagerDialog(
     modifier: Modifier = Modifier,
@@ -82,10 +87,13 @@ internal fun AndroidSettingsManagerDialog(
     busy: Boolean,
     shizukuStarting: Boolean,
     shizukuStartFailed: Boolean,
+    accessibilityManaged: Boolean,
     onDismissRequest: () -> Unit,
     onSetEnabled: (ManualRevertTarget, Boolean) -> Unit,
     onOpen: (ManualRevertTarget) -> Unit,
     onRevertToDefault: () -> Unit,
+    onOpenRevertConfiguration: () -> Unit,
+    onAccessibilityUnmanaged: () -> Unit,
 ) {
     var showShizukuHelp by remember { mutableStateOf(false) }
 
@@ -110,16 +118,40 @@ internal fun AndroidSettingsManagerDialog(
                 .fillMaxWidth()
                 .padding(10.dp),
         ) {
-            Text(
+            // The app's own icon, as the launcher draws it. This dialog is usually opened
+            // from a tile or a shortcut, over somebody else's app, with nothing else on
+            // screen to say which app just put a dialog in front of them.
+            Row(
                 modifier = Modifier.padding(10.dp),
-                text = stringResource(R.string.settings_manager_title),
-                style = MaterialTheme.typography.titleLarge,
-            )
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    modifier = Modifier.size(32.dp),
+                    painter = painterResource(designR.drawable.ic_imd_app),
+                    contentDescription = null,
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Text(
+                    text = stringResource(R.string.settings_manager_title),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
             ManualRevertTarget.entries.forEach { target ->
                 val isShizuku = target == ManualRevertTarget.Shizuku
+
+                // Nothing is managed, so there is nothing this switch could do. Shown off
+                // and greyed rather than hidden: the row is what tells the user the
+                // capability exists and is unconfigured, and its own note points at where
+                // to configure it. Forced off regardless of the revert configuration --
+                // a configuration saying "restore accessibility services" cannot restore
+                // an empty list, and a switch reading on would be describing nothing.
+                val accessibilityUnmanaged =
+                    target == ManualRevertTarget.AccessibilityServices && !accessibilityManaged
 
                 TargetRow(
                     target = target,
@@ -131,18 +163,21 @@ internal fun AndroidSettingsManagerDialog(
                     // the two to show for a beat: it invites a press that helps, where a
                     // wrong "on" invites the user to walk away from a device still locked
                     // down.
-                    enabled = states.isEnabled(target),
+                    enabled = states.isEnabled(target) && !accessibilityUnmanaged,
                     // Shizuku is the only row that can be switched off in the sense of
                     // "there is nothing here to control".
                     // Locked while an attempt is in flight. The switch already reads on and
                     // the outcome is a few seconds away; letting it be pressed again would
                     // queue a second attempt against a service that is still deciding.
-                    usable = !busy &&
+                    usable = !busy && !accessibilityUnmanaged &&
                         (!isShizuku || (states.shizukuAvailable && !shizukuStarting)),
-                    onClickWhenUnusable = if (isShizuku) {
-                        { showShizukuHelp = true }
-                    } else {
-                        null
+                    onClickWhenUnusable = when {
+                        accessibilityUnmanaged -> onAccessibilityUnmanaged
+                        isShizuku -> {
+                            { showShizukuHelp = true }
+                        }
+
+                        else -> null
                     },
                     onSetEnabled = { wanted ->
                         if (isShizuku && wanted) {
@@ -174,22 +209,37 @@ internal fun AndroidSettingsManagerDialog(
                 // Deliberately does not dismiss. The rows below are polled live, so staying
                 // open is what shows the revert happening — closing would hide the one piece
                 // of feedback the action has.
-                Button(
-                    onClick = onRevertToDefault,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                // A Surface rather than a Button, only because Button has no long press and
+                // this one needs one: holding it opens the configuration that decides what
+                // the short press will do. Everything else here is Button's own shape,
+                // colours and content padding, so it still reads as the filled button it
+                // was.
+                Surface(
+                    modifier = Modifier.combinedClickable(
+                        onClick = onRevertToDefault,
+                        onLongClick = onOpenRevertConfiguration,
+                        onLongClickLabel = stringResource(
+                            R.string.settings_manager_configure_revert,
+                        ),
                     ),
+                    shape = ButtonDefaults.shape,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 ) {
-                    Icon(
-                        modifier = Modifier.size(18.dp),
-                        painter = painterResource(designR.drawable.ic_revert_glyph),
-                        contentDescription = null,
-                    )
+                    Row(
+                        modifier = Modifier.padding(ButtonDefaults.ContentPadding),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(18.dp),
+                            painter = painterResource(designR.drawable.ic_revert_glyph),
+                            contentDescription = null,
+                        )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
-                    Text(text = stringResource(R.string.revert_to_default))
+                        Text(text = stringResource(R.string.revert_to_default))
+                    }
                 }
 
                 TextButton(onClick = onDismissRequest) {

@@ -30,6 +30,7 @@ import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.RevertDefaults
 import com.android.geto.domain.model.SettingSnapshot
+import com.android.geto.domain.model.SettingsToHide
 import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.FavouriteAppsOrdering
@@ -40,7 +41,6 @@ import com.android.geto.domain.model.ShizukuForkDefaults
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.model.UserData
-import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.model.SortFavouriteApps
@@ -855,7 +855,6 @@ private fun userData(
     favouriteComponentNames = emptyList(),
     sortFavouriteApps = SortFavouriteApps.Custom,
     favouriteAppsView = FavouriteAppsView.List,
-    favouriteAppsTapAction = FavouriteAppsTapAction.TapToLaunch,
     restartShizuku = false,
     shizukuForkMode = forkMode,
     shizukuAuthKey = authKey,
@@ -866,6 +865,8 @@ private fun userData(
     manualRevertTargets = emptySet(),
     notificationFunction = NotificationFunction.Default,
     revertDefaults = RevertDefaults.Default,
+    settingsToHide = SettingsToHide.Default,
+    notificationFunctionResetV16 = true,
     shizukuStartFailed = false,
     settingStateBefore = emptyMap(),
     tipShown = false,
@@ -1243,6 +1244,111 @@ private fun revertDefaultsTests() {
     )
 }
 
+/**
+ * "Settings to hide" — the device-wide configuration applied on the way into any app.
+ *
+ * Its rules differ from [RevertDefaults] in two ways that are easy to get wrong by copying
+ * one from the other, so both are pinned here: it covers four targets rather than five, and
+ * it defaults to all of them on rather than to a conservative subset.
+ */
+private fun settingsToHideTests() {
+    // 51. Shizuku is not a target. It is not a setting an app reads, and hiding it belongs
+    // to Shizuku's own "Hide Shizuku from other apps" switch — offering a toggle here would
+    // promise something this app cannot do.
+    check(
+        "Shizuku is not one of the targets",
+        ManualRevertTarget.Shizuku !in SettingsToHide.Targets,
+    )
+    checkEquals("there are exactly four targets", 4, SettingsToHide.Targets.size)
+
+    // 52. All four on by default, unlike the revert configuration. Hiding only some of them
+    // is the case that fails without any way to diagnose it: the app still sees developer
+    // mode and still refuses to run, having changed the device for nothing.
+    checkEquals(
+        "an empty configuration falls back to the default",
+        SettingsToHide.Default,
+        SettingsToHide.decode(emptyList()),
+    )
+    check(
+        "every target is hidden by default",
+        SettingsToHide.Default.values.all { it },
+    )
+    checkEquals(
+        "the default covers every target, so decode can never be missing one",
+        SettingsToHide.Targets.toSet(),
+        SettingsToHide.Default.keys,
+    )
+
+    // 53. Off is switched in the reverse of the order things are switched on in: developer
+    // options must go last, after the things that live underneath it.
+    checkEquals(
+        "the hide order is the reverse of the target order",
+        SettingsToHide.Targets.reversed(),
+        SettingsToHide.HideOrder,
+    )
+    checkEquals(
+        "developer settings is hidden last",
+        ManualRevertTarget.DeveloperSettings,
+        SettingsToHide.HideOrder.last(),
+    )
+
+    // 54. Every target is written, on or off, so "not hidden" and "not configured" stay
+    // distinct — the same reason the revert configuration stores a state per target.
+    val mixed = mapOf(
+        ManualRevertTarget.DeveloperSettings to true,
+        ManualRevertTarget.UsbDebugging to false,
+        ManualRevertTarget.WirelessDebugging to true,
+        ManualRevertTarget.AccessibilityServices to false,
+    )
+    checkEquals(
+        "encode writes one entry per target",
+        SettingsToHide.Targets.size,
+        SettingsToHide.encode(mixed).size,
+    )
+    checkEquals(
+        "a mixed configuration round-trips",
+        mixed,
+        SettingsToHide.decode(SettingsToHide.encode(mixed)),
+    )
+
+    // 55. Nothing ticked is a real answer — it means "launch apps without hiding anything"
+    // — and must survive the round trip rather than reading back as the default.
+    val allOff = SettingsToHide.Targets.associateWith { false }
+    checkEquals(
+        "all off round-trips rather than falling back to the default",
+        allOff,
+        SettingsToHide.decode(SettingsToHide.encode(allOff)),
+    )
+
+    // 56. Shizuku cannot get in even through stored data written by another version.
+    check(
+        "a stored Shizuku entry is dropped",
+        ManualRevertTarget.Shizuku !in SettingsToHide.decode(listOf("Shizuku=1")).keys,
+    )
+
+    // 57. A downgrade, or a target added later, must not poison the configuration.
+    checkEquals(
+        "an unknown target name is ignored",
+        SettingsToHide.Default,
+        SettingsToHide.decode(listOf("SomethingElse=0")),
+    )
+    checkEquals(
+        "a missing target falls back to its default",
+        true,
+        SettingsToHide.decode(listOf("UsbDebugging=0"))[ManualRevertTarget.DeveloperSettings],
+    )
+    checkEquals(
+        "a stored target still wins over the default",
+        false,
+        SettingsToHide.decode(listOf("UsbDebugging=0"))[ManualRevertTarget.UsbDebugging],
+    )
+    checkEquals(
+        "a malformed entry is ignored",
+        SettingsToHide.Default,
+        SettingsToHide.decode(listOf("=1", "UsbDebugging", "")),
+    )
+}
+
 fun main() {
     accessibilityHoldTests()
     accessibilityReleaseTests()
@@ -1261,6 +1367,7 @@ fun main() {
     launchPackageTests()
     accessibilityLiveStateTests()
     revertDefaultsTests()
+    settingsToHideTests()
 
     println("passed: $passed")
 

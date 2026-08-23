@@ -25,8 +25,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -38,10 +43,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.android.geto.designsystem.component.DialogContainer
+import com.android.geto.designsystem.component.emphasised
+import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.feature.settings.R
 
@@ -72,6 +81,9 @@ internal fun NotificationFunctionDialog(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                // The memory option now carries three caveats under its description, which
+                // on a short screen puts the Save button off the bottom of the dialog.
+                .verticalScroll(rememberScrollState())
                 .padding(10.dp),
         ) {
             Text(
@@ -88,7 +100,12 @@ internal fun NotificationFunctionDialog(
                 NotificationFunctionOption(
                     title = stringResource(R.string.notification_function_revert_option),
                     summary = stringResource(R.string.notification_function_revert_summary),
-                    detail = stringResource(R.string.notification_function_revert_detail),
+                    detail = emphasised(
+                        text = stringResource(R.string.notification_function_revert_detail),
+                        // The same resource the settings list uses for that row, so the
+                        // sentence cannot end up naming something the list does not.
+                        names = listOf(stringResource(R.string.revert_defaults_entry)),
+                    ),
                     selected = choice == NotificationFunction.RevertToDefault,
                     onSelect = { choice = NotificationFunction.RevertToDefault },
                 )
@@ -96,9 +113,44 @@ internal fun NotificationFunctionDialog(
                 NotificationFunctionOption(
                     title = stringResource(R.string.notification_function_memory_option),
                     summary = stringResource(R.string.notification_function_memory_summary),
-                    detail = stringResource(R.string.notification_function_memory_detail),
+                    detail = AnnotatedString(
+                        stringResource(R.string.notification_function_memory_detail),
+                    ),
                     selected = choice == NotificationFunction.Memory,
                     onSelect = { choice = NotificationFunction.Memory },
+                    extra = {
+                        // What this choice costs, then what it buys. Both are things the
+                        // option's own description cannot say, because they are about what
+                        // the *other* mode does for you and stops doing once you leave it.
+                        NoticeLine(
+                            text = emphasised(
+                                text = stringResource(R.string.notification_function_memory_warning_config),
+                                names = listOf(
+                                    stringResource(R.string.notif_name_all_apps),
+                                    stringResource(R.string.notif_name_favourites),
+                                ),
+                            ),
+                            colour = MaterialTheme.colorScheme.error,
+                        )
+
+                        NoticeLine(
+                            text = emphasised(
+                                text = stringResource(R.string.notification_function_memory_warning_revert),
+                                names = listOf(
+                                    stringResource(R.string.notif_name_revert_button),
+                                    stringResource(R.string.revert_defaults_entry),
+                                ),
+                            ),
+                            colour = MaterialTheme.colorScheme.error,
+                        )
+
+                        NoticeLine(
+                            text = AnnotatedString(
+                                stringResource(R.string.notification_function_memory_note),
+                            ),
+                            colour = MaterialTheme.colorScheme.primary,
+                        )
+                    },
                 )
             }
 
@@ -134,9 +186,10 @@ private fun NotificationFunctionOption(
     modifier: Modifier = Modifier,
     title: String,
     summary: String,
-    detail: String,
+    detail: AnnotatedString,
     selected: Boolean,
     onSelect: () -> Unit,
+    extra: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -157,6 +210,47 @@ private fun NotificationFunctionOption(
             Spacer(modifier = Modifier.height(2.dp))
 
             Text(text = detail, style = MaterialTheme.typography.bodySmall)
+
+            if (extra != null) {
+                Spacer(modifier = Modifier.height(6.dp))
+
+                extra()
+            }
         }
+    }
+}
+
+/**
+ * A consequence of picking an option, rather than a description of it.
+ *
+ * Coloured and marked with an icon so it reads as a caveat attached to the option above it
+ * and not as more of that option's description — the wording alone would not carry that,
+ * since a description and a warning are the same shape of sentence.
+ */
+@Composable
+private fun NoticeLine(
+    modifier: Modifier = Modifier,
+    text: AnnotatedString,
+    colour: Color,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp),
+    ) {
+        Icon(
+            modifier = Modifier.size(16.dp),
+            imageVector = GetoIcons.Info,
+            contentDescription = null,
+            tint = colour,
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = colour,
+        )
     }
 }

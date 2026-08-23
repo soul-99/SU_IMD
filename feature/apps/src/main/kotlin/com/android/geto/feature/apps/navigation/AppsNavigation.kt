@@ -17,6 +17,7 @@
  */
 package com.android.geto.feature.apps.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
@@ -34,12 +35,13 @@ fun NavController.navigateToApps() {
 }
 
 fun NavGraphBuilder.appsScreen(
+    snackbarHostState: SnackbarHostState,
     onClickApp: (
         componentName: String,
         activityLabel: String,
     ) -> Unit,
 ) {
     composable<AppsRouteData> {
-        AppsRoute(onClickApp = onClickApp)
+        AppsRoute(snackbarHostState = snackbarHostState, onClickApp = onClickApp)
     }
 }

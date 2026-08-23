@@ -50,6 +50,11 @@ fun GetoNavHost(navController: NavHostController) {
             snackbarHostState = snackbarHostState,
             topLevelDestinations = TopLevelDestination.entries,
             startDestination = FavouriteAppsRouteData::class,
+            // The manager dialog asking for the revert configuration, from a tile or a
+            // shortcut with the app not running, or already open on another tab. Navigating
+            // rather than choosing a start destination is what makes the second and every
+            // later request work as well as the first.
+            onRevertConfigurationRequest = NavHostController::navigateToSettings,
             onClickHomeDestination = { homeNavHostController, homeDestination ->
                 // HomeDestination is an interface, so this when is not checked for
                 // exhaustiveness. The else branch keeps a forgotten tab from crashing.
@@ -66,7 +71,10 @@ fun GetoNavHost(navController: NavHostController) {
                     onClickApp = navController::navigateToAppSettings,
                 )
 
-                appsScreen(onClickApp = navController::navigateToAppSettings)
+                appsScreen(
+                    snackbarHostState = snackbarHostState,
+                    onClickApp = navController::navigateToAppSettings,
+                )
 
                 settingsScreen()
             },

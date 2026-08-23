@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.geto.designsystem.component.DialogContainer
-import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.feature.apps.R
@@ -47,18 +46,21 @@ import com.android.geto.feature.apps.R
  * Every choice here applies the moment it is tapped. Sort and view change what is on
  * screen behind the dialog, so staging them behind an Update button would hide the
  * effect of the choice being made.
+ *
+ * A third group used to choose what a tap and a long press did. That is no longer a
+ * preference: the notification function decides it, because the two modes need different
+ * things behind a long press -- a shortcut in one, a per-app profile in the other -- and a
+ * user-set override could only ever disagree with the mode it was in.
  */
 @Composable
 internal fun FavouriteAppsOptionsDialog(
     modifier: Modifier = Modifier,
     sortFavouriteApps: SortFavouriteApps,
     favouriteAppsView: FavouriteAppsView,
-    favouriteAppsTapAction: FavouriteAppsTapAction,
     canReorder: Boolean,
     onDismissRequest: () -> Unit,
     onUpdateSortFavouriteApps: (SortFavouriteApps) -> Unit,
     onUpdateFavouriteAppsView: (FavouriteAppsView) -> Unit,
-    onUpdateFavouriteAppsTapAction: (FavouriteAppsTapAction) -> Unit,
     onReorderClick: () -> Unit,
 ) {
     DialogContainer(
@@ -112,33 +114,6 @@ internal fun FavouriteAppsOptionsDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OptionLabel(text = stringResource(R.string.default_tap))
-
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                FavouriteAppsTapAction.entries.forEachIndexed { index, entry ->
-                    SegmentedButton(
-                        selected = entry == favouriteAppsTapAction,
-                        onClick = { onUpdateFavouriteAppsTapAction(entry) },
-                        shape = SegmentedButtonDefaults.itemShape(
-                            index = index,
-                            count = FavouriteAppsTapAction.entries.size,
-                        ),
-                    ) {
-                        Text(text = entry.getTitle())
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                text = favouriteAppsTapAction.getDescription(),
-                style = MaterialTheme.typography.bodySmall,
-            )
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -182,16 +157,4 @@ private fun SortFavouriteApps.getTitle() = when (this) {
 private fun FavouriteAppsView.getTitle() = when (this) {
     FavouriteAppsView.List -> stringResource(R.string.list)
     FavouriteAppsView.Grid -> stringResource(R.string.grid)
-}
-
-@Composable
-private fun FavouriteAppsTapAction.getTitle() = when (this) {
-    FavouriteAppsTapAction.TapToLaunch -> stringResource(R.string.tap_to_launch)
-    FavouriteAppsTapAction.TapToModify -> stringResource(R.string.tap_to_modify)
-}
-
-@Composable
-private fun FavouriteAppsTapAction.getDescription() = when (this) {
-    FavouriteAppsTapAction.TapToLaunch -> stringResource(R.string.tap_to_launch_description)
-    FavouriteAppsTapAction.TapToModify -> stringResource(R.string.tap_to_modify_description)
 }

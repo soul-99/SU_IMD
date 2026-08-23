@@ -15,6 +15,16 @@ It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the pa
 - **Licence:** GPL-3.0
 - **No** ads, analytics, trackers, accounts or network access of any kind. The app never talks to the internet.
 
+## Install
+
+Grab the APK from the [releases page](https://github.com/soul-99/SU_IMD/releases), or let [Obtainium](https://github.com/ImranR98/Obtainium) watch that page and update the app for you:
+
+<a href="https://apps.obtainium.imranr.dev/redirect.html?r=obtainium%3A%2F%2Fadd%2Fhttps%3A%2F%2Fgithub.com%2Fsoul-99%2FSU_IMD">
+  <img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="54">
+</a>
+
+The app itself has no network permission, so it cannot check for its own updates — Obtainium is how you find out there is one.
+
 Grant the permission once with a PC:
 
 ```
@@ -43,9 +53,19 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 
 ### Added in this fork
 
-#### v1.5
+v1.1 is the last version published here, so updating from it brings everything below.
 
-Everything since v1.1, the last version published here.
+#### v1.6
+
+* **New ‘Settings to hide’ function**: one list used for every app — tick what should be switched off whenever any app is launched. An app you have never configured now opens correctly, so there is nothing to set up before you can start using the app. All four are ticked to begin with.
+* **Launch from either tab**: a tap launches the app from All apps as well as Favourites.
+* **Long press on an app** creates a homescreen shortcut for it, or opens that app’s own settings template if you use the Memory function.
+* **IMD services manager**: shows the IMD app icon, and long pressing ‘Revert to default’ opens its configuration. The Accessibility services toggle greys out when no services are selected in IMD settings.
+* **Settings reorganised**: ‘App functions’ is now ‘Default IMD settings’, opens expanded, and holds ‘Settings to hide’ and ‘Settings to unhide on Revert’. Notification function moved to Advanced.
+* **Shortcut labels autofilled** with the app’s own name.
+* Notifications now say **IMD** and **Settings hidden/disabled**.
+
+#### v1.5
 
 * **New ‘IMD services manager’ Dialog box**: A new dialog box to view the live status of each setting and services (including Shizuku service), and also allows to toggle them on/off easily.
 * **New ‘Revert to default’ mechanism** (previous revert mechanism is now called ‘memory function’ mechanism): this new mechanism allows to revert all the settings at once to a universal default state which is configured by the user in settings.

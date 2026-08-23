@@ -17,7 +17,6 @@
  */
 package com.android.geto.data.datastore.mapper
 
-import com.android.geto.data.datastore.proto.FavouriteAppsTapActionProto
 import com.android.geto.data.datastore.proto.FavouriteAppsViewProto
 import com.android.geto.data.datastore.proto.NotificationFunctionProto
 import com.android.geto.data.datastore.proto.ShizukuForkModeProto
@@ -25,7 +24,6 @@ import com.android.geto.data.datastore.proto.SortFavouriteAppsProto
 import com.android.geto.data.datastore.proto.SortLauncherAppsActivityInfoProto
 import com.android.geto.data.datastore.proto.SortOrderLauncherAppsActivityInfoProto
 import com.android.geto.data.datastore.proto.ThemeProto
-import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.ShizukuForkMode
@@ -166,30 +164,6 @@ internal fun FavouriteAppsView.asFavouriteAppsViewProto(): FavouriteAppsViewProt
 
     FavouriteAppsView.Grid -> {
         FavouriteAppsViewProto.FavouriteViewGrid
-    }
-}
-
-internal fun FavouriteAppsTapActionProto.asFavouriteAppsTapAction(): FavouriteAppsTapAction = when (this) {
-    FavouriteAppsTapActionProto.FavouriteTapLaunch -> {
-        FavouriteAppsTapAction.TapToLaunch
-    }
-
-    FavouriteAppsTapActionProto.FavouriteTapModify -> {
-        FavouriteAppsTapAction.TapToModify
-    }
-
-    FavouriteAppsTapActionProto.UNRECOGNIZED -> {
-        FavouriteAppsTapAction.TapToLaunch
-    }
-}
-
-internal fun FavouriteAppsTapAction.asFavouriteAppsTapActionProto(): FavouriteAppsTapActionProto = when (this) {
-    FavouriteAppsTapAction.TapToLaunch -> {
-        FavouriteAppsTapActionProto.FavouriteTapLaunch
-    }
-
-    FavouriteAppsTapAction.TapToModify -> {
-        FavouriteAppsTapActionProto.FavouriteTapModify
     }
 }
 

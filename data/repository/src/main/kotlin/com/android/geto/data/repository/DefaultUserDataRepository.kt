@@ -19,7 +19,6 @@
 package com.android.geto.data.repository
 
 import com.android.geto.data.datastore.UserPreferencesDataSource
-import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.NotificationFunction
@@ -79,10 +78,6 @@ class DefaultUserDataRepository @Inject constructor(
         userPreferencesDataSource.updateFavouriteAppsView(favouriteAppsView = favouriteAppsView)
     }
 
-    override suspend fun updateFavouriteAppsTapAction(favouriteAppsTapAction: FavouriteAppsTapAction) {
-        userPreferencesDataSource.updateFavouriteAppsTapAction(favouriteAppsTapAction = favouriteAppsTapAction)
-    }
-
     override suspend fun updateRestartShizuku(restartShizuku: Boolean) {
         userPreferencesDataSource.updateRestartShizuku(restartShizuku = restartShizuku)
     }
@@ -133,6 +128,14 @@ class DefaultUserDataRepository @Inject constructor(
 
     override suspend fun updateRevertDefaults(states: Map<ManualRevertTarget, Boolean>) {
         userPreferencesDataSource.updateRevertDefaults(states = states)
+    }
+
+    override suspend fun updateSettingsToHide(states: Map<ManualRevertTarget, Boolean>) {
+        userPreferencesDataSource.updateSettingsToHide(states = states)
+    }
+
+    override suspend fun updateNotificationFunctionResetV16(done: Boolean) {
+        userPreferencesDataSource.updateNotificationFunctionResetV16(done = done)
     }
 
     override suspend fun updateShizukuStartFailed(failed: Boolean) {

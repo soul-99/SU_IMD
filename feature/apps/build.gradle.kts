@@ -32,4 +32,5 @@ dependencies {
     implementation(projects.domain.framework)
     implementation(projects.domain.repository)
     implementation(projects.domain.useCase)
+    implementation(projects.feature.appSettings)
 }

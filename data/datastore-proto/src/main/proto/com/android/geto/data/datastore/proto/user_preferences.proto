@@ -24,7 +24,6 @@ import "com/android/geto/data/datastore/proto/sort_launcher_apps_activity_info.p
 import "com/android/geto/data/datastore/proto/sort_order_launcher_apps_activity_info.proto";
 import "com/android/geto/data/datastore/proto/sort_favourite_apps.proto";
 import "com/android/geto/data/datastore/proto/favourite_apps_view.proto";
-import "com/android/geto/data/datastore/proto/favourite_apps_tap_action.proto";
 import "com/android/geto/data/datastore/proto/shizuku_fork_mode.proto";
 import "com/android/geto/data/datastore/proto/notification_function.proto";
 
@@ -44,7 +43,6 @@ message UserPreferences {
   repeated string favouriteComponentNames = 6;
   SortFavouriteAppsProto sortFavouriteApps = 7;
   FavouriteAppsViewProto favouriteAppsView = 8;
-  FavouriteAppsTapActionProto favouriteAppsTapAction = 9;
 
   // Restart Shizuku after a revert puts back the USB debugging that took its service down.
   //
@@ -125,6 +123,24 @@ message UserPreferences {
   // ago has never read the current ones. Zero means it has never been shown.
   int32 setupNoticeVersion = 25;
 
+  // Which targets are switched off when an app is launched, encoded by SettingsToHide the
+  // same way as revertDefaults above.
+  //
+  // Device-wide rather than per app: the settings a locked-down app objects to are the same
+  // four whichever app it is, and requiring a profile per app before any app could be
+  // opened was the largest thing between installing this and using it. The per-app profiles
+  // still exist and are what the memory notification function reads.
+  repeated string settingsToHide = 27;
+
+  // Whether the one-time v1.6 reset of the notification function has run.
+  //
+  // v1.6 moves the whole app onto one device-wide "Settings to hide" configuration, and the
+  // memory function is now the deliberate exception rather than the thing an upgrade lands
+  // you in. An install carrying the old default forward would find every launch reading a
+  // per-app profile it has never written. False for every install that predates this field,
+  // so the reset happens once and a later switch back to the memory function sticks.
+  bool notificationFunctionResetV16 = 28;
+
   // Whether restartShizuku above holds an actual decision.
   //
   // False for every install that predates this field, including one that has the toggle
@@ -132,6 +148,8 @@ message UserPreferences {
   // defaults to on. Only someone deliberately switching it off is affected, and only once.
   bool restartShizukuSet = 26;
 
+  // 9 was favouriteAppsTapAction. What a tap and a long press do is now decided by the
+  // notification function rather than chosen, so there is nothing left for it to store.
   // 14 was a single global suspended-services list, replaced by the map above.
-  reserved 14;
+  reserved 9, 14;
 }

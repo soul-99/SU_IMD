@@ -90,6 +90,7 @@ import com.android.geto.common.ProjectLinks
 import com.android.geto.common.openObtainium
 import com.android.geto.common.openProjectUri
 import com.android.geto.designsystem.component.DialogContainer
+import com.android.geto.designsystem.component.LocalRevertConfigurationRequest
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.designsystem.theme.supportsDynamicTheming
 import com.android.geto.domain.model.AccessibilityServiceData
@@ -100,9 +101,11 @@ import com.android.geto.domain.model.ShizukuForkDefaults
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.model.UserData
+import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.feature.settings.dialog.AccessibilityServicesDialog
 import com.android.geto.feature.settings.dialog.NotificationFunctionDialog
 import com.android.geto.feature.settings.dialog.RevertDefaultsDialog
+import com.android.geto.feature.settings.dialog.SettingsToHideDialog
 import com.android.geto.feature.settings.dialog.ThemeDialog
 import com.android.geto.feature.settings.help.SetupHelpDialog
 import com.android.geto.service.SettingsObserverService
@@ -156,6 +159,7 @@ internal fun SettingsRoute(
         onUpdateManagedAccessibilityServices = viewModel::updateManagedAccessibilityServices,
         onUpdateNotificationFunction = viewModel::updateNotificationFunction,
         onUpdateRevertDefaults = viewModel::updateRevertDefaults,
+        onUpdateSettingsToHide = viewModel::updateSettingsToHide,
         onRefreshAccessibilityServices = viewModel::refreshAccessibilityServices,
         onRefreshInstalledApps = viewModel::refreshInstalledApps,
     )
@@ -179,6 +183,7 @@ internal fun SettingsScreen(
     onUpdateManagedAccessibilityServices: (List<String>) -> Unit,
     onUpdateNotificationFunction: (NotificationFunction) -> Unit,
     onUpdateRevertDefaults: (Map<ManualRevertTarget, Boolean>) -> Unit,
+    onUpdateSettingsToHide: (Map<ManualRevertTarget, Boolean>) -> Unit,
     onRefreshAccessibilityServices: () -> Unit,
     onRefreshInstalledApps: () -> Unit,
 ) {
@@ -200,13 +205,14 @@ internal fun SettingsScreen(
                     onUpdateDynamicTheme = onUpdateDynamicTheme,
                     onUpdateTheme = onUpdateTheme,
                     onUpdateRestartShizuku = onUpdateRestartShizuku,
-                    onUpdateShizukuForkMode = onUpdateShizukuForkMode,
+                        onUpdateShizukuForkMode = onUpdateShizukuForkMode,
                     onUpdateShizukuAuthKey = onUpdateShizukuAuthKey,
                     onUpdateShizukuPackageName = onUpdateShizukuPackageName,
                     onUpdateShizukuStartAction = onUpdateShizukuStartAction,
                     onUpdateManagedAccessibilityServices = onUpdateManagedAccessibilityServices,
                     onUpdateNotificationFunction = onUpdateNotificationFunction,
                     onUpdateRevertDefaults = onUpdateRevertDefaults,
+                    onUpdateSettingsToHide = onUpdateSettingsToHide,
                     onRefreshAccessibilityServices = onRefreshAccessibilityServices,
                     onRefreshInstalledApps = onRefreshInstalledApps,
                 )
@@ -232,6 +238,7 @@ private fun Success(
     onUpdateManagedAccessibilityServices: (List<String>) -> Unit,
     onUpdateNotificationFunction: (NotificationFunction) -> Unit,
     onUpdateRevertDefaults: (Map<ManualRevertTarget, Boolean>) -> Unit,
+    onUpdateSettingsToHide: (Map<ManualRevertTarget, Boolean>) -> Unit,
     onRefreshAccessibilityServices: () -> Unit,
     onRefreshInstalledApps: () -> Unit,
 ) {
@@ -245,12 +252,29 @@ private fun Success(
 
     var showRevertDefaultsDialog by remember { mutableStateOf(false) }
 
+    // The manager dialog's long press, arriving as a count that only goes up. Keyed on the
+    // count rather than seeded once, so the second and every later press opens the dialog
+    // too -- seeding only worked while this screen was being composed for the first time,
+    // which is exactly once per launch of the app.
+    val revertConfigurationRequest = LocalRevertConfigurationRequest.current
+
+    LaunchedEffect(revertConfigurationRequest) {
+        if (revertConfigurationRequest > 0) showRevertDefaultsDialog = true
+    }
+
+    var showSettingsToHideDialog by remember { mutableStateOf(false) }
+
     var selectedTheme by remember { mutableIntStateOf(Theme.entries.indexOf(userData.theme)) }
 
-    // Plain remember, not rememberSaveable: the sections reset to collapsed on every visit
-    // so the screen always opens as a short list of headings rather than in whatever state
-    // it was left in last week. Same reasoning as the Shizuku configuration panel.
-    var expanded by remember { mutableStateOf<SettingsSection?>(null) }
+    // Plain remember, not rememberSaveable: the sections reset on every visit so the screen
+    // always opens the same way rather than in whatever state it was left in last week.
+    // Same reasoning as the Shizuku configuration panel.
+    //
+    // Opens on Default IMD settings rather than on nothing. The two configurations in there
+    // are what decides whether launching an app does anything at all, so a screen that
+    // opens as five closed headings hides the only part most people ever need. Opening
+    // another section closes this one, as before — it is still an accordion.
+    var expanded by remember { mutableStateOf<SettingsSection?>(SettingsSection.AppFunctions) }
 
     val toggleSection = { section: SettingsSection ->
         expanded = if (expanded == section) null else section
@@ -283,14 +307,24 @@ private fun Success(
             expanded = expanded == SettingsSection.AppFunctions,
             onToggle = { toggleSection(SettingsSection.AppFunctions) },
         ) {
+            // Hide first, unhide second — the order the two run in when an app is opened
+            // and then left. Reading them the other way round makes the revert
+            // configuration look like the primary one, which it no longer is.
             SettingsColumn(
-                title = stringResource(R.string.notification_function),
-                subtitle = userData.notificationFunction.getTitle(),
-                onClick = { showNotificationFunctionDialog = true },
+                title = stringResource(R.string.settings_to_hide),
+                subtitle = stringResource(
+                    R.string.settings_to_hide_summary,
+                    userData.settingsToHide.count { it.value },
+                    userData.settingsToHide.size,
+                ),
+                onClick = { showSettingsToHideDialog = true },
             )
 
             SettingsColumn(
-                title = stringResource(R.string.revert_defaults),
+                // Named for what it does here rather than for the dialog it opens: in a
+                // list beside "Settings to hide", "Revert to default configuration" says
+                // nothing about the relationship between the two.
+                title = stringResource(R.string.revert_defaults_entry),
                 subtitle = stringResource(
                     R.string.revert_defaults_summary,
                     userData.revertDefaults.count { it.value },
@@ -299,30 +333,10 @@ private fun Success(
                 onClick = { showRevertDefaultsDialog = true },
             )
 
-        }
-
-        CollapsibleSection(
-            title = stringResource(R.string.shizuku),
-            expanded = expanded == SettingsSection.Shizuku,
-            onToggle = { toggleSection(SettingsSection.Shizuku) },
-        ) {
-            ShizukuSection(
-                userData = userData,
-                installedApps = installedApps,
-                onUpdateRestartShizuku = onUpdateRestartShizuku,
-                onUpdateShizukuForkMode = onUpdateShizukuForkMode,
-                onUpdateShizukuAuthKey = onUpdateShizukuAuthKey,
-                onUpdateShizukuPackageName = onUpdateShizukuPackageName,
-                onUpdateShizukuStartAction = onUpdateShizukuStartAction,
-                onRefreshInstalledApps = onRefreshInstalledApps,
-            )
-        }
-
-        CollapsibleSection(
-            title = stringResource(R.string.accessibility),
-            expanded = expanded == SettingsSection.Accessibility,
-            onToggle = { toggleSection(SettingsSection.Accessibility) },
-        ) {
+            // Third, under the two it qualifies. Which services this app may touch is part
+            // of what "hide" and "unhide" mean above -- both rows say as much in their own
+            // small print -- so a section of its own put one third of one answer somewhere
+            // else entirely.
             SettingsColumn(
                 title = stringResource(R.string.accessibility_services),
                 subtitle = accessibilityServicesSubtitle(
@@ -338,10 +352,40 @@ private fun Success(
         }
 
         CollapsibleSection(
+            title = stringResource(R.string.shizuku),
+            expanded = expanded == SettingsSection.Shizuku,
+            onToggle = { toggleSection(SettingsSection.Shizuku) },
+        ) {
+            ShizukuSection(
+                userData = userData,
+                installedApps = installedApps,
+                onUpdateShizukuForkMode = onUpdateShizukuForkMode,
+                onUpdateShizukuAuthKey = onUpdateShizukuAuthKey,
+                onUpdateShizukuPackageName = onUpdateShizukuPackageName,
+                onUpdateShizukuStartAction = onUpdateShizukuStartAction,
+                onRefreshInstalledApps = onRefreshInstalledApps,
+            )
+        }
+
+        CollapsibleSection(
             title = stringResource(R.string.section_advanced),
             expanded = expanded == SettingsSection.Advanced,
             onToggle = { toggleSection(SettingsSection.Advanced) },
         ) {
+            // Advanced because the recommended answer is the default and nobody has to
+            // come here: choosing the memory function means taking on a profile per app,
+            // which is the opposite of what Default IMD settings above is for.
+            SettingsColumn(
+                title = stringResource(R.string.notification_function),
+                subtitle = userData.notificationFunction.getTitle(),
+                onClick = { showNotificationFunctionDialog = true },
+            )
+
+            RestartShizukuSetting(
+                userData = userData,
+                onUpdateRestartShizuku = onUpdateRestartShizuku,
+            )
+
             // A foreground service that watches every settings change. Useful for working
             // out what an app is actually reading, and of no interest to anyone who is not
             // doing that — which is what makes it advanced rather than an app function.
@@ -416,6 +460,14 @@ private fun Success(
             onUpdateRevertDefaults = onUpdateRevertDefaults,
         )
     }
+
+    if (showSettingsToHideDialog) {
+        SettingsToHideDialog(
+            states = userData.settingsToHide,
+            onDismissRequest = { showSettingsToHideDialog = false },
+            onUpdateSettingsToHide = onUpdateSettingsToHide,
+        )
+    }
 }
 
 /**
@@ -429,7 +481,6 @@ private enum class SettingsSection {
     Theme,
     AppFunctions,
     Shizuku,
-    Accessibility,
     Advanced,
 }
 
@@ -494,12 +545,90 @@ private fun CollapsibleSection(
 }
 
 @OptIn(FlowPreview::class)
+/**
+ * Whether a revert that puts USB debugging back should also start Shizuku again.
+ *
+ * Under Advanced rather than beside the Shizuku fields it depends on, because it is a
+ * decision about what reverting does — the same kind of thing as the notification function
+ * above it — while that section is the connection details it needs in order to work at all.
+ *
+ * Enablement is read from the stored configuration rather than from the fields' live edit
+ * state, which is what the switch used while it sat among them. From another section there
+ * is nothing live to read, and by the time anyone has collapsed one section and opened
+ * another the debounced write has long since landed.
+ */
+@Composable
+private fun RestartShizukuSetting(
+    modifier: Modifier = Modifier,
+    userData: UserData,
+    onUpdateRestartShizuku: (Boolean) -> Unit,
+) {
+    var showFillHint by rememberSaveable { mutableStateOf(false) }
+
+    val configured = userData.isShizukuConfigured
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .clickable {
+                    if (configured) {
+                        onUpdateRestartShizuku(!userData.restartShizuku)
+                    } else {
+                        // Rather than a dead switch with no explanation, say what is
+                        // missing — and now also where, since the fields it needs are in a
+                        // different section from this switch.
+                        showFillHint = true
+                    }
+                }
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // Title and description in one column, the way every other setting on this
+            // screen stacks a title over its subtitle. As a sibling of the row the
+            // description was separated from its own title by the row's vertical padding
+            // while sitting flush against the next setting, so it read as belonging to
+            // the wrong one.
+            Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                Text(
+                    text = stringResource(R.string.restart_shizuku_service),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = stringResource(R.string.restart_shizuku_service_description),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
+            // A null onCheckedChange leaves the switch with no input modifier of its own,
+            // so a tap on it falls through to the row above and shows the hint instead of
+            // being silently swallowed by a disabled control.
+            Switch(
+                checked = userData.restartShizuku,
+                enabled = configured,
+                onCheckedChange = if (configured) onUpdateRestartShizuku else null,
+            )
+        }
+
+        if (showFillHint && !configured) {
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                text = stringResource(R.string.shizuku_fill_advanced),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+    }
+}
+
 @Composable
 private fun ShizukuSection(
     modifier: Modifier = Modifier,
     userData: UserData,
     installedApps: List<InstalledAppData>,
-    onUpdateRestartShizuku: (Boolean) -> Unit,
     onUpdateShizukuForkMode: (ShizukuForkMode) -> Unit,
     onUpdateShizukuAuthKey: (String) -> Unit,
     onUpdateShizukuPackageName: (String) -> Unit,
@@ -514,17 +643,7 @@ private fun ShizukuSection(
 
     var authKey by rememberSaveable { mutableStateOf(userData.shizukuAuthKey) }
 
-    var showFillHint by rememberSaveable { mutableStateOf(false) }
-
     val forkMode = userData.shizukuForkMode
-
-    // The same rule as UserData.isShizukuConfigured, but read off the local edit state so
-    // the switch unlocks the moment the last field is filled rather than half a second
-    // later when the debounced write lands.
-    val configured = forkMode != ShizukuForkMode.Unset &&
-        startAction.isNotBlank() &&
-        packageName.isNotBlank() &&
-        (!forkMode.requiresAuthKey || authKey.isNotBlank())
 
     // Committed on a pause rather than per keystroke: each write is a full proto rewrite
     // plus an emission that recomposes this whole screen. drop(1) skips the seed value so
@@ -555,18 +674,9 @@ private fun ShizukuSection(
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
-        // Always shown, and first. These fields are the precondition for everything else
-        // in this section — the restart switch below is dead until they are filled — so a
-        // panel that had to be opened first was hiding the step people came here to do.
-        // The heading stays because the setup help sends people to "Settings > Shizuku >
-        // Configuration" by name.
-        Text(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
-            text = stringResource(R.string.configuration),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.primary,
-        )
-
+        // No heading of its own any more: the section is called "Shizuku configuration",
+        // so a "Configuration" title one line under it said the same word twice.
+        //
         // Which forks this can drive at all. It belongs here rather than under the
         // restart switch, where it used to be: it is a precondition for everything in
         // this panel, not a footnote about one option.
@@ -649,53 +759,6 @@ private fun ShizukuSection(
             }
         }
 
-        // Last, because it is the only thing here that does nothing until the fields above
-        // are filled — and it stays disabled, with the hint below, until they are.
-        Row(
-            modifier = Modifier
-                .clickable {
-                    if (configured) {
-                        onUpdateRestartShizuku(!userData.restartShizuku)
-                    } else {
-                        // Rather than a dead switch with no explanation, say what is
-                        // missing. The fields it refers to are already on screen above.
-                        showFillHint = true
-                    }
-                }
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(R.string.restart_shizuku_service),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-
-            // A null onCheckedChange leaves the switch with no input modifier of its own,
-            // so a tap on it falls through to the row above and shows the hint instead of
-            // being silently swallowed by a disabled control.
-            Switch(
-                checked = userData.restartShizuku,
-                enabled = configured,
-                onCheckedChange = if (configured) onUpdateRestartShizuku else null,
-            )
-        }
-
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = stringResource(R.string.restart_shizuku_service_description),
-            style = MaterialTheme.typography.bodySmall,
-        )
-
-        if (showFillHint && !configured) {
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                text = stringResource(R.string.shizuku_fill_advanced),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-            )
-        }
     }
 }
 
@@ -997,7 +1060,10 @@ private fun AboutSection(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // Two lines of air, not one. Everything above this point is about the installed
+        // version and where to get the next one; everything below is who wrote it and under
+        // what licence. The gap is what separates the two, since neither has a heading.
+        Spacer(modifier = Modifier.height(40.dp))
 
         Text(text = author, style = MaterialTheme.typography.bodyMedium)
 

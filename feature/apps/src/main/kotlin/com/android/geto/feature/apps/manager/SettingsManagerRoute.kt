@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.geto.common.openRevertConfiguration
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.feature.apps.R
 import com.android.geto.feature.apps.dialog.AndroidSettingsManagerDialog
@@ -57,6 +58,8 @@ fun SettingsManagerRoute(
     val shizukuStarting by viewModel.shizukuStarting.collectAsStateWithLifecycle()
 
     val shizukuStartFailed by viewModel.shizukuStartFailed.collectAsStateWithLifecycle()
+
+    val accessibilityManaged by viewModel.accessibilityManaged.collectAsStateWithLifecycle()
 
     // Polling runs only while this is composed. DisposableEffect rather than
     // LaunchedEffect so it also stops on a back press or an outside tap, not just when the
@@ -92,6 +95,22 @@ fun SettingsManagerRoute(
             context.openTarget(target = target, shizukuPackage = shizukuLaunchPackage)
         },
         onRevertToDefault = viewModel::revertToDefault,
+        onOpenRevertConfiguration = {
+            // Dismissed first. The dialog is the thing being navigated away from, and
+            // leaving it standing over the settings screen it just opened would need
+            // dismissing again before the configuration underneath could be used.
+            onDismissRequest()
+
+            context.openRevertConfiguration()
+        },
+        onAccessibilityUnmanaged = {
+            Toast.makeText(
+                context,
+                R.string.settings_manager_accessibility_unmanaged,
+                Toast.LENGTH_LONG,
+            ).show()
+        },
+        accessibilityManaged = accessibilityManaged,
     )
 }
 

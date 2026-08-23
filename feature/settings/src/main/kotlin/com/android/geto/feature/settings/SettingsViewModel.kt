@@ -119,6 +119,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateSettingsToHide(states: Map<ManualRevertTarget, Boolean>) {
+        viewModelScope.launch {
+            userDataRepository.updateSettingsToHide(states = states)
+        }
+    }
+
     fun updateRevertDefaults(states: Map<ManualRevertTarget, Boolean>) {
         viewModelScope.launch {
             userDataRepository.updateRevertDefaults(states = states)

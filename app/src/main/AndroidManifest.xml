@@ -69,13 +69,24 @@
             android:theme="@style/Theme.Geto.Services" />
 
         <!--
-          Runs the revert and finishes without drawing anything. Exported because both the
-          launcher shortcut and the Quick Settings tile start it; it takes no extras and
-          does nothing an unprivileged caller could not already do from the app.
+          Runs the revert and finishes without drawing anything.
+
+          Not exported, and neither of its two callers needs it to be. The launcher starts
+          the shortcut through LauncherApps.startShortcut, which the system performs on
+          behalf of the publishing app — the same route every pinned per-app shortcut
+          already takes to ShortcutActivity, which has never been exported. The tile starts
+          it from inside this app: a PendingIntent this app created on Android 14 and up,
+          and a plain startActivity from the TileService below that. Both carry this app's
+          own identity, which is what an exported flag would otherwise be granting to
+          everyone else as well.
+
+          Exported, it was the one component through which any installed app could cause a
+          privileged state change — a revert can switch developer options and USB debugging
+          back on, with no user interaction and nothing on screen to say why.
         -->
         <activity
             android:name=".activity.revert.RevertActivity"
-            android:exported="true"
+            android:exported="false"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:label="@string/revert_shortcut_label"

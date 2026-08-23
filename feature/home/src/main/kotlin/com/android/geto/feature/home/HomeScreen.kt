@@ -26,13 +26,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
+import androidx.compose.material3.TopAppBarDefaults.exitUntilCollapsedScrollBehavior
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import com.android.geto.designsystem.component.LocalRevertConfigurationRequest
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -51,6 +53,7 @@ internal fun HomeRoute(
     topLevelDestinations: List<HomeDestination>,
     startDestination: KClass<*>,
     onClickHomeDestination: (NavHostController, HomeDestination) -> Unit,
+    onRevertConfigurationRequest: (NavHostController) -> Unit,
     builder: NavGraphBuilder.() -> Unit,
 ) {
     HomeScreen(
@@ -59,6 +62,7 @@ internal fun HomeRoute(
         topLevelDestinations = topLevelDestinations,
         startDestination = startDestination,
         onClickHomeDestination = onClickHomeDestination,
+        onRevertConfigurationRequest = onRevertConfigurationRequest,
         builder = builder,
     )
 }
@@ -71,11 +75,29 @@ internal fun HomeScreen(
     topLevelDestinations: List<HomeDestination>,
     startDestination: KClass<*>,
     onClickHomeDestination: (NavHostController, HomeDestination) -> Unit,
+    onRevertConfigurationRequest: (NavHostController) -> Unit,
     builder: NavGraphBuilder.() -> Unit,
 ) {
     val navController = rememberNavController()
 
-    val topAppBarScrollBehavior = enterAlwaysScrollBehavior()
+    // Something outside the graph has asked for a particular tab. The nav controller is
+    // created here and not exposed, so the request comes in as a value and the navigating
+    // is done here rather than by the caller reaching in.
+    val revertConfigurationRequest = LocalRevertConfigurationRequest.current
+
+    LaunchedEffect(revertConfigurationRequest) {
+        if (revertConfigurationRequest > 0) onRevertConfigurationRequest(navController)
+    }
+
+    // exitUntilCollapsed, not enterAlways. enterAlways re-expands the bar on *any* upward
+    // drag, so every change of direction shifts the whole page by the bar's collapse
+    // distance on top of the finger movement -- and on a LargeTopAppBar that distance is
+    // most of a title. On the two lazy lists it is lost in a long list; the settings tab is
+    // a plain column barely taller than the screen, so the same shift is a large fraction
+    // of its whole scroll range and reads as the page moving faster than the finger.
+    //
+    // enterAlways is meant for the small top app bar. A large one is paired with this.
+    val topAppBarScrollBehavior = exitUntilCollapsedScrollBehavior()
 
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination
 

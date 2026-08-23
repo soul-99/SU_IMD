@@ -32,7 +32,7 @@
     <string name="settings_observer_service">Settings Observer Service</string>
 
     <!-- Shizuku -->
-    <string name="shizuku">Shizuku</string>
+    <string name="shizuku">Shizuku configuration</string>
     <string name="restart_shizuku_service">Restart Shizuku service</string>
     <string name="restart_shizuku_service_description">On reverting USB debugging from Notification (memory function only), autostart Shizuku service.</string>
     <string name="shizuku_needs">Needs</string>
@@ -42,8 +42,7 @@
     <string name="shizuku_fork_mode_thedjchi">Thedjchi based forks of Shizuku</string>
     <string name="shizuku_fork_mode_other">Shevery / other forks of Shizuku</string>
     <string name="shizuku_choose_app">Choose an installed app</string>
-    <string name="shizuku_fill_advanced">Please fill configuration section</string>
-    <string name="configuration">Configuration</string>
+    <string name="shizuku_fill_advanced">Please fill the Shizuku configuration section first</string>
     <string name="show_value">Show</string>
     <string name="hide_value">Hide</string>
     <string name="shizuku_view_intents_hint">Go to shizuku app &gt; view intents to copy values</string>
@@ -52,8 +51,8 @@
     <string name="shizuku_package_name">Package name</string>
     <string name="shizuku_auth_key">Authentication key (extras &gt; auth:)</string>
 
-    <!-- Accessibility -->
-    <string name="accessibility">Accessibility Services</string>
+    <!-- Accessibility. The section header this used to title is gone; the entry now
+         sits under Default IMD settings, beside the two configurations it qualifies. -->
     <string name="accessibility_services">Accessibility services to hide</string>
     <string name="accessibility_services_dialog_description">These services are switched off when an app setting hides accessibility services, and switched back on when you revert it. Only the ones this app turned off are ever restored.</string>
     <string name="accessibility_services_none_selected">None selected. %1$d currently enabled on this device.</string>
@@ -79,7 +78,7 @@
 
     <!-- suIMD: collapsible section headers -->
     <string name="section_theme">Theme</string>
-    <string name="section_app_functions">App functions</string>
+    <string name="section_app_functions">Default IMD settings</string>
 
     <!-- suIMD: notification function -->
     <string name="notification_function">Notification function</string>
@@ -92,15 +91,38 @@
     <string name="notification_function_memory_option">Memory function (old method)</string>
     <string name="notification_function_memory_summary">Multiple notification per different app launch</string>
     <string name="notification_function_memory_detail">saves the previous device setting\'s state before turning off the configured device settings for that app and restores only those which were turned off by IMD</string>
+    <!-- What choosing the memory function costs. Red because these are consequences, not
+         features: the first is work the user takes on, the second is a limit on what the
+         choice actually covers. The third is the reason someone might want it anyway. -->
+    <string name="notification_function_memory_warning_config">You will need to manually configure what settings to hide for each individual app by long pressing that app icon in All apps or Favourites tab.</string>
+    <string name="notification_function_memory_warning_revert">Only Revert button in notifications will use memory function, all other revert functions (quick setting tile, in app button... etc) will still revert to Settings to unhide on Revert configuration from IMD app settings.</string>
+    <string name="notification_function_memory_note">Memory function allows you to hide additional settings other than the default 4 settings of IMD app</string>
+    <string name="notif_name_all_apps">All apps</string>
+    <string name="notif_name_favourites">Favourites</string>
+    <string name="notif_name_revert_button">Revert</string>
     <string name="notification_function_revert">Revert to default</string>
     <string name="notification_function_revert_option">Revert to default (Recommended)</string>
     <string name="notification_function_revert_summary">Single notification only</string>
-    <string name="notification_function_revert_detail">reverts the device settings to the Revert to default configuration in the IMD app\'s settings</string>
+    <string name="notification_function_revert_detail">reverts the device settings to Settings to unhide on Revert configured in IMD settings</string>
     <string name="save">Save</string>
 
     <!-- suIMD: revert to default configuration -->
     <string name="revert_defaults">Revert to default configuration</string>
+    <!-- The settings-list entry says what the configuration is for; the dialog it opens
+         keeps its own name, which is also what the notification function and the tile are
+         called. -->
+    <string name="revert_defaults_entry">Settings to unhide on Revert</string>
+    <string name="revert_defaults_description">These settings are unhidden/re-enabled when you click on \'revert\' button anywhere.</string>
     <string name="revert_defaults_summary">%1$d of %2$d switched on</string>
+
+    <string name="settings_to_hide">Settings to hide</string>
+    <string name="settings_to_hide_title">Settings to hide/ disable</string>
+    <string name="settings_to_hide_description">These settings are hidden when you launch an app.</string>
+    <string name="settings_to_hide_summary">%1$d of %2$d switched on</string>
+    <string name="settings_to_hide_usb_note">stopping USB debugging will also kill Shizuku service(if running), please configure Shizuku settings under IMD app to restart the Shizuku service after Revert</string>
+    <string name="settings_to_hide_info_all">Hiding only developer settings does not turn off USB and wireless debugging, and some apps might still detect that as developer settings turned on, so it is recommended to select all three</string>
+    <string name="settings_to_hide_info_shizuku">to hide Shizuku from apps use the Hide Shizuku from other apps function within the Shizuku app.</string>
+    <string name="settings_to_hide_name_shizuku_hide">Hide Shizuku from other apps</string>
     <string name="revert_defaults_developer_settings">Developer settings</string>
     <string name="revert_defaults_usb_debugging">USB debugging</string>
     <string name="revert_defaults_wireless_debugging">Wireless debugging</string>
@@ -113,29 +135,48 @@
     <string name="help_button">Help (readme)</string>
     <string name="help_close">Close</string>
     <string name="help_title">How to setup this app (don\'t skip)</string>
-    <string name="help_intro">These are things you need to setup yourself.\n(you can access this page anytime again from IMD Settings → Help button)</string>
+    <string name="help_intro">These are things you need to setup yourself.</string>
+    <string name="help_again">Access this page again -</string>
     <string name="help_numbered_title">%1$d.  %2$s</string>
 
-    <string name="help_hide_title">Setup what settings to hide per app first (MANDATORY)</string>
-    <string name="help_hide_body">For every app you need to individually configure what settings you want to hide first by adding them here:\na. Go to All apps → click on app name → Setting template, or\nb. Favourites → long press app name → Settings template.</string>
+    <!-- Where each thing lives, written the way the app is actually navigated. Kept as
+         whole strings rather than assembled from parts so a translator can reorder them,
+         and so a renamed screen is one edit rather than several. -->
+    <string name="help_path_help">IMD Settings → About → Help (readme)</string>
+    <string name="help_path_hide">IMD Settings → Default IMD settings → Settings to hide</string>
+    <string name="help_path_unhide">IMD Settings → Default IMD settings → Settings to unhide on Revert</string>
+    <string name="help_path_accessibility">IMD Settings → Default IMD settings → Accessibility services to hide</string>
+    <string name="help_path_shizuku">IMD Settings → Shizuku configuration</string>
 
-    <string name="help_revert_title">Setup Revert to default configuration (RECOMMENDED)</string>
-    <string name="help_revert_body">Settings → App functions → Revert to default configuration lets you say which settings and services this app should switch back on, and which it should leave alone. Every Revert to default — the notification button, the in app button, homescreen shortcut, quick setting tile — follows what you set there, so it is worth a minute now.</string>
+    <string name="help_hide_title">Setup what settings to hide (MANDATORY)</string>
+    <string name="help_hide_body">by default all settings are hidden (recommended), but you can customise it as per your liking.</string>
+
+    <string name="help_revert_title">Setup what settings to unhide on Revert (RECOMMENDED)</string>
+    <string name="help_revert_body">by default USB debugging, Accessibility services, and Shizuku service is enabled, but you can customise it to your liking.</string>
 
     <string name="help_accessibility_title">Setup Accessibility services to hide</string>
-    <string name="help_accessibility_body">The app will not touch any accessibility service until you say which ones. Settings → Accessibility Services → “Accessibility services to hide”, then tick the ones that should be switched off while a locked-down app is open. They are switched back on when you revert.</string>
+    <string name="help_accessibility_body">The app will not touch any accessibility service until you say which ones, then tick the ones that should be switched off while a locked-down app is open. They are switched back on when you revert.</string>
 
     <string name="help_shizuku_title">Setup Shizuku Start Intents (only if you use Shizuku)</string>
-    <string name="help_shizuku_body">If you use Shizuku service, whenever IMD will toggle off debugging settings it will kill the Shizuku service, so it is recommended to setup-verify Shizuku start intents in Settings → Configuration.</string>
+    <string name="help_shizuku_body">If you use Shizuku service, whenever IMD will toggle off debugging settings it will kill the Shizuku service, so it is recommended to setup &amp; verify Shizuku start intents.</string>
 
     <string name="help_general_title">General info</string>
+    <string name="help_general_how_title">HOW TO USE IMD</string>
     <string name="help_general_launch">1. To use the blocked apps you need to launch them either from within the IMD app or via IMD created app shortcuts on homescreen.</string>
-    <string name="help_general_shortcuts">2. In this app you can create app shortcuts directly to your homescreen by Favourites tab → long press on app listing → create shortcut.</string>
-    <string name="help_general_manager">3. IMD services manager - Use this service manager to quickly view the live status of your settings/services and also quickly toggle them on-off.</string>
-    <string name="help_general_access">4. You can access IMD services manager and Revert to default function from the</string>
-    <string name="help_general_access_items">a. Favourites tab,\nb. Android system quick settings toggles,\nc. Home screen shortcuts (long press IMD app icon then drag n drop the shortcut you want to add)</string>
-    <string name="help_name_manager">IMD services manager</string>
-    <string name="help_name_revert">Revert to default function</string>
+    <string name="help_general_shortcuts">2. In this app you can create app shortcuts directly to your homescreen by long pressing an app name in the All apps or Favourites tab.</string>
+    <string name="help_general_revert">3. After you are done using your app, use the Revert / Revert to default button to unhide/ re-enable your previous settings.</string>
+    <string name="help_general_revert_places">You can use the revert button from these places:</string>
+    <string name="help_general_revert_items">•  notifications after app launch\n•  Android quick setting toggle\n•  Favourites tab\n•  Home screen shortcut (long press IMD icon to generate shortcut)</string>
+    <string name="help_general_manager_title">IMD SERVICES MANAGER</string>
+    <string name="help_general_manager">Use this service manager to quickly view the live status of your settings/services and also quickly toggle them on-off.</string>
+    <string name="help_general_manager_places">You can open the IMD services manager from these places:</string>
+    <string name="help_general_manager_items">•  Android quick setting toggle\n•  Favourites tab\n•  Home screen shortcut (long press IMD icon to generate shortcut)</string>
+
+    <!-- Phrases bolded inside the sentences above, passed as the same resources the
+         controls themselves use where one exists. -->
+    <string name="help_name_mandatory">(MANDATORY)</string>
+    <string name="help_name_revert">Revert</string>
+    <string name="help_name_revert_button">Revert / Revert to default</string>
 
     <string name="section_advanced">Advanced</string>
 </resources>

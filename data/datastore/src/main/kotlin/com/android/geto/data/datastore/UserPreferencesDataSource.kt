@@ -19,8 +19,6 @@
 package com.android.geto.data.datastore
 
 import androidx.datastore.core.DataStore
-import com.android.geto.data.datastore.mapper.asFavouriteAppsTapAction
-import com.android.geto.data.datastore.mapper.asFavouriteAppsTapActionProto
 import com.android.geto.data.datastore.mapper.asFavouriteAppsView
 import com.android.geto.data.datastore.mapper.asFavouriteAppsViewProto
 import com.android.geto.data.datastore.mapper.asNotificationFunction
@@ -40,12 +38,12 @@ import com.android.geto.data.datastore.proto.copy
 import com.android.geto.domain.framework.ShizukuWrapper
 import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.FavouriteAppsOrdering
-import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.RevertDefaults
 import com.android.geto.domain.model.SettingSnapshot
+import com.android.geto.domain.model.SettingsToHide
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
@@ -66,7 +64,6 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
             favouriteComponentNames = it.favouriteComponentNamesList.toList(),
             sortFavouriteApps = it.sortFavouriteApps.asSortFavouriteApps(),
             favouriteAppsView = it.favouriteAppsView.asFavouriteAppsView(),
-            favouriteAppsTapAction = it.favouriteAppsTapAction.asFavouriteAppsTapAction(),
             // On unless the user has said otherwise. Reverting USB debugging without
             // bringing Shizuku back leaves the service down with nothing saying why, which
             // is a worse default than restarting something that was already running.
@@ -96,6 +93,8 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
             manualRevertTargets = ManualRevertTarget.decode(it.manualRevertTargetsList),
             notificationFunction = it.notificationFunction.asNotificationFunction(),
             revertDefaults = RevertDefaults.decode(it.revertDefaultsList),
+            settingsToHide = SettingsToHide.decode(it.settingsToHideList),
+            notificationFunctionResetV16 = it.notificationFunctionResetV16,
             shizukuStartFailed = it.shizukuStartFailed,
             settingStateBefore = it.settingStateBeforeMap.mapValues { entry ->
                 SettingSnapshot.decode(entry.value)
@@ -182,15 +181,6 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
         userPreferences.updateData {
             it.copy {
                 this.favouriteAppsView = favouriteAppsView.asFavouriteAppsViewProto()
-            }
-        }
-    }
-
-    suspend fun updateFavouriteAppsTapAction(favouriteAppsTapAction: FavouriteAppsTapAction) {
-        userPreferences.updateData {
-            it.copy {
-                this.favouriteAppsTapAction =
-                    favouriteAppsTapAction.asFavouriteAppsTapActionProto()
             }
         }
     }
@@ -315,6 +305,21 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
             it.copy {
                 revertDefaults.clear()
                 revertDefaults.addAll(RevertDefaults.encode(states))
+            }
+        }
+    }
+
+    suspend fun updateNotificationFunctionResetV16(done: Boolean) {
+        userPreferences.updateData {
+            it.copy { this.notificationFunctionResetV16 = done }
+        }
+    }
+
+    suspend fun updateSettingsToHide(states: Map<ManualRevertTarget, Boolean>) {
+        userPreferences.updateData {
+            it.copy {
+                settingsToHide.clear()
+                settingsToHide.addAll(SettingsToHide.encode(states))
             }
         }
     }

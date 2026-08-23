@@ -100,6 +100,22 @@ class SettingsManagerViewModel @Inject constructor(
             initialValue = false,
         )
 
+    /**
+     * Whether any accessibility service has been picked for this app to manage.
+     *
+     * The manager's accessibility switch governs that chosen set and nothing else, so with
+     * the set empty there is no state for it to be in. Read here rather than inferred from
+     * the polled row state, because "no services managed" and "the managed services are
+     * currently off" look identical from outside and mean opposite things.
+     */
+    val accessibilityManaged = userDataRepository.userData
+        .map { it.managedAccessibilityServices.isNotEmpty() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false,
+        )
+
     private var watchJob: Job? = null
 
     /**

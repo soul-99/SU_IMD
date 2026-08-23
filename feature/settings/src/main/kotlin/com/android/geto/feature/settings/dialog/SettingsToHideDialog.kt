@@ -26,8 +26,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,29 +43,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.android.geto.designsystem.component.DialogContainer
+import com.android.geto.designsystem.icon.GetoIcons
+import com.android.geto.designsystem.component.emphasised
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.feature.settings.R
 
 /**
- * What "Revert to default" should leave each target set to.
+ * What gets switched off on the way into any app.
  *
- * A configuration screen, not a control panel: nothing here changes the device. The switches
- * describe the state the user wants restored, which is why they stay where they are put even
- * when the device is currently the other way round.
+ * Checkboxes rather than the switches the revert dialog uses, and the difference is not
+ * decorative: this is one list being selected from, where every box means the same kind of
+ * thing, while the revert dialog's rows each describe a state — on *or* off — that a target
+ * should be left in. A switch reads as "this will be turned on", which is the opposite of
+ * what a ticked box means here.
+ *
+ * Nothing here changes the device. It is read the next time an app is launched.
  */
 @Composable
-internal fun RevertDefaultsDialog(
+internal fun SettingsToHideDialog(
     modifier: Modifier = Modifier,
     states: Map<ManualRevertTarget, Boolean>,
     onDismissRequest: () -> Unit,
-    onUpdateRevertDefaults: (Map<ManualRevertTarget, Boolean>) -> Unit,
+    onUpdateSettingsToHide: (Map<ManualRevertTarget, Boolean>) -> Unit,
 ) {
     var draft by remember(states) { mutableStateOf(states) }
 
-    // Each row sets only itself. Shizuku used to drag USB debugging with it and vice versa,
-    // which meant a tap could silently undo a choice the user had made two rows up.
     val toggle = { target: ManualRevertTarget, enabled: Boolean ->
         draft = draft + (target to enabled)
     }
@@ -72,55 +82,61 @@ internal fun RevertDefaultsDialog(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(10.dp),
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                text = stringResource(R.string.revert_defaults),
+                text = stringResource(R.string.settings_to_hide_title),
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            // Says when this runs, which the title does not: "Revert to default" is the
-            // name of five different buttons, and someone arriving here from the settings
-            // list has just read "Settings to hide" one row above.
             Text(
                 modifier = Modifier.padding(horizontal = 10.dp),
-                text = stringResource(R.string.revert_defaults_description),
+                text = stringResource(R.string.settings_to_hide_description),
                 style = MaterialTheme.typography.bodyMedium,
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            RevertDefaultRow(
+            SettingToHideRow(
                 label = stringResource(R.string.revert_defaults_developer_settings),
                 checked = draft[ManualRevertTarget.DeveloperSettings] == true,
                 onCheckedChange = { toggle(ManualRevertTarget.DeveloperSettings, it) },
             )
 
-            RevertDefaultRow(
+            SettingToHideRow(
                 label = stringResource(R.string.revert_defaults_usb_debugging),
+                note = stringResource(R.string.settings_to_hide_usb_note),
                 checked = draft[ManualRevertTarget.UsbDebugging] == true,
                 onCheckedChange = { toggle(ManualRevertTarget.UsbDebugging, it) },
             )
 
-            RevertDefaultRow(
+            SettingToHideRow(
                 label = stringResource(R.string.revert_defaults_wireless_debugging),
                 checked = draft[ManualRevertTarget.WirelessDebugging] == true,
                 onCheckedChange = { toggle(ManualRevertTarget.WirelessDebugging, it) },
             )
 
-            RevertDefaultRow(
+            SettingToHideRow(
+                // Deliberately the same string the revert dialog uses for this note: the
+                // caveat is about which services this app manages at all, so it is the
+                // same fact in both places and must not be able to drift.
                 label = stringResource(R.string.revert_defaults_accessibility_services),
                 note = stringResource(R.string.revert_defaults_accessibility_note),
                 checked = draft[ManualRevertTarget.AccessibilityServices] == true,
                 onCheckedChange = { toggle(ManualRevertTarget.AccessibilityServices, it) },
             )
 
-            RevertDefaultRow(
-                label = stringResource(R.string.revert_defaults_shizuku),
-                note = stringResource(R.string.revert_defaults_shizuku_note),
-                checked = draft[ManualRevertTarget.Shizuku] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.Shizuku, it) },
+            Spacer(modifier = Modifier.height(8.dp))
+
+            InfoLine(text = AnnotatedString(stringResource(R.string.settings_to_hide_info_all)))
+
+            InfoLine(
+                text = emphasised(
+                    text = stringResource(R.string.settings_to_hide_info_shizuku),
+                    names = listOf(stringResource(R.string.settings_to_hide_name_shizuku_hide)),
+                ),
             )
 
             Row(
@@ -131,7 +147,7 @@ internal fun RevertDefaultsDialog(
             ) {
                 TextButton(
                     onClick = {
-                        onUpdateRevertDefaults(draft)
+                        onUpdateSettingsToHide(draft)
 
                         onDismissRequest()
                     },
@@ -144,15 +160,12 @@ internal fun RevertDefaultsDialog(
 }
 
 /**
- * One target's row.
- *
- * [note] is the small print under a label, for the two rows whose switch does something
- * narrower or broader than the label alone suggests: accessibility services, which governs
- * only the services picked elsewhere in settings rather than every service on the device,
- * and Shizuku, which brings a debugging transport up with it.
+ * One target's row. [note] carries the small print for the two whose effect reaches past
+ * what the label says: USB debugging, which takes the Shizuku service down with it, and
+ * accessibility services, which touches only the services picked elsewhere in settings.
  */
 @Composable
-private fun RevertDefaultRow(
+private fun SettingToHideRow(
     modifier: Modifier = Modifier,
     label: String,
     note: String? = null,
@@ -176,6 +189,40 @@ private fun RevertDefaultRow(
             }
         }
 
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+/**
+ * A note that is about the list as a whole rather than about one row.
+ *
+ * Marked with an information icon rather than indented or italicised, so it cannot be read
+ * as another item to tick — the first of these is specifically warning against ticking
+ * only one of them.
+ */
+@Composable
+private fun InfoLine(
+    modifier: Modifier = Modifier,
+    text: AnnotatedString,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+    ) {
+        Icon(
+            modifier = Modifier.size(16.dp),
+            imageVector = GetoIcons.Info,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

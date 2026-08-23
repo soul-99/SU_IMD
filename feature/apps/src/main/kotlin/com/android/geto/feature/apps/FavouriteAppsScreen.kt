@@ -69,8 +69,9 @@ import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.domain.model.FavouriteAppsData
-import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
+import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
 import com.android.geto.domain.model.LauncherAppsActivityInfo
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.feature.apps.manager.SettingsManagerRoute
@@ -119,131 +120,9 @@ internal fun FavouriteAppsRoute(
         onSearch = viewModel::search,
         onUpdateSortFavouriteApps = viewModel::updateSortFavouriteApps,
         onUpdateFavouriteAppsView = viewModel::updateFavouriteAppsView,
-        onUpdateFavouriteAppsTapAction = viewModel::updateFavouriteAppsTapAction,
         onUpdateFavouriteComponentNames = viewModel::updateFavouriteComponentNames,
         onRevertToDefault = viewModel::revertToDefault,
     )
-}
-
-/**
- * Applies the app's settings, posts the ongoing notification with the Revert action, then
- * opens the app — the same three steps a pinned shortcut performs, so a favourite behaves
- * identically however it is launched.
- *
- * An app with nothing configured is simply opened; there is no point refusing to launch it
- * or nagging about a configuration the user never made.
- */
-@Composable
-private fun ApplyThenLaunchEffect(
-    appLaunch: FavouriteAppLaunch?,
-    snackbarHostState: SnackbarHostState,
-    onNotConfigured: (componentName: String) -> Unit,
-    onConsumed: () -> Unit,
-) {
-    val context = LocalContext.current
-
-    val launcherApps = LocalLauncherApps.current
-
-    val notificationManager = LocalNotificationManager.current
-
-    val title = stringResource(R.string.applied_settings_title)
-
-    val successText = stringResource(R.string.applied_settings_success)
-
-    val failureText = stringResource(R.string.applied_settings_failure)
-
-    val invalidText = stringResource(R.string.applied_settings_invalid)
-
-    val noPermissionText = stringResource(R.string.applied_settings_no_permission)
-
-    LaunchedEffect(appLaunch) {
-        val launch = appLaunch ?: return@LaunchedEffect
-
-        // showSnackbar suspends until the snackbar is dismissed. Switching tabs in that
-        // window cancels this effect, and without the finally the launch would never be
-        // consumed — coming back would replay the snackbar.
-        try {
-            when (launch.result) {
-                AppSettingsResult.Success -> {
-                    postAppliedSettingsNotification(
-                        context = context,
-                        notificationManager = notificationManager,
-                        notificationFunction = launch.notificationFunction,
-                        componentName = launch.componentName,
-                        icon = launch.icon,
-                        contentTitle = title,
-                        contentText = successText,
-                    )
-
-                    launcherApps.startMainActivity(componentName = launch.componentName)
-                }
-
-                // Nothing has ever been configured for this app, so launching it would do
-                // exactly what tapping its own icon does — which is how someone ends up
-                // believing a profile is applied when none exists. DisabledAppSettings is
-                // not the same case and still launches: those settings were configured and
-                // then deliberately switched off.
-                AppSettingsResult.EmptyAppSettings -> onNotConfigured(launch.componentName)
-
-                AppSettingsResult.DisabledAppSettings -> {
-                    launcherApps.startMainActivity(componentName = launch.componentName)
-                }
-
-                AppSettingsResult.Failure -> snackbarHostState.showSnackbar(message = failureText)
-
-                AppSettingsResult.InvalidValues -> snackbarHostState.showSnackbar(message = invalidText)
-
-                AppSettingsResult.NoPermission -> snackbarHostState.showSnackbar(message = noPermissionText)
-            }
-        } finally {
-            onConsumed()
-        }
-    }
-}
-
-/**
- * Shown when a favourite is tapped that has no settings configured.
- *
- * A dialog rather than a snackbar: a snackbar here would be read as "something went wrong
- * with the launch", and this is not a failure — it is the app pointing out that there is
- * nothing set up yet, and saying where to set it up.
- */
-@Composable
-private fun NotConfiguredDialog(
-    modifier: Modifier = Modifier,
-    onDismissRequest: () -> Unit,
-) {
-    DialogContainer(
-        modifier = modifier,
-        onDismissRequest = onDismissRequest,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.not_configured_title),
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = stringResource(R.string.not_configured_message),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                TextButton(onClick = onDismissRequest) {
-                    Text(text = stringResource(R.string.got_it))
-                }
-            }
-        }
-    }
 }
 
 @VisibleForTesting
@@ -259,7 +138,6 @@ internal fun FavouriteAppsScreen(
     onSearch: (String) -> Unit,
     onUpdateSortFavouriteApps: (SortFavouriteApps) -> Unit,
     onUpdateFavouriteAppsView: (FavouriteAppsView) -> Unit,
-    onUpdateFavouriteAppsTapAction: (FavouriteAppsTapAction) -> Unit,
     onUpdateFavouriteComponentNames: (List<String>) -> Unit,
     onRevertToDefault: () -> Unit,
 ) {
@@ -285,7 +163,6 @@ internal fun FavouriteAppsScreen(
                     onSearch = onSearch,
                     onUpdateSortFavouriteApps = onUpdateSortFavouriteApps,
                     onUpdateFavouriteAppsView = onUpdateFavouriteAppsView,
-                    onUpdateFavouriteAppsTapAction = onUpdateFavouriteAppsTapAction,
                     onUpdateFavouriteComponentNames = onUpdateFavouriteComponentNames,
                 )
             }
@@ -349,7 +226,6 @@ private fun Success(
     onSearch: (String) -> Unit,
     onUpdateSortFavouriteApps: (SortFavouriteApps) -> Unit,
     onUpdateFavouriteAppsView: (FavouriteAppsView) -> Unit,
-    onUpdateFavouriteAppsTapAction: (FavouriteAppsTapAction) -> Unit,
     onUpdateFavouriteComponentNames: (List<String>) -> Unit,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
@@ -366,23 +242,27 @@ private fun Success(
             .collect { onSearch(it) }
     }
 
-    // A plain tap does one of the two things and the long press does the other, so
-    // both handlers are derived from the single stored preference.
-    val tapToLaunch = userData.favouriteAppsTapAction == FavouriteAppsTapAction.TapToLaunch
+    // Which app the create-shortcut dialog is for, or null for closed. Held here rather
+    // than navigated to, because the shortcut is made for the row that was held and the
+    // list behind it is the context for that.
+    var shortcutFor by remember { mutableStateOf<LauncherAppsActivityInfo?>(null) }
+
+    // A tap always launches. What a long press does depends on the notification function,
+    // because the two modes need different things behind it: with Revert to default the
+    // settings to hide are device-wide and there is no per-app profile to edit, so the
+    // useful thing is a shortcut; with the memory function the per-app profile is the only
+    // thing that decides what a launch does, so that is what a long press has to reach.
+    val perApp = userData.notificationFunction == NotificationFunction.Memory
 
     val onTap: (LauncherAppsActivityInfo) -> Unit = { info ->
-        if (tapToLaunch) {
-            onLaunchApp(info.componentName)
-        } else {
-            onModifyApp(info.componentName, info.activityLabel)
-        }
+        onLaunchApp(info.componentName)
     }
 
     val onLongPress: (LauncherAppsActivityInfo) -> Unit = { info ->
-        if (tapToLaunch) {
+        if (perApp) {
             onModifyApp(info.componentName, info.activityLabel)
         } else {
-            onLaunchApp(info.componentName)
+            shortcutFor = info
         }
     }
 
@@ -446,18 +326,24 @@ private fun Success(
         }
     }
 
+    shortcutFor?.let { info ->
+        ShortcutRoute(
+            componentName = info.componentName,
+            activityLabel = info.activityLabel,
+            onDismissRequest = { shortcutFor = null },
+        )
+    }
+
     if (showOptionsDialog) {
         FavouriteAppsOptionsDialog(
             sortFavouriteApps = userData.sortFavouriteApps,
             favouriteAppsView = userData.favouriteAppsView,
-            favouriteAppsTapAction = userData.favouriteAppsTapAction,
             canReorder = favouriteAppsData.allFavouriteApps.size > 1,
             onDismissRequest = {
                 showOptionsDialog = false
             },
             onUpdateSortFavouriteApps = onUpdateSortFavouriteApps,
             onUpdateFavouriteAppsView = onUpdateFavouriteAppsView,
-            onUpdateFavouriteAppsTapAction = onUpdateFavouriteAppsTapAction,
             onReorderClick = {
                 showOptionsDialog = false
                 showReorderDialog = true

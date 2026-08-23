@@ -19,7 +19,8 @@
 package com.android.geto.feature.apps
 
 import androidx.annotation.VisibleForTesting
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -49,6 +51,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.LauncherAppsActivityInfo
+import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.LauncherAppsActivityInfoData
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
@@ -62,6 +66,7 @@ import kotlin.time.Duration.Companion.milliseconds
 internal fun AppsRoute(
     modifier: Modifier = Modifier,
     viewModel: AppsViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState,
     onClickApp: (
         componentName: String,
         activityLabel: String,
@@ -69,10 +74,47 @@ internal fun AppsRoute(
 ) {
     val appListUiState by viewModel.appsUiState.collectAsStateWithLifecycle()
 
+    val appLaunch by viewModel.appLaunch.collectAsStateWithLifecycle()
+
+    val notificationFunction by viewModel.notificationFunction.collectAsStateWithLifecycle()
+
+    var notConfigured by rememberSaveable { mutableStateOf(false) }
+
+    var shortcutFor by remember { mutableStateOf<LauncherAppsActivityInfo?>(null) }
+
+    ApplyThenLaunchEffect(
+        appLaunch = appLaunch,
+        snackbarHostState = snackbarHostState,
+        onNotConfigured = { notConfigured = true },
+        onConsumed = viewModel::consumeAppLaunch,
+    )
+
+    if (notConfigured) {
+        NotConfiguredDialog(onDismissRequest = { notConfigured = false })
+    }
+
+    shortcutFor?.let { info ->
+        ShortcutRoute(
+            componentName = info.componentName,
+            activityLabel = info.activityLabel,
+            onDismissRequest = { shortcutFor = null },
+        )
+    }
+
     AppsScreen(
         modifier = modifier,
         appsUiState = appListUiState,
-        onClickApp = onClickApp,
+        // A tap always launches. The long press reaches whichever thing decides what that
+        // launch does: the app's own profile under the memory function, and otherwise a
+        // shortcut, since there is no per-app profile to edit.
+        onClickApp = { componentName, _ -> viewModel.launchApp(componentName) },
+        onLongPressApp = { info ->
+            if (notificationFunction == NotificationFunction.Memory) {
+                onClickApp(info.componentName, info.activityLabel)
+            } else {
+                shortcutFor = info
+            }
+        },
         onSearch = viewModel::search,
         onUpdateSortLauncherAppsActivityInfo = viewModel::updateSortLauncherAppsActivityInfo,
         onUpdateSortOrderLauncherAppsActivityInfo = viewModel::updateSortOrderLauncherAppsActivityInfo,
@@ -90,6 +132,7 @@ internal fun AppsScreen(
         componentName: String,
         activityLabel: String,
     ) -> Unit,
+    onLongPressApp: (LauncherAppsActivityInfo) -> Unit,
     onSearch: (String) -> Unit,
     onUpdateSortLauncherAppsActivityInfo: (SortLauncherAppsActivityInfo) -> Unit,
     onUpdateSortOrderLauncherAppsActivityInfo: (SortOrderLauncherAppsActivityInfo) -> Unit,
@@ -106,6 +149,7 @@ internal fun AppsScreen(
                 Success(
                     launcherAppsActivityInfoData = appsUiState.launcherAppsActivityInfoData,
                     onClickApp = onClickApp,
+                    onLongPressApp = onLongPressApp,
                     onSearch = onSearch,
                     onUpdateSortLauncherAppsActivityInfo = onUpdateSortLauncherAppsActivityInfo,
                     onUpdateSortOrderLauncherAppsActivityInfo = onUpdateSortOrderLauncherAppsActivityInfo,
@@ -126,6 +170,7 @@ private fun Success(
         componentName: String,
         activityLabel: String,
     ) -> Unit,
+    onLongPressApp: (LauncherAppsActivityInfo) -> Unit,
     onSearch: (String) -> Unit,
     onUpdateSortLauncherAppsActivityInfo: (SortLauncherAppsActivityInfo) -> Unit,
     onUpdateSortOrderLauncherAppsActivityInfo: (SortOrderLauncherAppsActivityInfo) -> Unit,
@@ -176,6 +221,7 @@ private fun Success(
                     launcherAppsActivityInfo = launcherAppsActivityInfo,
                     favourite = launcherAppsActivityInfo.componentName in favourites,
                     onClickApp = onClickApp,
+                    onLongPressApp = onLongPressApp,
                     onUpdateFavourite = onUpdateFavourite,
                 )
             }
@@ -197,6 +243,7 @@ private fun Success(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AppItem(
     modifier: Modifier = Modifier,
@@ -206,16 +253,20 @@ private fun AppItem(
         componentName: String,
         activityLabel: String,
     ) -> Unit,
+    onLongPressApp: (LauncherAppsActivityInfo) -> Unit,
     onUpdateFavourite: (componentName: String, favourite: Boolean) -> Unit,
 ) {
     ListItem(
         modifier = modifier
-            .clickable {
-                onClickApp(
-                    launcherAppsActivityInfo.componentName,
-                    launcherAppsActivityInfo.activityLabel,
-                )
-            },
+            .combinedClickable(
+                onClick = {
+                    onClickApp(
+                        launcherAppsActivityInfo.componentName,
+                        launcherAppsActivityInfo.activityLabel,
+                    )
+                },
+                onLongClick = { onLongPressApp(launcherAppsActivityInfo) },
+            ),
         headlineContent = {
             Text(
                 text = launcherAppsActivityInfo.activityLabel,

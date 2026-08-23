@@ -22,7 +22,9 @@ import androidx.lifecycle.viewModelScope
 import com.android.geto.domain.framework.PackageManagerWrapper
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.repository.UserDataRepository
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
+import com.android.geto.domain.usecase.ApplySettingsToHideUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,6 +38,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ShortcutActivityViewModel @Inject constructor(
     private val applyAppSettingsUseCase: ApplyAppSettingsUseCase,
+    private val applySettingsToHideUseCase: ApplySettingsToHideUseCase,
     private val packageManagerWrapper: PackageManagerWrapper,
     private val userDataRepository: UserDataRepository,
 ) : ViewModel() {
@@ -55,13 +58,27 @@ class ShortcutActivityViewModel @Inject constructor(
         initialValue = null as UserData?,
     )
 
+    /**
+     * A pinned shortcut hides whatever the current mode says to hide, then opens the app.
+     *
+     * The same choice the two tabs make, and it has to be the same one: a shortcut is
+     * created from those tabs and is expected to behave like tapping the row it was made
+     * from. Under Revert to default that means the device-wide list, so a shortcut for an
+     * app with no profile works rather than landing on the "nothing configured" screen.
+     */
     fun applyAppSettings(componentName: String) {
         viewModelScope.launch {
-            val appSettingsResult = applyAppSettingsUseCase(componentName = componentName)
+            val notificationFunction = userDataRepository.userData.first().notificationFunction
+
+            val appSettingsResult = when (notificationFunction) {
+                NotificationFunction.RevertToDefault -> applySettingsToHideUseCase()
+
+                NotificationFunction.Memory -> {
+                    applyAppSettingsUseCase(componentName = componentName)
+                }
+            }
 
             val applicationIcon = packageManagerWrapper.getActivityIcon(componentName = componentName)
-
-            val notificationFunction = userDataRepository.userData.first().notificationFunction
 
             _shortcutActivityUiState.update {
                 ShortcutActivityUiState.Success(

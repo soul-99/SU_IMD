@@ -23,11 +23,12 @@ import androidx.lifecycle.viewModelScope
 import com.android.geto.broadcastreceiver.RevertToDefaultRunner
 import com.android.geto.common.ApplicationScope
 import com.android.geto.domain.framework.PackageManagerWrapper
-import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.repository.UserDataRepository
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
+import com.android.geto.domain.usecase.ApplySettingsToHideUseCase
 import com.android.geto.domain.usecase.GetFavouriteAppsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -52,6 +53,7 @@ private const val TARGET_POLL_MILLIS = 500L
 class FavouriteAppsViewModel @Inject constructor(
     getFavouriteAppsUseCase: GetFavouriteAppsUseCase,
     private val applyAppSettingsUseCase: ApplyAppSettingsUseCase,
+    private val applySettingsToHideUseCase: ApplySettingsToHideUseCase,
     private val packageManagerWrapper: PackageManagerWrapper,
     private val userDataRepository: UserDataRepository,
     private val revertToDefaultRunner: RevertToDefaultRunner,
@@ -70,20 +72,35 @@ class FavouriteAppsViewModel @Inject constructor(
         )
 
     /**
-     * Applies the app's configured settings before it is opened, so a tap on the
-     * Favourites tab behaves exactly like the launch arrow on the per-app screen or a
-     * pinned shortcut. Opening the app without applying them would silently defeat the
-     * whole point of having it here.
+     * Hides whatever should be hidden before the app is opened, so a tap on the Favourites
+     * tab behaves exactly like the launch arrow on the per-app screen or a pinned shortcut.
+     * Opening the app without doing it would silently defeat the whole point.
+     *
+     * Which configuration decides that is the notification function's, because the two have
+     * to agree: what is hidden on the way in is what the notification's button offers to
+     * put back. Revert to default reads the one device-wide "Settings to hide" list, so an
+     * app nobody has configured still opens; the memory function reads that app's own
+     * profile, and having none is a real answer that the caller reports rather than
+     * papering over.
      */
     fun launchApp(componentName: String) {
         viewModelScope.launch {
-            val result = applyAppSettingsUseCase(componentName = componentName)
+            // Read before applying, not after. Reading it afterwards would let a
+            // preference changed in the intervening moment announce the launch under a
+            // function other than the one that actually ran.
+            val notificationFunction = userDataRepository.userData.first().notificationFunction
+
+            val result = when (notificationFunction) {
+                NotificationFunction.RevertToDefault -> applySettingsToHideUseCase()
+
+                NotificationFunction.Memory -> {
+                    applyAppSettingsUseCase(componentName = componentName)
+                }
+            }
 
             // Fetched before the update: update re-runs its block on a compare-and-set
             // failure, and getActivityIcon is a real binder call.
             val icon = packageManagerWrapper.getActivityIcon(componentName = componentName)
-
-            val notificationFunction = userDataRepository.userData.first().notificationFunction
 
             _appLaunch.update {
                 FavouriteAppLaunch(
@@ -125,12 +142,6 @@ class FavouriteAppsViewModel @Inject constructor(
     fun updateFavouriteAppsView(favouriteAppsView: FavouriteAppsView) {
         viewModelScope.launch {
             userDataRepository.updateFavouriteAppsView(favouriteAppsView = favouriteAppsView)
-        }
-    }
-
-    fun updateFavouriteAppsTapAction(favouriteAppsTapAction: FavouriteAppsTapAction) {
-        viewModelScope.launch {
-            userDataRepository.updateFavouriteAppsTapAction(favouriteAppsTapAction = favouriteAppsTapAction)
         }
     }
 

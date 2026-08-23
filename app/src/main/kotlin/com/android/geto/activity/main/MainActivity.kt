@@ -17,6 +17,7 @@
  */
 package com.android.geto.activity.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,6 +26,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,6 +34,8 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.android.geto.common.EXTRA_OPEN_REVERT_CONFIGURATION
+import com.android.geto.designsystem.component.LocalRevertConfigurationRequest
 import com.android.geto.designsystem.theme.GetoTheme
 import com.android.geto.domain.framework.ShizukuWrapper
 import com.android.geto.framework.launcherapps.AndroidLauncherAppsWrapper
@@ -63,6 +67,38 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
 
     /**
+     * How many times the manager dialog has asked for the revert configuration.
+     *
+     * Counted rather than flagged. A boolean set true on the first request stays true, so
+     * the second request changes nothing, nothing recomposes and the configuration never
+     * opens again until the app is killed — which is precisely what a flag did here.
+     */
+    private var revertConfigurationRequest by mutableIntStateOf(0)
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        setIntent(intent)
+
+        consumeRevertConfigurationRequest(intent)
+    }
+
+    /**
+     * Reads the request off an intent, and takes it off again.
+     *
+     * Removing it matters: the same intent is handed back on every configuration change, so
+     * an extra left in place would reopen the configuration on each rotation, long after the
+     * press that asked for it.
+     */
+    private fun consumeRevertConfigurationRequest(intent: Intent) {
+        if (!intent.getBooleanExtra(EXTRA_OPEN_REVERT_CONFIGURATION, false)) return
+
+        intent.removeExtra(EXTRA_OPEN_REVERT_CONFIGURATION)
+
+        revertConfigurationRequest += 1
+    }
+
+    /**
      * The version code of the APK actually installed.
      *
      * Read from the package manager rather than from `BuildConfig`, matching what the
@@ -87,10 +123,13 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
+        consumeRevertConfigurationRequest(intent)
+
         setContent {
             CompositionLocalProvider(
                 LocalLauncherApps provides androidLauncherAppsWrapper,
                 LocalNotificationManager provides androidNotificationManagerWrapper,
+                LocalRevertConfigurationRequest provides revertConfigurationRequest,
             ) {
                 val navController = rememberNavController()
 
@@ -116,8 +155,27 @@ class MainActivity : ComponentActivity() {
                                 // screen; a user missing one stays on it until they tap
                                 // Continue, and Continue only enables once both are
                                 // actually granted.
+                                // Notifications are required to get *through* setup and
+                                // not afterwards. Without them the Revert action on the
+                                // notification is lost, but the tile, the shortcut and the
+                                // in-app button all still work — so switching them off
+                                // later is a choice about one route back, not a broken
+                                // app, and locking the whole app behind a setup screen
+                                // over it would be a punishment rather than a fix.
+                                //
+                                // WRITE_SECURE_SETTINGS stays mandatory forever: without
+                                // it every settings write silently fails and nothing the
+                                // app does works at all.
+                                val setupEverCompleted = uiState.userData.setupNoticeVersion != 0
+
+                                val permissionsMissing = if (setupEverCompleted) {
+                                    !setupState.hasSecureSettings
+                                } else {
+                                    !setupState.isComplete
+                                }
+
                                 var showSetup by remember {
-                                    mutableStateOf(!setupState.isComplete)
+                                    mutableStateOf(permissionsMissing)
                                 }
 
                                 // The reminders page is about configuration that changes
@@ -128,14 +186,14 @@ class MainActivity : ComponentActivity() {
                                 val remindersDue = uiState.userData.setupNoticeVersion !=
                                     installedVersionCode
 
-                                if (showSetup || !setupState.isComplete || remindersDue) {
+                                if (showSetup || permissionsMissing || remindersDue) {
                                     SetupScreen(
                                         setupState = setupState,
                                         // Straight to the reminders when the only reason for
                                         // being here is an update: the permissions step is
                                         // already satisfied and asking again would read as
                                         // the app having forgotten.
-                                        remindersOnly = setupState.isComplete && remindersDue,
+                                        remindersOnly = !permissionsMissing && remindersDue,
                                         grantViaShizuku = {
                                             shizukuWrapper.grantWriteSecureSettings(
                                                 packageName = packageName,

@@ -35,15 +35,10 @@
     <string name="no_matching_favourite_apps">No favourites match that search</string>
     <string name="no_favourite_apps_subtitle">Tap the star next to an app in All Apps, or the star in its settings screen.</string>
     <string name="view">View</string>
-    <string name="default_tap">Default tap</string>
     <string name="custom">Custom</string>
     <string name="alphabetical">A–Z</string>
     <string name="list">List</string>
     <string name="grid">Grid</string>
-    <string name="tap_to_launch">Tap launches</string>
-    <string name="tap_to_modify">Tap modifies</string>
-    <string name="tap_to_launch_description">Tap to launch the app, long press to modify its settings.</string>
-    <string name="tap_to_modify_description">Tap to modify the app\'s settings, long press to launch it.</string>
     <string name="reorder">Reorder</string>
     <string name="reorder_favourites">Reorder favourites</string>
     <string name="move_up">Move up</string>
@@ -52,7 +47,9 @@
 
     <!-- Launching a favourite applies its settings first, exactly like a pinned shortcut -->
     <string name="applied_settings_title">IMD</string>
-    <string name="applied_settings_success">Settings applied</string>
+    <string name="applied_settings_success">Settings hidden/disabled</string>
+    <string name="settings_manager_configure_revert">Configure what Revert restores</string>
+    <string name="settings_manager_accessibility_unmanaged">No accessibility services are currently being managed by the IMD app</string>
     <string name="applied_settings_failure">Could not apply settings</string>
     <string name="applied_settings_invalid">This app has settings with invalid values</string>
     <!-- Manual revert -->
@@ -60,8 +57,8 @@
          notification action, and the two merge into one resource in :app. -->
     <string name="settings_manager_title">IMD services manager</string>
     <string name="revert_to_default">Revert to default</string>
-    <string name="not_configured_title">Nothing to hide yet</string>
-    <string name="not_configured_message">Long press app icon and select settings to hide first</string>
+    <string name="not_configured_title">No settings to hide, you need to configure the settings to hide for this app.</string>
+    <string name="not_configured_message">In IMD app long press this app to open what settings to hide.</string>
     <string name="got_it">Got it</string>
     <string name="settings_manager_open">Open %1$s</string>
     <string name="settings_manager_accessibility_note">only services selected in the IMD app settings are managed</string>

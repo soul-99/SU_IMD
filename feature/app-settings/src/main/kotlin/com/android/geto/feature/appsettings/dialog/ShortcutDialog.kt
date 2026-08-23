@@ -49,9 +49,10 @@ import com.android.geto.feature.appsettings.R
 import com.android.geto.common.R as commonR
 
 @Composable
-internal fun RequestPinShortcutDialog(
+fun RequestPinShortcutDialog(
     modifier: Modifier = Modifier,
     icon: ByteArray?,
+    activityLabel: String,
     onDismissRequest: () -> Unit,
     onRequestPinShortcut: (
         icon: ByteArray?,
@@ -59,11 +60,14 @@ internal fun RequestPinShortcutDialog(
         longLabel: String,
     ) -> Unit,
 ) {
-    var shortLabel by remember { mutableStateOf("") }
+    // Both seeded with the app's own name, the same way the update dialog seeds from the
+    // shortcut it is editing. Two blank required fields made creating a shortcut a typing
+    // exercise whose only sensible answer was the name already on the screen behind it.
+    var shortLabel by remember(activityLabel) { mutableStateOf(activityLabel) }
 
     var showShortLabelError by remember { mutableStateOf(false) }
 
-    var longLabel by remember { mutableStateOf("") }
+    var longLabel by remember(activityLabel) { mutableStateOf(activityLabel) }
 
     var showLongLabelError by remember { mutableStateOf(false) }
 
@@ -132,7 +136,7 @@ internal fun RequestPinShortcutDialog(
 }
 
 @Composable
-internal fun UpdatePinShortcutDialog(
+fun UpdatePinShortcutDialog(
     modifier: Modifier = Modifier,
     icon: ByteArray?,
     getoShortcutInfoCompat: GetoShortcutInfoCompat,
@@ -143,11 +147,15 @@ internal fun UpdatePinShortcutDialog(
         longLabel: String,
     ) -> Unit,
 ) {
-    var shortLabel by remember { mutableStateOf(getoShortcutInfoCompat.shortLabel) }
+    var shortLabel by remember(getoShortcutInfoCompat) {
+        mutableStateOf(getoShortcutInfoCompat.shortLabel)
+    }
 
     var showShortLabelError by remember { mutableStateOf(false) }
 
-    var longLabel by remember { mutableStateOf(getoShortcutInfoCompat.longLabel) }
+    var longLabel by remember(getoShortcutInfoCompat) {
+        mutableStateOf(getoShortcutInfoCompat.longLabel)
+    }
 
     var showLongLabelError by remember { mutableStateOf(false) }
 
