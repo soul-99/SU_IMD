@@ -10,13 +10,13 @@
 
 Open banking and other locked-down apps without turning developer options, USB debugging, wireless debugging or your accessibility services off by hand every single time.
 
-Some apps refuse to run — or quietly disable parts of themselves — when they detect developer options, an ADB connection or an active accessibility service. The usual workaround is to go and switch those things off before opening the app and switch them back on afterwards, every time. IMD does that for you: pick an app, say which settings should change while it runs, and launch it from here. The settings are applied, the app opens, and an ongoing notification with a **Revert** action puts your device back the way it was.
+Some apps refuse to run or quietly disable parts of themselves when they detect developer options, an ADB connection or an active accessibility service. The usual workaround is to go and switch those things off before opening the app and switch them back on afterwards, every time. IMD does that for you: pick an app, say which settings should change while it runs, and launch it from here. The settings are applied, the app opens, and an ongoing notification with a **Revert** action puts your device back the way it was.
 
 The **IMD services manager** is the other half of that: one dialog showing the live state of developer settings, USB debugging, wireless debugging, your managed accessibility services and the Shizuku service, with a switch on each and a **Revert to default** button at the bottom. It opens from a Quick Settings tile, a homescreen shortcut or the Favourites tab — without the app itself having to be open — which is what you reach for when a banking app has just refused to start and you do not want to go hunting through Android's settings to find out why.
 
-It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the parts that did not survive real use — Shizuku dying with USB debugging, accessibility services that were listed but never actually stopped, and a quick re-enable settings button in app.
+It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the parts that did not survive real use - Shizuku dying with USB debugging disable, accessibility services that actually never stopped, and a quick re-enable settings button in app.
 
-- **Package:** `com.soul_99.suIMD` — installs alongside stock Geto, both can coexist
+- **Package:** `com.soul_99.suIMD` - installs alongside stock Geto, both can coexist
 - **Requires:** Android 7.0 (API 24) or newer, and `WRITE_SECURE_SETTINGS` granted once over ADB or Shizuku. **No root.**
 - **Licence:** GPL-3.0
 - **No** ads, analytics, trackers, accounts or network access of any kind. The app never talks to the internet.
@@ -86,9 +86,9 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 
 ### From the original Geto
 
-- Per-app profiles of Android **system**, **secure** and **global** settings.
+- Per-app profiles of Android **system**, **secure** and **global** settings (if using memory function as notification function).
 - A searchable, sortable list of every installed apps.
-- A browsable copy of the device's current settings
+- A browsable copy of the device settings.
 - Launch app from inside IMD or shortcut with its profile applied, and an ongoing notification carrying the **Revert** action.
 - A settings-observer foreground service.
 
@@ -104,12 +104,11 @@ This app is a fork of **[Geto](https://github.com/JackEblan/Geto)** by **Jack Eb
 
 ## The future of this fork
 
-I'm a radiology resident doctor, not a software developer. Writing software is a hobby, and this app
-exists because I wanted it to exist for myself — so please don't expect future builds,
-regular updates, or fixes for problems on devices I don't own. If it works for you, good; if
-it breaks, I may well not be able to help.
+I'm a full time radiology resident doctor, software is just a part time hobby. This app
+exists because I wanted it to exist for myself, I have made multiple revisions after testing every build, fixing bugs and adding features, making the app what it is now - **on par with my expectations**. Please know that it will take some time for me to reply to queries, fix bugs and add new features in future builds, so please be patient. 
+But I do plan to maintain this app for the near future, until someone else makes a better app for the same purpose.
 
-The source is all here under the GPL-3.0. Use it freely for your own purposes — build it,
+The source is all here under the GPL-3.0. Use it freely for your own purposes - build it,
 change it, fork it, keep the changes to yourself or pass them on. That is what it is for.
 
 Thanks!
