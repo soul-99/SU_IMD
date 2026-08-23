@@ -19,6 +19,7 @@
 package com.android.geto.feature.apps
 
 import com.android.geto.domain.model.AppSettingsResult
+import com.android.geto.domain.model.NotificationFunction
 
 /**
  * The outcome of applying a favourite's settings, on its way to the UI so it can post the
@@ -32,4 +33,10 @@ class FavouriteAppLaunch(
     val componentName: String,
     val result: AppSettingsResult,
     val icon: ByteArray?,
+    /**
+     * Read when the settings were applied rather than when the notification is posted, so a
+     * launch cannot be applied under one function and announced under the other if the
+     * preference changes in the moment between.
+     */
+    val notificationFunction: NotificationFunction,
 )

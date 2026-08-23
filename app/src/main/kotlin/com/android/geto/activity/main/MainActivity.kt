@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
@@ -37,6 +38,7 @@ import com.android.geto.framework.launcherapps.AndroidLauncherAppsWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import com.android.geto.navigation.GetoNavHost
 import com.android.geto.onboarding.SetupScreen
+import com.android.geto.onboarding.ObtainiumDialog
 import com.android.geto.onboarding.TipDialog
 import com.android.geto.onboarding.rememberSetupState
 import com.android.geto.ui.local.LocalLauncherApps
@@ -59,6 +61,24 @@ class MainActivity : ComponentActivity() {
     lateinit var shizukuWrapper: ShizukuWrapper
 
     private val viewModel: MainActivityViewModel by viewModels()
+
+    /**
+     * The version code of the APK actually installed.
+     *
+     * Read from the package manager rather than from `BuildConfig`, matching what the
+     * settings screen does with the version name: every module generates its own
+     * `BuildConfig`, and the one visible here is not necessarily the app's.
+     *
+     * Zero when the lookup fails, which matches the stored default and so simply means the
+     * reminders page is shown — the harmless direction to fail in.
+     */
+    private val installedVersionCode: Int by lazy {
+        runCatching {
+            PackageInfoCompat.getLongVersionCode(
+                packageManager.getPackageInfo(packageName, 0),
+            ).toInt()
+        }.getOrDefault(0)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -100,15 +120,34 @@ class MainActivity : ComponentActivity() {
                                     mutableStateOf(!setupState.isComplete)
                                 }
 
-                                if (showSetup || !setupState.isComplete) {
+                                // The reminders page is about configuration that changes
+                                // between releases, so it is gated on the version that last
+                                // showed it rather than on a "seen it" flag. Someone who
+                                // finished setup two versions ago has never read the
+                                // current ones, and is exactly who they are written for.
+                                val remindersDue = uiState.userData.setupNoticeVersion !=
+                                    installedVersionCode
+
+                                if (showSetup || !setupState.isComplete || remindersDue) {
                                     SetupScreen(
                                         setupState = setupState,
+                                        // Straight to the reminders when the only reason for
+                                        // being here is an update: the permissions step is
+                                        // already satisfied and asking again would read as
+                                        // the app having forgotten.
+                                        remindersOnly = setupState.isComplete && remindersDue,
                                         grantViaShizuku = {
                                             shizukuWrapper.grantWriteSecureSettings(
                                                 packageName = packageName,
                                             )
                                         },
-                                        onContinue = { showSetup = false },
+                                        onContinue = {
+                                            viewModel.markSetupNoticeSeen(
+                                                versionCode = installedVersionCode,
+                                            )
+
+                                            showSetup = false
+                                        },
                                     )
                                 } else {
                                     GetoNavHost(navController = navController)
@@ -117,8 +156,15 @@ class MainActivity : ComponentActivity() {
                                     // just finished", so it also reaches anyone upgrading
                                     // into this version — they were set up long ago and
                                     // would otherwise never see it.
+                                    // One at a time, in order. Two modal dialogs stacked
+                                    // on a fresh install is how the second one gets
+                                    // dismissed without being read.
                                     if (!uiState.userData.tipShown) {
                                         TipDialog(onDismissRequest = viewModel::markTipShown)
+                                    } else if (!uiState.userData.obtainiumTipShown) {
+                                        ObtainiumDialog(
+                                            onDismissRequest = viewModel::markObtainiumTipShown,
+                                        )
                                     }
                                 }
                             }

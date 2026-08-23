@@ -22,6 +22,7 @@ import com.android.geto.data.datastore.UserPreferencesDataSource
 import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.ManualRevertTarget
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
@@ -102,6 +103,10 @@ class DefaultUserDataRepository @Inject constructor(
         userPreferencesDataSource.updateShizukuStartAction(shizukuStartAction = shizukuStartAction)
     }
 
+    override suspend fun updateObtainiumTipShown(obtainiumTipShown: Boolean) {
+        userPreferencesDataSource.updateObtainiumTipShown(obtainiumTipShown = obtainiumTipShown)
+    }
+
     override suspend fun updateManagedAccessibilityServices(components: List<String>) {
         userPreferencesDataSource.updateManagedAccessibilityServices(components = components)
     }
@@ -120,5 +125,21 @@ class DefaultUserDataRepository @Inject constructor(
 
     override suspend fun updateTipShown(tipShown: Boolean) {
         userPreferencesDataSource.updateTipShown(tipShown = tipShown)
+    }
+
+    override suspend fun updateNotificationFunction(notificationFunction: NotificationFunction) {
+        userPreferencesDataSource.updateNotificationFunction(notificationFunction = notificationFunction)
+    }
+
+    override suspend fun updateRevertDefaults(states: Map<ManualRevertTarget, Boolean>) {
+        userPreferencesDataSource.updateRevertDefaults(states = states)
+    }
+
+    override suspend fun updateShizukuStartFailed(failed: Boolean) {
+        userPreferencesDataSource.updateShizukuStartFailed(failed = failed)
+    }
+
+    override suspend fun updateSetupNoticeVersion(versionCode: Int) {
+        userPreferencesDataSource.updateSetupNoticeVersion(versionCode = versionCode)
     }
 }

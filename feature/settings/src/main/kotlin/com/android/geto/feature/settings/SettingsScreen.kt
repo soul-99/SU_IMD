@@ -18,10 +18,7 @@
  */
 package com.android.geto.feature.settings
 
-import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -40,6 +37,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -83,26 +83,34 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import coil.compose.AsyncImage
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.android.geto.common.ProjectLinks
+import com.android.geto.common.openObtainium
+import com.android.geto.common.openProjectUri
 import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.designsystem.theme.supportsDynamicTheming
 import com.android.geto.domain.model.AccessibilityServiceData
 import com.android.geto.domain.model.InstalledAppData
+import com.android.geto.domain.model.ManualRevertTarget
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.ShizukuForkDefaults
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.model.UserData
 import com.android.geto.feature.settings.dialog.AccessibilityServicesDialog
+import com.android.geto.feature.settings.dialog.NotificationFunctionDialog
+import com.android.geto.feature.settings.dialog.RevertDefaultsDialog
 import com.android.geto.feature.settings.dialog.ThemeDialog
+import com.android.geto.feature.settings.help.SetupHelpDialog
 import com.android.geto.service.SettingsObserverService
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlin.time.Duration.Companion.milliseconds
 
 /** How long the Shizuku text fields wait after the last keystroke before persisting. */
 private val COMMIT_DEBOUNCE = 500.milliseconds
@@ -146,6 +154,8 @@ internal fun SettingsRoute(
         onUpdateShizukuPackageName = viewModel::updateShizukuPackageName,
         onUpdateShizukuStartAction = viewModel::updateShizukuStartAction,
         onUpdateManagedAccessibilityServices = viewModel::updateManagedAccessibilityServices,
+        onUpdateNotificationFunction = viewModel::updateNotificationFunction,
+        onUpdateRevertDefaults = viewModel::updateRevertDefaults,
         onRefreshAccessibilityServices = viewModel::refreshAccessibilityServices,
         onRefreshInstalledApps = viewModel::refreshInstalledApps,
     )
@@ -167,6 +177,8 @@ internal fun SettingsScreen(
     onUpdateShizukuPackageName: (String) -> Unit,
     onUpdateShizukuStartAction: (String) -> Unit,
     onUpdateManagedAccessibilityServices: (List<String>) -> Unit,
+    onUpdateNotificationFunction: (NotificationFunction) -> Unit,
+    onUpdateRevertDefaults: (Map<ManualRevertTarget, Boolean>) -> Unit,
     onRefreshAccessibilityServices: () -> Unit,
     onRefreshInstalledApps: () -> Unit,
 ) {
@@ -193,6 +205,8 @@ internal fun SettingsScreen(
                     onUpdateShizukuPackageName = onUpdateShizukuPackageName,
                     onUpdateShizukuStartAction = onUpdateShizukuStartAction,
                     onUpdateManagedAccessibilityServices = onUpdateManagedAccessibilityServices,
+                    onUpdateNotificationFunction = onUpdateNotificationFunction,
+                    onUpdateRevertDefaults = onUpdateRevertDefaults,
                     onRefreshAccessibilityServices = onRefreshAccessibilityServices,
                     onRefreshInstalledApps = onRefreshInstalledApps,
                 )
@@ -216,6 +230,8 @@ private fun Success(
     onUpdateShizukuPackageName: (String) -> Unit,
     onUpdateShizukuStartAction: (String) -> Unit,
     onUpdateManagedAccessibilityServices: (List<String>) -> Unit,
+    onUpdateNotificationFunction: (NotificationFunction) -> Unit,
+    onUpdateRevertDefaults: (Map<ManualRevertTarget, Boolean>) -> Unit,
     onRefreshAccessibilityServices: () -> Unit,
     onRefreshInstalledApps: () -> Unit,
 ) {
@@ -225,71 +241,134 @@ private fun Success(
 
     var showAccessibilityServicesDialog by remember { mutableStateOf(false) }
 
+    var showNotificationFunctionDialog by remember { mutableStateOf(false) }
+
+    var showRevertDefaultsDialog by remember { mutableStateOf(false) }
+
     var selectedTheme by remember { mutableIntStateOf(Theme.entries.indexOf(userData.theme)) }
+
+    // Plain remember, not rememberSaveable: the sections reset to collapsed on every visit
+    // so the screen always opens as a short list of headings rather than in whatever state
+    // it was left in last week. Same reasoning as the Shizuku configuration panel.
+    var expanded by remember { mutableStateOf<SettingsSection?>(null) }
+
+    val toggleSection = { section: SettingsSection ->
+        expanded = if (expanded == section) null else section
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        DynamicThemeSetting(
-            dynamicTheme = userData.dynamicTheme,
-            onUpdateDynamicTheme = onUpdateDynamicTheme,
-        )
+        CollapsibleSection(
+            title = stringResource(R.string.section_theme),
+            expanded = expanded == SettingsSection.Theme,
+            onToggle = { toggleSection(SettingsSection.Theme) },
+        ) {
+            DynamicThemeSetting(
+                dynamicTheme = userData.dynamicTheme,
+                onUpdateDynamicTheme = onUpdateDynamicTheme,
+            )
 
-        SettingsColumn(
-            title = stringResource(R.string.theme),
-            subtitle = userData.theme.getTitle(),
-            onClick = { showThemeDialog = true },
-        )
+            SettingsColumn(
+                title = stringResource(R.string.theme),
+                subtitle = userData.theme.getTitle(),
+                onClick = { showThemeDialog = true },
+            )
+        }
 
-        SettingsColumn(
-            title = stringResource(R.string.settings_observer_service),
-            subtitle = if (isServiceRunning) {
-                stringResource(R.string.stop_service)
-            } else {
-                stringResource(R.string.start_service)
-            },
-            onClick = {
-                val intent = Intent(context, SettingsObserverService::class.java)
+        CollapsibleSection(
+            title = stringResource(R.string.section_app_functions),
+            expanded = expanded == SettingsSection.AppFunctions,
+            onToggle = { toggleSection(SettingsSection.AppFunctions) },
+        ) {
+            SettingsColumn(
+                title = stringResource(R.string.notification_function),
+                subtitle = userData.notificationFunction.getTitle(),
+                onClick = { showNotificationFunctionDialog = true },
+            )
 
-                if (isServiceRunning) {
-                    context.stopService(intent)
+            SettingsColumn(
+                title = stringResource(R.string.revert_defaults),
+                subtitle = stringResource(
+                    R.string.revert_defaults_summary,
+                    userData.revertDefaults.count { it.value },
+                    userData.revertDefaults.size,
+                ),
+                onClick = { showRevertDefaultsDialog = true },
+            )
+
+        }
+
+        CollapsibleSection(
+            title = stringResource(R.string.shizuku),
+            expanded = expanded == SettingsSection.Shizuku,
+            onToggle = { toggleSection(SettingsSection.Shizuku) },
+        ) {
+            ShizukuSection(
+                userData = userData,
+                installedApps = installedApps,
+                onUpdateRestartShizuku = onUpdateRestartShizuku,
+                onUpdateShizukuForkMode = onUpdateShizukuForkMode,
+                onUpdateShizukuAuthKey = onUpdateShizukuAuthKey,
+                onUpdateShizukuPackageName = onUpdateShizukuPackageName,
+                onUpdateShizukuStartAction = onUpdateShizukuStartAction,
+                onRefreshInstalledApps = onRefreshInstalledApps,
+            )
+        }
+
+        CollapsibleSection(
+            title = stringResource(R.string.accessibility),
+            expanded = expanded == SettingsSection.Accessibility,
+            onToggle = { toggleSection(SettingsSection.Accessibility) },
+        ) {
+            SettingsColumn(
+                title = stringResource(R.string.accessibility_services),
+                subtitle = accessibilityServicesSubtitle(
+                    accessibilityServices = accessibilityServices,
+                    managed = userData.managedAccessibilityServices,
+                ),
+                onClick = {
+                    onRefreshAccessibilityServices()
+
+                    showAccessibilityServicesDialog = true
+                },
+            )
+        }
+
+        CollapsibleSection(
+            title = stringResource(R.string.section_advanced),
+            expanded = expanded == SettingsSection.Advanced,
+            onToggle = { toggleSection(SettingsSection.Advanced) },
+        ) {
+            // A foreground service that watches every settings change. Useful for working
+            // out what an app is actually reading, and of no interest to anyone who is not
+            // doing that — which is what makes it advanced rather than an app function.
+            SettingsColumn(
+                title = stringResource(R.string.settings_observer_service),
+                subtitle = if (isServiceRunning) {
+                    stringResource(R.string.stop_service)
                 } else {
-                    ContextCompat.startForegroundService(context, intent)
-                }
-            },
-        )
+                    stringResource(R.string.start_service)
+                },
+                onClick = {
+                    val intent = Intent(context, SettingsObserverService::class.java)
 
-        SectionDivider(title = stringResource(R.string.shizuku))
+                    if (isServiceRunning) {
+                        context.stopService(intent)
+                    } else {
+                        ContextCompat.startForegroundService(context, intent)
+                    }
+                },
+            )
+        }
 
-        ShizukuSection(
-            userData = userData,
-            installedApps = installedApps,
-            onUpdateRestartShizuku = onUpdateRestartShizuku,
-            onUpdateShizukuForkMode = onUpdateShizukuForkMode,
-            onUpdateShizukuAuthKey = onUpdateShizukuAuthKey,
-            onUpdateShizukuPackageName = onUpdateShizukuPackageName,
-            onUpdateShizukuStartAction = onUpdateShizukuStartAction,
-            onRefreshInstalledApps = onRefreshInstalledApps,
-        )
-
-        SectionDivider(title = stringResource(R.string.accessibility))
-
-        SettingsColumn(
-            title = stringResource(R.string.accessibility_services),
-            subtitle = accessibilityServicesSubtitle(
-                accessibilityServices = accessibilityServices,
-                managed = userData.managedAccessibilityServices,
-            ),
-            onClick = {
-                onRefreshAccessibilityServices()
-
-                showAccessibilityServicesDialog = true
-            },
-        )
-
+        // Not collapsible, unlike the five above. There is nothing to configure in it, and
+        // the version line is what someone opens this screen to read when reporting a bug.
         SectionDivider(title = stringResource(R.string.about))
+
+        Spacer(modifier = Modifier.height(60.dp))
 
         AboutSection()
 
@@ -321,6 +400,97 @@ private fun Success(
             onUpdateManagedAccessibilityServices = onUpdateManagedAccessibilityServices,
         )
     }
+
+    if (showNotificationFunctionDialog) {
+        NotificationFunctionDialog(
+            selected = userData.notificationFunction,
+            onDismissRequest = { showNotificationFunctionDialog = false },
+            onUpdateNotificationFunction = onUpdateNotificationFunction,
+        )
+    }
+
+    if (showRevertDefaultsDialog) {
+        RevertDefaultsDialog(
+            states = userData.revertDefaults,
+            onDismissRequest = { showRevertDefaultsDialog = false },
+            onUpdateRevertDefaults = onUpdateRevertDefaults,
+        )
+    }
+}
+
+/**
+ * Which section is open.
+ *
+ * One at a time rather than a flag per section: the screen is a short list of five headings
+ * when everything is shut, and that is the state it is most useful in — opening one section
+ * should not mean scrolling past another that was left open.
+ */
+private enum class SettingsSection {
+    Theme,
+    AppFunctions,
+    Shizuku,
+    Accessibility,
+    Advanced,
+}
+
+/**
+ * A section heading that opens and closes, wrapping its own contents.
+ *
+ * A Material 3 card rather than a rule and a row: with everything collapsed this screen is a
+ * list of five headings, and containers are what make that read as five choices rather than
+ * five pieces of one long page. The tonal surface also separates a closed section from an
+ * open one without needing a second colour.
+ */
+@Composable
+private fun CollapsibleSection(
+    modifier: Modifier = Modifier,
+    title: String,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = if (expanded) {
+                MaterialTheme.colorScheme.surfaceContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            },
+        ),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onToggle)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+
+            Icon(
+                imageVector = if (expanded) GetoIcons.ExpandLess else GetoIcons.ExpandMore,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        if (expanded) {
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                content()
+            }
+        }
+    }
 }
 
 @OptIn(FlowPreview::class)
@@ -343,11 +513,6 @@ private fun ShizukuSection(
     var packageName by rememberSaveable { mutableStateOf(userData.shizukuPackageName) }
 
     var authKey by rememberSaveable { mutableStateOf(userData.shizukuAuthKey) }
-
-    // Plain remember, not rememberSaveable: Advanced is a "go and look something up"
-    // panel, not a preference. Saving it meant that once it had been opened — which the
-    // gated toggle does for you — it stayed open on every later visit.
-    var showAdvanced by remember { mutableStateOf(false) }
 
     var showFillHint by rememberSaveable { mutableStateOf(false) }
 
@@ -382,13 +547,110 @@ private fun ShizukuSection(
             .collect { onUpdateShizukuAuthKey(it) }
     }
 
-    // The picker needs the installed-app list to be able to preselect anything, so ask for
-    // it as soon as the panel opens rather than when the dropdown is first tapped.
-    LaunchedEffect(showAdvanced) {
-        if (showAdvanced) onRefreshInstalledApps()
+    // The picker needs the installed-app list to be able to preselect anything. Asked for
+    // as soon as the section is composed, now that the fields are always on screen rather
+    // than behind a panel that had to be opened first.
+    LaunchedEffect(Unit) {
+        onRefreshInstalledApps()
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
+        // Always shown, and first. These fields are the precondition for everything else
+        // in this section — the restart switch below is dead until they are filled — so a
+        // panel that had to be opened first was hiding the step people came here to do.
+        // The heading stays because the setup help sends people to "Settings > Shizuku >
+        // Configuration" by name.
+        Text(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+            text = stringResource(R.string.configuration),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+        )
+
+        // Which forks this can drive at all. It belongs here rather than under the
+        // restart switch, where it used to be: it is a precondition for everything in
+        // this panel, not a footnote about one option.
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            text = shizukuForkRequirement(),
+            style = MaterialTheme.typography.bodySmall,
+        )
+
+        ForkModeSelector(
+            selected = forkMode,
+            onSelect = { mode ->
+                if (mode != forkMode) {
+                    // Picking a family is the only moment the app knows enough to fill
+                    // these in, and the two families disagree about every one of them.
+                    // Written into the visible fields rather than applied behind the
+                    // scenes, so a wrong guess is something the user can see and fix.
+                    val suggested = ShizukuForkDefaults.packageFor(
+                        mode = mode,
+                        apps = installedApps,
+                    )
+
+                    packageName = suggested
+
+                    startAction = ShizukuForkDefaults.actionFor(
+                        mode = mode,
+                        selectedLabel = installedApps.labelOf(suggested),
+                    )
+
+                    onUpdateShizukuForkMode(mode)
+                }
+            },
+        )
+
+        if (forkMode != ShizukuForkMode.Unset) {
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                text = stringResource(
+                    if (forkMode == ShizukuForkMode.Thedjchi) {
+                        R.string.shizuku_view_intents_hint
+                    } else {
+                        R.string.shizuku_other_fork_hint
+                    },
+                ),
+                style = MaterialTheme.typography.bodySmall,
+            )
+
+            PackageNameField(
+                value = packageName,
+                installedApps = installedApps,
+                onValueChange = { packageName = it },
+                onSelectApp = { app ->
+                    packageName = app.packageName
+
+                    // Only the "other forks" family derives its action from which app
+                    // was picked; thedjchi's is the same string whatever the package
+                    // has been renamed to.
+                    if (forkMode == ShizukuForkMode.Other) {
+                        startAction = ShizukuForkDefaults.actionFor(
+                            mode = forkMode,
+                            selectedLabel = app.label,
+                        )
+                    }
+                },
+            )
+
+            ShizukuField(
+                value = startAction,
+                label = stringResource(R.string.shizuku_start_action),
+                onValueChange = { startAction = it },
+            )
+
+            if (forkMode.requiresAuthKey) {
+                ShizukuField(
+                    value = authKey,
+                    label = stringResource(R.string.shizuku_auth_key),
+                    secret = true,
+                    onValueChange = { authKey = it },
+                )
+            }
+        }
+
+        // Last, because it is the only thing here that does nothing until the fields above
+        // are filled — and it stays disabled, with the hint below, until they are.
         Row(
             modifier = Modifier
                 .clickable {
@@ -396,10 +658,8 @@ private fun ShizukuSection(
                         onUpdateRestartShizuku(!userData.restartShizuku)
                     } else {
                         // Rather than a dead switch with no explanation, say what is
-                        // missing and open the section that holds it.
+                        // missing. The fields it refers to are already on screen above.
                         showFillHint = true
-
-                        showAdvanced = true
                     }
                 }
                 .fillMaxWidth()
@@ -424,7 +684,7 @@ private fun ShizukuSection(
 
         Text(
             modifier = Modifier.padding(horizontal = 16.dp),
-            text = shizukuDescription(),
+            text = stringResource(R.string.restart_shizuku_service_description),
             style = MaterialTheme.typography.bodySmall,
         )
 
@@ -435,87 +695,6 @@ private fun ShizukuSection(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error,
             )
-        }
-
-        ExpandableHeader(
-            title = stringResource(R.string.advanced),
-            expanded = showAdvanced,
-            onClick = { showAdvanced = !showAdvanced },
-        )
-
-        if (showAdvanced) {
-            ForkModeSelector(
-                selected = forkMode,
-                onSelect = { mode ->
-                    if (mode != forkMode) {
-                        // Picking a family is the only moment the app knows enough to fill
-                        // these in, and the two families disagree about every one of them.
-                        // Written into the visible fields rather than applied behind the
-                        // scenes, so a wrong guess is something the user can see and fix.
-                        val suggested = ShizukuForkDefaults.packageFor(
-                            mode = mode,
-                            apps = installedApps,
-                        )
-
-                        packageName = suggested
-
-                        startAction = ShizukuForkDefaults.actionFor(
-                            mode = mode,
-                            selectedLabel = installedApps.labelOf(suggested),
-                        )
-
-                        onUpdateShizukuForkMode(mode)
-                    }
-                },
-            )
-
-            if (forkMode != ShizukuForkMode.Unset) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                    text = stringResource(
-                        if (forkMode == ShizukuForkMode.Thedjchi) {
-                            R.string.shizuku_view_intents_hint
-                        } else {
-                            R.string.shizuku_other_fork_hint
-                        },
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-
-                PackageNameField(
-                    value = packageName,
-                    installedApps = installedApps,
-                    onValueChange = { packageName = it },
-                    onSelectApp = { app ->
-                        packageName = app.packageName
-
-                        // Only the "other forks" family derives its action from which app
-                        // was picked; thedjchi's is the same string whatever the package
-                        // has been renamed to.
-                        if (forkMode == ShizukuForkMode.Other) {
-                            startAction = ShizukuForkDefaults.actionFor(
-                                mode = forkMode,
-                                selectedLabel = app.label,
-                            )
-                        }
-                    },
-                )
-
-                ShizukuField(
-                    value = startAction,
-                    label = stringResource(R.string.shizuku_start_action),
-                    onValueChange = { startAction = it },
-                )
-
-                if (forkMode.requiresAuthKey) {
-                    ShizukuField(
-                        value = authKey,
-                        label = stringResource(R.string.shizuku_auth_key),
-                        secret = true,
-                        onValueChange = { authKey = it },
-                    )
-                }
-            }
         }
     }
 }
@@ -728,6 +907,8 @@ private fun ShizukuField(
 private fun AboutSection(modifier: Modifier = Modifier) {
     var showAuthorDialog by rememberSaveable { mutableStateOf(false) }
 
+    var showHelp by rememberSaveable { mutableStateOf(false) }
+
     // Every composable read is hoisted out of the builder lambdas: resources and theme
     // colours are resolved once per recomposition rather than once per span.
     val linkStyles = linkStyles()
@@ -776,7 +957,48 @@ private fun AboutSection(modifier: Modifier = Modifier) {
         }
     }
 
+    val context = LocalContext.current
+
     Column(modifier = modifier.padding(horizontal = 16.dp)) {
+        // First thing in About and a filled button rather than a link, because it is the
+        // one item here that does something rather than saying something — and it is the
+        // page a confused user needs, not the licence.
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            onClick = { showHelp = true },
+        ) {
+            Text(text = stringResource(R.string.help_button))
+        }
+
+        VersionRow()
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Both routes out are offered rather than one: Obtainium is the answer for anyone
+        // who wants this kept current automatically, and the releases page is the answer
+        // for everyone else. An offline app has no third option.
+        LinkRow(
+            text = stringResource(R.string.about_check_releases),
+            onClick = { context.openProjectUri(ProjectLinks.RELEASES) },
+        )
+
+        LinkRow(
+            text = stringResource(R.string.about_add_to_obtainium),
+            onClick = { context.openObtainium() },
+        )
+
+        // Plain text, not part of the link: it says what Obtainium is for, and underlining
+        // it would make the explanation look like a second place to tap.
+        Text(
+            text = stringResource(R.string.about_obtainium_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         Text(text = author, style = MaterialTheme.typography.bodyMedium)
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -791,20 +1013,62 @@ private fun AboutSection(modifier: Modifier = Modifier) {
     if (showAuthorDialog) {
         AuthorDialog(onDismissRequest = { showAuthorDialog = false })
     }
+
+    if (showHelp) {
+        SetupHelpDialog(onDismissRequest = { showHelp = false })
+    }
 }
 
 /**
- * The Shizuku explanation, with each named fork linked to its own release page.
+ * The installed version, linking to what changed in it.
+ *
+ * Read from the package manager rather than from `BuildConfig`: this module has its own
+ * `BuildConfig` with its own version, which is not the one the user installed.
+ */
+@Composable
+private fun VersionRow(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
+    val versionName = remember(context) {
+        runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        }.getOrNull().orEmpty()
+    }
+
+    val linkStyles = linkStyles()
+
+    val label = stringResource(R.string.about_version, versionName)
+
+    val version = remember(label, linkStyles) {
+        buildAnnotatedString {
+            withLink(LinkAnnotation.Url(url = ProjectLinks.CHANGELOG, styles = linkStyles)) {
+                append(label)
+            }
+        }
+    }
+
+    Text(
+        modifier = modifier,
+        text = version,
+        style = MaterialTheme.typography.bodyMedium,
+    )
+}
+
+/**
+ * "Needs thedjchi / shevery / other forks ...", with each named fork linked to its own
+ * release page.
  *
  * Two links rather than one because the choice between them is the whole point of the
  * section below, and a reader who has only heard of one of the two forks needs to be able
  * to go and look at the other.
+ *
+ * Built as one annotated string rather than assembled from separate Text composables so the
+ * sentence wraps as a sentence; two of its words happen to be links, which is a property of
+ * the words rather than of the layout.
  */
 @Composable
-private fun shizukuDescription(): AnnotatedString {
+private fun shizukuForkRequirement(): AnnotatedString {
     val linkStyles = linkStyles()
-
-    val description = stringResource(R.string.restart_shizuku_service_description)
 
     val needs = stringResource(R.string.shizuku_needs)
 
@@ -814,10 +1078,8 @@ private fun shizukuDescription(): AnnotatedString {
 
     val suffix = stringResource(R.string.shizuku_forks_suffix)
 
-    return remember(description, needs, thedjchi, shevery, suffix, linkStyles) {
+    return remember(needs, thedjchi, shevery, suffix, linkStyles) {
         buildAnnotatedString {
-            append(description)
-            append(" ")
             append(needs)
             append(" ")
             withLink(LinkAnnotation.Url(url = SHIZUKU_THEDJCHI_URL, styles = linkStyles)) {
@@ -850,12 +1112,12 @@ private fun AuthorDialog(
 
             LinkRow(
                 text = stringResource(R.string.about_view_github),
-                onClick = { context.openUri(AUTHOR_GITHUB_URL) },
+                onClick = { context.openProjectUri(AUTHOR_GITHUB_URL) },
             )
 
             LinkRow(
                 text = AUTHOR_EMAIL,
-                onClick = { context.openUri("mailto:$AUTHOR_EMAIL") },
+                onClick = { context.openProjectUri("mailto:$AUTHOR_EMAIL") },
             )
 
             Row(
@@ -904,33 +1166,6 @@ private fun FossFooter(modifier: Modifier = Modifier) {
             text = stringResource(R.string.long_live_foss),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-        )
-    }
-}
-
-@Composable
-private fun ExpandableHeader(
-    modifier: Modifier = Modifier,
-    title: String,
-    expanded: Boolean,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-
-        Icon(
-            imageVector = if (expanded) GetoIcons.ExpandLess else GetoIcons.ExpandMore,
-            contentDescription = null,
         )
     }
 }
@@ -1062,14 +1297,10 @@ private fun accessibilityServicesSubtitle(
     }
 }
 
-private fun Context.openUri(uri: String) {
-    runCatching {
-        startActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse(uri)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-        )
-    }.onFailure {
-        if (it !is ActivityNotFoundException) throw it
-    }
+@Composable
+internal fun NotificationFunction.getTitle() = when (this) {
+    NotificationFunction.Memory -> stringResource(R.string.notification_function_memory)
+    NotificationFunction.RevertToDefault -> stringResource(R.string.notification_function_revert)
 }
 
 @Composable

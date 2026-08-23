@@ -23,6 +23,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,12 +38,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,31 +56,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.android.geto.broadcastreceiver.buildAppliedSettingsNotification
+import com.android.geto.broadcastreceiver.postAppliedSettingsNotification
+import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.domain.model.FavouriteAppsData
 import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.LauncherAppsActivityInfo
-import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.SortFavouriteApps
+import com.android.geto.feature.apps.manager.SettingsManagerRoute
 import com.android.geto.feature.apps.dialog.FavouriteAppsOptionsDialog
 import com.android.geto.feature.apps.dialog.ReorderFavouriteAppsDialog
-import com.android.geto.feature.apps.dialog.RevertSettingsDialog
-import androidx.compose.ui.platform.LocalContext
 import com.android.geto.ui.local.LocalLauncherApps
 import com.android.geto.ui.local.LocalNotificationManager
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlin.time.Duration.Companion.milliseconds
+import com.android.geto.designsystem.R as designR
 
 @Composable
 internal fun FavouriteAppsRoute(
@@ -93,27 +98,22 @@ internal fun FavouriteAppsRoute(
 
     val appLaunch by viewModel.appLaunch.collectAsStateWithLifecycle()
 
-    val manualRevert by viewModel.manualRevertState.collectAsStateWithLifecycle()
+    var notConfigured by rememberSaveable { mutableStateOf(false) }
 
     ApplyThenLaunchEffect(
         appLaunch = appLaunch,
         snackbarHostState = snackbarHostState,
+        onNotConfigured = { notConfigured = true },
         onConsumed = viewModel::consumeAppLaunch,
     )
 
-    ManualRevertEffect(
-        manualRevertState = manualRevert,
-        snackbarHostState = snackbarHostState,
-        onConsumed = viewModel::consumeManualRevertResult,
-    )
+    if (notConfigured) {
+        NotConfiguredDialog(onDismissRequest = { notConfigured = false })
+    }
 
     FavouriteAppsScreen(
         modifier = modifier,
         favouriteAppsUiState = favouriteAppsUiState,
-        manualRevertState = manualRevert,
-        onToggleRevertTarget = viewModel::toggleManualRevertTarget,
-        onRevert = viewModel::revertNow,
-        onRevertOne = viewModel::revertOneNow,
         onModifyApp = onClickApp,
         onLaunchApp = viewModel::launchApp,
         onSearch = viewModel::search,
@@ -121,6 +121,7 @@ internal fun FavouriteAppsRoute(
         onUpdateFavouriteAppsView = viewModel::updateFavouriteAppsView,
         onUpdateFavouriteAppsTapAction = viewModel::updateFavouriteAppsTapAction,
         onUpdateFavouriteComponentNames = viewModel::updateFavouriteComponentNames,
+        onRevertToDefault = viewModel::revertToDefault,
     )
 }
 
@@ -136,6 +137,7 @@ internal fun FavouriteAppsRoute(
 private fun ApplyThenLaunchEffect(
     appLaunch: FavouriteAppLaunch?,
     snackbarHostState: SnackbarHostState,
+    onNotConfigured: (componentName: String) -> Unit,
     onConsumed: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -163,28 +165,27 @@ private fun ApplyThenLaunchEffect(
         try {
             when (launch.result) {
                 AppSettingsResult.Success -> {
-                    // Keyed on the component name so each target app owns its own
-                    // notification and its own Revert action.
-                    val notificationId = launch.componentName.hashCode()
-
-                    notificationManager.notify(
-                        id = notificationId,
-                        notification = buildAppliedSettingsNotification(
-                            context = context,
-                            notificationId = notificationId,
-                            componentName = launch.componentName,
-                            icon = launch.icon,
-                            contentTitle = title,
-                            contentText = successText,
-                        ),
+                    postAppliedSettingsNotification(
+                        context = context,
+                        notificationManager = notificationManager,
+                        notificationFunction = launch.notificationFunction,
+                        componentName = launch.componentName,
+                        icon = launch.icon,
+                        contentTitle = title,
+                        contentText = successText,
                     )
 
                     launcherApps.startMainActivity(componentName = launch.componentName)
                 }
 
-                AppSettingsResult.EmptyAppSettings,
-                AppSettingsResult.DisabledAppSettings,
-                -> {
+                // Nothing has ever been configured for this app, so launching it would do
+                // exactly what tapping its own icon does — which is how someone ends up
+                // believing a profile is applied when none exists. DisabledAppSettings is
+                // not the same case and still launches: those settings were configured and
+                // then deliberately switched off.
+                AppSettingsResult.EmptyAppSettings -> onNotConfigured(launch.componentName)
+
+                AppSettingsResult.DisabledAppSettings -> {
                     launcherApps.startMainActivity(componentName = launch.componentName)
                 }
 
@@ -200,15 +201,56 @@ private fun ApplyThenLaunchEffect(
     }
 }
 
+/**
+ * Shown when a favourite is tapped that has no settings configured.
+ *
+ * A dialog rather than a snackbar: a snackbar here would be read as "something went wrong
+ * with the launch", and this is not a failure — it is the app pointing out that there is
+ * nothing set up yet, and saying where to set it up.
+ */
+@Composable
+private fun NotConfiguredDialog(
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit,
+) {
+    DialogContainer(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.not_configured_title),
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = stringResource(R.string.not_configured_message),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                TextButton(onClick = onDismissRequest) {
+                    Text(text = stringResource(R.string.got_it))
+                }
+            }
+        }
+    }
+}
+
 @VisibleForTesting
 @Composable
 internal fun FavouriteAppsScreen(
     modifier: Modifier = Modifier,
     favouriteAppsUiState: FavouriteAppsUiState,
-    manualRevertState: ManualRevertState,
-    onToggleRevertTarget: (ManualRevertTarget, Set<ManualRevertTarget>) -> Unit,
-    onRevert: (Set<ManualRevertTarget>) -> Unit,
-    onRevertOne: (ManualRevertTarget) -> Unit,
     onModifyApp: (
         componentName: String,
         activityLabel: String,
@@ -219,13 +261,15 @@ internal fun FavouriteAppsScreen(
     onUpdateFavouriteAppsView: (FavouriteAppsView) -> Unit,
     onUpdateFavouriteAppsTapAction: (FavouriteAppsTapAction) -> Unit,
     onUpdateFavouriteComponentNames: (List<String>) -> Unit,
+    onRevertToDefault: () -> Unit,
 ) {
     var showRevertDialog by rememberSaveable { mutableStateOf(false) }
 
     // Read from the persisted preferences, so the ticks survive closing the dialog, the
     // app, and the device. Before they have loaded the dialog cannot be opened anyway.
-    val selectedTargets = (favouriteAppsUiState as? FavouriteAppsUiState.Success)
-        ?.favouriteAppsData?.userData?.manualRevertTargets
+    // The manager is not tied to any selection any more, so it is offered whenever the
+    // screen has something to show.
+    val managerAvailable = favouriteAppsUiState is FavouriteAppsUiState.Success
 
     Box(modifier = modifier.fillMaxSize()) {
         when (favouriteAppsUiState) {
@@ -247,80 +291,48 @@ internal fun FavouriteAppsScreen(
             }
         }
 
-        if (selectedTargets != null) {
-            FloatingActionButton(
+        if (managerAvailable) {
+            Row(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp),
-                onClick = { showRevertDialog = true },
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    imageVector = GetoIcons.Restore,
-                    contentDescription = stringResource(R.string.revert_settings),
-                )
+                // Left of the manager, and visibly secondary to it: this one acts, the
+                // other one opens something. A tonal container rather than the primary one
+                // keeps a one-press device-wide change from being the loudest thing on the
+                // screen.
+                SmallFloatingActionButton(
+                    onClick = onRevertToDefault,
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(designR.drawable.ic_revert_glyph),
+                        contentDescription = stringResource(R.string.revert_to_default),
+                    )
+                }
+
+                FloatingActionButton(onClick = { showRevertDialog = true }) {
+                    // The Quick Settings tile artwork rather than two stacked Material
+                    // icons: the tile, the launcher shortcut and this button all open the
+                    // same dialog, and looking like each other is how that reads as one
+                    // thing rather than three. Tinted by the FAB, so it keeps the colours
+                    // the composed pair had.
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(designR.drawable.ic_services_glyph),
+                        contentDescription = stringResource(R.string.settings_manager_title),
+                    )
+                }
             }
         }
     }
 
-    if (showRevertDialog && selectedTargets != null) {
-        RevertSettingsDialog(
-            selected = selectedTargets,
-            busy = manualRevertState.busy,
-            onDismissRequest = { showRevertDialog = false },
-            onToggle = { onToggleRevertTarget(it, selectedTargets) },
-            onRevertOne = onRevertOne,
-            onRevert = {
-                onRevert(selectedTargets)
-
-                // Closed straight away: the work continues in the ViewModel and reports
-                // itself through the snackbar, so holding the dialog open would only hide
-                // the list the user is about to go back to.
-                showRevertDialog = false
-            },
-        )
-    }
-}
-
-/**
- * Reports what a manual revert actually managed to do. Partial results are named rather
- * than rounded up to "done": being told everything is back when Shizuku is still down is
- * worse than being told nothing at all.
- */
-@Composable
-private fun ManualRevertEffect(
-    manualRevertState: ManualRevertState,
-    snackbarHostState: SnackbarHostState,
-    onConsumed: () -> Unit,
-) {
-    val doneText = stringResource(R.string.revert_done)
-
-    val failedText = stringResource(R.string.revert_failed)
-
-    val noPermissionText = stringResource(R.string.revert_no_permission)
-
-    val result = manualRevertState.result
-
-    val partialText = stringResource(
-        R.string.revert_partial,
-        result?.reverted?.size ?: 0,
-        manualRevertState.requested,
-    )
-
-    LaunchedEffect(result) {
-        if (result == null) return@LaunchedEffect
-
-        try {
-            val message = when {
-                result.noPermission -> noPermissionText
-                result.reverted.isEmpty() -> failedText
-                result.failed.isEmpty() -> doneText
-                else -> partialText
-            }
-
-            snackbarHostState.showSnackbar(message = message)
-        } finally {
-            onConsumed()
-        }
+    if (showRevertDialog && managerAvailable) {
+        SettingsManagerRoute(onDismissRequest = { showRevertDialog = false })
     }
 }
 

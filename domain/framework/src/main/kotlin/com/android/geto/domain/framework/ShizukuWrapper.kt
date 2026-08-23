@@ -53,6 +53,19 @@ interface ShizukuWrapper {
         authKey: String,
     ): Boolean
 
+    /**
+     * The same broadcast with the fork's stop action instead.
+     *
+     * Separate from [startShizuku] only so call sites read honestly; the mechanism is
+     * identical, and the action is supplied by the caller because it is derived from
+     * whatever the user configured rather than known here.
+     */
+    suspend fun stopShizuku(
+        packageName: String,
+        action: String,
+        authKey: String,
+    ): Boolean
+
     companion object {
         const val DEFAULT_SHIZUKU_PACKAGE_NAME = "moe.shizuku.privileged.api"
         const val ACTION_START_SUFFIX = ".START"

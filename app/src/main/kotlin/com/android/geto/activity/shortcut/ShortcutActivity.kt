@@ -19,18 +19,25 @@ package com.android.geto.activity.shortcut
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.android.geto.broadcastreceiver.buildAppliedSettingsNotification
+import com.android.geto.broadcastreceiver.postAppliedSettingsNotification
+import com.android.geto.designsystem.theme.GetoTheme
 import com.android.geto.domain.framework.ShortcutManagerCompatWrapper
 import com.android.geto.domain.model.AppSettingsResult
+import com.android.geto.domain.model.Theme
 import com.android.geto.framework.launcherapps.AndroidLauncherAppsWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.android.geto.feature.appsettings.R as appSettingsR
 
 @AndroidEntryPoint
 class ShortcutActivity : ComponentActivity() {
@@ -49,118 +56,75 @@ class ShortcutActivity : ComponentActivity() {
             intent.getStringExtra(ShortcutManagerCompatWrapper.SHORTCUT_EXTRA_COMPONENT_NAME)
                 ?: return
 
-        val notificationId = componentName.hashCode()
-
         viewModel.applyAppSettings(componentName = componentName)
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.shortcutActivityUiState.collect { shortcutActivityUiState ->
-                    if (shortcutActivityUiState is ShortcutActivityUiState.Success) {
-                        when (shortcutActivityUiState.appSettingsResult) {
-                            AppSettingsResult.Success -> {
-                                androidNotificationManagerWrapper.notify(
-                                    id = notificationId,
-                                    notification = buildAppliedSettingsNotification(
-                                        context = this@ShortcutActivity,
-                                        notificationId = notificationId,
-                                        componentName = componentName,
-                                        icon = shortcutActivityUiState.applicationIcon,
-                                        contentTitle = getString(com.android.geto.feature.appsettings.R.string.geto_settings),
-                                        contentText = getString(com.android.geto.feature.appsettings.R.string.apply_success),
-                                    ),
-                                )
+                    if (shortcutActivityUiState !is ShortcutActivityUiState.Success) return@collect
 
-                                androidLauncherAppsWrapper.startMainActivity(componentName = componentName)
+                    val result = shortcutActivityUiState.appSettingsResult ?: return@collect
 
-                                finish()
-                            }
+                    // Nothing was applied and nothing will be reverted, so a notification
+                    // with a Revert button would be offering to undo nothing. The shortcut
+                    // was made for an app that was never configured, and saying where to
+                    // configure it is the only useful thing left to do.
+                    if (result == AppSettingsResult.EmptyAppSettings) {
+                        showNotConfigured()
 
-                            AppSettingsResult.Failure -> {
-                                androidNotificationManagerWrapper.notify(
-                                    id = notificationId,
-                                    notification = buildAppliedSettingsNotification(
-                                        context = this@ShortcutActivity,
-                                        notificationId = notificationId,
-                                        componentName = componentName,
-                                        icon = shortcutActivityUiState.applicationIcon,
-                                        contentTitle = getString(com.android.geto.feature.appsettings.R.string.geto_settings),
-                                        contentText = getString(com.android.geto.feature.appsettings.R.string.apply_failure),
-                                    ),
-                                )
-
-                                finish()
-                            }
-
-                            AppSettingsResult.NoPermission -> {
-                                androidNotificationManagerWrapper.notify(
-                                    id = notificationId,
-                                    notification = buildAppliedSettingsNotification(
-                                        context = this@ShortcutActivity,
-                                        notificationId = notificationId,
-                                        componentName = componentName,
-                                        icon = shortcutActivityUiState.applicationIcon,
-                                        contentTitle = getString(com.android.geto.feature.appsettings.R.string.geto_settings),
-                                        contentText = getString(com.android.geto.feature.appsettings.R.string.no_permission),
-                                    ),
-                                )
-
-                                finish()
-                            }
-
-                            AppSettingsResult.InvalidValues -> {
-                                androidNotificationManagerWrapper.notify(
-                                    id = notificationId,
-                                    notification = buildAppliedSettingsNotification(
-                                        context = this@ShortcutActivity,
-                                        notificationId = notificationId,
-                                        componentName = componentName,
-                                        icon = shortcutActivityUiState.applicationIcon,
-                                        contentTitle = getString(com.android.geto.feature.appsettings.R.string.geto_settings),
-                                        contentText = getString(com.android.geto.feature.appsettings.R.string.settings_has_invalid_values),
-                                    ),
-                                )
-
-                                finish()
-                            }
-
-                            AppSettingsResult.EmptyAppSettings -> {
-                                androidNotificationManagerWrapper.notify(
-                                    id = notificationId,
-                                    notification = buildAppliedSettingsNotification(
-                                        context = this@ShortcutActivity,
-                                        notificationId = notificationId,
-                                        componentName = componentName,
-                                        icon = shortcutActivityUiState.applicationIcon,
-                                        contentTitle = getString(com.android.geto.feature.appsettings.R.string.geto_settings),
-                                        contentText = getString(com.android.geto.feature.appsettings.R.string.empty_app_settings_list),
-                                    ),
-                                )
-
-                                finish()
-                            }
-
-                            AppSettingsResult.DisabledAppSettings -> {
-                                androidNotificationManagerWrapper.notify(
-                                    id = notificationId,
-                                    notification = buildAppliedSettingsNotification(
-                                        context = this@ShortcutActivity,
-                                        notificationId = notificationId,
-                                        componentName = componentName,
-                                        icon = shortcutActivityUiState.applicationIcon,
-                                        contentTitle = getString(com.android.geto.feature.appsettings.R.string.geto_settings),
-                                        contentText = getString(com.android.geto.feature.appsettings.R.string.app_settings_disabled),
-                                    ),
-                                )
-
-                                finish()
-                            }
-
-                            null -> Unit
-                        }
+                        return@collect
                     }
+
+                    // One notification for every other outcome, differing only in its text.
+                    // This was six near-identical blocks; the shape was easy to get subtly
+                    // wrong and the difference between them was one string each.
+                    postAppliedSettingsNotification(
+                        context = this@ShortcutActivity,
+                        notificationManager = androidNotificationManagerWrapper,
+                        notificationFunction = shortcutActivityUiState.notificationFunction,
+                        componentName = componentName,
+                        icon = shortcutActivityUiState.applicationIcon,
+                        contentTitle = getString(appSettingsR.string.geto_settings),
+                        contentText = getString(contentTextFor(result)),
+                    )
+
+                    if (result == AppSettingsResult.Success) {
+                        androidLauncherAppsWrapper.startMainActivity(componentName = componentName)
+                    }
+
+                    finish()
                 }
             }
         }
+    }
+
+    /**
+     * Replaces this activity's empty window with the explanation, rather than finishing.
+     *
+     * The window is transparent and normally never draws anything, which is what makes a
+     * shortcut feel like it launches the app directly. Here it has to say something, and
+     * dismissing is what finishes it.
+     */
+    private fun showNotConfigured() {
+        setContent {
+            val userData by viewModel.userData.collectAsStateWithLifecycle()
+
+            GetoTheme(
+                theme = userData?.theme ?: Theme.FOLLOW_SYSTEM,
+                dynamicTheme = userData?.dynamicTheme ?: false,
+            ) {
+                NotConfiguredDialog(onDismissRequest = ::finish)
+            }
+        }
+    }
+
+    @StringRes
+    private fun contentTextFor(result: AppSettingsResult): Int = when (result) {
+        AppSettingsResult.Success -> appSettingsR.string.apply_success
+        AppSettingsResult.Failure -> appSettingsR.string.apply_failure
+        AppSettingsResult.NoPermission -> appSettingsR.string.no_permission
+        AppSettingsResult.InvalidValues -> appSettingsR.string.settings_has_invalid_values
+        AppSettingsResult.EmptyAppSettings -> appSettingsR.string.empty_app_settings_list
+        AppSettingsResult.DisabledAppSettings -> appSettingsR.string.app_settings_disabled
     }
 }

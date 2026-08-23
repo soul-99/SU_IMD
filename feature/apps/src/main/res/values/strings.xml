@@ -56,20 +56,32 @@
     <string name="applied_settings_failure">Could not apply settings</string>
     <string name="applied_settings_invalid">This app has settings with invalid values</string>
     <!-- Manual revert -->
-    <string name="revert_settings">Re-enable settings/services</string>
-    <string name="cancel">Cancel</string>
     <!-- Not "revert": :framework:notification-manager owns that name for the
          notification action, and the two merge into one resource in :app. -->
-    <string name="re_enable">Re-enable</string>
-    <string name="revert_one">Re-enable %1$s now</string>
+    <string name="settings_manager_title">IMD services manager</string>
+    <string name="revert_to_default">Revert to default</string>
+    <string name="not_configured_title">Nothing to hide yet</string>
+    <string name="not_configured_message">Long press app icon and select settings to hide first</string>
+    <string name="got_it">Got it</string>
+    <string name="settings_manager_open">Open %1$s</string>
+    <string name="settings_manager_accessibility_note">only services selected in the IMD app settings are managed</string>
+    <string name="settings_manager_enable_developer_options">Please enable developer options first</string>
+    <string name="settings_manager_cannot_open">Could not open that screen on this device</string>
+    <string name="settings_manager_no_shizuku">No Shizuku app found — set the package name in Settings</string>
+    <string name="ok">OK</string>
+    <string name="shizuku_help_title">Shizuku service unavailable</string>
+    <string name="shizuku_help_bullet">%1$d.</string>
+    <string name="shizuku_help_point_setup">Please make sure the Shizuku app is installed, registered in ADB, and configured correctly in the IMD app\'s settings page.</string>
+    <string name="shizuku_help_point_permission">IMD app\'s Shizuku permission is only used to grant the privileged Android permission WRITE_SECURE_SETTINGS once. It is not used to detect Shizuku service status or to turn the Shizuku service on and off.</string>
+    <string name="shizuku_help_point_restart">After proper setup please restart the IMD app and try again.</string>
+    <string name="settings_manager_shizuku_wait">Please wait 10s, as some Shizuku forks are slow to start service via intents</string>
     <string name="revert_developer_settings">Developer settings</string>
     <string name="revert_usb_debugging">USB debugging</string>
     <string name="revert_wireless_debugging">Wireless debugging</string>
     <string name="revert_accessibility">Accessibility services</string>
-    <string name="revert_shizuku">Shizuku</string>
-    <string name="revert_done">Re-enabled</string>
-    <string name="revert_partial">Re-enabled %1$d of %2$d — the rest could not be changed</string>
-    <string name="revert_failed">Nothing could be re-enabled</string>
-    <string name="revert_no_permission">Grant WRITE_SECURE_SETTINGS first — see the setup screen</string>
+    <string name="revert_shizuku">Shizuku service</string>
     <string name="applied_settings_no_permission">Grant WRITE_SECURE_SETTINGS first — see the setup screen</string>
+    <string name="settings_manager_shizuku_failed">Failed to start shizuku service on last attempt, please check shizuku app settings and IMD shizuku configuration</string>
+    <string name="settings_manager_shizuku_failed_open">Why the Shizuku service did not start</string>
+    <string name="understood">Understood</string>
 </resources>

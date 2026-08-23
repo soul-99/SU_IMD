@@ -33,8 +33,12 @@ object AppSettingKeys {
     const val ENABLED_ACCESSIBILITY_SERVICES = "enabled_accessibility_services"
 
     /**
-     * Turning any of these back on is what Shizuku needs in order to be startable
-     * again, so a revert that touches one of them is the trigger for the restart.
+     * Turning any of these back on is what Shizuku needs in order to be startable again.
+     *
+     * Kept as a set even though only [ADB_ENABLED] triggers the restart now, because the
+     * other two are still what Shizuku depends on — developer options off takes USB
+     * debugging with it — and a future caller asking "does this profile touch Shizuku's
+     * transport" wants all three.
      */
     val SHIZUKU_DEPENDENT_KEYS = setOf(
         DEVELOPMENT_SETTINGS_ENABLED,
@@ -43,12 +47,23 @@ object AppSettingKeys {
     )
 
     /**
-     * True when reverting these settings actually switches the transport Shizuku needs
-     * back on. A revert value other than "1" leaves it off, so there would be nothing for
-     * Shizuku to reconnect through and firing the start broadcast would be noise.
+     * True when reverting a profile puts back the USB debugging that same profile switched
+     * off.
+     *
+     * Narrower than it used to be, in two ways. Only USB debugging counts: it is the
+     * transport Shizuku's service actually runs over, and restarting Shizuku because a
+     * profile happened to restore *wireless* debugging was firing the broadcast at devices
+     * where nothing had gone down in the first place.
+     *
+     * And the profile must have been what switched it off — [AppSetting.valueOnLaunch] of
+     * "0". A profile that leaves USB debugging alone, or turns it on, did not stop Shizuku,
+     * so there is nothing for this to put right.
      */
     fun triggersShizukuRestart(appSettings: List<AppSetting>): Boolean = appSettings.any {
-        it.enabled && it.key in SHIZUKU_DEPENDENT_KEYS && it.valueOnRevert == "1"
+        it.enabled &&
+            it.key == ADB_ENABLED &&
+            it.valueOnLaunch == "0" &&
+            it.valueOnRevert == "1"
     }
 
     /**

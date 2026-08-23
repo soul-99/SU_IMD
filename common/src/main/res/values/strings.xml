@@ -22,4 +22,7 @@
     <string name="system">System</string>
     <string name="secure">Secure</string>
     <string name="global">Global</string>
+
+    <string name="revert_to_default_toast">Revert to default</string>
+    <string name="revert_from_memory_toast">Revert from memory</string>
 </resources>

@@ -39,4 +39,18 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
     </style>
+
+    <!--
+      Like Theme.Geto.Shortcut, but inheriting the app's own theme rather than the
+      platform light one: this window actually draws Compose content, so it has to carry
+      the Material colours the dialog expects.
+    -->
+    <style name="Theme.Geto.Services" parent="Theme.Geto">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
 </resources>

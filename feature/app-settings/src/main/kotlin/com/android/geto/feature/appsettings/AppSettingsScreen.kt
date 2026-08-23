@@ -67,13 +67,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.android.geto.broadcastreceiver.buildAppliedSettingsNotification
+import com.android.geto.broadcastreceiver.postAppliedSettingsNotification
+import com.android.geto.common.showRevertFromMemoryToast
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.AddAppSettingResult
 import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingTemplate
 import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.domain.model.GetPinShortcutResult
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.RequestPinShortcutResult
 import com.android.geto.domain.model.SecureSetting
 import com.android.geto.domain.model.SettingType
@@ -104,6 +106,8 @@ internal fun AppSettingsRoute(
 
     val revertAppSettingsResult by viewModel.revertAppSettingsResult.collectAsStateWithLifecycle()
 
+    val notificationFunction by viewModel.notificationFunction.collectAsStateWithLifecycle()
+
     val addAppSettingResult by viewModel.addAppSettingsResult.collectAsStateWithLifecycle()
 
     val activityIcon by viewModel.activityIcon.collectAsStateWithLifecycle()
@@ -118,6 +122,8 @@ internal fun AppSettingsRoute(
 
     val isFavourite by viewModel.isFavourite.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
+
     AppSettingsScreen(
         modifier = modifier,
         appSettingsRouteData = appSettingsRouteData,
@@ -127,13 +133,21 @@ internal fun AppSettingsRoute(
         addAppSettingResult = addAppSettingResult,
         applyAppSettingsResult = applyAppSettingsResult,
         revertAppSettingsResult = revertAppSettingsResult,
+        notificationFunction = notificationFunction,
         requestPinShortcutResult = requestPinShortcutResult,
         appSettingTemplates = appSettingTemplates,
         updatePinShortcutResult = updatePinShortcutResult,
         isFavourite = isFavourite,
         onUpdateFavourite = viewModel::updateFavourite,
         onApplyAppSettings = viewModel::applyAppSettings,
-        onRevertAppSettings = viewModel::revertAppSettings,
+        onRevertAppSettings = {
+            // Said on the press rather than on the result. This is the memory revert, and
+            // the only thing distinguishing it from "Revert to default" from the user's
+            // side is which button was pressed — so the answer has to arrive with the press.
+            context.showRevertFromMemoryToast()
+
+            viewModel.revertAppSettings()
+        },
         onCheckAppSetting = viewModel::checkAppSetting,
         onDeleteAppSetting = viewModel::deleteAppSetting,
         onAddAppSetting = viewModel::addAppSetting,
@@ -163,6 +177,7 @@ internal fun AppSettingsScreen(
     addAppSettingResult: AddAppSettingResult?,
     applyAppSettingsResult: AppSettingsResult?,
     revertAppSettingsResult: AppSettingsResult?,
+    notificationFunction: NotificationFunction,
     requestPinShortcutResult: RequestPinShortcutResult?,
     appSettingTemplates: List<AppSettingTemplate>,
     getPinShortcutResult: GetPinShortcutResult?,
@@ -209,6 +224,7 @@ internal fun AppSettingsScreen(
         addAppSettingResult = addAppSettingResult,
         applyAppSettingsResult = applyAppSettingsResult,
         revertAppSettingsResult = revertAppSettingsResult,
+        notificationFunction = notificationFunction,
         requestPinShortcutResult = requestPinShortcutResult,
         getPinShortcutResult = getPinShortcutResult,
         updatePinShortcutResult = updatePinShortcutResult,
@@ -341,6 +357,7 @@ private fun AppSettingsLaunchedEffects(
     addAppSettingResult: AddAppSettingResult?,
     applyAppSettingsResult: AppSettingsResult?,
     revertAppSettingsResult: AppSettingsResult?,
+    notificationFunction: NotificationFunction,
     requestPinShortcutResult: RequestPinShortcutResult?,
     getPinShortcutResult: GetPinShortcutResult?,
     updatePinShortcutResult: UpdatePinShortcutResult?,
@@ -416,18 +433,14 @@ private fun AppSettingsLaunchedEffects(
             }
 
             AppSettingsResult.Success -> {
-                val notificationId = appSettingsRouteData.componentName.hashCode()
-
-                androidNotificationManagerWrapper.notify(
-                    id = notificationId,
-                    notification = buildAppliedSettingsNotification(
-                        context = context,
-                        notificationId = notificationId,
-                        componentName = appSettingsRouteData.componentName,
-                        icon = activityIcon,
-                        contentTitle = getoSettings,
-                        contentText = applySuccess,
-                    ),
+                postAppliedSettingsNotification(
+                    context = context,
+                    notificationManager = androidNotificationManagerWrapper,
+                    notificationFunction = notificationFunction,
+                    componentName = appSettingsRouteData.componentName,
+                    icon = activityIcon,
+                    contentTitle = getoSettings,
+                    contentText = applySuccess,
                 )
 
                 androidLauncherAppsWrapper.startMainActivity(componentName = appSettingsRouteData.componentName)

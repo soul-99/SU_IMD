@@ -91,6 +91,58 @@ internal class DefaultPackageManagerWrapper @Inject constructor(
         }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label })
     }
 
+    override suspend fun findLaunchablePackage(
+        preferredPackage: String,
+        labels: List<String>,
+    ): String? = withContext(ioDispatcher) {
+        if (preferredPackage.isNotBlank() && isLaunchable(preferredPackage)) {
+            return@withContext preferredPackage
+        }
+
+        val applications = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getInstalledApplications(
+                    PackageManager.ApplicationInfoFlags.of(0),
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.getInstalledApplications(0)
+            }
+        } catch (_: RuntimeException) {
+            emptyList()
+        }
+
+        // Ordered by the caller's preference, not by whatever order the package manager
+        // happens to return, so "Shizuku, then Shevery" means exactly that.
+        labels.firstNotNullOfOrNull { label ->
+            applications.firstOrNull { applicationInfo ->
+                isLaunchable(applicationInfo.packageName) &&
+                    runCatching {
+                        packageManager.getApplicationLabel(applicationInfo).toString()
+                    }.getOrDefault("").trim().equals(label, ignoreCase = true)
+            }?.packageName
+        }
+    }
+
+    override suspend fun isInstalled(packageName: String): Boolean = withContext(ioDispatcher) {
+        if (packageName.isBlank()) return@withContext false
+
+        runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.getPackageInfo(packageName, 0)
+            }
+
+            true
+        }.getOrDefault(false)
+    }
+
+    private fun isLaunchable(packageName: String): Boolean = runCatching {
+        packageManager.getLaunchIntentForPackage(packageName) != null
+    }.getOrDefault(false)
+
     override suspend fun getLastInstallTimes(): Map<String, Long> = withContext(ioDispatcher) {
         val packages = try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

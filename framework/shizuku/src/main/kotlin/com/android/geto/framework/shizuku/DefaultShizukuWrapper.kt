@@ -50,6 +50,26 @@ internal class DefaultShizukuWrapper @Inject constructor(
         packageName: String,
         action: String,
         authKey: String,
+    ): Boolean = sendShizukuBroadcast(
+        packageName = packageName,
+        action = action,
+        authKey = authKey,
+    )
+
+    override suspend fun stopShizuku(
+        packageName: String,
+        action: String,
+        authKey: String,
+    ): Boolean = sendShizukuBroadcast(
+        packageName = packageName,
+        action = action,
+        authKey = authKey,
+    )
+
+    private suspend fun sendShizukuBroadcast(
+        packageName: String,
+        action: String,
+        authKey: String,
     ): Boolean = withContext(ioDispatcher) {
         if (packageName.isBlank() || action.isBlank()) {
             return@withContext false

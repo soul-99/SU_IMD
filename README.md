@@ -39,6 +39,23 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 
 ### Added in this fork
 
+#### v1.5
+
+Everything since v1.1, the last version published here.
+
+* **New ‘IMD services manager’ Dialog box**: A new dialog box to view the live status of each setting and services (including Shizuku service), and also allows to toggle them on/off easily.
+* **New ‘Revert to default’ mechanism** (previous revert mechanism is now called ‘memory function’ mechanism): this new mechanism allows to revert all the settings at once to a universal default state which is configured by the user in settings.
+* Both ‘Revert to default function’ and ‘IMD services manager’ gets:
+  * **Quick setting tiles** (with short and long press actions).
+  * **Homescreen shortcuts**: long press on the IMD icon to create those shortcuts.
+  * **Favourites tab buttons**
+* User can choose either old or new mechanism for notifications.
+* **New detailed Readme in app**: to help user on how to setup the app.
+* **Obtainium**: In app link to add app to obtainium.
+* **New settings page options and redesign**
+* Material design update
+* Newer icons
+
 #### v1.1
 
 - Better Shizuku integeration with auto-fill for default values.

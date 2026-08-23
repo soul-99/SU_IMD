@@ -22,7 +22,6 @@ import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers
 import com.android.geto.domain.framework.AccessibilityServicesWrapper
 import com.android.geto.domain.framework.SecureSettingsWrapper
-import com.android.geto.domain.framework.ShizukuWrapper
 import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.AppSettingsResult
@@ -52,8 +51,8 @@ class RevertAppSettingsUseCase @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository,
     private val secureSettingsWrapper: SecureSettingsWrapper,
     private val accessibilityServicesWrapper: AccessibilityServicesWrapper,
-    private val shizukuWrapper: ShizukuWrapper,
     private val userDataRepository: UserDataRepository,
+    private val startShizukuUseCase: StartShizukuUseCase,
     @param:Dispatcher(GetoDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(componentName: String): AppSettingsResult = withContext(defaultDispatcher) {
@@ -183,12 +182,10 @@ class RevertAppSettingsUseCase @Inject constructor(
 
         delay(SHIZUKU_START_DELAY_MILLIS)
 
-        shizukuWrapper.startShizuku(
-            packageName = userData.shizukuPackageName,
-            action = userData.shizukuStartAction.ifBlank {
-                userData.shizukuPackageName + ShizukuWrapper.ACTION_START_SUFFIX
-            },
-            authKey = userData.shizukuAuthKey,
-        )
+        // Through the shared use case so this attempt is confirmed and recorded like every
+        // other. It is the attempt most in need of it: nobody is looking at the app when a
+        // notification's Revert button fires, so a silent failure here used to surface only
+        // as Shizuku mysteriously not running later on.
+        startShizukuUseCase()
     }
 }

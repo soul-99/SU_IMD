@@ -26,6 +26,7 @@ import "com/android/geto/data/datastore/proto/sort_favourite_apps.proto";
 import "com/android/geto/data/datastore/proto/favourite_apps_view.proto";
 import "com/android/geto/data/datastore/proto/favourite_apps_tap_action.proto";
 import "com/android/geto/data/datastore/proto/shizuku_fork_mode.proto";
+import "com/android/geto/data/datastore/proto/notification_function.proto";
 
 option java_package = "com.android.geto.data.datastore.proto";
 option java_multiple_files = true;
@@ -45,8 +46,11 @@ message UserPreferences {
   FavouriteAppsViewProto favouriteAppsView = 8;
   FavouriteAppsTapActionProto favouriteAppsTapAction = 9;
 
-  // Restart Shizuku after reverting developer options / USB debugging /
-  // wireless debugging.
+  // Restart Shizuku after a revert puts back the USB debugging that took its service down.
+  //
+  // Only meaningful when restartShizukuSet below is true. A proto3 bool cannot tell "the
+  // user switched this off" from "the user has never seen it", and those need to differ now
+  // that the answer to the second one is on rather than off.
   bool restartShizuku = 10;
   // Auth token from Shizuku's "View intents" screen.
   string shizukuAuthKey = 11;
@@ -88,6 +92,45 @@ message UserPreferences {
   // auth key is part of the contract at all, so it cannot be inferred from the other
   // fields.
   ShizukuForkModeProto shizukuForkMode = 20;
+
+  // Whether the one-time "use Obtainium for updates" note has been dismissed. Its own
+  // flag rather than a reuse of tipShown, so upgrading into this version shows it to
+  // people who saw the earlier tip long ago — they are exactly who needs telling.
+  bool obtainiumTipShown = 21;
+
+  // Whether the notification posted after a launch reverts what that one app changed, or
+  // drives the whole device back to revertDefaults below.
+  NotificationFunctionProto notificationFunction = 22;
+
+  // The state each target should be left in when "Revert to default" runs, one entry per
+  // target encoded by RevertDefaults as "<Name>=0" or "<Name>=1".
+  //
+  // A state per target rather than a list of names to switch on: an absent name could not
+  // tell "the user wants this left off" apart from "not configured yet", and those have to
+  // behave differently — the first is a decision, the second falls back to RevertDefaults.Default.
+  repeated string revertDefaults = 23;
+
+  // Whether the last attempt to start the Shizuku service timed out without it coming up.
+  //
+  // Persisted rather than held in memory because most attempts happen with no UI on screen —
+  // a revert from a tile or a notification — and the failure has to survive until the
+  // settings manager is next opened, which is the only place it can be reported.
+  bool shizukuStartFailed = 24;
+
+  // The app version that last showed the setup reminders page.
+  //
+  // A version rather than a "seen it" flag, so an update can put the page in front of people
+  // who were set up long ago — which is the whole point of it: the reminders are about
+  // configuration that changes between releases, and someone who finished setup two versions
+  // ago has never read the current ones. Zero means it has never been shown.
+  int32 setupNoticeVersion = 25;
+
+  // Whether restartShizuku above holds an actual decision.
+  //
+  // False for every install that predates this field, including one that has the toggle
+  // switched on — which reads the same either way, since an unset restartShizuku now
+  // defaults to on. Only someone deliberately switching it off is affected, and only once.
+  bool restartShizukuSet = 26;
 
   // 14 was a single global suspended-services list, replaced by the map above.
   reserved 14;

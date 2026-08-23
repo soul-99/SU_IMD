@@ -42,4 +42,16 @@ class MainActivityViewModel @Inject constructor(
             userDataRepository.updateTipShown(tipShown = true)
         }
     }
+
+    fun markSetupNoticeSeen(versionCode: Int) {
+        viewModelScope.launch {
+            userDataRepository.updateSetupNoticeVersion(versionCode = versionCode)
+        }
+    }
+
+    fun markObtainiumTipShown() {
+        viewModelScope.launch {
+            userDataRepository.updateObtainiumTipShown(obtainiumTipShown = true)
+        }
+    }
 }

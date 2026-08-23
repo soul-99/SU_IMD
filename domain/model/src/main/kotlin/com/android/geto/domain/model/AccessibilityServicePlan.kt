@@ -126,6 +126,43 @@ object AccessibilityServicePlan {
         return currentlyEnabled + wanted.distinct().filterNot { it in enabled }
     }
 
+    /**
+     * [currentlyEnabled] with [unwanted] taken out, order otherwise untouched.
+     *
+     * The mirror of [enable], for the manager dialog's off switch. Same rule as everywhere
+     * else here: only the components this app is responsible for are removed, so a service
+     * the user turned on themselves is never swept up by switching the app's own set off.
+     */
+    fun disable(
+        unwanted: List<String>,
+        currentlyEnabled: List<String>,
+    ): List<String> {
+        val remove = unwanted.toSet()
+
+        return currentlyEnabled.filterNot { it in remove }
+    }
+
+    /**
+     * Whether every one of [wanted] is currently on.
+     *
+     * All of them, not any: the dialog's accessibility row stands for a set, and a row that
+     * reads "on" while two of five services are off would be a lie in the direction that
+     * matters — the user would believe the device was back to normal when it was not.
+     *
+     * An empty [wanted] is reported as on. Nothing is being held down, so there is nothing
+     * for the switch to put back, and showing it off would invite a press that does nothing.
+     */
+    fun allEnabled(
+        wanted: List<String>,
+        currentlyEnabled: List<String>,
+    ): Boolean {
+        if (wanted.isEmpty()) return true
+
+        val enabled = currentlyEnabled.toSet()
+
+        return wanted.distinct().all { it in enabled }
+    }
+
     /** Everything held by apps other than [exceptComponentName]. */
     fun heldByOthers(
         held: Map<String, List<String>>,

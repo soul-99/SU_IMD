@@ -25,6 +25,14 @@
                 <action android:name="ACTION_REVERT_SETTINGS" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name="com.android.geto.broadcastreceiver.RevertToDefaultBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ACTION_REVERT_TO_DEFAULT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

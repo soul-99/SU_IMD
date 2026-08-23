@@ -37,12 +37,89 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- The long-press menu on the launcher icon. -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <activity
             android:name=".activity.shortcut.ShortcutActivity"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.Geto.Shortcut" />
+
+        <!--
+          The settings manager on its own. Exported because the launcher starts it for the
+          long-press shortcut; it takes no extras and does nothing an unprivileged caller
+          could not already do from the app itself.
+
+          The empty taskAffinity is load-bearing. Without it this window joins the app's own
+          task, so starting it from the tile brings that whole task forward — and the app
+          appears behind the dialog, over whatever the user was actually looking at. Its own
+          task means only the dialog comes to the front.
+        -->
+        <activity
+            android:name=".activity.services.ServicesActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/services_shortcut_label"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Geto.Services" />
+
+        <!--
+          Runs the revert and finishes without drawing anything. Exported because both the
+          launcher shortcut and the Quick Settings tile start it; it takes no extras and
+          does nothing an unprivileged caller could not already do from the app.
+        -->
+        <activity
+            android:name=".activity.revert.RevertActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:label="@string/revert_shortcut_label"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Geto.Shortcut" />
+
+        <!--
+          Android allows one long-press target per app however many tiles it publishes, so
+          both tiles arrive here and are told apart by EXTRA_COMPONENT_NAME.
+        -->
+        <activity
+            android:name=".activity.revert.TilePreferencesActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Geto.Shortcut">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".activity.revert.RevertTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_revert_tile"
+            android:label="@string/revert_shortcut_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".activity.services.ServicesTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_services_tile"
+            android:label="@string/services_shortcut_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
     </application>
 

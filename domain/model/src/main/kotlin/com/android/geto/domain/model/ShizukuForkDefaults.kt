@@ -74,6 +74,44 @@ object ShizukuForkDefaults {
         }
     }
 
+    /**
+     * The stop action that pairs with a configured start action.
+     *
+     * Derived rather than looked up. Both known families spell the pair the same way —
+     * `…api.START` / `…api.STOP`, `…action.START_SERVER` / `…action.STOP_SERVER` — so
+     * rewriting the word the user already gave us is right for a fork nobody here has
+     * heard of, where a hardcoded table would simply be wrong.
+     *
+     * Only the last occurrence is rewritten, so a package that happens to contain "START"
+     * earlier in the string is left alone. A start action with no "START" in it has no
+     * derivable stop action, and blank is returned rather than a guess.
+     */
+    fun stopActionFor(startAction: String): String {
+        val at = startAction.lastIndexOf(START)
+
+        if (at < 0) return ""
+
+        return startAction.substring(0, at) + STOP + startAction.substring(at + START.length)
+    }
+
+    /**
+     * Which package the dialog's Shizuku shortcut should open.
+     *
+     * The configured package first — it is what the restart actually talks to, and on a
+     * renamed install it is the only correct answer. Falling back to a label search covers
+     * the case where the field was never filled in, which is exactly when someone is most
+     * likely to be poking at the shortcut to find out what is installed.
+     */
+    fun launchPackageFor(configuredPackage: String, apps: List<InstalledAppData>): String {
+        if (apps.any { it.packageName == configuredPackage }) return configuredPackage
+
+        return apps.findByLabel(SHIZUKU_LABEL).ifBlank { apps.findByLabel(SHEVERY_LABEL) }
+    }
+
+    private const val START = "START"
+
+    private const val STOP = "STOP"
+
     private fun List<InstalledAppData>.findByLabel(label: String): String = firstOrNull { it.label.matches(label) }?.packageName.orEmpty()
 
     private fun String?.matches(label: String): Boolean = this?.trim().equals(label, ignoreCase = true)

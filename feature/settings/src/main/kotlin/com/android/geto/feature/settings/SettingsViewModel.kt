@@ -22,6 +22,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.geto.domain.model.AccessibilityServiceData
 import com.android.geto.domain.model.InstalledAppData
+import com.android.geto.domain.model.ManualRevertTarget
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.repository.UserDataRepository
@@ -108,6 +110,18 @@ class SettingsViewModel @Inject constructor(
     fun updateManagedAccessibilityServices(components: List<String>) {
         viewModelScope.launch {
             userDataRepository.updateManagedAccessibilityServices(components = components)
+        }
+    }
+
+    fun updateNotificationFunction(notificationFunction: NotificationFunction) {
+        viewModelScope.launch {
+            userDataRepository.updateNotificationFunction(notificationFunction = notificationFunction)
+        }
+    }
+
+    fun updateRevertDefaults(states: Map<ManualRevertTarget, Boolean>) {
+        viewModelScope.launch {
+            userDataRepository.updateRevertDefaults(states = states)
         }
     }
 

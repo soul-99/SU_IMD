@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -41,6 +42,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.Info
 
 object GetoIcons {
     val Apps = Icons.Default.Apps
@@ -65,6 +67,10 @@ object GetoIcons {
     val Link = Icons.Default.Link
     val Tune = Icons.Default.Tune
     val Restore = Icons.Default.SettingsBackupRestore
+    val OpenInNew = Icons.Default.OpenInNew
     val Visible = Icons.Default.Visibility
     val Hidden = Icons.Default.VisibilityOff
+
+    /** Outlined rather than filled: it sits beside a label, not on a button. */
+    val Info = Icons.Outlined.Info
 }

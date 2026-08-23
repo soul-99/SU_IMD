@@ -18,6 +18,7 @@
 package com.android.geto.activity.shortcut
 
 import com.android.geto.domain.model.AppSettingsResult
+import com.android.geto.domain.model.NotificationFunction
 
 sealed interface ShortcutActivityUiState {
     data object Loading : ShortcutActivityUiState
@@ -25,6 +26,7 @@ sealed interface ShortcutActivityUiState {
     data class Success(
         val appSettingsResult: AppSettingsResult?,
         val applicationIcon: ByteArray?,
+        val notificationFunction: NotificationFunction = NotificationFunction.Default,
     ) : ShortcutActivityUiState {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -33,6 +35,7 @@ sealed interface ShortcutActivityUiState {
             other as Success
 
             if (appSettingsResult != other.appSettingsResult) return false
+            if (notificationFunction != other.notificationFunction) return false
             if (!applicationIcon.contentEquals(other.applicationIcon)) return false
 
             return true
@@ -40,6 +43,7 @@ sealed interface ShortcutActivityUiState {
 
         override fun hashCode(): Int {
             var result = appSettingsResult?.hashCode() ?: 0
+            result = 31 * result + notificationFunction.hashCode()
             result = 31 * result + (applicationIcon?.contentHashCode() ?: 0)
             return result
         }

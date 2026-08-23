@@ -37,6 +37,7 @@ import javax.inject.Inject
 internal class DefaultSecureSettingsWrapper @Inject constructor(
     @param:Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
     @param:ApplicationContext private val context: Context,
+    private val writeSecureSettingsMonitor: WriteSecureSettingsMonitor,
 ) : SecureSettingsWrapper {
 
     private val contentResolver = context.contentResolver
@@ -52,24 +53,34 @@ internal class DefaultSecureSettingsWrapper @Inject constructor(
         key: String,
         value: String,
     ): Boolean = withContext(ioDispatcher) {
-        when (settingType) {
-            SYSTEM -> Settings.System.putString(
-                contentResolver,
-                key,
-                value,
-            )
+        // Every write in the app comes through here, which makes it the one place that can
+        // notice the WRITE_SECURE_SETTINGS grant having gone away. Rethrown either way, so
+        // the use cases still map it to AppSettingsResult.NoPermission exactly as before —
+        // this only adds the reaction, it does not swallow the failure.
+        try {
+            when (settingType) {
+                SYSTEM -> Settings.System.putString(
+                    contentResolver,
+                    key,
+                    value,
+                )
 
-            SECURE -> Settings.Secure.putString(
-                contentResolver,
-                key,
-                value,
-            )
+                SECURE -> Settings.Secure.putString(
+                    contentResolver,
+                    key,
+                    value,
+                )
 
-            GLOBAL -> Settings.Global.putString(
-                contentResolver,
-                key,
-                value,
-            )
+                GLOBAL -> Settings.Global.putString(
+                    contentResolver,
+                    key,
+                    value,
+                )
+            }
+        } catch (securityException: SecurityException) {
+            writeSecureSettingsMonitor.onWriteRefused()
+
+            throw securityException
         }
     }
 

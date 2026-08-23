@@ -533,6 +533,187 @@ thedjchi's fork ever asked for one, so the old setup is already saying which fam
 built against. `UserPreferencesDataSource` reads it that way, and a working configuration
 keeps working instead of resetting to "not chosen".
 
+### 16. The dialog became a manager
+
+*(v1.2)*
+
+§7 built this as a rescue hatch: tick what is still switched off, press one button, get it
+back. It could only ever go one way, and it could not tell you what state anything was
+actually in — which meant the most common question it was opened to answer, *is developer
+mode still off?*, was the one thing it could not show.
+
+It now reads the device instead of assuming. Each row carries a switch driven by the real
+current value, re-read every 500 ms while the dialog is open, and the switch works in both
+directions. The button below is now *Enable selected* and still does the batch; the ticks
+still persist between openings.
+
+**Polled, not observed.** `Settings.Global` has a content observer, but Shizuku's liveness
+does not, and rows updating on different schedules from each other would read as broken.
+Every value here can also be changed from outside the app — including from the system
+screens this dialog now links out to — so there is no version of this that works from a
+cached answer. The cost is three `Settings.Global` reads the framework already caches
+in-process, one `Settings.Secure` read and a local binder ping, and the job is tied to the
+dialog being on screen: it starts in a `DisposableEffect` and stops on dismissal, including
+a back press or an outside tap.
+
+**Off is deliberately narrower than on.** Accessibility services removes only the components
+listed in this app's own settings — hence the caption under that row — and Shizuku sends the
+fork's stop broadcast rather than killing a process. Neither reaches past what the app put
+in place itself. Switching accessibility services *on* additionally covers anything still
+held for a target app and discharges those holds, so one press cannot leave a service down
+with no record of why.
+
+**The stop action is derived, not looked up.** `ShizukuForkDefaults.stopActionFor` rewrites
+the last `START` in whatever the user configured into `STOP`, which turns
+`moe.shizuku.privileged.api.START` and `moe.shizuku.manager.action.START_SERVER` into their
+correct pairs and does the right thing for a fork nobody here has heard of. A table would
+have been wrong for exactly the forks the v1.1 work opened the door to. An action with no
+`START` in it yields blank rather than an invention, and the switch reports failure.
+
+The accessibility row reads *on* only when **every** managed service is on. A row showing
+"on" while two of five are still off would be a lie in the direction that matters — the user
+would put the phone down believing the device was back to normal.
+
+Three rows now carry an open-in-new arrow: developer options, accessibility settings, and
+the configured Shizuku app. That last one resolves the configured package first, since on a
+renamed install it is the only correct answer, and falls back to a label search for Shizuku
+then Shevery. When developer options have never been enabled the settings activity is not
+exported on many builds and the launch throws, so that case gets a toast saying to enable
+them first rather than failing silently.
+
+Starting Shizuku shows a toast asking for ten seconds' patience. Shevery in particular is
+slow to come up after the broadcast, and the switch snapping back to off in the meantime is
+indistinguishable from a failure — saying so is cheaper and more honest than making the poll
+pretend.
+
+The FAB that opens all this is now a gear badged with the Android robot, composed from two
+icons rather than drawn as one vector so it keeps taking its colours from the button.
+
+### 17. Updates, without a network permission
+
+*(v1.3)*
+
+A sideloaded app has no store to tell it an update exists, and this one cannot tell itself:
+it holds no `INTERNET` permission, which is not an oversight but a promise the README and
+the app's own description both make. An update checker was drafted for this version and
+then deleted, because it needed exactly that permission — and a manifest entry saying
+"has full network access" makes the promise false whether or not the feature is switched
+on, including for the people who would have switched it off.
+
+Obtainium solves the same problem from outside the process. It watches a GitHub releases
+page and installs from it, which is precisely the missing piece, and it needs nothing from
+this app but a link.
+
+So the whole feature is two links and a note shown once:
+
+- **A one-time dialog** on the first launch of this version, saying the app is offline and
+  suggesting Obtainium. *Do not show again* and *Add to Obtainium* both dismiss it for
+  good — the second hands the job over, and bringing the note back afterwards would be
+  nagging someone who already did what it asked.
+- **In Settings → About**, the installed version as the first line, linking to the
+  changelog section of the README, with the release page and an *Add to Obtainium* button
+  under it.
+
+`ProjectLinks` in `:common` holds the four URLs and both launchers, shared rather than
+copied: the dialog and the Settings screen offer the same destinations, and a URL that
+drifts between two copies is one that quietly stops working in one of them.
+
+The Obtainium link is its documented `obtainium://add/<repo-url>` form, which opens its Add
+App page with the repository already filled in and leaves the actual add to the user. When
+Obtainium is not installed the intent fails, and rather than doing nothing visible it falls
+back to `apps.obtainium.imranr.dev/redirect.html`, the maintainer's own workaround for
+places that cannot handle a custom scheme — which lands on a page explaining what Obtainium
+is instead of on an error.
+
+The version string is read from the package manager, not from `BuildConfig`: `:feature:settings`
+has a `BuildConfig` of its own whose version is not the one the user installed.
+
+`obtainiumTipShown` is a separate preference rather than a reuse of `tipShown`, so an
+install upgrading into this version shows the note to people who dismissed the earlier tip
+long ago. They are exactly the ones who need telling.
+
+### 18. The manager loses its checkboxes, and stops lying about Shizuku
+
+*(v1.3.1)*
+
+Two changes, one of them a real bug.
+
+**The batch selection is gone.** §16 kept the ticks and the *Enable selected* button from
+the rescue-hatch design and added live switches beside them. Once the switches existed the
+ticks were two steps to do what one switch already did, so the checkboxes, the button and
+the persisted selection behind them are all removed. *Cancel* becomes *Close*, since there
+is nothing left to cancel. `ManualRevertUseCase` and `ManualRevertState` went with them.
+
+**The Shizuku switch was lying.** Uninstall Shizuku while the row says "on" and it stayed
+on, unmovable. `Shizuku.pingBinder()` is asked whether the service is alive, and a client
+process holds a binder handle that uninstalling does not reliably invalidate — so it
+answered "alive" for a service that no longer existed.
+
+No amount of care around the ping fixes that, because the ping is the thing that is wrong.
+The reading that survives an uninstall is the package manager: `GetManualTargetStatesUseCase`
+now asks whether the configured Shizuku package is installed **before** it asks Shizuku
+anything, and gates both the row's value and its usability on the answer. Hence
+`ManualTargetStates` carrying `shizukuAvailable` alongside the on/off map — "off" and
+"there is nothing here to switch" are different situations needing different UI, and
+conflating them is what produced the stuck switch.
+
+Unavailable, the row greys out and a tap explains why rather than doing nothing. A disabled
+`Switch` swallows taps, so it is wrapped in a clickable `Box` and handed a null
+`onCheckedChange` — the same trick the gated Shizuku toggle in Settings uses, for the same
+reason.
+
+The explanation also appears after three failed attempts to switch Shizuku on while the row
+*is* usable. Shizuku can take several seconds to start, so one or two presses are
+impatience; past that it is not going to work, and a switch that keeps springing back with
+no explanation is the worst version of this. Its middle point is the one nobody guesses:
+this app asks Shizuku for one permission, once, and holds no privileged channel afterwards.
+Everything else it sends Shizuku is a broadcast Shizuku is free to ignore.
+
+### 19. Two more front doors
+
+*(v1.4)*
+
+The manager was only reachable from the Favourites tab, which is the wrong place for it.
+The moment you need it is the moment a banking app has refused to start — and getting there
+meant opening IMD, finding the tab and pressing a button, with developer options possibly
+already off.
+
+It now has three entry points: that tab, a **Quick Settings tile**, and a **long-press
+shortcut** on the launcher icon, both labelled *IMD services*. Both open `ServicesActivity`,
+a translucent activity showing nothing but the dialog over whatever was already on screen,
+which finishes when the dialog is dismissed.
+
+That meant lifting the manager out of `FavouriteAppsViewModel`, where its polling and writes
+had been living, into `SettingsManagerViewModel` and a public `SettingsManagerRoute`. One
+owner for all three doors is the point: a tile that drifted away from the in-app dialog
+would be worse than no tile.
+
+**The tile deliberately does not toggle anything.** There are five switches behind it and no
+honest way to collapse them into one tile state — a tile reading "on" while two of them were
+off would be the same lie the Shizuku switch used to tell. It stays `STATE_INACTIVE` and
+behaves as a shortcut. From Android 14 the panel refuses a bare intent from a tile, so the
+click path branches to a `PendingIntent` on `UPSIDE_DOWN_CAKE` and above.
+
+The shortcut is **static** rather than dynamic: it never changes, so there is nothing to keep
+in sync, and a static shortcut exists from install without the app having been opened once.
+
+**The icons** are the app icon's own gear — the exact path out of `ic_launcher_foreground.xml`,
+not a redrawing — with the key replaced by an Android head. The launcher version fills it in
+the icon's own green; the tile version is one flat colour, because Quick Settings tints the
+drawable and anything with its own fills comes out as mud. That forced the head to be a
+*hole* through the gear rather than a shape on top of it, with the eyes filled back in inside
+the hole.
+
+Punching that hole needed real boolean geometry rather than an even-odd trick: the antennae
+overlap the dome, and even-odd punches overlaps back to solid, which would have put two
+bright wedges across the robot's ears. The head is flattened to polygons, unioned, and the
+single resulting outline emitted as the hole — asserted to be one polygon with no interior
+rings, so that failure cannot pass silently. The generator lives in `design/`.
+
+The tile drawable spans 22.4 of its 24 units. The first attempt was still inside the
+adaptive-icon safe zone, which reserves the outer third for launcher masking — a tile has no
+such zone, and the icon looked half-size because of it.
+
 ## Other fixes made along the way
 
 These were found while working on the above and are not upstream behaviour:

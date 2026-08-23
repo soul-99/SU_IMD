@@ -76,7 +76,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.android.geto.R
+import com.android.geto.designsystem.component.emphasised
 import com.android.geto.domain.model.ShizukuGrant
+import com.android.geto.feature.settings.help.SetupHelpContent
 import kotlinx.coroutines.launch
 
 /**
@@ -95,12 +97,19 @@ import kotlinx.coroutines.launch
 fun SetupScreen(
     modifier: Modifier = Modifier,
     setupState: SetupState,
+    /**
+     * Opens straight at the reminders page, skipping the permissions step.
+     *
+     * Used after an update, where the permissions are already granted and the only thing
+     * worth showing is what has changed since the user last read these.
+     */
+    remindersOnly: Boolean = false,
     grantViaShizuku: suspend () -> ShizukuGrant,
     onContinue: () -> Unit,
 ) {
     // Two pages, so a boolean rather than an index: `rememberSaveable` around
     // `mutableStateOf` is the pattern already proven everywhere else in this app.
-    var configuring by rememberSaveable { mutableStateOf(false) }
+    var configuring by rememberSaveable { mutableStateOf(remindersOnly) }
 
     if (!configuring) {
         PermissionsPage(
@@ -110,9 +119,18 @@ fun SetupScreen(
             onNext = { configuring = true },
         )
     } else {
+        // No way back when there was no permissions step to come from — Back would otherwise
+        // drop the user into a page asking them to grant what they already granted. Hoisted
+        // into a typed local because `if (x) null else { { ... } }` inline reads as a bug.
+        val onBack: (() -> Unit)? = if (remindersOnly) {
+            null
+        } else {
+            { configuring = false }
+        }
+
         ConfigurePage(
             modifier = modifier,
-            onBack = { configuring = false },
+            onBack = onBack,
             onContinue = onContinue,
         )
     }
@@ -277,15 +295,14 @@ private fun PermissionsPage(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
+            // Shizuku first, and marked as the recommendation. Both routes end at the same
+            // grant, but only one of them needs a computer — and the button that does it is
+            // right above this text, which the ADB command is not.
             Text(
-                text = stringResource(R.string.setup_secure_settings_adb),
-                style = MaterialTheme.typography.bodySmall,
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.setup_secure_settings_shizuku),
+                text = emphasised(
+                    text = stringResource(R.string.setup_secure_settings_shizuku),
+                    names = listOf(stringResource(R.string.setup_use_shizuku)),
+                ),
                 style = MaterialTheme.typography.bodySmall,
             )
 
@@ -295,6 +312,21 @@ private fun PermissionsPage(
                 text = stringResource(R.string.setup_shizuku_once),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = stringResource(R.string.setup_shizuku_once_extra),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.setup_secure_settings_adb),
+                style = MaterialTheme.typography.bodySmall,
             )
         }
 
@@ -380,7 +412,7 @@ private fun PermissionsPage(
 @Composable
 private fun ConfigurePage(
     modifier: Modifier = Modifier,
-    onBack: () -> Unit,
+    onBack: (() -> Unit)?,
     onContinue: () -> Unit,
 ) {
     Column(
@@ -389,51 +421,13 @@ private fun ConfigurePage(
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(
-            text = stringResource(R.string.setup_configure_title),
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = stringResource(R.string.setup_configure_intro),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        SetupStep(
-            stepNumber = 1,
-            title = stringResource(R.string.setup_configure_shizuku_title),
-            done = false,
-            showStatus = false,
-        ) {
-            Text(
-                text = stringResource(R.string.setup_configure_shizuku_body),
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        SetupStep(
-            stepNumber = 2,
-            title = stringResource(R.string.setup_configure_accessibility_title),
-            done = false,
-            showStatus = false,
-        ) {
-            Text(
-                text = stringResource(R.string.setup_configure_accessibility_body),
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
+        // The page's whole body lives in feature/settings, because Settings shows the same
+        // thing behind a Help button. Two copies of a page that is nothing but navigation
+        // paths would be out of step by the next release that moves a menu.
+        SetupHelpContent()
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -444,11 +438,18 @@ private fun ConfigurePage(
             Text(text = stringResource(R.string.setup_finish))
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        if (onBack != null) {
+            Spacer(modifier = Modifier.height(4.dp))
 
-        TextButton(onClick = onBack) {
-            Text(text = stringResource(R.string.setup_back))
+            TextButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onBack,
+            ) {
+                Text(text = stringResource(R.string.setup_back))
+            }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -458,8 +459,6 @@ private fun SetupStep(
     stepNumber: Int,
     title: String,
     done: Boolean,
-    /** Page two lists things to go and do, not permissions to check, so it has no badge. */
-    showStatus: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     OutlinedCard(modifier = modifier.fillMaxWidth()) {
@@ -494,21 +493,19 @@ private fun SetupStep(
                     )
                 }
 
-                if (showStatus) {
-                    Text(
-                        text = if (done) {
-                            stringResource(R.string.setup_granted)
-                        } else {
-                            stringResource(R.string.setup_not_granted)
-                        },
-                        style = MaterialTheme.typography.labelMedium,
-                        color = if (done) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.error
-                        },
-                    )
-                }
+                Text(
+                    text = if (done) {
+                        stringResource(R.string.setup_granted)
+                    } else {
+                        stringResource(R.string.setup_not_granted)
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (done) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    },
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))

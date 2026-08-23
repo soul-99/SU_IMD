@@ -17,4 +17,5 @@
   -->
 <resources>
     <string name="revert">Revert</string>
+    <string name="revert_to_default">Revert to default</string>
 </resources>

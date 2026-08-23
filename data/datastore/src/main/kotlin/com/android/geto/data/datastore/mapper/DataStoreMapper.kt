@@ -19,6 +19,7 @@ package com.android.geto.data.datastore.mapper
 
 import com.android.geto.data.datastore.proto.FavouriteAppsTapActionProto
 import com.android.geto.data.datastore.proto.FavouriteAppsViewProto
+import com.android.geto.data.datastore.proto.NotificationFunctionProto
 import com.android.geto.data.datastore.proto.ShizukuForkModeProto
 import com.android.geto.data.datastore.proto.SortFavouriteAppsProto
 import com.android.geto.data.datastore.proto.SortLauncherAppsActivityInfoProto
@@ -26,6 +27,7 @@ import com.android.geto.data.datastore.proto.SortOrderLauncherAppsActivityInfoPr
 import com.android.geto.data.datastore.proto.ThemeProto
 import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
@@ -220,5 +222,33 @@ internal fun ShizukuForkMode.asShizukuForkModeProto(): ShizukuForkModeProto = wh
 
     ShizukuForkMode.Other -> {
         ShizukuForkModeProto.ShizukuForkOther
+    }
+}
+
+internal fun NotificationFunctionProto.asNotificationFunction(): NotificationFunction = when (this) {
+    NotificationFunctionProto.NotificationFunctionRevertToDefault -> {
+        NotificationFunction.RevertToDefault
+    }
+
+    NotificationFunctionProto.NotificationFunctionMemory -> {
+        NotificationFunction.Memory
+    }
+
+    // Never chosen, or written by a build this one does not know about. Both mean the same
+    // thing here — no decision has been recorded — and the recommendation answers it.
+    NotificationFunctionProto.NotificationFunctionUnset,
+    NotificationFunctionProto.UNRECOGNIZED,
+    -> {
+        NotificationFunction.Default
+    }
+}
+
+internal fun NotificationFunction.asNotificationFunctionProto(): NotificationFunctionProto = when (this) {
+    NotificationFunction.Memory -> {
+        NotificationFunctionProto.NotificationFunctionMemory
+    }
+
+    NotificationFunction.RevertToDefault -> {
+        NotificationFunctionProto.NotificationFunctionRevertToDefault
     }
 }

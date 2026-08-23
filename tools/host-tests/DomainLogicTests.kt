@@ -27,6 +27,8 @@ import com.android.geto.domain.model.AppListOrder
 import com.android.geto.domain.model.AppListOrdering
 import com.android.geto.domain.model.ManualRevertResult
 import com.android.geto.domain.model.ManualRevertTarget
+import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.RevertDefaults
 import com.android.geto.domain.model.SettingSnapshot
 import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingKeys
@@ -472,38 +474,55 @@ private fun favouriteToggleTests() {
 }
 
 private fun appSettingKeyTests() {
-    // 26. Each of the three keys arms the Shizuku restart.
+    // 26. Only USB debugging arms the restart now, and only when this profile is what
+    // switched it off. Shizuku's service runs over the USB transport; a profile restoring
+    // wireless debugging never took it down, so restarting was firing at a service that had
+    // not stopped.
     check(
-        "wireless debugging revert arms the restart",
-        AppSettingKeys.triggersShizukuRestart(listOf(setting(AppSettingKeys.ADB_WIFI_ENABLED))),
+        "usb debugging switched off then restored arms the restart",
+        AppSettingKeys.triggersShizukuRestart(
+            listOf(setting(AppSettingKeys.ADB_ENABLED, valueOnLaunch = "0", valueOnRevert = "1")),
+        ),
     )
     check(
-        "usb debugging revert arms the restart",
-        AppSettingKeys.triggersShizukuRestart(listOf(setting(AppSettingKeys.ADB_ENABLED))),
+        "wireless debugging does not arm the restart",
+        !AppSettingKeys.triggersShizukuRestart(listOf(setting(AppSettingKeys.ADB_WIFI_ENABLED))),
     )
     check(
-        "developer options revert arms the restart",
-        AppSettingKeys.triggersShizukuRestart(listOf(setting(AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED))),
+        "developer options alone does not arm the restart",
+        !AppSettingKeys.triggersShizukuRestart(listOf(setting(AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED))),
     )
 
-    // 27. An unticked setting is not written, so it must not arm the restart either.
+    // 27. A profile that leaves USB debugging on, or turns it on, did not stop Shizuku.
+    check(
+        "usb debugging left on does not arm the restart",
+        !AppSettingKeys.triggersShizukuRestart(
+            listOf(setting(AppSettingKeys.ADB_ENABLED, valueOnLaunch = "1", valueOnRevert = "1")),
+        ),
+    )
+    check(
+        "usb debugging not restored does not arm the restart",
+        !AppSettingKeys.triggersShizukuRestart(
+            listOf(setting(AppSettingKeys.ADB_ENABLED, valueOnLaunch = "0", valueOnRevert = "0")),
+        ),
+    )
+
+    // 28. An unticked setting is not written, so it must not arm the restart either.
     check(
         "a disabled setting does not arm the restart",
-        !AppSettingKeys.triggersShizukuRestart(listOf(setting(AppSettingKeys.ADB_WIFI_ENABLED, enabled = false))),
+        !AppSettingKeys.triggersShizukuRestart(listOf(setting(AppSettingKeys.ADB_ENABLED, enabled = false))),
     )
 
-    // 28. An unrelated key must not arm it.
+    // 29. An unrelated key must not arm it, and one matching key among several is enough.
     check(
         "an unrelated key does not arm the restart",
         !AppSettingKeys.triggersShizukuRestart(listOf(setting("screen_brightness"))),
     )
     check("no settings does not arm the restart", !AppSettingKeys.triggersShizukuRestart(emptyList()))
-
-    // 29. One matching key among several is enough.
     check(
         "one matching key among several arms the restart",
         AppSettingKeys.triggersShizukuRestart(
-            listOf(setting("screen_brightness"), setting(AppSettingKeys.ADB_WIFI_ENABLED)),
+            listOf(setting("screen_brightness"), setting(AppSettingKeys.ADB_ENABLED)),
         ),
     )
 
@@ -845,8 +864,13 @@ private fun userData(
     managedAccessibilityServices = emptyList(),
     heldAccessibilityServices = emptyMap(),
     manualRevertTargets = emptySet(),
+    notificationFunction = NotificationFunction.Default,
+    revertDefaults = RevertDefaults.Default,
+    shizukuStartFailed = false,
     settingStateBefore = emptyMap(),
     tipShown = false,
+    obtainiumTipShown = false,
+    setupNoticeVersion = 0,
 )
 
 private fun shizukuForkDefaultsTests() {
@@ -965,6 +989,260 @@ private fun shizukuConfiguredTests() {
     )
 }
 
+// ---------------------------------------------------------------------------------
+// v1.2 — the settings manager's live rows
+// ---------------------------------------------------------------------------------
+
+private fun stopActionTests() {
+    checkEquals(
+        "thedjchi's start action pairs with its stop action",
+        "moe.shizuku.privileged.api.STOP",
+        ShizukuForkDefaults.stopActionFor("moe.shizuku.privileged.api.START"),
+    )
+
+    checkEquals(
+        "Shevery's START_SERVER pairs with STOP_SERVER",
+        "moe.shizuku.manager.action.STOP_SERVER",
+        ShizukuForkDefaults.stopActionFor("moe.shizuku.manager.action.START_SERVER"),
+    )
+
+    checkEquals(
+        "an unknown fork's action is rewritten the same way",
+        "com.example.fork.action.STOP_IT",
+        ShizukuForkDefaults.stopActionFor("com.example.fork.action.START_IT"),
+    )
+
+    checkEquals(
+        "only the last START is rewritten, so a package containing it survives",
+        "com.START.thing.STOP",
+        ShizukuForkDefaults.stopActionFor("com.START.thing.START"),
+    )
+
+    checkEquals(
+        "an action with no START yields no stop action rather than a guess",
+        "",
+        ShizukuForkDefaults.stopActionFor("moe.shizuku.privileged.api.LAUNCH"),
+    )
+
+    checkEquals("a blank action stays blank", "", ShizukuForkDefaults.stopActionFor(""))
+}
+
+private fun launchPackageTests() {
+    val installed = listOf(UNRELATED, SHIZUKU_APP, SHEVERY_APP)
+
+    checkEquals(
+        "the configured package wins when it is installed",
+        "com.hamondev.shevery",
+        ShizukuForkDefaults.launchPackageFor("com.hamondev.shevery", installed),
+    )
+
+    checkEquals(
+        "a configured package that is not installed falls back to Shizuku",
+        "moe.shizuku.privileged.api",
+        ShizukuForkDefaults.launchPackageFor("com.gone", installed),
+    )
+
+    checkEquals(
+        "with no Shizuku installed it falls back to Shevery",
+        "com.hamondev.shevery",
+        ShizukuForkDefaults.launchPackageFor("", listOf(UNRELATED, SHEVERY_APP)),
+    )
+
+    checkEquals(
+        "nothing installed means nothing to open",
+        "",
+        ShizukuForkDefaults.launchPackageFor("", listOf(UNRELATED)),
+    )
+
+    checkEquals(
+        "a renamed but configured package is still honoured",
+        "com.uzuku",
+        ShizukuForkDefaults.launchPackageFor("com.uzuku", listOf(RENAMED_SHIZUKU)),
+    )
+}
+
+private fun accessibilityLiveStateTests() {
+    val enabled = listOf(TALKBACK, SWIPE, BIXBY)
+
+    check(
+        "the row reads on only when every managed service is on",
+        AccessibilityServicePlan.allEnabled(listOf(TALKBACK, SWIPE), enabled),
+    )
+
+    check(
+        "one managed service missing reads as off",
+        !AccessibilityServicePlan.allEnabled(listOf(TALKBACK, TASKER), enabled),
+    )
+
+    check(
+        "managing nothing reads as on, since there is nothing to put back",
+        AccessibilityServicePlan.allEnabled(emptyList(), emptyList()),
+    )
+
+    check(
+        "duplicates in the managed list do not change the answer",
+        AccessibilityServicePlan.allEnabled(listOf(TALKBACK, TALKBACK), enabled),
+    )
+
+    checkEquals(
+        "switching off removes only the managed services",
+        listOf(BIXBY),
+        AccessibilityServicePlan.disable(listOf(TALKBACK, SWIPE), enabled),
+    )
+
+    checkEquals(
+        "a service the user enabled themselves is never swept up",
+        listOf(TALKBACK, SWIPE, BIXBY),
+        AccessibilityServicePlan.disable(listOf(TASKER), enabled),
+    )
+
+    checkEquals(
+        "switching off an empty managed set changes nothing",
+        enabled,
+        AccessibilityServicePlan.disable(emptyList(), enabled),
+    )
+
+    checkEquals(
+        "order of the survivors is preserved",
+        listOf(TALKBACK, BIXBY),
+        AccessibilityServicePlan.disable(listOf(SWIPE), enabled),
+    )
+}
+
+/**
+ * The "Revert to default" configuration: what it stores, what it falls back to, and the one
+ * rule it enforces between two of its rows.
+ */
+private fun revertDefaultsTests() {
+    // 45. Never configured falls back to the three a locked-down app actually breaks, and
+    // leaves developer settings and wireless debugging alone — turning either on for someone
+    // who keeps them off is a change they never asked for.
+    checkEquals(
+        "an empty configuration falls back to the default",
+        RevertDefaults.Default,
+        RevertDefaults.decode(emptyList()),
+    )
+    checkEquals(
+        "USB debugging is on by default",
+        true,
+        RevertDefaults.Default[ManualRevertTarget.UsbDebugging],
+    )
+    checkEquals(
+        "accessibility services is on by default",
+        true,
+        RevertDefaults.Default[ManualRevertTarget.AccessibilityServices],
+    )
+    checkEquals(
+        "Shizuku is on by default",
+        true,
+        RevertDefaults.Default[ManualRevertTarget.Shizuku],
+    )
+    checkEquals(
+        "developer settings is off by default",
+        false,
+        RevertDefaults.Default[ManualRevertTarget.DeveloperSettings],
+    )
+    checkEquals(
+        "wireless debugging is off by default",
+        false,
+        RevertDefaults.Default[ManualRevertTarget.WirelessDebugging],
+    )
+    check(
+        "the default covers every target, so decode can never be missing one",
+        RevertDefaults.Default.keys == ManualRevertTarget.entries.toSet(),
+    )
+
+    // 46. Every target is written, on or off, so "off" and "not configured" stay distinct.
+    val mixed = mapOf(
+        ManualRevertTarget.DeveloperSettings to true,
+        ManualRevertTarget.UsbDebugging to true,
+        ManualRevertTarget.WirelessDebugging to false,
+        ManualRevertTarget.AccessibilityServices to true,
+        ManualRevertTarget.Shizuku to false,
+    )
+    checkEquals(
+        "encode writes one entry per target",
+        ManualRevertTarget.entries.size,
+        RevertDefaults.encode(mixed).size,
+    )
+    checkEquals("a mixed configuration round-trips", mixed, RevertDefaults.decode(RevertDefaults.encode(mixed)))
+
+    // 47. All off is a real answer and must survive the round trip, or someone who wants
+    // nothing restored gets everything restored.
+    val allOff = ManualRevertTarget.entries.associateWith { false }
+    checkEquals("all off round-trips", allOff, RevertDefaults.decode(RevertDefaults.encode(allOff)))
+
+    // 48. A downgrade, or a target added in a later version, must not poison the stored
+    // configuration: unknown names are dropped and missing ones fall back to the default.
+    checkEquals(
+        "an unknown target name is ignored",
+        RevertDefaults.Default,
+        RevertDefaults.decode(listOf("SomethingElse=0")),
+    )
+    checkEquals(
+        "a missing target falls back to its default",
+        true,
+        RevertDefaults.decode(listOf("Shizuku=0"))[ManualRevertTarget.UsbDebugging],
+    )
+    checkEquals(
+        "a stored target still wins over the default",
+        false,
+        RevertDefaults.decode(listOf("Shizuku=0"))[ManualRevertTarget.Shizuku],
+    )
+    checkEquals(
+        "a malformed entry is ignored",
+        RevertDefaults.Default,
+        RevertDefaults.decode(listOf("=1", "Shizuku", "")),
+    )
+
+    // 49. Every target is independent. An earlier version tied Shizuku to USB debugging;
+    // which transport the service needs depends on how Shizuku was started, and Shizuku
+    // re-enables the right one itself, so deciding it here overrode a deliberate choice.
+    checkEquals(
+        "the encoding has no cross-target rule left to enforce",
+        listOf("DeveloperSettings=0", "UsbDebugging=1", "WirelessDebugging=0",
+               "AccessibilityServices=1", "Shizuku=0"),
+        RevertDefaults.encode(
+            mapOf(
+                ManualRevertTarget.DeveloperSettings to false,
+                ManualRevertTarget.UsbDebugging to true,
+                ManualRevertTarget.WirelessDebugging to false,
+                ManualRevertTarget.AccessibilityServices to true,
+                ManualRevertTarget.Shizuku to false,
+            ),
+        ),
+    )
+
+    // 50. The combination the old rule forbade — Shizuku on with USB debugging off — has to
+    // survive a round trip, because it is now a configuration the user is allowed to save.
+    val shizukuWithoutUsb = mapOf(
+        ManualRevertTarget.DeveloperSettings to false,
+        ManualRevertTarget.UsbDebugging to false,
+        ManualRevertTarget.WirelessDebugging to true,
+        ManualRevertTarget.AccessibilityServices to false,
+        ManualRevertTarget.Shizuku to true,
+    )
+    checkEquals(
+        "Shizuku on with USB debugging off round-trips",
+        shizukuWithoutUsb,
+        RevertDefaults.decode(RevertDefaults.encode(shizukuWithoutUsb)),
+    )
+
+    // 53. Revert to default is what an install that has never opened the picker gets. The
+    // memory function's notification is its only way back, and a notification can be swiped
+    // away; this one has a tile and a shortcut that need no notification at all.
+    checkEquals(
+        "revert to default is the recommended default",
+        NotificationFunction.RevertToDefault,
+        NotificationFunction.Default,
+    )
+    check(
+        "both functions are still reachable",
+        NotificationFunction.entries.toSet() ==
+            setOf(NotificationFunction.Memory, NotificationFunction.RevertToDefault),
+    )
+}
+
 fun main() {
     accessibilityHoldTests()
     accessibilityReleaseTests()
@@ -979,6 +1257,10 @@ fun main() {
     settingSnapshotTests()
     shizukuForkDefaultsTests()
     shizukuConfiguredTests()
+    stopActionTests()
+    launchPackageTests()
+    accessibilityLiveStateTests()
+    revertDefaultsTests()
 
     println("passed: $passed")
 

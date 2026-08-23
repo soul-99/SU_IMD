@@ -16,17 +16,20 @@
  *   limitations under the License.
  *
  */
-package com.android.geto.feature.apps
 
-import com.android.geto.domain.model.ManualRevertResult
+syntax = "proto3";
 
-/**
- * A manual revert can sit for a second and a half waiting for adbd, so the dialog needs
- * to know it is in flight and stop taking further presses.
- */
-data class ManualRevertState(
-    val busy: Boolean = false,
-    val result: ManualRevertResult? = null,
-    /** How many were asked for, so a partial result can be reported as "3 of 5". */
-    val requested: Int = 0,
-)
+option java_package = "com.android.geto.data.datastore.proto";
+option java_multiple_files = true;
+
+// Zero is "not chosen", the same shape as ShizukuForkModeProto, so which function an
+// install that has never opened the picker gets is decided in the domain rather than
+// baked into a wire format. Changing the recommendation later is then one line in
+// NotificationFunction, with no renumbering and nothing to migrate.
+//
+// Renumbering was free: no released version has ever written this field.
+enum NotificationFunctionProto {
+  NotificationFunctionUnset = 0;
+  NotificationFunctionMemory = 1;
+  NotificationFunctionRevertToDefault = 2;
+}

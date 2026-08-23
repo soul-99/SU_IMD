@@ -21,6 +21,7 @@ package com.android.geto.domain.repository
 import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.ManualRevertTarget
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
@@ -69,7 +70,17 @@ interface UserDataRepository {
 
     suspend fun updateManualRevertTargets(targets: Set<ManualRevertTarget>)
 
+    suspend fun updateNotificationFunction(notificationFunction: NotificationFunction)
+
+    suspend fun updateRevertDefaults(states: Map<ManualRevertTarget, Boolean>)
+
+    suspend fun updateShizukuStartFailed(failed: Boolean)
+
+    suspend fun updateSetupNoticeVersion(versionCode: Int)
+
     suspend fun updateSettingStateBefore(states: Map<String, Map<String, String?>>)
 
     suspend fun updateTipShown(tipShown: Boolean)
+
+    suspend fun updateObtainiumTipShown(obtainiumTipShown: Boolean)
 }

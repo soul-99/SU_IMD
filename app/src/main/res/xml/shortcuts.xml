@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      Static rather than dynamic: it never changes, so there is nothing for the app to
+      keep in sync, and a static shortcut is present from install without the app having
+      to have been opened first.
+    -->
+    <shortcut
+        android:shortcutId="imd_services"
+        android:enabled="true"
+        android:icon="@mipmap/ic_services"
+        android:shortcutShortLabel="@string/services_shortcut_label"
+        android:shortcutLongLabel="@string/services_shortcut_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.soul_99.suIMD"
+            android:targetClass="com.android.geto.activity.services.ServicesActivity" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="imd_revert_to_default"
+        android:enabled="true"
+        android:icon="@mipmap/ic_revert"
+        android:shortcutShortLabel="@string/revert_shortcut_label"
+        android:shortcutLongLabel="@string/revert_shortcut_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.soul_99.suIMD"
+            android:targetClass="com.android.geto.activity.revert.RevertActivity" />
+    </shortcut>
+</shortcuts>

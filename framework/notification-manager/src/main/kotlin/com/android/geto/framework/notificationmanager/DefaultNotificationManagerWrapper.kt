@@ -44,6 +44,10 @@ internal class DefaultNotificationManagerWrapper @Inject constructor(@param:Appl
         notificationManager.cancel(id)
     }
 
+    override fun cancelAll() {
+        notificationManager.cancelAll()
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun createNotificationChannel(
         channelId: String,

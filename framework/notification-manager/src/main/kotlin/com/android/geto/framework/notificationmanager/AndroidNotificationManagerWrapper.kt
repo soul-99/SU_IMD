@@ -36,10 +36,34 @@ interface AndroidNotificationManagerWrapper {
 
     fun cancel(id: Int)
 
+    /**
+     * Clears every notification this app has posted.
+     *
+     * Used by "Revert to default", which puts the whole device into a known state and so
+     * makes every outstanding per-app Revert button describe a device that no longer
+     * exists. Leaving them up would invite a press that writes stale values back over the
+     * defaults that were just applied.
+     */
+    fun cancelAll()
+
     companion object {
         const val NOTIFICATION_CHANNEL_ID = "geto_notification_channel_id"
         const val ACTION_REVERT_SETTINGS = "ACTION_REVERT_SETTINGS"
+        const val ACTION_REVERT_TO_DEFAULT = "ACTION_REVERT_TO_DEFAULT"
         const val NOTIFICATION_EXTRA_COMPONENT_NAME = "component_name"
         const val NOTIFICATION_EXTRA_NOTIFICATION_ID = "notification_id"
+
+        /**
+         * The single id every "Revert to default" notification is posted under.
+         *
+         * Fixed rather than derived from the app being launched, which is what makes the
+         * mode's "one notification only" rule work: posting under an id that is already
+         * showing replaces it, so launching a second app through this app silently retires
+         * the first notification instead of stacking another one beside it.
+         *
+         * Far away from the per-app ids, which are component-name hash codes, and from the
+         * observer service's id 1.
+         */
+        const val REVERT_TO_DEFAULT_NOTIFICATION_ID = 1_000_001
     }
 }

@@ -36,6 +36,11 @@ data class UserData(
     val managedAccessibilityServices: List<String>,
     val heldAccessibilityServices: Map<String, List<String>>,
     val manualRevertTargets: Set<ManualRevertTarget>,
+    val notificationFunction: NotificationFunction,
+    val revertDefaults: Map<ManualRevertTarget, Boolean>,
+    val shizukuStartFailed: Boolean,
     val settingStateBefore: Map<String, Map<String, String?>>,
     val tipShown: Boolean,
+    val obtainiumTipShown: Boolean,
+    val setupNoticeVersion: Int,
 )

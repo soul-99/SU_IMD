@@ -20,40 +20,47 @@ package com.android.geto.feature.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.geto.broadcastreceiver.RevertToDefaultRunner
+import com.android.geto.common.ApplicationScope
 import com.android.geto.domain.framework.PackageManagerWrapper
 import com.android.geto.domain.model.FavouriteAppsTapAction
 import com.android.geto.domain.model.FavouriteAppsView
-import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.repository.UserDataRepository
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
 import com.android.geto.domain.usecase.GetFavouriteAppsUseCase
-import com.android.geto.domain.usecase.ManualRevertUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+
+/**
+ * Short enough to read as live, long enough that it is not doing anything expensive: the
+ * reads behind it are in-process setting lookups and a binder ping, and it only runs while
+ * the manager dialog is open.
+ */
+private const val TARGET_POLL_MILLIS = 500L
 
 @HiltViewModel
 class FavouriteAppsViewModel @Inject constructor(
     getFavouriteAppsUseCase: GetFavouriteAppsUseCase,
     private val applyAppSettingsUseCase: ApplyAppSettingsUseCase,
-    private val manualRevertUseCase: ManualRevertUseCase,
     private val packageManagerWrapper: PackageManagerWrapper,
     private val userDataRepository: UserDataRepository,
+    private val revertToDefaultRunner: RevertToDefaultRunner,
+    @param:ApplicationScope private val appScope: CoroutineScope,
 ) : ViewModel() {
     private val _textFlow = MutableStateFlow<String?>(null)
 
     private val _appLaunch = MutableStateFlow<FavouriteAppLaunch?>(null)
     val appLaunch = _appLaunch.asStateFlow()
-
-    private val _manualRevert = MutableStateFlow(ManualRevertState())
-    val manualRevertState = _manualRevert.asStateFlow()
 
     val favouriteAppsUiState =
         getFavouriteAppsUseCase(textFlow = _textFlow).map(FavouriteAppsUiState::Success).stateIn(
@@ -76,14 +83,28 @@ class FavouriteAppsViewModel @Inject constructor(
             // failure, and getActivityIcon is a real binder call.
             val icon = packageManagerWrapper.getActivityIcon(componentName = componentName)
 
+            val notificationFunction = userDataRepository.userData.first().notificationFunction
+
             _appLaunch.update {
                 FavouriteAppLaunch(
                     componentName = componentName,
                     result = result,
                     icon = icon,
+                    notificationFunction = notificationFunction,
                 )
             }
         }
+    }
+
+    /**
+     * Puts the device back into the configured default.
+     *
+     * Launched on the application scope rather than [viewModelScope]: leaving the Favourites
+     * tab — which is exactly what someone does after pressing this — would otherwise cancel
+     * a revert that takes seconds, and can wait on adbd before it is finished.
+     */
+    fun revertToDefault() {
+        appScope.launch { revertToDefaultRunner() }
     }
 
     /** Cleared once handled, so tapping the same app twice emits twice. */
@@ -119,38 +140,5 @@ class FavouriteAppsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * The ticked set is the persisted one, so closing and reopening the dialog — or
-     * killing the app — comes back to the same selection.
-     */
-    fun toggleManualRevertTarget(target: ManualRevertTarget, current: Set<ManualRevertTarget>) {
-        viewModelScope.launch {
-            val updated = if (target in current) current - target else current + target
 
-            userDataRepository.updateManualRevertTargets(targets = updated)
-        }
-    }
-
-    fun revertNow(targets: Set<ManualRevertTarget>) {
-        if (targets.isEmpty() || _manualRevert.value.busy) return
-
-        viewModelScope.launch {
-            _manualRevert.update { ManualRevertState(busy = true, requested = targets.size) }
-
-            val result = manualRevertUseCase(targets = targets)
-
-            _manualRevert.update {
-                ManualRevertState(busy = false, result = result, requested = targets.size)
-            }
-        }
-    }
-
-    /** The per-row button. Runs one target and leaves the ticked set alone. */
-    fun revertOneNow(target: ManualRevertTarget) {
-        revertNow(targets = setOf(target))
-    }
-
-    fun consumeManualRevertResult() {
-        _manualRevert.update { it.copy(result = null, requested = 0) }
-    }
 }

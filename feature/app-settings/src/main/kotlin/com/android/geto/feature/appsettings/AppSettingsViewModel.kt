@@ -28,6 +28,7 @@ import com.android.geto.domain.model.AddAppSettingResult
 import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingTemplate
 import com.android.geto.domain.model.AppSettingsResult
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.GetPinShortcutResult
 import com.android.geto.domain.model.RequestPinShortcutResult
 import com.android.geto.domain.model.SecureSetting
@@ -76,6 +77,20 @@ class AppSettingsViewModel @Inject constructor(
 
     private var _secureSettings = MutableStateFlow<List<SecureSetting>>(emptyList())
     val secureSettings = _secureSettings.asStateFlow()
+
+    /**
+     * Which notification this screen's launch button should post.
+     *
+     * Read here rather than in the composable because the repository is a suspending flow
+     * and this screen already owns every other read of it.
+     */
+    val notificationFunction = userDataRepository.userData
+        .map { it.notificationFunction }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = NotificationFunction.Default,
+        )
 
     val isFavourite = userDataRepository.userData.map {
         componentName in it.favouriteComponentNames

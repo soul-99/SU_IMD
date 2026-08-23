@@ -21,6 +21,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.android.geto.common.ApplicationScope
+import com.android.geto.common.showRevertFromMemoryToast
 import com.android.geto.domain.usecase.RevertAppSettingsUseCase
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.NOTIFICATION_EXTRA_COMPONENT_NAME
@@ -47,6 +48,10 @@ class RevertSettingsBroadcastReceiver @Inject constructor() : BroadcastReceiver(
         val componentName = intent?.extras?.getString(NOTIFICATION_EXTRA_COMPONENT_NAME) ?: return
 
         val notificationId = intent.extras?.getInt(NOTIFICATION_EXTRA_NOTIFICATION_ID) ?: return
+
+        // Says which of the two reverts ran. Nothing else on screen distinguishes them, and
+        // this one puts back only what that app changed rather than the whole device.
+        context?.showRevertFromMemoryToast()
 
         // Without goAsync the process drops to a cached state the moment onReceive
         // returns, and the revert — which writes secure settings, restores accessibility

@@ -32,6 +32,25 @@ interface PackageManagerWrapper {
     suspend fun getInstalledApps(): List<InstalledAppData>
 
     /**
+     * The package a "open this app" shortcut should target: [preferredPackage] if it is
+     * installed and launchable, otherwise the first installed app whose label matches one
+     * of [labels], in order. Null when nothing matches.
+     *
+     * Separate from [getInstalledApps] because it needs no icons. Resolving one package to
+     * open should not cost a few hundred bitmaps.
+     */
+    suspend fun findLaunchablePackage(preferredPackage: String, labels: List<String>): String?
+
+    /**
+     * Whether [packageName] is installed at all — launchable or not.
+     *
+     * Not the same question as [findLaunchablePackage]: a Shizuku build hiding itself has
+     * no launcher entry but is very much installed, and the difference decides whether the
+     * manager's Shizuku switch is usable or dead.
+     */
+    suspend fun isInstalled(packageName: String): Boolean
+
+    /**
      * Last-update time for every installed package, keyed by package name.
      *
      * Bulk rather than per-package: the launcher list is rebuilt from scratch on every
