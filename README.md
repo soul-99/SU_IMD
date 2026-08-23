@@ -54,6 +54,7 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 * Notifications now say **IMD** and **Settings hidden/disabled**.
 
 #### v1.5
+(Multiple builds and versions were made between v1.5 and v1.1, this is a combined list of all changes) 
 
 * **New ‘IMD services manager’ Dialog box**: A new dialog box to view the live status of each setting and services (including Shizuku service), and also allows to toggle them on/off easily.
 * **New ‘Revert to default’ mechanism** (previous revert mechanism is now called ‘memory function’ mechanism): this new mechanism allows to revert all the settings at once to a universal default state which is configured by the user in settings.
