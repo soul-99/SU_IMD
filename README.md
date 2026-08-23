@@ -24,7 +24,11 @@ adb shell pm grant com.soul_99.suIMD android.permission.WRITE_SECURE_SETTINGS
 or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that command for you. The screen also shows the command with a copy button and re-checks itself when you come back, so you never have to type it twice. The grant survives reboots but not a reinstall.
 
 <p>
-  <img src="docs/screenshots/poster.png" width="100%" alt="Favourites tab">
+  <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the app">
+</p>
+
+<p>
+  <img src="docs/screenshots/poster1.5.png" width="100%" alt="Poster: the v1.5 update, with screenshots of the services manager, Quick Settings tiles, Shizuku settings, Revert to default configuration and the setup help page">
 </p>
 
 ## Functions
