@@ -111,6 +111,17 @@ fun SetupHelpContent(modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // First, because it is the one thing on this page someone can get wrong
+                // without any error to tell them: settings are applied on the way into an
+                // app, so an app opened from the launcher gets none of them and looks
+                // exactly like the app not working.
+                Text(
+                    text = stringResource(R.string.help_general_launch),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = stringResource(R.string.help_general_shortcuts),
                     style = MaterialTheme.typography.bodySmall,
