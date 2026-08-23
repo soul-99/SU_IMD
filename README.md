@@ -8,6 +8,8 @@ Open banking and other locked-down apps without turning developer options, USB d
 
 Some apps refuse to run — or quietly disable parts of themselves — when they detect developer options, an ADB connection or an active accessibility service. The usual workaround is to go and switch those things off before opening the app and switch them back on afterwards, every time. IMD does that for you: pick an app, say which settings should change while it runs, and launch it from here. The settings are applied, the app opens, and an ongoing notification with a **Revert** action puts your device back the way it was.
 
+The **IMD services manager** is the other half of that: one dialog showing the live state of developer settings, USB debugging, wireless debugging, your managed accessibility services and the Shizuku service, with a switch on each and a **Revert to default** button at the bottom. It opens from a Quick Settings tile, a homescreen shortcut or the Favourites tab — without the app itself having to be open — which is what you reach for when a banking app has just refused to start and you do not want to go hunting through Android's settings to find out why.
+
 It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the parts that did not survive real use — Shizuku dying with USB debugging, accessibility services that were listed but never actually stopped, and a quick re-enable settings button in app.
 
 - **Package:** `com.soul_99.suIMD` — installs alongside stock Geto, both can coexist
@@ -34,32 +36,17 @@ adb shell pm grant com.soul_99.suIMD android.permission.WRITE_SECURE_SETTINGS
 or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that command for you. The screen also shows the command with a copy button and re-checks itself when you come back, so you never have to type it twice. The grant survives reboots but not a reinstall.
 
 <p>
-  <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the app">
-</p>
-
-<p>
-  <img src="docs/screenshots/poster1.5.png" width="100%" alt="Poster: the v1.5 update, with screenshots of the services manager, Quick Settings tiles, Shizuku settings, Revert to default configuration and the setup help page">
+  <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the Favourites tab, creating a shortcut, the IMD services manager, the settings screen and the Quick Settings tiles">
 </p>
 
 ## Functions
 
-### From the original Geto
-
-- Per-app profiles of Android **system**, **secure** and **global** settings.
-- A searchable, sortable list of every installed apps.
-- A browsable copy of the device's current settings
-- Launch app from inside IMD or shortcut with its profile applied, and an ongoing notification carrying the **Revert** action.
-- A settings-observer foreground service.
-
 ### Added in this fork
-
-v1.1 is the last version published here, so updating from it brings everything below.
 
 #### v1.6
 
-* **New ‘Settings to hide’ function**: one list used for every app — tick what should be switched off whenever any app is launched. An app you have never configured now opens correctly, so there is nothing to set up before you can start using the app. All four are ticked to begin with.
-* **Launch from either tab**: a tap launches the app from All apps as well as Favourites.
-* **Long press on an app** creates a homescreen shortcut for it, or opens that app’s own settings template if you use the Memory function.
+* Default configuration options for both **Settings to hide** & **Settings to unhide**.
+* short press opens app, Long press creates shortcut.
 * **IMD services manager**: shows the IMD app icon, and long pressing ‘Revert to default’ opens its configuration. The Accessibility services toggle greys out when no services are selected in IMD settings.
 * **Settings reorganised**: ‘App functions’ is now ‘Default IMD settings’, opens expanded, and holds ‘Settings to hide’ and ‘Settings to unhide on Revert’. Notification function moved to Advanced.
 * **Shortcut labels autofilled** with the app’s own name.
@@ -95,6 +82,14 @@ v1.1 is the last version published here, so updating from it brings everything b
 - Matching shortcut icons to android adaptive icon
 - A new better initialisation screen with Shizuku support to grant permissions
 - Material Design search box
+
+### From the original Geto
+
+- Per-app profiles of Android **system**, **secure** and **global** settings.
+- A searchable, sortable list of every installed apps.
+- A browsable copy of the device's current settings
+- Launch app from inside IMD or shortcut with its profile applied, and an ongoing notification carrying the **Revert** action.
+- A settings-observer foreground service.
 
 ## Source
 
