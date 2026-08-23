@@ -39,8 +39,8 @@
     <string name="alphabetical">A–Z</string>
     <string name="list">List</string>
     <string name="grid">Grid</string>
-    <string name="reorder">Reorder</string>
-    <string name="reorder_favourites">Reorder favourites</string>
+    <string name="reorder">Re-organise favourites</string>
+    <string name="reorder_favourites">Re-organise favourites</string>
     <string name="move_up">Move up</string>
     <string name="move_down">Move down</string>
     <string name="close">Close</string>

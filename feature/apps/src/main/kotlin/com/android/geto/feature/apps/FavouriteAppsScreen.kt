@@ -338,7 +338,10 @@ private fun Success(
         FavouriteAppsOptionsDialog(
             sortFavouriteApps = userData.sortFavouriteApps,
             favouriteAppsView = userData.favouriteAppsView,
-            canReorder = favouriteAppsData.allFavouriteApps.size > 1,
+            // One is enough now: with a remove button in there, the dialog is worth
+            // opening for a single favourite you want rid of, where reordering alone
+            // needed two.
+            canReorder = favouriteAppsData.allFavouriteApps.isNotEmpty(),
             onDismissRequest = {
                 showOptionsDialog = false
             },

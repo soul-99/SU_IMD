@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SettingsBackupRestore
@@ -64,6 +65,7 @@ object GetoIcons {
     val ExpandLess = Icons.Default.ExpandLess
     val ArrowUpward = Icons.Default.ArrowUpward
     val ArrowDownward = Icons.Default.ArrowDownward
+    val Remove = Icons.Default.Remove
     val Link = Icons.Default.Link
     val Tune = Icons.Default.Tune
     val Restore = Icons.Default.SettingsBackupRestore

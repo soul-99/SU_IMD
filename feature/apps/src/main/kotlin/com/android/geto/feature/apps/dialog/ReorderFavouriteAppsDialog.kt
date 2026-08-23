@@ -47,9 +47,14 @@ import com.android.geto.feature.apps.R
 import com.android.geto.common.R as commonR
 
 /**
- * Move-up / move-down rather than drag-to-reorder on purpose: the favourites grid
- * already binds long press to launch-or-modify, and a drag handle competing with that
- * gesture is how you get accidental launches.
+ * Re-organise favourites: order them, and drop the ones that should not be here.
+ *
+ * Move-up / move-down rather than drag-to-reorder on purpose: the favourites grid already
+ * binds long press, and a drag handle competing with that gesture is how you get accidental
+ * launches.
+ *
+ * Both the ordering and the removals are staged until Update, so Cancel undoes everything —
+ * removal especially, since the alternative is a mis-tap that silently drops a favourite.
  */
 @Composable
 internal fun ReorderFavouriteAppsDialog(
@@ -62,6 +67,12 @@ internal fun ReorderFavouriteAppsDialog(
     val ordered = remember(favouriteApps) {
         mutableStateListOf<LauncherAppsActivityInfo>().apply { addAll(favouriteApps) }
     }
+
+    // Removals are tracked by name rather than inferred from what is missing at save time.
+    // The save below deliberately keeps favourites the dialog could not show, and a removed
+    // app is indistinguishable from one of those — so without this list, removing an app
+    // would put it straight back.
+    val removed = remember(favouriteApps) { mutableStateListOf<String>() }
 
     DialogContainer(
         modifier = modifier,
@@ -122,6 +133,25 @@ internal fun ReorderFavouriteAppsDialog(
                                         contentDescription = stringResource(R.string.move_down),
                                     )
                                 }
+
+                                IconButton(
+                                    onClick = {
+                                        removed.add(info.componentName)
+
+                                        // removeAt, not remove(info): the element overload
+                                        // and the deprecated index one are told apart by
+                                        // the element type, and the index is already here.
+                                        ordered.removeAt(index)
+                                    },
+                                ) {
+                                    Icon(
+                                        imageVector = GetoIcons.Remove,
+                                        contentDescription = stringResource(
+                                            R.string.remove_from_favourites,
+                                        ),
+                                        tint = MaterialTheme.colorScheme.error,
+                                    )
+                                }
                             }
                         },
                     )
@@ -145,8 +175,11 @@ internal fun ReorderFavouriteAppsDialog(
                         // Saving only what the dialog could show would quietly delete
                         // favourites whose app is merely unavailable right now — an
                         // unmounted SD card or a paused work profile, not an uninstall.
-                        val unresolved: List<String> =
-                            savedComponentNames.filterNot { it in reordered }
+                        // Anything removed here is excluded from that rescue, or the two
+                        // rules would cancel out and removal would never take effect.
+                        val unresolved: List<String> = savedComponentNames.filterNot {
+                            it in reordered || it in removed
+                        }
 
                         onUpdateFavouriteComponentNames(reordered + unresolved)
                     },
