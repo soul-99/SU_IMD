@@ -2,11 +2,11 @@
 
 **(SU) IMD — Shut up! it's my device**
 
+## Description
+
 <p>
   <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the Favourites tab, creating a shortcut, the IMD services manager, the settings screen and the Quick Settings tiles">
 </p>
-
-## Description
 
 Open banking and other locked-down apps without turning developer options, USB debugging, wireless debugging or your accessibility services off by hand every single time.
 
