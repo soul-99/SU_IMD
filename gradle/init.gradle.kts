@@ -42,35 +42,31 @@ rootProject {
                         "android" to "true",
                     ),
                 )
-                // WARNING, read before running spotlessApply on this fork.
+                // Header enforcement is deliberately off on this fork.
                 //
-                // licenseHeaderFile REPLACES the header it finds. spotless/copyright.kt
-                // holds the original notice only, so applying it strips the
-                // "Modifications Copyright 2026 soul_99 (suIMD)" line from the 98 files
-                // that carry it - which is the notice GPL-3.0 section 5(a) asks a modified
-                // work to keep.
+                // licenseHeaderFile REPLACES the header it finds with the contents of the
+                // file it is given, and spotless/copyright.kt holds the original notice
+                // only. Left on, spotlessApply would strip
+                // "Modifications Copyright 2026 soul_99 (suIMD)" from every file that
+                // carries it - the notice GPL-3.0 section 5(a) asks a modified work to keep.
                 //
-                // Adding that line to the copyright files is not a straight fix either:
-                // spotless applies one header to every file, so untouched upstream files
-                // would then claim a modification that never happened.
+                // Putting that line into copyright.kt is not the fix either: spotless
+                // applies one header to every file, so the files this fork never touched
+                // would start claiming a modification that never happened.
                 //
-                // Until that is decided, format without the header step:
-                //   ./gradlew -I gradle/init.gradle.kts spotlessApply
-                // is NOT safe as written. Run ktlint directly, or comment this line out
-                // for the run.
-                licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
+                // So spotless formats, and headers are maintained by hand. New files copy
+                // the header from the file beside them. The licence position itself is
+                // unaffected and is set out in full in SUIMD.md section 3.
             }
             format("kts") {
                 target("**/*.kts")
                 targetExclude("**/build/**/*.kts")
-                // Look for the first line that doesn't have a block comment (assumed to be the license)
-                licenseHeaderFile(rootProject.file("spotless/copyright.kts"), "(^(?![\\/ ]\\*).*$)")
+                // Header enforcement off, for the reason given above.
             }
             format("xml") {
                 target("**/*.xml")
                 targetExclude("**/build/**/*.xml")
-                // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
-                licenseHeaderFile(rootProject.file("spotless/copyright.xml"), "(<[^!?])")
+                // Header enforcement off, for the reason given above.
             }
         }
     }
