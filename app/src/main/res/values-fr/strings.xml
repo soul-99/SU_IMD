@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      French. Machine translation, reviewed for consistency of terminology.
+
+      Left untranslated on purpose: the app name, Shizuku and ADB (product names), the adb
+      command itself, and WRITE_SECURE_SETTINGS, which has to be typed exactly as written.
+    -->
+    <string name="app_name">IMD</string>
+    <string name="favourite_apps">Favoris</string>
+    <string name="all_apps">Toutes les applications</string>
+    <string name="settings">Paramètres</string>
+
+    <!-- First-run setup -->
+    <string name="setup_purpose">Ouvrez vos applications bancaires et autres applications verrouillées sans avoir à désactiver à la main les options pour les développeurs, le débogage USB ou vos services d\'accessibilité à chaque fois. Choisissez une application, indiquez ce qui doit changer pendant son exécution, et tout est remis en place ensuite.</string>
+    <string name="setup_step">Étape %1$d</string>
+    <string name="setup_granted">Accordée</string>
+    <string name="setup_not_granted">Non accordée</string>
+    <string name="setup_secure_settings_title">Accès aux paramètres sécurisés</string>
+    <string name="setup_secure_settings_why">Android n\'autorise aucune application ordinaire à modifier ces paramètres. L\'autorisation s\'accorde une seule fois depuis un shell et survit aux redémarrages, mais pas à une réinstallation.</string>
+    <string name="setup_copy_command">Copier la commande</string>
+    <string name="setup_check_again">Vérifier à nouveau</string>
+    <string name="setup_use_shizuku">Utiliser Shizuku</string>
+    <string name="services_shortcut_label">Gestionnaire de services</string>
+    <string name="revert_shortcut_label">Rétablir par défaut</string>
+    <string name="shortcut_not_configured_title">Rien n\'est configuré pour cette application</string>
+    <string name="shortcut_not_configured_message">Vous devez d\'abord définir les paramètres à masquer pour cette application : IMD → Toutes les applications → appuyez sur le nom de l\'application → Modèle de paramètres → sélectionnez les paramètres à masquer.</string>
+    <string name="shortcut_not_configured_dismiss">Compris</string>
+    <string name="obtainium_title">Garder cette application à jour</string>
+    <string name="obtainium_body">Comme cette application est entièrement hors ligne, utilisez Obtainium pour rechercher les mises à jour et les installer directement depuis les versions publiées sur GitHub.</string>
+    <string name="obtainium_do_not_show_again">Ne plus afficher</string>
+    <string name="obtainium_add">Ajouter à Obtainium</string>
+    <string name="tip">Astuce</string>
+    <string name="tip_got_it">Compris</string>
+    <string name="tip_developer_options">Vous n\'avez pas besoin de laisser les options pour les développeurs activées pour Shizuku, vous pouvez donc les laisser désactivées. Quand Shizuku démarre son service, il active lui-même le débogage USB, sans activer les options pour les développeurs, grâce à sa propre autorisation WRITE_SECURE_SETTINGS.</string>
+    <string name="setup_shizuku_working">Demande envoyée à Shizuku…</string>
+    <string name="setup_shizuku_granted">Autorisation accordée via Shizuku.</string>
+    <string name="setup_shizuku_not_running">Aucun service Shizuku trouvé. Démarrez Shizuku, puis réessayez.</string>
+    <string name="setup_shizuku_denied">Shizuku a refusé. Autorisez cette application dans Shizuku, puis réessayez. Si vous aviez choisi « Refuser et ne plus demander », retirez-la d\'abord de la liste des applications de Shizuku.</string>
+    <string name="setup_shizuku_failed">Shizuku n\'a pas pu exécuter la commande. Utilisez plutôt la commande ADB.</string>
+    <string name="setup_shizuku_once">Avertissement : Shizuku n\'est nécessaire que pour cette seule autorisation. Celle-ci survit aux redémarrages, vous pouvez donc ensuite arrêter ou désinstaller Shizuku, sauf si vous voulez aussi la fonction facultative « Redémarrer le service Shizuku » des Paramètres, qui l\'utilise à nouveau plus tard.</string>
+    <string name="setup_shizuku_once_extra">Si vous aviez activé le débogage et les options pour les développeurs pour configurer Shizuku, vous pouvez aussi les désactiver : cette application n\'a besoin ni de l\'un ni de l\'autre une fois la configuration réussie.</string>
+    <string name="setup_secure_settings_adb">Avec un PC : activez le débogage USB → branchez le téléphone à un PC disposant d\'un terminal ADB shell → exécutez la commande ci-dessus.</string>
+    <string name="setup_secure_settings_shizuku">Sans PC (recommandé) :\n1. Installez et configurez l\'application Shizuku, puis démarrez le service Shizuku\n2. Appuyez sur le bouton Utiliser Shizuku ci-dessus\n3. Appuyez sur Autoriser lorsque la demande apparaît.</string>
+    <string name="setup_notifications_title">Notifications</string>
+    <string name="setup_notifications_why">Chaque fois que des paramètres sont appliqués, une notification persistante apparaît avec un bouton Rétablir. C\'est par cette notification que vous remettez votre appareil en état. Vous pourrez désactiver plus tard toutes les notifications de cette application si vous préférez utiliser les tuiles des réglages rapides ou les raccourcis de l\'écran d\'accueil pour rétablir les paramètres.</string>
+    <string name="setup_allow_notifications">Autoriser</string>
+    <string name="setup_open_settings">Ouvrir les paramètres</string>
+    <string name="setup_notifications_denied_hint">Déjà refusé deux fois ? Android cesse d\'afficher la demande, utilisez plutôt Ouvrir les paramètres.</string>
+    <string name="setup_next">Suivant</string>
+    <string name="setup_back">Précédent</string>
+    <string name="setup_finish">Commencer</string>
+
+    <!-- suIMD: the language step, shown once, ahead of the permissions screen -->
+    <string name="language_setup_title">Choisissez votre langue</string>
+    <string name="language_setup_subtitle">Vous pourrez modifier ce choix plus tard dans Paramètres → Interface utilisateur.</string>
+    <string name="language_setup_continue">Continuer</string>
+    <string name="setup_blocked">Les deux étapes sont obligatoires. Sans elles, l\'application ne peut ni modifier ni restaurer le moindre paramètre.</string>
+    <string name="setup_copied">Copié</string>
+    <string name="setup_open_settings_failed">Impossible d\'ouvrir les paramètres sur cet appareil</string>
+</resources>

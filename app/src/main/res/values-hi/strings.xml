@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Hindi. Machine translation, reviewed for consistency of terminology.
+
+      Left untranslated on purpose: the app name, Shizuku and ADB (product names), the adb
+      command itself, and WRITE_SECURE_SETTINGS, which has to be typed exactly as written.
+    -->
+    <string name="app_name">IMD</string>
+    <string name="favourite_apps">पसंदीदा</string>
+    <string name="all_apps">सभी ऐप</string>
+    <string name="settings">सेटिंग्स</string>
+
+    <!-- First-run setup -->
+    <string name="setup_purpose">बैंकिंग और दूसरे प्रतिबंधित ऐप हर बार डेवलपर विकल्प, USB डीबगिंग या एक्सेसिबिलिटी सेवाएँ हाथ से बंद किए बिना खोलें। एक ऐप चुनिए, बताइए कि उसके चलते समय क्या बदलना चाहिए, और यह ऐप बाद में सब कुछ वापस पहले जैसा कर देता है।</string>
+    <string name="setup_step">चरण %1$d</string>
+    <string name="setup_granted">मिल गई</string>
+    <string name="setup_not_granted">नहीं मिली</string>
+    <string name="setup_secure_settings_title">सुरक्षित सेटिंग्स तक पहुँच</string>
+    <string name="setup_secure_settings_why">Android किसी भी सामान्य ऐप को ये सेटिंग्स बदलने नहीं देता। यह अनुमति एक बार शेल से दी जाती है और रीबूट के बाद भी बनी रहती है, पर दोबारा इंस्टॉल करने पर नहीं।</string>
+    <string name="setup_copy_command">कमांड कॉपी करें</string>
+    <string name="setup_check_again">दोबारा जाँचें</string>
+    <string name="setup_use_shizuku">Shizuku का उपयोग करें</string>
+    <string name="services_shortcut_label">सेवा प्रबंधक</string>
+    <string name="revert_shortcut_label">डिफ़ॉल्ट पर वापस लाएँ</string>
+    <string name="shortcut_not_configured_title">इस ऐप के लिए कुछ भी सेट नहीं है</string>
+    <string name="shortcut_not_configured_message">पहले आपको इस ऐप के लिए यह तय करना होगा कि कौन-सी सेटिंग्स छिपानी हैं: IMD → सभी ऐप → ऐप के नाम पर टैप करें → सेटिंग्स टेम्पलेट → चुनें कि कौन-सी सेटिंग्स छिपानी हैं।</string>
+    <string name="shortcut_not_configured_dismiss">समझ गया</string>
+    <string name="obtainium_title">इस ऐप को अपडेट रखना</string>
+    <string name="obtainium_body">यह ऐप पूरी तरह ऑफ़लाइन है, इसलिए अपडेट देखने और उन्हें सीधे GitHub रिलीज़ से इंस्टॉल करने के लिए Obtainium का उपयोग करें।</string>
+    <string name="obtainium_do_not_show_again">दोबारा न दिखाएँ</string>
+    <string name="obtainium_add">Obtainium में जोड़ें</string>
+    <string name="tip">सुझाव</string>
+    <string name="tip_got_it">समझ गया</string>
+    <string name="tip_developer_options">Shizuku के लिए डेवलपर विकल्प चालू रखना ज़रूरी नहीं है, इसलिए आप उन्हें बंद रख सकते हैं। Shizuku जब अपनी सेवा शुरू करता है तो वह अपनी WRITE_SECURE_SETTINGS अनुमति से खुद ही USB डीबगिंग चालू कर लेता है, डेवलपर सेटिंग्स चालू किए बिना।</string>
+    <string name="setup_shizuku_working">Shizuku से पूछा जा रहा है…</string>
+    <string name="setup_shizuku_granted">Shizuku के ज़रिए अनुमति मिल गई।</string>
+    <string name="setup_shizuku_not_running">कोई Shizuku सेवा नहीं मिली। Shizuku शुरू करें, फिर दोबारा कोशिश करें।</string>
+    <string name="setup_shizuku_denied">Shizuku ने मना कर दिया। Shizuku में इस ऐप को अनुमति दें और दोबारा कोशिश करें, अगर आपने “मना करें और दोबारा न पूछें” चुना था, तो पहले Shizuku की ऐप सूची से उसे हटाएँ।</string>
+    <string name="setup_shizuku_failed">Shizuku कमांड नहीं चला सका। इसके बजाय ADB कमांड का उपयोग करें।</string>
+    <string name="setup_shizuku_once">अस्वीकरण: Shizuku सिर्फ़ इसी एक अनुमति के लिए चाहिए। यह अनुमति रीबूट के बाद भी बनी रहती है, इसलिए बाद में आप Shizuku बंद या अनइंस्टॉल कर सकते हैं, बशर्ते आपको सेटिंग्स में मौजूद वैकल्पिक “Shizuku सेवा पुनः चालू करें” सुविधा न चाहिए, जो इसका दोबारा उपयोग करती है।</string>
+    <string name="setup_shizuku_once_extra">अगर आपने Shizuku सेट करने के लिए डीबगिंग और डेवलपर सेटिंग्स चालू की थीं, तो उन्हें बंद भी कर सकते हैं; सफल सेटअप के बाद इस ऐप को इनमें से किसी की ज़रूरत नहीं है।</string>
+    <string name="setup_secure_settings_adb">PC के साथ: USB डीबगिंग चालू करें → फ़ोन को ADB शेल टर्मिनल वाले PC से जोड़ें → ऊपर दी गई कमांड चलाएँ।</string>
+    <string name="setup_secure_settings_shizuku">बिना PC के (अनुशंसित):\n1. Shizuku ऐप इंस्टॉल और सेट करें, Shizuku सेवा शुरू करें\n2. ऊपर दिए गए “Shizuku का उपयोग करें” बटन पर टैप करें\n3. संकेत आने पर “अनुमति दें” चुनें।</string>
+    <string name="setup_notifications_title">नोटिफ़िकेशन</string>
+    <string name="setup_notifications_why">हर बार सेटिंग्स लागू होने पर एक चालू नोटिफ़िकेशन दिखता है जिसमें “वापस लाएँ” बटन होता है। उसी से आप अपने डिवाइस को पहले जैसा करते हैं। अगर आप सेटिंग्स वापस लाने के लिए क्विक सेटिंग टॉगल या होम स्क्रीन शॉर्टकट का उपयोग करना चाहते हैं, तो बाद में इस ऐप के सभी नोटिफ़िकेशन बंद कर सकते हैं।</string>
+    <string name="setup_allow_notifications">अनुमति दें</string>
+    <string name="setup_open_settings">सेटिंग्स खोलें</string>
+    <string name="setup_notifications_denied_hint">पहले ही दो बार मना कर चुके हैं? Android फिर संकेत दिखाना बंद कर देता है, इसके बजाय “सेटिंग्स खोलें” का उपयोग करें।</string>
+    <string name="setup_next">आगे</string>
+    <string name="setup_back">पीछे</string>
+    <string name="setup_finish">शुरू करें</string>
+
+    <!-- suIMD: the language step, shown once, ahead of the permissions screen -->
+    <string name="language_setup_title">अपनी भाषा चुनें</string>
+    <string name="language_setup_subtitle">इसे बाद में सेटिंग्स → यूज़र इंटरफ़ेस में बदला जा सकता है।</string>
+    <string name="language_setup_continue">आगे बढ़ें</string>
+    <string name="setup_blocked">दोनों चरण ज़रूरी हैं। इनके बिना यह ऐप एक भी सेटिंग न बदल सकता है, न वापस ला सकता है।</string>
+    <string name="setup_copied">कॉपी हो गया</string>
+    <string name="setup_open_settings_failed">इस डिवाइस पर सेटिंग्स नहीं खोली जा सकीं</string>
+</resources>

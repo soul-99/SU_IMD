@@ -29,11 +29,11 @@ import com.android.geto.domain.model.SettingType
 import com.android.geto.domain.model.ShizukuForkDefaults
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.repository.UserDataRepository
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 private const val ON = "1"
 

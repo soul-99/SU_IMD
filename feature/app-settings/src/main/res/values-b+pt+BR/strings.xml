@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Brazilian Portuguese. Machine translation, reviewed for consistency of terminology. -->
+    <string name="app_settings_disabled">Ative pelo menos uma configuração</string>
+    <string name="empty_app_settings_list">Nenhuma configuração encontrada</string>
+    <string name="geto_settings">IMD</string>
+    <string name="apply_success">Configurações ocultadas/desativadas</string>
+    <string name="apply_failure">Falha ao aplicar as configurações</string>
+    <string name="revert_failure">Falha ao reverter as configurações</string>
+    <string name="revert_success">Configurações revertidas</string>
+    <string name="add_your_first_settings">Adicione sua primeira configuração</string>
+    <string name="add_app_setting">Adicionar configuração do app</string>
+    <string name="setting_label">Rótulo da configuração</string>
+    <string name="setting_key">Chave da configuração</string>
+    <string name="setting_value_on_launch">Valor da configuração ao abrir</string>
+    <string name="setting_value_on_revert">Valor da configuração ao reverter</string>
+    <string name="templates">Modelos</string>
+    <string name="add_shortcut">Adicionar atalho</string>
+    <string name="update_shortcut">Atualizar atalho</string>
+    <string name="short_label">Rótulo curto</string>
+    <string name="long_label">Rótulo longo</string>
+    <string name="short_label_is_blank">O rótulo curto está vazio</string>
+    <string name="long_label_is_blank">O rótulo longo está vazio</string>
+    <string name="setting_label_is_blank">O rótulo da configuração está vazio</string>
+    <string name="setting_key_is_blank">A chave da configuração está vazia</string>
+    <string name="setting_key_not_found">Chave da configuração não encontrada</string>
+    <string name="setting_value_on_launch_is_blank">O valor da configuração ao abrir está vazio</string>
+    <string name="setting_value_on_revert_is_blank">O valor da configuração ao reverter está vazio</string>
+    <string name="settings_has_invalid_values">As configurações têm valores inválidos</string>
+    <string name="shortcut_update_immutable_shortcuts">Não é possível atualizar atalhos imutáveis</string>
+    <string name="shortcut_update_failed">Falha ao atualizar o atalho</string>
+    <string name="shortcut_update_success">Atalho atualizado</string>
+    <string name="supported_launcher">Seu launcher atual é compatível com atalhos</string>
+    <string name="unsupported_launcher">Seu launcher atual não é compatível com atalhos</string>
+    <string name="no_settings_found">Nenhuma configuração encontrada</string>
+    <string name="permission">Permissão</string>
+    <string name="app_setting_already_exists">Essa configuração do app já existe</string>
+    <string name="app_setting_added_successfully">Configuração do app adicionada</string>
+    <string name="no_permission">Conceda a permissão WRITE_SECURE_SETTINGS via ADB</string>
+    <string name="write_secure_settings_message">Copie o comando abaixo e execute-o via ADB para conceder a permissão Write Secure Settings</string>
+    <string name="add_to_favourites">Adicionar aos favoritos</string>
+    <string name="remove_from_favourites">Remover dos favoritos</string>
+    <string name="action_revert">Reverter</string>
+    <string name="action_app_setting">Configuração do app</string>
+    <string name="action_create_shortcut">Criar atalho</string>
+    <string name="action_setting_template">Modelo de configurações</string>
+</resources>

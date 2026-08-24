@@ -24,14 +24,13 @@ import com.android.geto.broadcastreceiver.RevertToDefaultRunner
 import com.android.geto.common.ApplicationScope
 import com.android.geto.domain.framework.PackageManagerWrapper
 import com.android.geto.domain.model.FavouriteAppsView
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.repository.UserDataRepository
-import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
 import com.android.geto.domain.usecase.ApplySettingsToHideUseCase
 import com.android.geto.domain.usecase.GetFavouriteAppsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,6 +40,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Short enough to read as live, long enough that it is not doing anything expensive: the

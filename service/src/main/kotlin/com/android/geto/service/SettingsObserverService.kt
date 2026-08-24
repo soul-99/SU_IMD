@@ -20,6 +20,7 @@ package com.android.geto.service
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.database.ContentObserver
@@ -31,6 +32,7 @@ import android.os.Looper
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.android.geto.common.AppLocale
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +46,12 @@ private const val SERVICE_ACTION_STOP = "com.android.geto.action.STOP"
 
 @AndroidEntryPoint
 class SettingsObserverService : Service() {
+    // The chosen language, applied before anything reads a string. A no-op on Android 13
+    // and up, where the platform has already applied it to this context.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
     @Inject
     lateinit var androidNotificationManagerWrapper: AndroidNotificationManagerWrapper
 

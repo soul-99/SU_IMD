@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Spanish. Machine translation, reviewed for consistency of terminology. -->
+    <string name="search">Buscar</string>
+    <string name="sort">Ordenar</string>
+    <string name="name">Nombre</string>
+    <string name="update_time">Actualización</string>
+    <string name="install_time">Instalación</string>
+    <string name="ascending">Ascendente</string>
+    <string name="descending">Descendente</string>
+    <string name="show_system">Mostrar sistema</string>
+    <string name="show_system_applications">Mostrar aplicaciones del sistema</string>
+
+    <!-- Favourites -->
+    <string name="add_to_favourites">Añadir a favoritos</string>
+    <string name="remove_from_favourites">Quitar de favoritos</string>
+    <string name="favourite_apps_options">Opciones de favoritos</string>
+    <string name="no_favourite_apps">Aún no hay favoritos</string>
+    <string name="no_matching_favourite_apps">Ningún favorito coincide con esa búsqueda</string>
+    <string name="no_favourite_apps_subtitle">Toca la estrella que hay junto a una app en Todas las apps, o la estrella de su pantalla de ajustes.</string>
+    <string name="view">Vista</string>
+    <string name="custom">Personalizado</string>
+    <string name="alphabetical">A–Z</string>
+    <string name="list">Lista</string>
+    <string name="grid">Cuadrícula</string>
+    <string name="reorder">Reorganizar favoritos</string>
+    <string name="reorder_favourites">Reorganizar favoritos</string>
+    <string name="move_up">Mover arriba</string>
+    <string name="move_down">Mover abajo</string>
+    <string name="close">Cerrar</string>
+
+    <string name="applied_settings_title">IMD</string>
+    <string name="applied_settings_success">Ajustes ocultados o desactivados</string>
+    <string name="settings_manager_configure_revert">Configura qué restaura Revertir</string>
+    <string name="settings_manager_accessibility_unmanaged">Ahora mismo la app IMD no gestiona ningún servicio de accesibilidad</string>
+    <string name="applied_settings_failure">No se pudieron aplicar los ajustes</string>
+    <string name="applied_settings_invalid">Esta app tiene ajustes con valores no válidos</string>
+    <string name="settings_manager_title">Administrador de servicios de IMD</string>
+
+    <!-- settings_manager_title and the two _name_ strings below are matched as substrings
+         inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_info">Qué hace este diálogo</string>
+    <string name="settings_manager_info_live">El Administrador de servicios de IMD muestra el estado en tiempo real de los ajustes y los servicios. No decide qué ajustes o servicios se ocultan o se vuelven a mostrar cuando las apps se abren desde IMD o desde accesos directos creados por IMD.</string>
+    <string name="settings_manager_info_live_extra">Para definir qué se oculta y qué se vuelve a mostrar al abrir apps desde IMD, configura los ajustes predeterminados de IMD dentro de la app IMD.</string>
+    <string name="settings_manager_info_name_defaults">ajustes predeterminados de IMD</string>
+    <string name="settings_manager_info_developer">Desactivar las opciones de desarrollador desde IMD solo activa o desactiva el interruptor de las opciones de desarrollador; no restablece los cambios hechos dentro de ellas (como la escala de animación, la app de ubicación simulada… etc.).</string>
+    <string name="settings_manager_info_developer_extra">Para restablecer las opciones de desarrollador, abre la página de opciones de desarrollador y desactívalas desde ahí.</string>
+    <string name="settings_manager_info_name_reset">restablecer las opciones de desarrollador</string>
+    <string name="revert_to_default">Revertir a valores predeterminados</string>
+    <string name="not_configured_title">No hay ajustes que ocultar: tienes que configurar qué ajustes ocultar para esta app.</string>
+    <string name="not_configured_message">En la app IMD, mantén pulsada esta app para elegir qué ajustes ocultar.</string>
+    <string name="got_it">Entendido</string>
+    <string name="settings_manager_open">Abrir %1$s</string>
+    <string name="settings_manager_accessibility_note">solo se gestionan los servicios seleccionados en los ajustes de la app IMD</string>
+    <string name="settings_manager_enable_developer_options">Activa primero las opciones de desarrollador</string>
+    <string name="settings_manager_cannot_open">No se pudo abrir esa pantalla en este dispositivo</string>
+    <string name="settings_manager_no_shizuku">No se encontró ninguna app de Shizuku, indica el nombre del paquete en Ajustes</string>
+    <string name="ok">Aceptar</string>
+    <string name="shizuku_help_title">El servicio de Shizuku no está disponible</string>
+    <string name="shizuku_help_bullet">%1$d.</string>
+    <string name="shizuku_help_point_setup">Asegúrate de que la app Shizuku está instalada, registrada en ADB y configurada correctamente en la página de ajustes de la app IMD.</string>
+    <string name="shizuku_help_point_permission">El permiso de Shizuku que tiene la app IMD solo se usa para conceder una vez el permiso privilegiado de Android WRITE_SECURE_SETTINGS. No se usa para detectar el estado del servicio de Shizuku ni para activarlo o desactivarlo.</string>
+    <string name="shizuku_help_point_restart">Cuando lo hayas configurado correctamente, reinicia la app IMD y vuelve a intentarlo.</string>
+    <string name="settings_manager_shizuku_wait">Espera 10 s, ya que algunos forks de Shizuku tardan en iniciar el servicio mediante intents</string>
+    <string name="revert_developer_settings">Opciones de desarrollador</string>
+    <string name="revert_usb_debugging">Depuración USB</string>
+    <string name="revert_wireless_debugging">Depuración inalámbrica</string>
+    <string name="revert_accessibility">Servicios de accesibilidad</string>
+    <string name="revert_shizuku">Servicio de Shizuku</string>
+    <string name="applied_settings_no_permission">Concede primero WRITE_SECURE_SETTINGS, consulta la pantalla de configuración</string>
+    <string name="settings_manager_shizuku_failed">No se pudo iniciar el servicio de Shizuku en el último intento; revisa los ajustes de la app Shizuku y la configuración de Shizuku en IMD</string>
+    <string name="settings_manager_shizuku_failed_open">Por qué no se inició el servicio de Shizuku</string>
+    <string name="understood">Entendido</string>
+</resources>

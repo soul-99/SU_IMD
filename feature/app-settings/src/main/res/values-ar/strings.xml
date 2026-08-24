@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Arabic. Machine translation, reviewed for consistency of terminology.
+
+      "Write Secure Settings" is left in English where it names the permission the user has
+      to grant, so it matches WRITE_SECURE_SETTINGS and the adb command.
+    -->
+    <string name="app_settings_disabled">يُرجى تفعيل إعداد واحد على الأقل</string>
+    <string name="empty_app_settings_list">لم يُعثر على أي إعدادات</string>
+    <string name="geto_settings">IMD</string>
+    <string name="apply_success">تم إخفاء الإعدادات / تعطيلها</string>
+    <string name="apply_failure">تعذّر تطبيق الإعدادات</string>
+    <string name="revert_failure">تعذّرت استعادة الإعدادات</string>
+    <string name="revert_success">تمت استعادة الإعدادات</string>
+    <string name="add_your_first_settings">أضف أول إعداد لك</string>
+    <string name="add_app_setting">إضافة إعداد للتطبيق</string>
+    <string name="setting_label">اسم الإعداد</string>
+    <string name="setting_key">مفتاح الإعداد</string>
+    <string name="setting_value_on_launch">قيمة الإعداد عند التشغيل</string>
+    <string name="setting_value_on_revert">قيمة الإعداد عند الاستعادة</string>
+    <string name="templates">القوالب</string>
+    <string name="add_shortcut">إضافة اختصار</string>
+    <string name="update_shortcut">تحديث الاختصار</string>
+    <string name="short_label">الاسم المختصر</string>
+    <string name="long_label">الاسم الكامل</string>
+    <string name="short_label_is_blank">الاسم المختصر فارغ</string>
+    <string name="long_label_is_blank">الاسم الكامل فارغ</string>
+    <string name="setting_label_is_blank">اسم الإعداد فارغ</string>
+    <string name="setting_key_is_blank">مفتاح الإعداد فارغ</string>
+    <string name="setting_key_not_found">لم يُعثر على مفتاح الإعداد</string>
+    <string name="setting_value_on_launch_is_blank">قيمة الإعداد عند التشغيل فارغة</string>
+    <string name="setting_value_on_revert_is_blank">قيمة الإعداد عند الاستعادة فارغة</string>
+    <string name="settings_has_invalid_values">تحتوي الإعدادات على قيم غير صالحة</string>
+    <string name="shortcut_update_immutable_shortcuts">لا يمكن تحديث الاختصارات غير القابلة للتعديل</string>
+    <string name="shortcut_update_failed">تعذّر تحديث الاختصار</string>
+    <string name="shortcut_update_success">تم تحديث الاختصار</string>
+    <string name="supported_launcher">المشغّل الحالي يدعم الاختصارات</string>
+    <string name="unsupported_launcher">المشغّل الحالي لا يدعم الاختصارات</string>
+    <string name="no_settings_found">لم يُعثر على أي إعدادات</string>
+    <string name="permission">الإذن</string>
+    <string name="app_setting_already_exists">إعداد التطبيق هذا موجود بالفعل</string>
+    <string name="app_setting_added_successfully">تمت إضافة إعداد التطبيق بنجاح</string>
+    <string name="no_permission">يُرجى منح إذن WRITE_SECURE_SETTINGS عبر ADB</string>
+    <string name="write_secure_settings_message">انسخ الأمر أدناه ونفّذه عبر ADB لمنح إذن Write Secure Settings</string>
+    <string name="add_to_favourites">إضافة إلى المفضّلة</string>
+    <string name="remove_from_favourites">إزالة من المفضّلة</string>
+    <string name="action_revert">استعادة</string>
+    <string name="action_app_setting">إعداد التطبيق</string>
+    <string name="action_create_shortcut">إنشاء اختصار</string>
+    <string name="action_setting_template">قالب الإعدادات</string>
+</resources>

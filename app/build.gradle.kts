@@ -58,8 +58,8 @@ android {
 
     defaultConfig {
         applicationId = "com.soul_99.suIMD"
-        versionCode = 9
-        versionName = "1.6.1"
+        versionCode = 12
+        versionName = "1.6.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

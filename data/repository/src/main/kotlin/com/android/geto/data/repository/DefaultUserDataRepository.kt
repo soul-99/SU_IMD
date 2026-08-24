@@ -134,6 +134,18 @@ class DefaultUserDataRepository @Inject constructor(
         userPreferencesDataSource.updateSettingsToHide(states = states)
     }
 
+    override suspend fun updateRevertDefaultsResetV166(done: Boolean) {
+        userPreferencesDataSource.updateRevertDefaultsResetV166(done = done)
+    }
+
+    override suspend fun updateRevertDefaultsNoticePending(pending: Boolean) {
+        userPreferencesDataSource.updateRevertDefaultsNoticePending(pending = pending)
+    }
+
+    override suspend fun updateSettingsManagerInfoShown(shown: Boolean) {
+        userPreferencesDataSource.updateSettingsManagerInfoShown(shown = shown)
+    }
+
     override suspend fun updateNotificationFunctionResetV16(done: Boolean) {
         userPreferencesDataSource.updateNotificationFunctionResetV16(done = done)
     }

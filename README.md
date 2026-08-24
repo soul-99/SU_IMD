@@ -2,11 +2,11 @@
 
 **(SU) IMD — Shut up! it's my device**
 
-## Description
-
 <p>
   <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the Favourites tab, creating a shortcut, the IMD services manager, the settings screen and the Quick Settings tiles">
 </p>
+
+## Description
 
 Open banking and other locked-down apps without turning developer options, USB debugging, wireless debugging or your accessibility services off by hand every single time.
 
@@ -20,6 +20,17 @@ It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the pa
 - **Requires:** Android 7.0 (API 24) or newer, and `WRITE_SECURE_SETTINGS` granted once over ADB or Shizuku. **No root.**
 - **Licence:** GPL-3.0
 - **No** ads, analytics, trackers, accounts or network access of any kind. The app never talks to the internet.
+
+## About Permissions
+
+* `WRITE_SECURE_SETTINGS` (one time grant via adb shell or Shizuku) (MANDATORY, needed to change settings state)
+* Post notifications (optional)
+
+## Security Concerns
+
+* No internet access or unnecessary continuous background services (so almost zero battery / system resource use).
+* Does not tamper with any apps on the device.
+* The parts of this app that change settings cannot be triggered by another app, so only you can change them.
 
 ## Install
 
@@ -43,6 +54,32 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 ## Functions
 
 ### Added in this fork
+
+#### v1.6.7
+
+* added all languages for testing
+* The notification's revert button now names the mechanism it will run: **Revert to default** or **Revert using memory**.
+* The **UI** settings section is now called **User interface**.
+* Wording fix in the **Revert to default configuration** dialog.
+
+#### v1.6.6
+
+* The default **Settings to unhide on revert** are changed due to security reasons.
+* Documentation update.
+
+#### v1.6.5
+
+1. added other languages support (in testing)
+   1. Portuguese (Brazilian)
+   2. Spanish
+   3. Simplified Chinese
+   4. French
+   5. German
+   6. Russian
+   7. Hindi
+   8. Arabic
+   9. Korean
+   10. Japanese
 
 #### v1.6
 

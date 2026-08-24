@@ -28,8 +28,8 @@ import com.android.geto.domain.model.AddAppSettingResult
 import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingTemplate
 import com.android.geto.domain.model.AppSettingsResult
-import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.GetPinShortcutResult
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.RequestPinShortcutResult
 import com.android.geto.domain.model.SecureSetting
 import com.android.geto.domain.model.SettingType

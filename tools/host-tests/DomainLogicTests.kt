@@ -25,27 +25,27 @@
 import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.AppListOrder
 import com.android.geto.domain.model.AppListOrdering
+import com.android.geto.domain.model.AppSetting
+import com.android.geto.domain.model.AppSettingKeys
+import com.android.geto.domain.model.FavouriteAppsOrdering
+import com.android.geto.domain.model.FavouriteAppsView
+import com.android.geto.domain.model.InstalledAppData
+import com.android.geto.domain.model.LauncherAppsActivityInfo
 import com.android.geto.domain.model.ManualRevertResult
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.RevertDefaults
 import com.android.geto.domain.model.SettingSnapshot
-import com.android.geto.domain.model.SettingsToHide
-import com.android.geto.domain.model.AppSetting
-import com.android.geto.domain.model.AppSettingKeys
-import com.android.geto.domain.model.FavouriteAppsOrdering
-import com.android.geto.domain.model.LauncherAppsActivityInfo
-import com.android.geto.domain.model.InstalledAppData
 import com.android.geto.domain.model.SettingType
+import com.android.geto.domain.model.SettingsToHide
 import com.android.geto.domain.model.ShizukuForkDefaults
 import com.android.geto.domain.model.ShizukuForkMode
-import com.android.geto.domain.model.Theme
-import com.android.geto.domain.model.UserData
-import com.android.geto.domain.model.FavouriteAppsView
-import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
+import com.android.geto.domain.model.Theme
+import com.android.geto.domain.model.UserData
+import com.android.geto.domain.model.isShizukuConfigured
 
 private var passed = 0
 private val failures = mutableListOf<String>()
@@ -872,6 +872,9 @@ private fun userData(
     tipShown = false,
     obtainiumTipShown = false,
     setupNoticeVersion = 0,
+    revertDefaultsResetV166 = false,
+    revertDefaultsNoticePending = false,
+    settingsManagerInfoShown = false,
 )
 
 private fun shizukuForkDefaultsTests() {
@@ -1115,17 +1118,18 @@ private fun accessibilityLiveStateTests() {
  * rule it enforces between two of its rows.
  */
 private fun revertDefaultsTests() {
-    // 45. Never configured falls back to the three a locked-down app actually breaks, and
-    // leaves developer settings and wireless debugging alone — turning either on for someone
-    // who keeps them off is a change they never asked for.
+    // 45. Never configured falls back to accessibility services alone. Every other target
+    // is a debugging surface, and a Revert that switches those on can leave a device more
+    // open than the person pressing the button realised. Changed in v1.6.6; these assertions
+    // are what stops the old, wider default creeping back in.
     checkEquals(
         "an empty configuration falls back to the default",
         RevertDefaults.Default,
         RevertDefaults.decode(emptyList()),
     )
     checkEquals(
-        "USB debugging is on by default",
-        true,
+        "USB debugging is off by default",
+        false,
         RevertDefaults.Default[ManualRevertTarget.UsbDebugging],
     )
     checkEquals(
@@ -1134,9 +1138,14 @@ private fun revertDefaultsTests() {
         RevertDefaults.Default[ManualRevertTarget.AccessibilityServices],
     )
     checkEquals(
-        "Shizuku is on by default",
-        true,
+        "Shizuku is off by default",
+        false,
         RevertDefaults.Default[ManualRevertTarget.Shizuku],
+    )
+    checkEquals(
+        "accessibility services is the only target on by default",
+        1,
+        RevertDefaults.Default.count { it.value },
     )
     checkEquals(
         "developer settings is off by default",
@@ -1180,10 +1189,13 @@ private fun revertDefaultsTests() {
         RevertDefaults.Default,
         RevertDefaults.decode(listOf("SomethingElse=0")),
     )
+    // Asserted on accessibility services rather than USB debugging, because since v1.6.6
+    // it is the only target whose default is on - and a fallback to false proves nothing,
+    // since an absent target and a target defaulting to off would look identical.
     checkEquals(
         "a missing target falls back to its default",
         true,
-        RevertDefaults.decode(listOf("Shizuku=0"))[ManualRevertTarget.UsbDebugging],
+        RevertDefaults.decode(listOf("Shizuku=0"))[ManualRevertTarget.AccessibilityServices],
     )
     checkEquals(
         "a stored target still wins over the default",

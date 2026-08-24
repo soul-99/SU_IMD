@@ -17,6 +17,7 @@
  */
 package com.android.geto.activity.main
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -34,15 +35,18 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.android.geto.common.AppLocale
 import com.android.geto.common.EXTRA_OPEN_REVERT_CONFIGURATION
 import com.android.geto.designsystem.component.LocalRevertConfigurationRequest
 import com.android.geto.designsystem.theme.GetoTheme
 import com.android.geto.domain.framework.ShizukuWrapper
+import com.android.geto.feature.settings.dialog.RevertDefaultsNoticeDialog
 import com.android.geto.framework.launcherapps.AndroidLauncherAppsWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import com.android.geto.navigation.GetoNavHost
-import com.android.geto.onboarding.SetupScreen
+import com.android.geto.onboarding.LanguageSetupScreen
 import com.android.geto.onboarding.ObtainiumDialog
+import com.android.geto.onboarding.SetupScreen
 import com.android.geto.onboarding.TipDialog
 import com.android.geto.onboarding.rememberSetupState
 import com.android.geto.ui.local.LocalLauncherApps
@@ -52,6 +56,12 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    // The chosen language, applied before anything reads a string. A no-op on Android 13
+    // and up, where the platform has already applied it to this context.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
     @Inject
     lateinit var androidLauncherAppsWrapper: AndroidLauncherAppsWrapper
 
@@ -186,7 +196,38 @@ class MainActivity : ComponentActivity() {
                                 val remindersDue = uiState.userData.setupNoticeVersion !=
                                     installedVersionCode
 
-                                if (showSetup || permissionsMissing || remindersDue) {
+                                // Ahead of everything else on a new install: every screen
+                                // after this one is instructions, and instructions in a
+                                // language the reader does not have are worse than none.
+                                // Not gated on setup being unfinished, so an install that
+                                // predates this version gets the choice once as well.
+                                var chooseLanguage by remember {
+                                    mutableStateOf(!AppLocale.prompted(this@MainActivity))
+                                }
+
+                                if (chooseLanguage) {
+                                    LanguageSetupScreen(
+                                        initialTag = AppLocale.stored(this@MainActivity),
+                                        onContinue = { tag ->
+                                            val changed =
+                                                tag != AppLocale.stored(this@MainActivity)
+
+                                            AppLocale.markPrompted(this@MainActivity)
+
+                                            chooseLanguage = false
+
+                                            // Below Android 13 the screens already composed
+                                            // are still in the old language, so the activity
+                                            // has to come back. From 13 up the platform does
+                                            // that itself when it applies the locale.
+                                            if (changed &&
+                                                AppLocale.set(this@MainActivity, tag)
+                                            ) {
+                                                recreate()
+                                            }
+                                        },
+                                    )
+                                } else if (showSetup || permissionsMissing || remindersDue) {
                                     SetupScreen(
                                         setupState = setupState,
                                         // Straight to the reminders when the only reason for
@@ -217,7 +258,16 @@ class MainActivity : ComponentActivity() {
                                     // One at a time, in order. Two modal dialogs stacked
                                     // on a fresh install is how the second one gets
                                     // dismissed without being read.
-                                    if (!uiState.userData.tipShown) {
+                                    // Ahead of the two tips, because this one reports a
+                                    // change the app made to their device rather than
+                                    // offering advice, and because it is the only one of
+                                    // the three that is ever shown to an existing install.
+                                    if (uiState.userData.revertDefaultsNoticePending) {
+                                        RevertDefaultsNoticeDialog(
+                                            onDismissRequest =
+                                                viewModel::acknowledgeRevertDefaultsNotice,
+                                        )
+                                    } else if (!uiState.userData.tipShown) {
                                         TipDialog(onDismissRequest = viewModel::markTipShown)
                                     } else if (!uiState.userData.obtainiumTipShown) {
                                         ObtainiumDialog(

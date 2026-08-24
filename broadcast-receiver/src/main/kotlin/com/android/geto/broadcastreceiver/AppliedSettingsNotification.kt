@@ -80,7 +80,9 @@ fun buildAppliedSettingsNotification(
         setPriority(NotificationCompat.PRIORITY_DEFAULT)
         addAction(
             com.android.geto.framework.notificationmanager.R.drawable.baseline_settings_24,
-            context.getString(com.android.geto.framework.notificationmanager.R.string.revert),
+            context.getString(
+                com.android.geto.framework.notificationmanager.R.string.revert_using_memory,
+            ),
             revertPendingIntent,
         )
     }.build()

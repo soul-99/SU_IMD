@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Russian. Machine translation, reviewed for consistency of terminology. -->
+    <string name="search">Поиск</string>
+    <string name="sort">Сортировка</string>
+    <string name="name">Название</string>
+    <string name="update_time">Обновление</string>
+    <string name="install_time">Установка</string>
+    <string name="ascending">По возрастанию</string>
+    <string name="descending">По убыванию</string>
+    <string name="show_system">Показать системные</string>
+    <string name="show_system_applications">Показывать системные приложения</string>
+
+    <!-- Favourites -->
+    <string name="add_to_favourites">Добавить в избранное</string>
+    <string name="remove_from_favourites">Убрать из избранного</string>
+    <string name="favourite_apps_options">Параметры избранного</string>
+    <string name="no_favourite_apps">Пока нет избранного</string>
+    <string name="no_matching_favourite_apps">В избранном ничего не найдено</string>
+    <string name="no_favourite_apps_subtitle">Нажмите на звёздочку рядом с приложением на вкладке «Все приложения» или на звёздочку на экране его настроек.</string>
+    <string name="view">Вид</string>
+    <string name="custom">Свой порядок</string>
+    <string name="alphabetical">А–Я</string>
+    <string name="list">Список</string>
+    <string name="grid">Сетка</string>
+    <string name="reorder">Изменить порядок избранного</string>
+    <string name="reorder_favourites">Изменить порядок избранного</string>
+    <string name="move_up">Переместить вверх</string>
+    <string name="move_down">Переместить вниз</string>
+    <string name="close">Закрыть</string>
+
+    <string name="applied_settings_title">IMD</string>
+    <string name="applied_settings_success">Настройки скрыты/отключены</string>
+    <string name="settings_manager_configure_revert">Настройте, что восстанавливает кнопка «Вернуть»</string>
+    <string name="settings_manager_accessibility_unmanaged">Сейчас приложение IMD не управляет ни одной службой специальных возможностей</string>
+    <string name="applied_settings_failure">Не удалось применить настройки</string>
+    <string name="applied_settings_invalid">У этого приложения есть настройки с недопустимыми значениями</string>
+    <string name="settings_manager_title">Диспетчер служб IMD</string>
+
+    <!-- settings_manager_title and the two _name_ strings below are matched as substrings
+         inside the longer strings, to bold them. They must stay worded identically, so each
+         one is quoted in the nominative there rather than declined into the sentence. -->
+    <string name="settings_manager_info">Что делает это окно</string>
+    <string name="settings_manager_info_live">Диспетчер служб IMD показывает текущее состояние настроек и служб. Он не определяет, какие настройки и службы скрывать или показывать при запуске приложений через IMD или через созданные в IMD ярлыки.</string>
+    <string name="settings_manager_info_live_extra">Чтобы задать, что скрывать и что показывать при запуске приложений через IMD, настройте стандартные настройки IMD в самом приложении IMD.</string>
+    <string name="settings_manager_info_name_defaults">стандартные настройки IMD</string>
+    <string name="settings_manager_info_developer">Отключение параметров разработчика через IMD только переключает флаг параметров разработчика и не сбрасывает изменения, сделанные в них (например, масштаб анимации, приложение для фиктивных местоположений… и т. д.).</string>
+    <string name="settings_manager_info_developer_extra">Чтобы сбросить параметры разработчика, откройте страницу параметров разработчика и отключите их там.</string>
+    <string name="settings_manager_info_name_reset">сбросить параметры разработчика</string>
+    <string name="revert_to_default">Вернуть по умолчанию</string>
+    <string name="not_configured_title">Нет настроек для скрытия: нужно указать, какие настройки скрывать для этого приложения.</string>
+    <string name="not_configured_message">В приложении IMD нажмите и удерживайте это приложение, чтобы выбрать, какие настройки скрывать.</string>
+    <string name="got_it">Понятно</string>
+    <string name="settings_manager_open">Открыть %1$s</string>
+    <string name="settings_manager_accessibility_note">управляются только те службы, которые выбраны в настройках приложения IMD</string>
+    <string name="settings_manager_enable_developer_options">Сначала включите параметры разработчика</string>
+    <string name="settings_manager_cannot_open">Не удалось открыть этот экран на этом устройстве</string>
+    <string name="settings_manager_no_shizuku">Приложение Shizuku не найдено: укажите имя пакета в настройках</string>
+    <string name="ok">ОК</string>
+    <string name="shizuku_help_title">Служба Shizuku недоступна</string>
+    <string name="shizuku_help_bullet">%1$d.</string>
+    <string name="shizuku_help_point_setup">Убедитесь, что приложение Shizuku установлено, зарегистрировано в ADB и правильно настроено на странице настроек приложения IMD.</string>
+    <string name="shizuku_help_point_permission">Разрешение Shizuku для приложения IMD используется только для того, чтобы один раз выдать привилегированное разрешение Android WRITE_SECURE_SETTINGS. Оно не используется ни для определения состояния службы Shizuku, ни для её включения и выключения.</string>
+    <string name="shizuku_help_point_restart">После правильной настройки перезапустите приложение IMD и повторите попытку.</string>
+    <string name="settings_manager_shizuku_wait">Подождите 10 секунд: некоторые форки Shizuku медленно запускают службу через intent</string>
+    <string name="revert_developer_settings">Параметры разработчика</string>
+    <string name="revert_usb_debugging">Отладка по USB</string>
+    <string name="revert_wireless_debugging">Беспроводная отладка</string>
+    <string name="revert_accessibility">Службы специальных возможностей</string>
+    <string name="revert_shizuku">Служба Shizuku</string>
+    <string name="applied_settings_no_permission">Сначала выдайте WRITE_SECURE_SETTINGS: см. экран настройки</string>
+    <string name="settings_manager_shizuku_failed">При последней попытке не удалось запустить службу Shizuku. Проверьте настройки приложения Shizuku и конфигурацию Shizuku в IMD</string>
+    <string name="settings_manager_shizuku_failed_open">Почему служба Shizuku не запустилась</string>
+    <string name="understood">Понятно</string>
+</resources>

@@ -17,8 +17,8 @@
  */
 
 import com.android.build.api.dsl.ApplicationExtension
-import com.android.geto.configureCompose
 import com.android.geto.configureAndroid
+import com.android.geto.configureCompose
 import com.android.geto.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project

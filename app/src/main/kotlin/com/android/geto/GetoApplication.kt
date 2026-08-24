@@ -19,9 +19,12 @@ package com.android.geto
 
 import android.app.Application
 import android.app.NotificationManager
+import android.content.Context
 import android.os.Build
+import com.android.geto.common.AppLocale
 import com.android.geto.common.ApplicationScope
 import com.android.geto.domain.usecase.MigrateNotificationFunctionUseCase
+import com.android.geto.domain.usecase.MigrateRevertDefaultsUseCase
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -37,8 +40,18 @@ class GetoApplication : Application() {
     lateinit var migrateNotificationFunctionUseCase: MigrateNotificationFunctionUseCase
 
     @Inject
+    lateinit var migrateRevertDefaultsUseCase: MigrateRevertDefaultsUseCase
+
+    @Inject
     @ApplicationScope
     lateinit var appScope: CoroutineScope
+
+    // Wrapping here is what puts the chosen language on the application context, which is
+    // the context Hilt injects everywhere and the one every notification is built from.
+    // A no-op on Android 13 and up, where the platform applies it before the process starts.
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(AppLocale.wrap(base))
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -49,6 +62,11 @@ class GetoApplication : Application() {
         // first launch of the UI would leave those reading the old preference for as long as
         // the user never opened the app.
         appScope.launch { migrateNotificationFunctionUseCase() }
+
+        // Same reasoning as above, and the same reason it cannot wait for the UI: a tile or
+        // a shortcut can fire a Revert in this process without an activity ever existing,
+        // and that Revert must already be reading the narrowed configuration.
+        appScope.launch { migrateRevertDefaultsUseCase() }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManagerWrapper.createNotificationChannel(

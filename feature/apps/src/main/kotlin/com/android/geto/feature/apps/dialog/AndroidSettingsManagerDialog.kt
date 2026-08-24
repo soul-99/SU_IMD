@@ -29,17 +29,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -88,6 +88,9 @@ internal fun AndroidSettingsManagerDialog(
     shizukuStarting: Boolean,
     shizukuStartFailed: Boolean,
     accessibilityManaged: Boolean,
+    /** Null while the stored answer is still being read; see the ViewModel. */
+    infoShown: Boolean? = true,
+    onInfoShown: () -> Unit = {},
     onDismissRequest: () -> Unit,
     onSetEnabled: (ManualRevertTarget, Boolean) -> Unit,
     onOpen: (ManualRevertTarget) -> Unit,
@@ -96,6 +99,20 @@ internal fun AndroidSettingsManagerDialog(
     onAccessibilityUnmanaged: () -> Unit,
 ) {
     var showShizukuHelp by remember { mutableStateOf(false) }
+
+    var showInfo by remember { mutableStateOf(false) }
+
+    // Opened for the first time, so say what this dialog is before the user reads the
+    // switches as the configuration. Recorded as shown at the moment it appears rather than
+    // when it is dismissed: the requirement is that it is shown once, and a dismissal that
+    // never reaches the store would show it again on the next open.
+    LaunchedEffect(infoShown) {
+        if (infoShown == false) {
+            showInfo = true
+
+            onInfoShown()
+        }
+    }
 
     // Counts attempts to switch Shizuku on that have not taken effect yet. Shizuku can be
     // slow to come up, so the first couple of presses are simply impatience; past that it
@@ -137,6 +154,17 @@ internal fun AndroidSettingsManagerDialog(
                     text = stringResource(R.string.settings_manager_title),
                     style = MaterialTheme.typography.titleLarge,
                 )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                IconButton(onClick = { showInfo = true }) {
+                    Icon(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = GetoIcons.Info,
+                        contentDescription = stringResource(R.string.settings_manager_info),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -247,6 +275,10 @@ internal fun AndroidSettingsManagerDialog(
                 }
             }
         }
+    }
+
+    if (showInfo) {
+        SettingsManagerInfoDialog(onDismissRequest = { showInfo = false })
     }
 
     if (showShizukuHelp) {
@@ -478,3 +510,4 @@ internal fun ManualRevertTarget.getTitle(): String = when (this) {
     ManualRevertTarget.AccessibilityServices -> stringResource(R.string.revert_accessibility)
     ManualRevertTarget.Shizuku -> stringResource(R.string.revert_shizuku)
 }
+

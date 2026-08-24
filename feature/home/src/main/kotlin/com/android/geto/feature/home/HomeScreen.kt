@@ -34,7 +34,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import com.android.geto.designsystem.component.LocalRevertConfigurationRequest
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -43,6 +42,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.android.geto.designsystem.component.LocalRevertConfigurationRequest
 import com.android.geto.feature.home.navigation.HomeDestination
 import kotlin.reflect.KClass
 

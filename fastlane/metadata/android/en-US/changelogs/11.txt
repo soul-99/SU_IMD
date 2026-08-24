@@ -1,0 +1,5 @@
+v1.6.6
+
+* The default Settings to unhide on Revert is now Accessibility services only. Everything else in that list is a debugging setting, and switching those back on automatically is a security risk. Existing installs are reset once and told.
+* The services manager has an information button explaining what it does and does not control.
+* Settings to hide warns about Shizuku's watchdog service, which can turn ADB back on behind you.

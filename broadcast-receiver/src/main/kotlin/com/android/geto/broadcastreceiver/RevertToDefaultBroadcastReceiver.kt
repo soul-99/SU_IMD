@@ -23,9 +23,9 @@ import android.content.Context
 import android.content.Intent
 import com.android.geto.common.ApplicationScope
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * The "Revert to default" button on the notification.

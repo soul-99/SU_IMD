@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<!--
+  What Android's own per-app language screen offers, on Android 13 and up. The order here
+  does not reach the user; that screen sorts by its own rules. The order the app's picker
+  uses lives in AppLocale.LANGUAGES.
+
+  English is listed first and is the fallback: a system language that is not one of these
+  resolves to the default res/values, which is English.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="pt-BR" />
+    <locale android:name="es" />
+    <locale android:name="zh-Hans" />
+    <locale android:name="fr" />
+    <locale android:name="de" />
+    <locale android:name="ru" />
+    <locale android:name="hi" />
+    <locale android:name="ar" />
+    <locale android:name="ko" />
+    <locale android:name="ja" />
+</locale-config>

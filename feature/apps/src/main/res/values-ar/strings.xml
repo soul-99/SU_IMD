@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Arabic. Machine translation, reviewed for consistency of terminology. -->
+    <string name="search">بحث</string>
+    <string name="sort">ترتيب</string>
+    <string name="name">الاسم</string>
+    <string name="update_time">التحديث</string>
+    <string name="install_time">التثبيت</string>
+    <string name="ascending">تصاعدي</string>
+    <string name="descending">تنازلي</string>
+    <string name="show_system">تطبيقات النظام</string>
+    <string name="show_system_applications">إظهار تطبيقات النظام</string>
+
+    <!-- Favourites -->
+    <string name="add_to_favourites">إضافة إلى المفضّلة</string>
+    <string name="remove_from_favourites">إزالة من المفضّلة</string>
+    <string name="favourite_apps_options">خيارات المفضّلة</string>
+    <string name="no_favourite_apps">لا توجد مفضّلة بعد</string>
+    <string name="no_matching_favourite_apps">لا توجد مفضّلة تطابق هذا البحث</string>
+    <string name="no_favourite_apps_subtitle">اضغط على النجمة بجوار أي تطبيق في “كل التطبيقات”، أو على النجمة في شاشة إعداداته.</string>
+    <string name="view">العرض</string>
+    <string name="custom">مخصّص</string>
+    <string name="alphabetical">أ-ي</string>
+    <string name="list">قائمة</string>
+    <string name="grid">شبكة</string>
+    <string name="reorder">إعادة ترتيب المفضّلة</string>
+    <string name="reorder_favourites">إعادة ترتيب المفضّلة</string>
+    <string name="move_up">تحريك لأعلى</string>
+    <string name="move_down">تحريك لأسفل</string>
+    <string name="close">إغلاق</string>
+
+    <!-- Launching a favourite applies its settings first, exactly like a pinned shortcut -->
+    <string name="applied_settings_title">IMD</string>
+    <string name="applied_settings_success">تم إخفاء الإعدادات / تعطيلها</string>
+    <string name="settings_manager_configure_revert">تحديد ما الذي يستعيده زر الاستعادة</string>
+    <string name="settings_manager_accessibility_unmanaged">لا يدير تطبيق IMD حاليًا أي خدمة من خدمات إمكانية الوصول</string>
+    <string name="applied_settings_failure">تعذّر تطبيق الإعدادات</string>
+    <string name="applied_settings_invalid">يحتوي هذا التطبيق على إعدادات بقيم غير صالحة</string>
+    <string name="settings_manager_title">مدير خدمات IMD</string>
+
+    <!-- settings_manager_title and the two _name_ strings below are matched as substrings
+         inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_info">ما الذي تفعله هذه النافذة</string>
+    <string name="settings_manager_info_live">مدير خدمات IMD يعرض الحالة الحيّة للإعدادات والخدمات. وهو لا يحدّد الإعدادات أو الخدمات التي تُخفى أو يُلغى إخفاؤها عند فتح التطبيقات عبر IMD أو عبر اختصارات التطبيقات التي أنشأها IMD.</string>
+    <string name="settings_manager_info_live_extra">لتحديد ما الذي يُخفى وما الذي يظهر مجددًا عند فتح التطبيقات عبر IMD، يُرجى ضبط إعدادات IMD الافتراضية داخل تطبيق IMD.</string>
+    <string name="settings_manager_info_name_defaults">إعدادات IMD الافتراضية</string>
+    <string name="settings_manager_info_developer">إيقاف خيارات المطوّر عبر IMD لا يفعل أكثر من تشغيل مفتاح إعدادات المطوّر أو إيقافه، وهو لا يُعيد ضبط التغييرات التي أُجريت داخل إعدادات المطوّر (مثل مقياس الرسوم المتحركة، وتطبيق تحديد الموقع الوهمي… إلخ).</string>
+    <string name="settings_manager_info_developer_extra">يمكنك إعادة ضبط إعدادات المطوّر بفتح صفحة إعدادات المطوّر وإيقافها من هناك.</string>
+    <string name="settings_manager_info_name_reset">إعادة ضبط إعدادات المطوّر</string>
+    <string name="revert_to_default">استعادة الوضع الافتراضي</string>
+    <string name="not_configured_title">لا توجد إعدادات لإخفائها، عليك تحديد الإعدادات المراد إخفاؤها لهذا التطبيق.</string>
+    <string name="not_configured_message">في تطبيق IMD اضغط مطوّلًا على هذا التطبيق لتحديد الإعدادات المراد إخفاؤها.</string>
+    <string name="got_it">حسنًا</string>
+    <string name="settings_manager_open">فتح %1$s</string>
+    <string name="settings_manager_accessibility_note">لا تُدار سوى الخدمات المحدَّدة في إعدادات تطبيق IMD</string>
+    <string name="settings_manager_enable_developer_options">يُرجى تفعيل خيارات المطوّر أولًا</string>
+    <string name="settings_manager_cannot_open">تعذّر فتح تلك الشاشة على هذا الجهاز</string>
+    <string name="settings_manager_no_shizuku">لم يُعثر على تطبيق Shizuku، حدّد اسم الحزمة في الإعدادات</string>
+    <string name="ok">موافق</string>
+    <string name="shizuku_help_title">خدمة Shizuku غير متاحة</string>
+    <string name="shizuku_help_bullet">%1$d.</string>
+    <string name="shizuku_help_point_setup">يُرجى التأكد من أن تطبيق Shizuku مثبَّت، ومسجَّل في ADB، ومهيَّأ بشكل صحيح في صفحة إعدادات تطبيق IMD.</string>
+    <string name="shizuku_help_point_permission">لا يُستخدم إذن Shizuku في تطبيق IMD إلا لمنح إذن Android المميّز WRITE_SECURE_SETTINGS مرة واحدة. ولا يُستخدم لمعرفة حالة خدمة Shizuku ولا لتشغيل خدمة Shizuku أو إيقافها.</string>
+    <string name="shizuku_help_point_restart">بعد إتمام الإعداد بشكل صحيح، يُرجى إعادة تشغيل تطبيق IMD ثم المحاولة مرة أخرى.</string>
+    <string name="settings_manager_shizuku_wait">يُرجى الانتظار 10 ثوانٍ، فبعض نسخ Shizuku المعدَّلة بطيئة في بدء الخدمة عبر الـ intents</string>
+    <string name="revert_developer_settings">إعدادات المطوّر</string>
+    <string name="revert_usb_debugging">تصحيح أخطاء USB</string>
+    <string name="revert_wireless_debugging">تصحيح الأخطاء لاسلكيًا</string>
+    <string name="revert_accessibility">خدمات إمكانية الوصول</string>
+    <string name="revert_shizuku">خدمة Shizuku</string>
+    <string name="applied_settings_no_permission">امنح إذن WRITE_SECURE_SETTINGS أولًا، راجع شاشة الإعداد</string>
+    <string name="settings_manager_shizuku_failed">تعذّر بدء خدمة Shizuku في المحاولة الأخيرة، يُرجى مراجعة إعدادات تطبيق Shizuku وتهيئة Shizuku داخل IMD</string>
+    <string name="settings_manager_shizuku_failed_open">لماذا لم تبدأ خدمة Shizuku</string>
+    <string name="understood">فهمت</string>
+</resources>

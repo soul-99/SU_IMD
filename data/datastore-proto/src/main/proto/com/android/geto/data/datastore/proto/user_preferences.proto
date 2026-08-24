@@ -148,6 +148,27 @@ message UserPreferences {
   // defaults to on. Only someone deliberately switching it off is affected, and only once.
   bool restartShizukuSet = 26;
 
+  // Whether the one-time v1.6.6 reset of the revert configuration has run.
+  //
+  // v1.6.6 narrows the default to accessibility services alone, because everything else in
+  // that list is a debugging surface and a Revert switching those on can leave a device
+  // more open than the person pressing the button realised. An install carrying the old
+  // wider default forward is reset once, and told.
+  bool revertDefaultsResetV166 = 29;
+
+  // Whether that reset still owes the user an explanation.
+  //
+  // Separate from the marker above because the reset happens wherever the app process
+  // starts - a tile, a shortcut, a notification action - and the notice can only be shown
+  // where there is a screen. Set by the migration, cleared when the notice is dismissed.
+  bool revertDefaultsNoticePending = 30;
+
+  // Whether the services manager has explained itself once.
+  //
+  // The manager shows live state and changes nothing about what launching an app does,
+  // which is the single most common thing to misread about it.
+  bool settingsManagerInfoShown = 31;
+
   // 9 was favouriteAppsTapAction. What a tap and a long press do is now decided by the
   // notification function rather than chosen, so there is nothing left for it to store.
   // 14 was a single global suspended-services list, replaced by the map above.

@@ -26,23 +26,25 @@ import com.android.geto.domain.framework.PackageManagerWrapper
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.ManualTargetStates
 import com.android.geto.domain.model.ShizukuForkDefaults
+import com.android.geto.domain.model.UserData
 import com.android.geto.domain.repository.UserDataRepository
 import com.android.geto.domain.usecase.GetManualTargetStatesUseCase
 import com.android.geto.domain.usecase.SetManualTargetUseCase
 import com.android.geto.domain.usecase.ShizukuStartTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Short enough to read as live, long enough that it is not doing anything expensive: the
@@ -115,6 +117,28 @@ class SettingsManagerViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = false,
         )
+
+    /**
+     * Whether the manager has already explained itself, or null while that is still being
+     * read.
+     *
+     * Nullable on purpose. A plain false as the initial value would mean every open of this
+     * dialog flashes the information popup for the moment before the stored answer arrives,
+     * including for people who dismissed it months ago.
+     */
+    val infoShown: StateFlow<Boolean?> = userDataRepository.userData
+        .map<UserData, Boolean?> { it.settingsManagerInfoShown }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null,
+        )
+
+    fun markInfoShown() {
+        viewModelScope.launch {
+            userDataRepository.updateSettingsManagerInfoShown(shown = true)
+        }
+    }
 
     private var watchJob: Job? = null
 

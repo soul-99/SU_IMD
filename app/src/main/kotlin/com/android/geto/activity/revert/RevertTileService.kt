@@ -19,6 +19,7 @@
 package com.android.geto.activity.revert
 
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
@@ -26,6 +27,7 @@ import android.os.Looper
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
+import com.android.geto.common.AppLocale
 
 /**
  * How long the tile shows as on after a press.
@@ -44,6 +46,12 @@ private const val ACTIVE_FLASH_MILLIS = 1_000L
  */
 @RequiresApi(Build.VERSION_CODES.N)
 class RevertTileService : TileService() {
+    // The chosen language, applied before anything reads a string. A no-op on Android 13
+    // and up, where the platform has already applied it to this context.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
 
     private val handler = Handler(Looper.getMainLooper())
 

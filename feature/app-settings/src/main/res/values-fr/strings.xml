@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- French. Machine translation, reviewed for consistency of terminology. -->
+    <string name="app_settings_disabled">Veuillez activer au moins un paramètre</string>
+    <string name="empty_app_settings_list">Aucun paramètre trouvé</string>
+    <string name="geto_settings">IMD</string>
+    <string name="apply_success">Paramètres masqués/désactivés</string>
+    <string name="apply_failure">Échec de l\'application des paramètres</string>
+    <string name="revert_failure">Échec du rétablissement des paramètres</string>
+    <string name="revert_success">Paramètres rétablis</string>
+    <string name="add_your_first_settings">Ajoutez vos premiers paramètres</string>
+    <string name="add_app_setting">Ajouter un paramètre d\'application</string>
+    <string name="setting_label">Nom du paramètre</string>
+    <string name="setting_key">Clé du paramètre</string>
+    <string name="setting_value_on_launch">Valeur au lancement</string>
+    <string name="setting_value_on_revert">Valeur au rétablissement</string>
+    <string name="templates">Modèles</string>
+    <string name="add_shortcut">Ajouter un raccourci</string>
+    <string name="update_shortcut">Mettre à jour le raccourci</string>
+    <string name="short_label">Nom court</string>
+    <string name="long_label">Nom long</string>
+    <string name="short_label_is_blank">Le nom court est vide</string>
+    <string name="long_label_is_blank">Le nom long est vide</string>
+    <string name="setting_label_is_blank">Le nom du paramètre est vide</string>
+    <string name="setting_key_is_blank">La clé du paramètre est vide</string>
+    <string name="setting_key_not_found">Clé de paramètre introuvable</string>
+    <string name="setting_value_on_launch_is_blank">La valeur au lancement est vide</string>
+    <string name="setting_value_on_revert_is_blank">La valeur au rétablissement est vide</string>
+    <string name="settings_has_invalid_values">Les paramètres contiennent des valeurs non valides</string>
+    <string name="shortcut_update_immutable_shortcuts">Impossible de mettre à jour des raccourcis immuables</string>
+    <string name="shortcut_update_failed">Échec de la mise à jour du raccourci</string>
+    <string name="shortcut_update_success">Raccourci mis à jour</string>
+    <string name="supported_launcher">Votre lanceur actuel prend en charge les raccourcis</string>
+    <string name="unsupported_launcher">Votre lanceur actuel ne prend pas en charge les raccourcis</string>
+    <string name="no_settings_found">Aucun paramètre trouvé</string>
+    <string name="permission">Autorisation</string>
+    <string name="app_setting_already_exists">Ce paramètre d\'application existe déjà</string>
+    <string name="app_setting_added_successfully">Paramètre d\'application ajouté</string>
+    <string name="no_permission">Veuillez accorder l\'autorisation WRITE_SECURE_SETTINGS via ADB</string>
+    <string name="write_secure_settings_message">Copiez la commande ci-dessous et exécutez-la via ADB pour accorder l\'autorisation Write Secure Settings</string>
+    <string name="add_to_favourites">Ajouter aux favoris</string>
+    <string name="remove_from_favourites">Retirer des favoris</string>
+    <string name="action_revert">Rétablir</string>
+    <string name="action_app_setting">Paramètre d\'application</string>
+    <string name="action_create_shortcut">Créer un raccourci</string>
+    <string name="action_setting_template">Modèle de paramètres</string>
+</resources>

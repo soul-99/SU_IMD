@@ -36,8 +36,8 @@
     <string name="restart_shizuku_service">Restart Shizuku service</string>
     <string name="restart_shizuku_service_description">On reverting USB debugging from Notification (memory function only), autostart Shizuku service.</string>
     <string name="shizuku_needs">Needs</string>
-    <string name="shizuku_fork_thedjchi">thedjchi</string>
-    <string name="shizuku_fork_shevery">shevery</string>
+    <string name="shizuku_fork_thedjchi" translatable="false">thedjchi</string>
+    <string name="shizuku_fork_shevery" translatable="false">shevery</string>
     <string name="shizuku_forks_suffix">/ other forks of Shizuku that support start service intents (RikkaApps and its direct forks do not support service start intent).</string>
     <string name="shizuku_fork_mode_thedjchi">Thedjchi based forks of Shizuku</string>
     <string name="shizuku_fork_mode_other">Shevery / other forks of Shizuku</string>
@@ -68,16 +68,17 @@
     <string name="about_add_to_obtainium">Add to Obtainium</string>
     <string name="about_obtainium_note">(to track updates/ auto-update app)</string>
     <string name="about_created_by">App created by</string>
-    <string name="about_author_name">soul_99</string>
+    <string name="about_author_name" translatable="false">soul_99</string>
     <string name="about_view_github">View GitHub</string>
     <string name="about_fork_of">Fork of</string>
     <string name="about_geto_app">Geto app</string>
-    <string name="about_licence_name">GNU General Public License v3.0</string>
+    <string name="about_licence_name" translatable="false">GNU General Public License v3.0</string>
 
     <string name="long_live_foss">Long live free and open source software!</string>
 
     <!-- suIMD: collapsible section headers -->
-    <string name="section_theme">Theme</string>
+    <string name="section_ui">User interface</string>
+    <string name="language">Language</string>
     <string name="section_app_functions">Default IMD settings</string>
 
     <!-- suIMD: notification function -->
@@ -112,7 +113,13 @@
          keeps its own name, which is also what the notification function and the tile are
          called. -->
     <string name="revert_defaults_entry">Settings to unhide on Revert</string>
-    <string name="revert_defaults_description">These settings are unhidden/re-enabled when you click on \'revert\' button anywhere.</string>
+
+    <!-- suIMD v1.6.6: shown once to installs upgrading into the narrowed default. The
+         body's bolded phrase is revert_defaults_entry above, matched as a substring. -->
+    <string name="revert_defaults_notice_title">Notice</string>
+    <string name="revert_defaults_notice_body">Due to security reasons, the default Settings to unhide on Revert have been reset. Please reconfigure them from:</string>
+    <string name="revert_defaults_notice_dismiss">Understood</string>
+    <string name="revert_defaults_description">These settings are unhidden/re-enabled when you click on \'Revert to default\' button anywhere.</string>
     <string name="revert_defaults_summary">%1$d of %2$d switched on</string>
 
     <string name="settings_to_hide">Settings to hide</string>
@@ -124,6 +131,8 @@
     <string name="settings_to_hide_info_all">Hiding only developer settings does not turn off USB and wireless debugging, and some apps might still detect that as developer settings turned on, so it is recommended to select all three</string>
     <string name="settings_to_hide_info_shizuku">to hide Shizuku from apps use the Hide Shizuku from other apps function within the Shizuku app.</string>
     <string name="settings_to_hide_name_shizuku_hide">Hide Shizuku from other apps</string>
+    <string name="settings_to_hide_info_watchdog">It is recommended to keep Shizuku\'s watchdog service off as if Shizuku restarts in the background it will also turn on ADB, when settings are hidden and your apps might be able to detect that.</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">Shizuku\'s watchdog service</string>
     <string name="revert_defaults_developer_settings">Developer settings</string>
     <string name="revert_defaults_usb_debugging">USB debugging</string>
     <string name="revert_defaults_wireless_debugging">Wireless debugging</string>
@@ -153,7 +162,7 @@
     <string name="help_hide_body">by default all settings are hidden (recommended), but you can customise it as per your liking.</string>
 
     <string name="help_revert_title">Setup what settings to unhide on Revert (RECOMMENDED)</string>
-    <string name="help_revert_body">by default USB debugging, Accessibility services, and Shizuku service is enabled, but you can customise it to your liking.</string>
+    <string name="help_revert_body">by default only Accessibility services is enabled, as everything else in that list is a debugging setting and switching those back on automatically is a security risk. You can customise it to your liking.</string>
 
     <string name="help_accessibility_title">Setup Accessibility services to hide</string>
     <string name="help_accessibility_body">The app will not touch any accessibility service until you say which ones, then tick the ones that should be switched off while a locked-down app is open. They are switched back on when you revert.</string>

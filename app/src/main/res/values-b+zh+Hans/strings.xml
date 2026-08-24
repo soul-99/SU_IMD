@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Simplified Chinese (zh-Hans). Machine translation, reviewed for consistency of
+      terminology. Mainland conventions.
+
+      Left untranslated on purpose: the app name, Shizuku, ADB and Obtainium (product
+      names), the adb command itself, and WRITE_SECURE_SETTINGS, which has to be typed
+      exactly as written.
+
+      setup_use_shizuku is matched as a substring inside setup_secure_settings_shizuku to
+      bold it. Word it differently in the two places and nothing is bolded, silently.
+      language_setup_subtitle names the Settings screen and its UI section, so it has to
+      match how those are named in :feature:settings.
+    -->
+    <string name="app_name">IMD</string>
+    <string name="favourite_apps">收藏</string>
+    <string name="all_apps">所有应用</string>
+    <string name="settings">设置</string>
+
+    <!-- First-run setup -->
+    <string name="setup_purpose">打开银行类和其他受限应用时，不必每次都手动关闭开发者选项、USB 调试或无障碍服务。选择一个应用，指定它运行时应更改哪些设置，本应用会在用完之后把一切恢复原样。</string>
+    <string name="setup_step">第 %1$d 步</string>
+    <string name="setup_granted">已授予</string>
+    <string name="setup_not_granted">未授予</string>
+    <string name="setup_secure_settings_title">安全设置访问权限</string>
+    <string name="setup_secure_settings_why">Android 不允许任何普通应用更改这些设置。该权限只需从 shell 授予一次，重启后依然有效，但重新安装后会失效。</string>
+    <string name="setup_copy_command">复制命令</string>
+    <string name="setup_check_again">重新检查</string>
+    <string name="setup_use_shizuku">使用 Shizuku</string>
+    <string name="services_shortcut_label">服务管理器</string>
+    <string name="revert_shortcut_label">还原为默认</string>
+    <string name="shortcut_not_configured_title">尚未为该应用配置任何内容</string>
+    <string name="shortcut_not_configured_message">您需要先为该应用配置要隐藏哪些设置：IMD → 所有应用 → 点击应用名称 → 设置模板 → 选择要隐藏的设置。</string>
+    <string name="shortcut_not_configured_dismiss">知道了</string>
+    <string name="obtainium_title">让本应用保持最新</string>
+    <string name="obtainium_body">由于本应用完全离线运行，请使用 Obtainium 检查更新，并直接从 GitHub 发布页安装。</string>
+    <string name="obtainium_do_not_show_again">不再显示</string>
+    <string name="obtainium_add">添加到 Obtainium</string>
+    <string name="tip">提示</string>
+    <string name="tip_got_it">知道了</string>
+    <string name="tip_developer_options">Shizuku 并不需要一直启用开发者选项，因此您可以让它保持关闭。Shizuku 启动自身服务时，会用它自己的 WRITE_SECURE_SETTINGS 权限自行开启 USB 调试，而无需启用开发者选项。</string>
+    <string name="setup_shizuku_working">正在请求 Shizuku…</string>
+    <string name="setup_shizuku_granted">已通过 Shizuku 授予权限。</string>
+    <string name="setup_shizuku_not_running">未找到 Shizuku 服务。请先启动 Shizuku，然后重试。</string>
+    <string name="setup_shizuku_denied">Shizuku 拒绝了请求。请在 Shizuku 中允许本应用后重试。如果您之前选择了「拒绝并不再询问」，请先在 Shizuku 的应用列表中清除该记录。</string>
+    <string name="setup_shizuku_failed">Shizuku 无法执行该命令。请改用 ADB 命令。</string>
+    <string name="setup_shizuku_once">免责声明：只有这一次授权才需要 Shizuku。该权限在重启后依然有效，因此之后您可以停止或卸载 Shizuku，除非您还想使用「设置」中可选的「重启 Shizuku 服务」功能，那项功能之后会再次用到它。</string>
+    <string name="setup_shizuku_once_extra">如果您为了配置 Shizuku 而开启了调试和开发者选项，现在也可以把它们关闭；设置成功后，本应用两者都不需要。</string>
+    <string name="setup_secure_settings_adb">使用电脑：启用 USB 调试 → 把手机连接到运行 ADB shell 终端的电脑 → 运行上面的命令。</string>
+    <string name="setup_secure_settings_shizuku">无需电脑（推荐）：\n1. 安装并配置 Shizuku 应用，启动 Shizuku 服务\n2. 点击上面的「使用 Shizuku」按钮\n3. 出现提示时点击「允许」。</string>
+    <string name="setup_notifications_title">通知</string>
+    <string name="setup_notifications_why">每次应用设置后，都会出现一条带有「还原」操作的常驻通知。您正是通过这条通知让设备恢复原样的。如果您打算改用快捷设置磁贴或主屏幕快捷方式来还原设置，之后可以关闭本应用的所有通知。</string>
+    <string name="setup_allow_notifications">允许</string>
+    <string name="setup_open_settings">打开设置</string>
+    <string name="setup_notifications_denied_hint">已经拒绝过两次？Android 将不再显示该请求，请改用「打开设置」。</string>
+    <string name="setup_next">下一步</string>
+    <string name="setup_back">上一步</string>
+    <string name="setup_finish">开始使用</string>
+
+    <!-- suIMD: the language step, shown once, ahead of the permissions screen -->
+    <string name="language_setup_title">选择您的语言</string>
+    <string name="language_setup_subtitle">之后可在「设置」→ 用户界面 中更改。</string>
+    <string name="language_setup_continue">继续</string>
+    <string name="setup_blocked">这两个步骤都是必需的。没有它们，本应用无法更改或还原任何一项设置。</string>
+    <string name="setup_copied">已复制</string>
+    <string name="setup_open_settings_failed">无法在此设备上打开设置</string>
+</resources>

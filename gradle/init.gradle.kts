@@ -42,6 +42,22 @@ rootProject {
                         "android" to "true",
                     ),
                 )
+                // WARNING, read before running spotlessApply on this fork.
+                //
+                // licenseHeaderFile REPLACES the header it finds. spotless/copyright.kt
+                // holds the original notice only, so applying it strips the
+                // "Modifications Copyright 2026 soul_99 (suIMD)" line from the 98 files
+                // that carry it - which is the notice GPL-3.0 section 5(a) asks a modified
+                // work to keep.
+                //
+                // Adding that line to the copyright files is not a straight fix either:
+                // spotless applies one header to every file, so untouched upstream files
+                // would then claim a modification that never happened.
+                //
+                // Until that is decided, format without the header step:
+                //   ./gradlew -I gradle/init.gradle.kts spotlessApply
+                // is NOT safe as written. Run ktlint directly, or comment this line out
+                // for the run.
                 licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
             }
             format("kts") {

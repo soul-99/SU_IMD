@@ -49,6 +49,12 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    fun acknowledgeRevertDefaultsNotice() {
+        viewModelScope.launch {
+            userDataRepository.updateRevertDefaultsNoticePending(pending = false)
+        }
+    }
+
     fun markObtainiumTipShown() {
         viewModelScope.launch {
             userDataRepository.updateObtainiumTipShown(obtainiumTipShown = true)

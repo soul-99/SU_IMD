@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      German. Machine translation, reviewed for consistency of terminology.
+
+      Two things in here are load-bearing rather than cosmetic:
+
+      * The help page's menu paths have to name screens exactly as those screens are
+        named in this file. A path pointing at a heading that does not exist in German is
+        worse than one left in English.
+      * The short strings used for bolding (help_name_*, notif_name_*,
+        settings_to_hide_name_shizuku_hide) are matched as substrings inside the longer
+        strings they highlight. Word them differently in the two places and the bolding
+        silently does nothing. German declension is the trap: the bolded phrase is always
+        placed so that it appears unchanged, if necessary in quotation marks.
+
+      "Revert" is "wiederherstellen" throughout, never "zurücksetzen"; only the developer
+      options are ever "zurückgesetzt", which is a different thing and stays distinct.
+    -->
+    <string name="settings">Einstellungen</string>
+    <string name="dynamic_theme">Dynamisches Design</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="change">Ändern</string>
+    <string name="close">Schließen</string>
+    <string name="theme">Design</string>
+    <string name="available_on_android_12">Verfügbar ab Android 12</string>
+    <string name="follow_system">Systemeinstellung übernehmen</string>
+    <string name="light">Hell</string>
+    <string name="dark">Dunkel</string>
+    <string name="start_service">Dienst starten</string>
+    <string name="stop_service">Dienst beenden</string>
+    <string name="settings_observer_service">Dienst zur Einstellungsüberwachung</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">Shizuku-Konfiguration</string>
+    <string name="restart_shizuku_service">Shizuku-Dienst neu starten</string>
+    <string name="restart_shizuku_service_description">Beim Wiederherstellen des USB-Debuggings über die Benachrichtigung (nur Speicherfunktion) den Shizuku-Dienst automatisch starten.</string>
+    <string name="shizuku_needs">Benötigt</string>
+    <string name="shizuku_forks_suffix">/ andere Shizuku-Forks, die Service-Start-Intents unterstützen (RikkaApps und dessen direkte Forks unterstützen den Service-Start-Intent nicht).</string>
+    <string name="shizuku_fork_mode_thedjchi">Shizuku-Forks auf Thedjchi-Basis</string>
+    <string name="shizuku_fork_mode_other">Shevery / andere Shizuku-Forks</string>
+    <string name="shizuku_choose_app">Installierte App auswählen</string>
+    <string name="shizuku_fill_advanced">Bitte fülle zuerst den Abschnitt Shizuku-Konfiguration aus</string>
+    <string name="show_value">Anzeigen</string>
+    <string name="hide_value">Ausblenden</string>
+    <string name="shizuku_view_intents_hint">Zum Kopieren der Werte: Shizuku-App &gt; view intents</string>
+    <string name="shizuku_other_fork_hint">Falls die Standardwerte nicht funktionieren, suche den Wert für den Service-Start-Intent in deiner Shizuku-Fork-App oder im Repository deines Shizuku-Forks</string>
+    <string name="shizuku_start_action">Service-Start-Intent (action)</string>
+    <string name="shizuku_package_name">Paketname</string>
+    <string name="shizuku_auth_key">Authentifizierungsschlüssel (extras &gt; auth:)</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_services">Auszublendende Bedienungshilfen-Dienste</string>
+    <string name="accessibility_services_dialog_description">Diese Dienste werden ausgeschaltet, wenn eine App-Einstellung Bedienungshilfen-Dienste ausblendet, und wieder eingeschaltet, sobald du sie wiederherstellst. Wiederhergestellt werden immer nur die Dienste, die diese App selbst ausgeschaltet hat.</string>
+    <string name="accessibility_services_none_selected">Keine ausgewählt. Auf diesem Gerät sind derzeit %1$d aktiviert.</string>
+    <string name="accessibility_services_selected">%1$d ausgewählt, %2$d auf diesem Gerät derzeit aktiviert.</string>
+    <string name="accessibility_service_enabled">Aktiviert · %1$s</string>
+    <string name="accessibility_service_disabled">Aus · %1$s</string>
+    <string name="no_accessibility_services">Auf diesem Gerät sind keine Bedienungshilfen-Dienste installiert.</string>
+
+    <!-- About -->
+    <string name="about">Info</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_check_releases">GitHub-Release-Seite öffnen, um nach Updates zu suchen</string>
+    <string name="about_add_to_obtainium">Zu Obtainium hinzufügen</string>
+    <string name="about_obtainium_note">(um Updates zu verfolgen / die App automatisch zu aktualisieren)</string>
+    <string name="about_created_by">App erstellt von</string>
+    <string name="about_view_github">GitHub ansehen</string>
+    <string name="about_fork_of">Fork von</string>
+    <string name="about_geto_app">Geto-App</string>
+
+    <string name="long_live_foss">Lang lebe freie und quelloffene Software!</string>
+
+    <!-- suIMD: collapsible section headers -->
+    <string name="section_ui">Benutzeroberfläche</string>
+    <string name="language">Sprache</string>
+    <string name="section_app_functions">Standard-IMD-Einstellungen</string>
+
+    <!-- suIMD: notification function -->
+    <string name="notification_function">Benachrichtigungsfunktion</string>
+    <string name="notification_function_memory">Speicherfunktion</string>
+    <string name="notification_function_memory_option">Speicherfunktion (alte Methode)</string>
+    <string name="notification_function_memory_summary">Mehrere Benachrichtigungen, eine je App-Start</string>
+    <string name="notification_function_memory_detail">speichert den vorherigen Zustand der Geräteeinstellungen, bevor die für diese App konfigurierten Geräteeinstellungen ausgeschaltet werden, und stellt nur die wieder her, die von IMD ausgeschaltet wurden</string>
+    <string name="notification_function_memory_warning_config">Du musst für jede einzelne App manuell festlegen, welche Einstellungen ausgeblendet werden sollen. Halte dazu das App-Symbol im Tab „Alle Apps“ oder „Favoriten“ gedrückt.</string>
+    <string name="notification_function_memory_warning_revert">Nur die Schaltfläche „Wiederherstellen“ in Benachrichtigungen nutzt die Speicherfunktion. Alle anderen Wege zum Wiederherstellen (Schnelleinstellungen-Kachel, Schaltfläche in der App … usw.) richten sich weiterhin nach „Beim Wiederherstellen einzublendende Einstellungen“ aus den IMD-App-Einstellungen.</string>
+    <string name="notification_function_memory_note">Mit der Speicherfunktion kannst du über die 4 Standardeinstellungen der IMD-App hinaus weitere Einstellungen ausblenden</string>
+    <string name="notif_name_all_apps">Alle Apps</string>
+    <string name="notif_name_favourites">Favoriten</string>
+    <string name="notif_name_revert_button">Wiederherstellen</string>
+    <string name="notification_function_revert">Standard wiederherstellen</string>
+    <string name="notification_function_revert_option">Standard wiederherstellen (empfohlen)</string>
+    <string name="notification_function_revert_summary">Nur eine einzige Benachrichtigung</string>
+    <string name="notification_function_revert_detail">stellt die Geräteeinstellungen gemäß „Beim Wiederherstellen einzublendende Einstellungen“ aus den IMD-Einstellungen wieder her</string>
+    <string name="save">Speichern</string>
+
+    <!-- suIMD: revert to default configuration -->
+    <string name="revert_defaults">Konfiguration für „Standard wiederherstellen“</string>
+    <string name="revert_defaults_entry">Beim Wiederherstellen einzublendende Einstellungen</string>
+    <string name="revert_defaults_notice_title">Hinweis</string>
+    <string name="revert_defaults_notice_body">Aus Sicherheitsgründen wurden die standardmäßigen „Beim Wiederherstellen einzublendende Einstellungen“ zurückgesetzt. Bitte konfiguriere sie hier neu:</string>
+    <string name="revert_defaults_notice_dismiss">Verstanden</string>
+    <string name="revert_defaults_description">Diese Einstellungen werden wieder eingeblendet/aktiviert, wenn du irgendwo auf die Schaltfläche \'Standard wiederherstellen\' tippst.</string>
+    <string name="revert_defaults_summary">%1$d von %2$d aktiviert</string>
+
+    <string name="settings_to_hide">Auszublendende Einstellungen</string>
+    <string name="settings_to_hide_title">Auszublendende / zu deaktivierende Einstellungen</string>
+    <string name="settings_to_hide_description">Diese Einstellungen werden ausgeblendet, wenn du eine App startest.</string>
+    <string name="settings_to_hide_summary">%1$d von %2$d aktiviert</string>
+    <string name="settings_to_hide_usb_note">das Ausschalten des USB-Debuggings beendet auch den Shizuku-Dienst (falls er läuft). Konfiguriere bitte die Shizuku-Einstellungen in der IMD-App, damit der Shizuku-Dienst nach dem Wiederherstellen neu gestartet wird</string>
+    <string name="settings_to_hide_info_per_app">Wenn du für einzelne Apps unterschiedliche Einstellungen ausblenden möchtest, nutze die Speicherfunktion unter IMD-Einstellungen &gt; Erweitert &gt; Benachrichtigungsfunktion</string>
+    <string name="settings_to_hide_info_all">Werden nur die Entwickleroptionen ausgeblendet, bleiben USB-Debugging und drahtloses Debugging eingeschaltet, und manche Apps werten das trotzdem als aktivierte Entwickleroptionen. Es wird daher empfohlen, alle drei auszuwählen</string>
+    <string name="settings_to_hide_info_shizuku">um Shizuku vor Apps auszublenden, nutze in der Shizuku-App die Funktion „Shizuku vor anderen Apps ausblenden“.</string>
+    <string name="settings_to_hide_name_shizuku_hide">Shizuku vor anderen Apps ausblenden</string>
+    <string name="settings_to_hide_info_watchdog">Es wird empfohlen, Shizukus Watchdog-Dienst ausgeschaltet zu lassen: Startet Shizuku im Hintergrund neu, schaltet es auch ADB wieder ein, während die Einstellungen ausgeblendet sind, und deine Apps könnten das erkennen.</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">Shizukus Watchdog-Dienst</string>
+    <string name="revert_defaults_developer_settings">Entwickleroptionen</string>
+    <string name="revert_defaults_usb_debugging">USB-Debugging</string>
+    <string name="revert_defaults_wireless_debugging">Drahtloses Debugging</string>
+    <string name="revert_defaults_accessibility_services">Bedienungshilfen-Dienste</string>
+    <string name="revert_defaults_accessibility_note">es werden nur Dienste verwaltet, die in den Einstellungen der IMD-App ausgewählt sind</string>
+    <string name="revert_defaults_shizuku">Shizuku-Dienst</string>
+    <string name="revert_defaults_shizuku_note">Je nachdem, mit welcher Methode Shizuku den Dienst startet, aktiviert es entweder USB-Debugging oder drahtloses Debugging wieder, das es auch benötigt, um den Shizuku-Dienst am Laufen zu halten</string>
+
+    <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
+    <string name="help_button">Hilfe (readme)</string>
+    <string name="help_close">Schließen</string>
+    <string name="help_title">So richtest du diese App ein (nicht überspringen)</string>
+    <string name="help_intro">Diese Dinge musst du selbst einrichten.</string>
+    <string name="help_again">Diese Seite erreichst du wieder über -</string>
+    <string name="help_numbered_title">%1$d.  %2$s</string>
+    <string name="help_path_help">IMD-Einstellungen → Info → Hilfe (readme)</string>
+    <string name="help_path_hide">IMD-Einstellungen → Standard-IMD-Einstellungen → Auszublendende Einstellungen</string>
+    <string name="help_path_unhide">IMD-Einstellungen → Standard-IMD-Einstellungen → Beim Wiederherstellen einzublendende Einstellungen</string>
+    <string name="help_path_accessibility">IMD-Einstellungen → Standard-IMD-Einstellungen → Auszublendende Bedienungshilfen-Dienste</string>
+    <string name="help_path_shizuku">IMD-Einstellungen → Shizuku-Konfiguration</string>
+    <string name="help_hide_title">Lege fest, welche Einstellungen ausgeblendet werden (PFLICHT)</string>
+    <string name="help_hide_body">standardmäßig werden alle Einstellungen ausgeblendet (empfohlen), du kannst das aber nach deinen Wünschen anpassen.</string>
+    <string name="help_revert_title">Lege fest, welche Einstellungen beim Wiederherstellen eingeblendet werden (EMPFOHLEN)</string>
+    <string name="help_revert_body">standardmäßig sind nur die Bedienungshilfen-Dienste aktiviert, denn alles andere in dieser Liste ist eine Debugging-Einstellung, und diese automatisch wieder einzuschalten ist ein Sicherheitsrisiko. Du kannst das nach deinen Wünschen anpassen.</string>
+    <string name="help_accessibility_title">Auszublendende Bedienungshilfen-Dienste einrichten</string>
+    <string name="help_accessibility_body">Die App rührt keinen Bedienungshilfen-Dienst an, solange du nicht sagst, welche gemeint sind. Wähle also die Dienste aus, die ausgeschaltet sein sollen, während eine abgeschottete App geöffnet ist. Beim Wiederherstellen werden sie wieder eingeschaltet.</string>
+    <string name="help_shizuku_title">Shizuku-Start-Intents einrichten (nur wenn du Shizuku verwendest)</string>
+    <string name="help_shizuku_body">Wenn du den Shizuku-Dienst verwendest: Sobald IMD Debugging-Einstellungen ausschaltet, beendet es auch den Shizuku-Dienst. Es wird daher empfohlen, die Shizuku-Start-Intents einzurichten &amp; zu überprüfen.</string>
+    <string name="help_general_title">Allgemeine Hinweise</string>
+    <string name="help_general_how_title">SO VERWENDEST DU IMD</string>
+    <string name="help_general_launch">1. Um die blockierten Apps zu nutzen, musst du sie entweder aus der IMD-App heraus starten oder über App-Verknüpfungen, die IMD auf dem Startbildschirm angelegt hat.</string>
+    <string name="help_general_shortcuts">2. In dieser App kannst du App-Verknüpfungen direkt auf deinem Startbildschirm anlegen, indem du im Tab „Alle Apps“ oder „Favoriten“ einen App-Namen gedrückt hältst.</string>
+    <string name="help_general_revert">3. Wenn du mit deiner App fertig bist, blende deine vorherigen Einstellungen mit der Schaltfläche Wiederherstellen / Standard wiederherstellen wieder ein bzw. aktiviere sie erneut.</string>
+    <string name="help_general_revert_places">Die Schaltfläche zum Wiederherstellen findest du an diesen Stellen:</string>
+    <string name="help_general_revert_items">•  Benachrichtigungen nach dem App-Start\n•  Android-Schnelleinstellungen-Kachel\n•  Tab „Favoriten“\n•  Verknüpfung auf dem Startbildschirm (IMD-Symbol gedrückt halten, um eine Verknüpfung zu erstellen)</string>
+    <string name="help_general_manager_title">IMD-DIENSTMANAGER</string>
+    <string name="help_general_manager">Mit diesem Dienstmanager siehst du schnell den aktuellen Status deiner Einstellungen/Dienste und kannst sie ebenso schnell ein- und ausschalten.</string>
+    <string name="help_general_manager_places">Den IMD-Dienstmanager kannst du an diesen Stellen öffnen:</string>
+    <string name="help_general_manager_items">•  Android-Schnelleinstellungen-Kachel\n•  Tab „Favoriten“\n•  Verknüpfung auf dem Startbildschirm (IMD-Symbol gedrückt halten, um eine Verknüpfung zu erstellen)</string>
+    <string name="help_name_mandatory">(PFLICHT)</string>
+    <string name="help_name_revert">Wiederherstellen</string>
+    <string name="help_name_revert_button">Wiederherstellen / Standard wiederherstellen</string>
+
+    <string name="section_advanced">Erweitert</string>
+</resources>

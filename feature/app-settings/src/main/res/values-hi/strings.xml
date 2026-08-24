@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Hindi. Machine translation, reviewed for consistency of terminology. -->
+    <string name="app_settings_disabled">कृपया कम से कम एक सेटिंग चालू करें</string>
+    <string name="empty_app_settings_list">कोई सेटिंग नहीं मिली</string>
+    <string name="geto_settings">IMD</string>
+    <string name="apply_success">सेटिंग्स छिपा/बंद कर दी गईं</string>
+    <string name="apply_failure">सेटिंग्स लागू नहीं हो सकीं</string>
+    <string name="revert_failure">सेटिंग्स वापस नहीं लाई जा सकीं</string>
+    <string name="revert_success">सेटिंग्स वापस ले आई गईं</string>
+    <string name="add_your_first_settings">अपनी पहली सेटिंग जोड़ें</string>
+    <string name="add_app_setting">ऐप सेटिंग जोड़ें</string>
+    <string name="setting_label">सेटिंग का नाम</string>
+    <string name="setting_key">सेटिंग की (key)</string>
+    <string name="setting_value_on_launch">लॉन्च के समय का मान</string>
+    <string name="setting_value_on_revert">वापस लाने पर का मान</string>
+    <string name="templates">टेम्पलेट</string>
+    <string name="add_shortcut">शॉर्टकट जोड़ें</string>
+    <string name="update_shortcut">शॉर्टकट अपडेट करें</string>
+    <string name="short_label">छोटा नाम</string>
+    <string name="long_label">पूरा नाम</string>
+    <string name="short_label_is_blank">छोटा नाम खाली है</string>
+    <string name="long_label_is_blank">पूरा नाम खाली है</string>
+    <string name="setting_label_is_blank">सेटिंग का नाम खाली है</string>
+    <string name="setting_key_is_blank">सेटिंग की (key) खाली है</string>
+    <string name="setting_key_not_found">सेटिंग की (key) नहीं मिली</string>
+    <string name="setting_value_on_launch_is_blank">लॉन्च के समय का मान खाली है</string>
+    <string name="setting_value_on_revert_is_blank">वापस लाने पर का मान खाली है</string>
+    <string name="settings_has_invalid_values">सेटिंग्स में अमान्य मान हैं</string>
+    <string name="shortcut_update_immutable_shortcuts">अपरिवर्तनीय शॉर्टकट अपडेट नहीं किए जा सकते</string>
+    <string name="shortcut_update_failed">शॉर्टकट अपडेट नहीं हो सका</string>
+    <string name="shortcut_update_success">शॉर्टकट अपडेट हो गया</string>
+    <string name="supported_launcher">आपका मौजूदा लॉन्चर शॉर्टकट का समर्थन करता है</string>
+    <string name="unsupported_launcher">आपका मौजूदा लॉन्चर शॉर्टकट का समर्थन नहीं करता</string>
+    <string name="no_settings_found">कोई सेटिंग नहीं मिली</string>
+    <string name="permission">अनुमति</string>
+    <string name="app_setting_already_exists">यह ऐप सेटिंग पहले से मौजूद है</string>
+    <string name="app_setting_added_successfully">ऐप सेटिंग जुड़ गई</string>
+    <string name="no_permission">कृपया ADB के ज़रिए WRITE_SECURE_SETTINGS अनुमति दें</string>
+    <string name="write_secure_settings_message">Write Secure Settings अनुमति देने के लिए नीचे दी गई कमांड कॉपी करके ADB में चलाएँ</string>
+    <string name="add_to_favourites">पसंदीदा में जोड़ें</string>
+    <string name="remove_from_favourites">पसंदीदा से हटाएँ</string>
+    <string name="action_revert">वापस लाएँ</string>
+    <string name="action_app_setting">ऐप सेटिंग</string>
+    <string name="action_create_shortcut">शॉर्टकट बनाएँ</string>
+    <string name="action_setting_template">सेटिंग टेम्पलेट</string>
+</resources>

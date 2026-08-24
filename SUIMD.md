@@ -26,7 +26,73 @@ installed and used on his own phone before release. Anything under **Broke** was
 way unless it says otherwise - this list is what testing turned up, not a list of things
 that shipped broken.
 
-Newest first.
+Newest first. Every release gets an entry here, including the ones that only change
+documentation.
+
+### v1.6.7 - 24 August 2026 · versionCode 12
+
+**Changed**
+
+- **The notification's action names its mechanism.** Under the memory function it reads
+  *Revert using memory*; under Revert to default it already read *Revert to default*. Which
+  notification gets posted follows the notification function, so that label was the only
+  thing on screen saying which of the two was about to run, and they do different things:
+  one restores what this app changed for this app, the other drives the whole device to the
+  configured state.
+- The *Revert to default configuration* dialog's description now names the button it means,
+  rather than saying "revert button".
+- **All ten languages are translated**, for testing. 296 strings across seven modules in each
+  of Brazilian Portuguese, Spanish, Simplified Chinese, French, German, Russian, Hindi,
+  Arabic, Korean and Japanese, every one of them checked by `tools/check_translations.py`
+  for name parity, surviving format specifiers and intact bolding pairs.
+- The **UI** settings section is now **User interface**, in all eleven languages. It is named
+  in two places - the section heading and the first-run screen's subtitle - and both had to
+  move together, or the app would send people to a heading that does not exist.
+
+### v1.6.6 - 24 August 2026 · versionCode 11
+
+**Changed**
+
+- **The default Settings to unhide on Revert is now Accessibility services alone.** Every
+  other target in that list is a debugging surface - developer settings, USB debugging,
+  wireless debugging, and the Shizuku service that rides on one of them. A Revert can be
+  fired from a Quick Settings tile or a notification with nothing on screen, so the old
+  default could re-open a device at a moment its owner was not watching. Accessibility
+  services stay on because the app switched them off itself and leaving them off silently
+  breaks a screen reader.
+- **Installs upgrading into this version are reset to that default, once, and told.** A
+  notice names the setting and the exact path to reconfigure it. A default changing quietly
+  underneath somebody is worse than the original default was.
+- **The services manager gained an information button** beside its title, explaining the two
+  things people most often misread: that it shows live state and decides nothing about what
+  launching an app hides, and that switching developer options off is a flag rather than an
+  undo - animation scales, a mock location app and the rest stay as they were set. Shown
+  automatically the first time the manager is opened, and on request after that.
+- **Settings to hide gained a fourth note**, in red: keep Shizuku's watchdog service off.
+  The watchdog restarts the service on its own, and starting the service turns ADB back on,
+  so settings the dialog has just hidden come back mid-session with nobody touching the
+  device. That is precisely the state a locked-down app is looking for.
+- The help page's second card now describes the narrowed default.
+
+### v1.6.5 - 24 August 2026 · versionCode 10
+
+**Changed**
+
+- **Ten languages, in testing**: Brazilian Portuguese, Spanish, Simplified Chinese, French,
+  German, Russian, Hindi, Arabic, Korean and Japanese. Machine translated, and the app says
+  so in both places the language can be chosen. English is the fallback for any system
+  language not on the list.
+- **The Theme section of Settings is now UI**, and holds Theme and Language. The picker
+  lists System / automatic first, then each language written in its own script - somebody
+  stuck in a language they cannot read is exactly who opens that dialog.
+- **A language step now comes first on a new install**, ahead of the permissions screen,
+  because every screen after it is instructions.
+- On Android 13 and up the choice is handed to the platform, so it also appears in Android's
+  own per-app language screen. Below 13 every context is wrapped by hand.
+
+**Broke, then fixed**
+
+- Nothing on device yet; this version was cut for testing the switch.
 
 ### v1.6.1 - 23 August 2026 · versionCode 9
 

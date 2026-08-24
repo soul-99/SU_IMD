@@ -18,14 +18,16 @@
  */
 package com.android.geto.activity.revert
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.android.geto.broadcastreceiver.RevertToDefaultRunner
+import com.android.geto.common.AppLocale
 import com.android.geto.common.ApplicationScope
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * "Revert to default" with no UI at all: it runs, says so with a toast, and finishes.
@@ -41,6 +43,12 @@ import kotlinx.coroutines.launch
  */
 @AndroidEntryPoint
 class RevertActivity : ComponentActivity() {
+    // The chosen language, applied before anything reads a string. A no-op on Android 13
+    // and up, where the platform has already applied it to this context.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
 
     @Inject
     @ApplicationScope

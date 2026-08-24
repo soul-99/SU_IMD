@@ -19,11 +19,13 @@
 package com.android.geto.activity.services
 
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
+import com.android.geto.common.AppLocale
 
 /**
  * The Quick Settings tile.
@@ -37,6 +39,12 @@ import androidx.annotation.RequiresApi
  */
 @RequiresApi(Build.VERSION_CODES.N)
 class ServicesTileService : TileService() {
+    // The chosen language, applied before anything reads a string. A no-op on Android 13
+    // and up, where the platform has already applied it to this context.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
     override fun onStartListening() {
         super.onStartListening()
 

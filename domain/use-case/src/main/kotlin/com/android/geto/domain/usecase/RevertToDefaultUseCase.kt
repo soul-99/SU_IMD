@@ -23,12 +23,12 @@ import com.android.geto.domain.common.dispatcher.GetoDispatchers
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.RevertToDefaultResult
 import com.android.geto.domain.repository.UserDataRepository
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Wireless and USB debugging do not come back the instant the Global flag is written; adbd

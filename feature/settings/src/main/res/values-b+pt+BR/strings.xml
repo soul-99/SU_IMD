@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Brazilian Portuguese. Machine translation, reviewed for consistency of terminology.
+
+      Two things in here are load-bearing rather than cosmetic:
+
+      * The help page's menu paths have to name screens exactly as those screens are
+        named in this file. A path pointing at a heading that does not exist in Brazilian
+        Portuguese is worse than one left in English.
+      * The short strings used for bolding (help_name_*, notif_name_*,
+        settings_to_hide_name_shizuku_hide) are matched as substrings inside the longer
+        strings they highlight. Word them differently in the two places and the bolding
+        silently does nothing.
+    -->
+    <string name="settings">Configurações</string>
+    <string name="dynamic_theme">Tema dinâmico</string>
+    <string name="cancel">Cancelar</string>
+    <string name="change">Alterar</string>
+    <string name="close">Fechar</string>
+    <string name="theme">Tema</string>
+    <string name="available_on_android_12">Disponível no Android 12 +</string>
+    <string name="follow_system">Seguir o sistema</string>
+    <string name="light">Claro</string>
+    <string name="dark">Escuro</string>
+    <string name="start_service">Iniciar serviço</string>
+    <string name="stop_service">Parar serviço</string>
+    <string name="settings_observer_service">Serviço Observador de configurações</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">Configuração do Shizuku</string>
+    <string name="restart_shizuku_service">Reiniciar o serviço do Shizuku</string>
+    <string name="restart_shizuku_service_description">Ao reverter a Depuração USB pela notificação (somente na função de memória), iniciar o serviço do Shizuku automaticamente.</string>
+    <string name="shizuku_needs">Requer</string>
+    <string name="shizuku_forks_suffix">/ outros forks do Shizuku compatíveis com intents de início de serviço (o RikkaApps e seus forks diretos não são compatíveis com o intent de início de serviço).</string>
+    <string name="shizuku_fork_mode_thedjchi">Forks do Shizuku baseados no thedjchi</string>
+    <string name="shizuku_fork_mode_other">Shevery / outros forks do Shizuku</string>
+    <string name="shizuku_choose_app">Escolha um app instalado</string>
+    <string name="shizuku_fill_advanced">Preencha primeiro a seção Configuração do Shizuku</string>
+    <string name="show_value">Mostrar</string>
+    <string name="hide_value">Ocultar</string>
+    <string name="shizuku_view_intents_hint">Vá ao app Shizuku &gt; view intents para copiar os valores</string>
+    <string name="shizuku_other_fork_hint">Se os valores padrão não funcionarem, procure no app do seu fork do Shizuku ou no repositório dele para obter o valor do intent de início</string>
+    <string name="shizuku_start_action">Intent de início do serviço (action)</string>
+    <string name="shizuku_package_name">Nome do pacote</string>
+    <string name="shizuku_auth_key">Chave de autenticação (extras &gt; auth:)</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_services">Serviços de acessibilidade a ocultar</string>
+    <string name="accessibility_services_dialog_description">Estes serviços são desativados quando uma configuração de app oculta os serviços de acessibilidade, e reativados quando você reverte. Só são restaurados os que este app desativou.</string>
+    <string name="accessibility_services_none_selected">Nenhum selecionado. %1$d ativados neste dispositivo no momento.</string>
+    <string name="accessibility_services_selected">%1$d selecionados, %2$d ativados neste dispositivo no momento.</string>
+    <string name="accessibility_service_enabled">Ativado · %1$s</string>
+    <string name="accessibility_service_disabled">Desativado · %1$s</string>
+    <string name="no_accessibility_services">Nenhum serviço de acessibilidade está instalado neste dispositivo.</string>
+
+    <!-- About -->
+    <string name="about">Sobre</string>
+    <string name="about_version">Versão %1$s</string>
+    <string name="about_check_releases">Abrir a página de releases do GitHub para ver atualizações</string>
+    <string name="about_add_to_obtainium">Adicionar ao Obtainium</string>
+    <string name="about_obtainium_note">(para acompanhar atualizações / atualizar o app automaticamente)</string>
+    <string name="about_created_by">App criado por</string>
+    <string name="about_view_github">Ver no GitHub</string>
+    <string name="about_fork_of">Fork do</string>
+    <string name="about_geto_app">app Geto</string>
+
+    <string name="long_live_foss">Vida longa ao software livre e de código aberto!</string>
+
+    <!-- suIMD: collapsible section headers -->
+    <string name="section_ui">Interface do usuário</string>
+    <string name="language">Idioma</string>
+    <string name="section_app_functions">Configurações padrão do IMD</string>
+
+    <!-- suIMD: notification function -->
+    <string name="notification_function">Função de notificação</string>
+    <string name="notification_function_memory">Função de memória</string>
+    <string name="notification_function_memory_option">Função de memória (método antigo)</string>
+    <string name="notification_function_memory_summary">Uma notificação para cada abertura de app</string>
+    <string name="notification_function_memory_detail">salva o estado anterior das configurações do dispositivo antes de desativar as configurações definidas para aquele app, e restaura apenas aquelas que o IMD desativou</string>
+    <string name="notification_function_memory_warning_config">Você vai precisar definir manualmente quais configurações ocultar para cada app, tocando e segurando o ícone do app na aba Todos os apps ou Favoritos.</string>
+    <string name="notification_function_memory_warning_revert">Somente o botão Reverter das notificações usa a função de memória; todas as outras formas de reverter (bloco das Configurações rápidas, botão dentro do app... etc) continuam voltando para as Configurações a reexibir ao Reverter definidas nas configurações do app IMD.</string>
+    <string name="notification_function_memory_note">A função de memória permite ocultar outras configurações além das 4 configurações padrão do app IMD</string>
+    <string name="notif_name_all_apps">Todos os apps</string>
+    <string name="notif_name_favourites">Favoritos</string>
+    <string name="notif_name_revert_button">Reverter</string>
+    <string name="notification_function_revert">Reverter para o padrão</string>
+    <string name="notification_function_revert_option">Reverter para o padrão (Recomendado)</string>
+    <string name="notification_function_revert_summary">Apenas uma notificação</string>
+    <string name="notification_function_revert_detail">devolve as configurações do dispositivo às Configurações a reexibir ao Reverter definidas nas configurações do IMD</string>
+    <string name="save">Salvar</string>
+
+    <!-- suIMD: revert to default configuration -->
+    <string name="revert_defaults">Configuração de Reverter para o padrão</string>
+    <string name="revert_defaults_entry">Configurações a reexibir ao Reverter</string>
+    <string name="revert_defaults_notice_title">Aviso</string>
+    <string name="revert_defaults_notice_body">Por motivos de segurança, o padrão de Configurações a reexibir ao Reverter foi redefinido. Configure-o de novo em:</string>
+    <string name="revert_defaults_notice_dismiss">Entendido</string>
+    <string name="revert_defaults_description">Estas configurações são reexibidas/reativadas quando você toca no botão \'Reverter para o padrão\' em qualquer lugar.</string>
+    <string name="revert_defaults_summary">%1$d de %2$d ativadas</string>
+
+    <string name="settings_to_hide">Configurações a ocultar</string>
+    <string name="settings_to_hide_title">Configurações a ocultar/ desativar</string>
+    <string name="settings_to_hide_description">Estas configurações são ocultadas quando você abre um app.</string>
+    <string name="settings_to_hide_summary">%1$d de %2$d ativadas</string>
+    <string name="settings_to_hide_usb_note">parar a Depuração USB também encerra o serviço do Shizuku (se estiver em execução); configure as opções do Shizuku no app IMD para reiniciar o serviço do Shizuku depois de Reverter</string>
+    <string name="settings_to_hide_info_per_app">Se você quiser ocultar configurações diferentes para cada app, use a função de memória em Configurações do IMD &gt; Avançado &gt; Função de notificação</string>
+    <string name="settings_to_hide_info_all">Ocultar apenas as opções do desenvolvedor não desliga a Depuração USB nem a Depuração por Wi-Fi, e alguns apps ainda podem detectar isso como opções do desenvolvedor ativadas, por isso é recomendável selecionar as três</string>
+    <string name="settings_to_hide_info_shizuku">para ocultar o Shizuku dos apps, use a função Ocultar o Shizuku de outros apps dentro do próprio app Shizuku.</string>
+    <string name="settings_to_hide_name_shizuku_hide">Ocultar o Shizuku de outros apps</string>
+    <string name="settings_to_hide_info_watchdog">É recomendável manter o serviço watchdog do Shizuku desligado, porque, se o Shizuku reiniciar em segundo plano, ele também vai ativar o ADB enquanto as configurações estão ocultas, e os seus apps podem detectar isso.</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">serviço watchdog do Shizuku</string>
+    <string name="revert_defaults_developer_settings">Opções do desenvolvedor</string>
+    <string name="revert_defaults_usb_debugging">Depuração USB</string>
+    <string name="revert_defaults_wireless_debugging">Depuração por Wi-Fi</string>
+    <string name="revert_defaults_accessibility_services">Serviços de acessibilidade</string>
+    <string name="revert_defaults_accessibility_note">somente os serviços selecionados nas configurações do app IMD são gerenciados</string>
+    <string name="revert_defaults_shizuku">Serviço do Shizuku</string>
+    <string name="revert_defaults_shizuku_note">Dependendo do método que o Shizuku usa para iniciar o serviço, ele vai reativar a Depuração USB ou a Depuração por Wi-Fi, de que também precisa para manter o serviço do Shizuku em execução</string>
+
+    <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
+    <string name="help_button">Ajuda (readme)</string>
+    <string name="help_close">Fechar</string>
+    <string name="help_title">Como configurar este app (não pule)</string>
+    <string name="help_intro">Estas são as coisas que você precisa configurar por conta própria.</string>
+    <string name="help_again">Acesse esta página de novo em -</string>
+    <string name="help_numbered_title">%1$d.  %2$s</string>
+    <string name="help_path_help">Configurações do IMD → Sobre → Ajuda (readme)</string>
+    <string name="help_path_hide">Configurações do IMD → Configurações padrão do IMD → Configurações a ocultar</string>
+    <string name="help_path_unhide">Configurações do IMD → Configurações padrão do IMD → Configurações a reexibir ao Reverter</string>
+    <string name="help_path_accessibility">Configurações do IMD → Configurações padrão do IMD → Serviços de acessibilidade a ocultar</string>
+    <string name="help_path_shizuku">Configurações do IMD → Configuração do Shizuku</string>
+    <string name="help_hide_title">Defina quais configurações ocultar (OBRIGATÓRIO)</string>
+    <string name="help_hide_body">por padrão todas as configurações são ocultadas (recomendado), mas você pode personalizar isso como preferir.</string>
+    <string name="help_revert_title">Defina quais configurações reexibir ao Reverter (RECOMENDADO)</string>
+    <string name="help_revert_body">por padrão só Serviços de acessibilidade vem ativado, porque todo o resto dessa lista é uma configuração de depuração e reativá-las automaticamente é um risco de segurança. Você pode personalizar isso como preferir.</string>
+    <string name="help_accessibility_title">Escolha os Serviços de acessibilidade a ocultar</string>
+    <string name="help_accessibility_body">O app não mexe em nenhum serviço de acessibilidade até você dizer em quais; então marque os que devem ficar desativados enquanto um app restrito estiver aberto. Eles são reativados quando você reverte.</string>
+    <string name="help_shizuku_title">Configure os intents de início do Shizuku (só se você usa o Shizuku)</string>
+    <string name="help_shizuku_body">Se você usa o serviço do Shizuku, sempre que o IMD desativar as configurações de depuração ele vai encerrar o serviço do Shizuku, por isso é recomendável configurar &amp; verificar os intents de início do Shizuku.</string>
+    <string name="help_general_title">Informações gerais</string>
+    <string name="help_general_how_title">COMO USAR O IMD</string>
+    <string name="help_general_launch">1. Para usar os apps bloqueados, você precisa abri-los pelo app IMD ou por atalhos criados pelo IMD na tela inicial.</string>
+    <string name="help_general_shortcuts">2. Neste app você pode criar atalhos direto na sua tela inicial, tocando e segurando o nome de um app na aba Todos os apps ou Favoritos.</string>
+    <string name="help_general_revert">3. Quando terminar de usar o seu app, use o botão Reverter / Reverter para o padrão para reexibir/reativar as suas configurações anteriores.</string>
+    <string name="help_general_revert_places">Você pode usar o botão de reverter nestes lugares:</string>
+    <string name="help_general_revert_items">•  nas notificações depois de abrir o app\n•  no bloco das Configurações rápidas do Android\n•  na aba Favoritos\n•  no atalho da tela inicial (toque e segure o ícone do IMD para criar o atalho)</string>
+    <string name="help_general_manager_title">GERENCIADOR DE SERVIÇOS DO IMD</string>
+    <string name="help_general_manager">Use este gerenciador de serviços para ver rapidamente o estado ao vivo das suas configurações/serviços e também para ligá-los e desligá-los rapidamente.</string>
+    <string name="help_general_manager_places">Você pode abrir o Gerenciador de serviços do IMD nestes lugares:</string>
+    <string name="help_general_manager_items">•  no bloco das Configurações rápidas do Android\n•  na aba Favoritos\n•  no atalho da tela inicial (toque e segure o ícone do IMD para criar o atalho)</string>
+    <string name="help_name_mandatory">(OBRIGATÓRIO)</string>
+    <string name="help_name_revert">Reverter</string>
+    <string name="help_name_revert_button">Reverter / Reverter para o padrão</string>
+
+    <string name="section_advanced">Avançado</string>
+</resources>

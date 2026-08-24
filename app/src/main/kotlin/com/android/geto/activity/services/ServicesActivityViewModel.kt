@@ -23,9 +23,9 @@ import androidx.lifecycle.viewModelScope
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.repository.UserDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 /**
  * Only the theme. Everything else this screen needs belongs to the manager itself.

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Japanese. Machine translation, reviewed for consistency of terminology. -->
+    <string name="search">検索</string>
+    <string name="sort">並べ替え</string>
+    <string name="name">名前</string>
+    <string name="update_time">更新</string>
+    <string name="install_time">インストール</string>
+    <string name="ascending">昇順</string>
+    <string name="descending">降順</string>
+    <string name="show_system">システムを表示</string>
+    <string name="show_system_applications">システムアプリを表示</string>
+
+    <!-- Favourites -->
+    <string name="add_to_favourites">お気に入りに追加</string>
+    <string name="remove_from_favourites">お気に入りから削除</string>
+    <string name="favourite_apps_options">お気に入りのオプション</string>
+    <string name="no_favourite_apps">お気に入りはまだありません</string>
+    <string name="no_matching_favourite_apps">その検索に一致するお気に入りはありません</string>
+    <string name="no_favourite_apps_subtitle">「すべてのアプリ」でアプリの横にある星、またはそのアプリの設定画面にある星をタップしてください。</string>
+    <string name="view">表示</string>
+    <string name="custom">カスタム</string>
+    <string name="alphabetical">名前順</string>
+    <string name="list">リスト</string>
+    <string name="grid">グリッド</string>
+    <string name="reorder">お気に入りを並べ替え</string>
+    <string name="reorder_favourites">お気に入りを並べ替え</string>
+    <string name="move_up">上へ移動</string>
+    <string name="move_down">下へ移動</string>
+    <string name="close">閉じる</string>
+
+    <string name="applied_settings_title">IMD</string>
+    <string name="applied_settings_success">設定を非表示 / 無効にしました</string>
+    <string name="settings_manager_configure_revert">「元に戻す」で復元する内容を指定</string>
+    <string name="settings_manager_accessibility_unmanaged">現在、IMD アプリが管理しているユーザー補助サービスはありません</string>
+    <string name="applied_settings_failure">設定を適用できませんでした</string>
+    <string name="applied_settings_invalid">このアプリの設定に無効な値があります</string>
+    <string name="settings_manager_title">IMD サービスマネージャー</string>
+
+    <!-- settings_manager_title and the two _name_ strings below are matched as substrings
+         inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_info">このダイアログについて</string>
+    <string name="settings_manager_info_live">IMD サービスマネージャーは、設定とサービスの現在の状態を表示します。IMD や IMD で作成したアプリのショートカットからアプリを開いたときに、どの設定やサービスを非表示または再表示するかを決めるものではありません。</string>
+    <string name="settings_manager_info_live_extra">IMD からアプリを起動したときに何を非表示にし、何を再表示するかを決めるには、IMD アプリ内でデフォルト IMD 設定を指定してください。</string>
+    <string name="settings_manager_info_name_defaults">デフォルト IMD 設定</string>
+    <string name="settings_manager_info_developer">IMD から開発者向けオプションをオフにしても、開発者向けオプションのフラグがオン・オフされるだけで、開発者向けオプション内で行った変更（アニメーションスケールの設定、仮の現在地アプリなど）はリセットされません。</string>
+    <string name="settings_manager_info_developer_extra">開発者向けオプションをリセットするには、開発者向けオプションのページを開き、そこからオフにしてください。</string>
+    <string name="settings_manager_info_name_reset">開発者向けオプションをリセット</string>
+    <string name="revert_to_default">デフォルトに戻す</string>
+    <string name="not_configured_title">非表示にする設定がありません。このアプリで非表示にする設定を指定する必要があります。</string>
+    <string name="not_configured_message">IMD アプリでこのアプリを長押しすると、非表示にする設定を選べます。</string>
+    <string name="got_it">わかりました</string>
+    <string name="settings_manager_open">%1$s を開く</string>
+    <string name="settings_manager_accessibility_note">管理されるのは IMD アプリの設定で選択したサービスだけです</string>
+    <string name="settings_manager_enable_developer_options">先に開発者向けオプションを有効にしてください</string>
+    <string name="settings_manager_cannot_open">このデバイスではその画面を開けませんでした</string>
+    <string name="settings_manager_no_shizuku">Shizuku アプリが見つかりません。設定でパッケージ名を指定してください</string>
+    <string name="ok">OK</string>
+    <string name="shizuku_help_title">Shizuku サービスを利用できません</string>
+    <string name="shizuku_help_bullet">%1$d.</string>
+    <string name="shizuku_help_point_setup">Shizuku アプリがインストールされ、ADB に登録されていること、そして IMD アプリの設定ページで正しく指定されていることを確認してください。</string>
+    <string name="shizuku_help_point_permission">IMD アプリの Shizuku 権限は、特権的な Android 権限 WRITE_SECURE_SETTINGS を一度付与するためだけに使われます。Shizuku サービスの状態を調べたり、Shizuku サービスをオン・オフしたりするためには使われません。</string>
+    <string name="shizuku_help_point_restart">正しく設定できたら、IMD アプリを再起動してもう一度お試しください。</string>
+    <string name="settings_manager_shizuku_wait">Shizuku のフォークによってはインテントでのサービス開始に時間がかかるため、10 秒ほどお待ちください</string>
+    <string name="revert_developer_settings">開発者向けオプション</string>
+    <string name="revert_usb_debugging">USB デバッグ</string>
+    <string name="revert_wireless_debugging">ワイヤレス デバッグ</string>
+    <string name="revert_accessibility">ユーザー補助サービス</string>
+    <string name="revert_shizuku">Shizuku サービス</string>
+    <string name="applied_settings_no_permission">先に WRITE_SECURE_SETTINGS を付与してください。セットアップ画面をご覧ください</string>
+    <string name="settings_manager_shizuku_failed">前回の試行では Shizuku サービスを開始できませんでした。Shizuku アプリの設定と、IMD 側の Shizuku の構成を確認してください</string>
+    <string name="settings_manager_shizuku_failed_open">Shizuku サービスが開始しなかった理由</string>
+    <string name="understood">了解しました</string>
+</resources>

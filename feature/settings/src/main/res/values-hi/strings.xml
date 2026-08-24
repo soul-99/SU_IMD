@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Hindi. Machine translation, reviewed for consistency of terminology.
+
+      Two things in here are load-bearing rather than cosmetic:
+
+      * The help page's menu paths have to name screens exactly as those screens are
+        named in this file. A path pointing at a heading that does not exist in Hindi is
+        worse than one left in English.
+      * The short strings used for bolding (help_name_*, notif_name_*,
+        settings_to_hide_name_shizuku_hide) are matched as substrings inside the longer
+        strings they highlight. Word them differently in the two places and the bolding
+        silently does nothing.
+    -->
+    <string name="settings">सेटिंग्स</string>
+    <string name="dynamic_theme">डायनैमिक थीम</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="change">बदलें</string>
+    <string name="close">बंद करें</string>
+    <string name="theme">थीम</string>
+    <string name="available_on_android_12">Android 12+ पर उपलब्ध</string>
+    <string name="follow_system">सिस्टम के अनुसार</string>
+    <string name="light">हल्की</string>
+    <string name="dark">गहरी</string>
+    <string name="start_service">सेवा शुरू करें</string>
+    <string name="stop_service">सेवा बंद करें</string>
+    <string name="settings_observer_service">सेटिंग्स ऑब्ज़र्वर सेवा</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">Shizuku कॉन्फ़िगरेशन</string>
+    <string name="restart_shizuku_service">Shizuku सेवा पुनः चालू करें</string>
+    <string name="restart_shizuku_service_description">नोटिफ़िकेशन से USB डीबगिंग वापस लाने पर (केवल मेमोरी फ़ंक्शन में), Shizuku सेवा अपने आप शुरू करें।</string>
+    <string name="shizuku_needs">ज़रूरत</string>
+    <string name="shizuku_forks_suffix">/ Shizuku के अन्य फ़ोर्क जो स्टार्ट सर्विस इंटेंट का समर्थन करते हैं (RikkaApps और उसके सीधे फ़ोर्क सर्विस स्टार्ट इंटेंट का समर्थन नहीं करते)।</string>
+    <string name="shizuku_fork_mode_thedjchi">Shizuku के thedjchi आधारित फ़ोर्क</string>
+    <string name="shizuku_fork_mode_other">Shevery / Shizuku के अन्य फ़ोर्क</string>
+    <string name="shizuku_choose_app">कोई इंस्टॉल किया हुआ ऐप चुनें</string>
+    <string name="shizuku_fill_advanced">कृपया पहले Shizuku कॉन्फ़िगरेशन अनुभाग भरें</string>
+    <string name="show_value">दिखाएँ</string>
+    <string name="hide_value">छिपाएँ</string>
+    <string name="shizuku_view_intents_hint">मान कॉपी करने के लिए Shizuku ऐप &gt; view intents में जाएँ</string>
+    <string name="shizuku_other_fork_hint">अगर डिफ़ॉल्ट मान काम न करें, तो स्टार्ट इंटेंट का मान पाने के लिए अपने Shizuku फ़ोर्क ऐप में या उसके रिपॉज़िटरी में खोजें</string>
+    <string name="shizuku_start_action">सर्विस स्टार्ट इंटेंट (action)</string>
+    <string name="shizuku_package_name">पैकेज नाम</string>
+    <string name="shizuku_auth_key">प्रमाणीकरण कुंजी (extras &gt; auth:)</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_services">छिपाई जाने वाली एक्सेसिबिलिटी सेवाएँ</string>
+    <string name="accessibility_services_dialog_description">जब कोई ऐप सेटिंग एक्सेसिबिलिटी सेवाओं को छिपाती है तब ये सेवाएँ बंद कर दी जाती हैं, और वापस लाने पर फिर चालू कर दी जाती हैं। सिर्फ़ वही सेवाएँ वापस चालू होती हैं जिन्हें इस ऐप ने बंद किया था।</string>
+    <string name="accessibility_services_none_selected">कोई नहीं चुनी गई। इस डिवाइस पर अभी %1$d चालू हैं।</string>
+    <string name="accessibility_services_selected">%1$d चुनी गईं, इस डिवाइस पर अभी %2$d चालू हैं।</string>
+    <string name="accessibility_service_enabled">चालू · %1$s</string>
+    <string name="accessibility_service_disabled">बंद · %1$s</string>
+    <string name="no_accessibility_services">इस डिवाइस पर कोई एक्सेसिबिलिटी सेवा इंस्टॉल नहीं है।</string>
+
+    <!-- About -->
+    <string name="about">परिचय</string>
+    <string name="about_version">संस्करण %1$s</string>
+    <string name="about_check_releases">अपडेट देखने के लिए GitHub रिलीज़ पेज खोलें</string>
+    <string name="about_add_to_obtainium">Obtainium में जोड़ें</string>
+    <string name="about_obtainium_note">(अपडेट पर नज़र रखने / ऐप को अपने आप अपडेट करने के लिए)</string>
+    <string name="about_created_by">ऐप बनाया</string>
+    <string name="about_view_github">GitHub देखें</string>
+    <string name="about_fork_of">फ़ोर्क है</string>
+    <string name="about_geto_app">Geto ऐप का</string>
+
+    <string name="long_live_foss">मुक्त और ओपन सोर्स सॉफ़्टवेयर अमर रहे!</string>
+
+    <!-- suIMD: collapsible section headers -->
+    <string name="section_ui">यूज़र इंटरफ़ेस</string>
+    <string name="language">भाषा</string>
+    <string name="section_app_functions">डिफ़ॉल्ट IMD सेटिंग्स</string>
+
+    <!-- suIMD: notification function -->
+    <string name="notification_function">नोटिफ़िकेशन फ़ंक्शन</string>
+    <string name="notification_function_memory">मेमोरी फ़ंक्शन</string>
+    <string name="notification_function_memory_option">मेमोरी फ़ंक्शन (पुराना तरीक़ा)</string>
+    <string name="notification_function_memory_summary">हर अलग ऐप लॉन्च के लिए अलग नोटिफ़िकेशन</string>
+    <string name="notification_function_memory_detail">उस ऐप के लिए तय की गई डिवाइस सेटिंग्स बंद करने से पहले उनकी पिछली स्थिति सहेजता है, और सिर्फ़ उन्हीं को वापस लाता है जिन्हें IMD ने बंद किया था</string>
+    <string name="notification_function_memory_warning_config">आपको हर ऐप के लिए यह अलग-अलग तय करना होगा कि कौन-सी सेटिंग्स छिपानी हैं, सभी ऐप या पसंदीदा टैब में उस ऐप के आइकॉन को देर तक दबाकर।</string>
+    <string name="notification_function_memory_warning_revert">सिर्फ़ नोटिफ़िकेशन का वापस लाएँ बटन मेमोरी फ़ंक्शन का उपयोग करेगा; बाक़ी सभी तरीक़े (क्विक सेटिंग टाइल, ऐप के अंदर का बटन… आदि) IMD ऐप सेटिंग्स की वापस लाने पर दिखाई जाने वाली सेटिंग्स के अनुसार ही वापस लाएँगे।</string>
+    <string name="notification_function_memory_note">मेमोरी फ़ंक्शन से आप IMD ऐप की डिफ़ॉल्ट 4 सेटिंग्स के अलावा और सेटिंग्स भी छिपा सकते हैं</string>
+    <string name="notif_name_all_apps">सभी ऐप</string>
+    <string name="notif_name_favourites">पसंदीदा</string>
+    <string name="notif_name_revert_button">वापस लाएँ</string>
+    <string name="notification_function_revert">डिफ़ॉल्ट पर वापस लाएँ</string>
+    <string name="notification_function_revert_option">डिफ़ॉल्ट पर वापस लाएँ (अनुशंसित)</string>
+    <string name="notification_function_revert_summary">केवल एक नोटिफ़िकेशन</string>
+    <string name="notification_function_revert_detail">डिवाइस की सेटिंग्स को IMD सेटिंग्स में तय की गई वापस लाने पर दिखाई जाने वाली सेटिंग्स पर लौटा देता है</string>
+    <string name="save">सहेजें</string>
+
+    <!-- suIMD: revert to default configuration -->
+    <string name="revert_defaults">डिफ़ॉल्ट पर वापस लाने की कॉन्फ़िगरेशन</string>
+    <string name="revert_defaults_entry">वापस लाने पर दिखाई जाने वाली सेटिंग्स</string>
+    <string name="revert_defaults_notice_title">सूचना</string>
+    <string name="revert_defaults_notice_body">सुरक्षा कारणों से, डिफ़ॉल्ट वापस लाने पर दिखाई जाने वाली सेटिंग्स रीसेट कर दी गई हैं। कृपया उन्हें यहाँ से दोबारा सेट करें:</string>
+    <string name="revert_defaults_notice_dismiss">समझ गया</string>
+    <string name="revert_defaults_description">जब आप कहीं भी \'डिफ़ॉल्ट पर वापस लाएँ\' बटन दबाते हैं, तो ये सेटिंग्स फिर से दिखा/चालू कर दी जाती हैं।</string>
+    <string name="revert_defaults_summary">%2$d में से %1$d चालू</string>
+    <string name="settings_to_hide">छिपाई जाने वाली सेटिंग्स</string>
+    <string name="settings_to_hide_title">छिपाई / बंद की जाने वाली सेटिंग्स</string>
+    <string name="settings_to_hide_description">जब आप कोई ऐप खोलते हैं तब ये सेटिंग्स छिपा दी जाती हैं।</string>
+    <string name="settings_to_hide_summary">%2$d में से %1$d चालू</string>
+    <string name="settings_to_hide_usb_note">USB डीबगिंग बंद करने से Shizuku सेवा भी बंद हो जाएगी (अगर चल रही हो); वापस लाने के बाद Shizuku सेवा फिर शुरू करने के लिए कृपया IMD ऐप में Shizuku सेटिंग्स कॉन्फ़िगर करें</string>
+    <string name="settings_to_hide_info_per_app">अगर आप हर ऐप के लिए अलग-अलग सेटिंग्स छिपाना चाहते हैं, तो IMD सेटिंग्स &gt; उन्नत &gt; नोटिफ़िकेशन फ़ंक्शन में मेमोरी फ़ंक्शन चुनें</string>
+    <string name="settings_to_hide_info_all">सिर्फ़ डेवलपर सेटिंग्स छिपाने से USB और वायरलेस डीबगिंग बंद नहीं होतीं, और कुछ ऐप इसे भी डेवलपर सेटिंग्स चालू होना मान सकते हैं, इसलिए तीनों चुनने की सलाह दी जाती है</string>
+    <string name="settings_to_hide_info_shizuku">ऐप से Shizuku छिपाने के लिए Shizuku ऐप के अंदर मौजूद दूसरे ऐप से Shizuku छिपाएँ सुविधा का उपयोग करें।</string>
+    <string name="settings_to_hide_name_shizuku_hide">दूसरे ऐप से Shizuku छिपाएँ</string>
+    <string name="settings_to_hide_info_watchdog">सलाह दी जाती है कि Shizuku की वॉचडॉग सेवा बंद रखें, क्योंकि अगर Shizuku बैकग्राउंड में दोबारा चालू होता है तो वह ADB भी चालू कर देगा, जबकि सेटिंग्स छिपी हुई हैं, और तब आपके ऐप इसे पहचान सकते हैं।</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">Shizuku की वॉचडॉग सेवा</string>
+    <string name="revert_defaults_developer_settings">डेवलपर सेटिंग्स</string>
+    <string name="revert_defaults_usb_debugging">USB डीबगिंग</string>
+    <string name="revert_defaults_wireless_debugging">वायरलेस डीबगिंग</string>
+    <string name="revert_defaults_accessibility_services">एक्सेसिबिलिटी सेवाएँ</string>
+    <string name="revert_defaults_accessibility_note">केवल वही सेवाएँ नियंत्रित होती हैं जो IMD ऐप की सेटिंग्स में चुनी गई हैं</string>
+    <string name="revert_defaults_shizuku">Shizuku सेवा</string>
+    <string name="revert_defaults_shizuku_note">Shizuku सेवा शुरू करने के लिए जिस तरीक़े का उपयोग करता है, उसी के अनुसार वह USB डीबगिंग या वायरलेस डीबगिंग में से एक फिर चालू कर देगा, जिसकी उसे सेवा चलाते रहने के लिए भी ज़रूरत होती है</string>
+
+    <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
+    <string name="help_button">सहायता (readme)</string>
+    <string name="help_close">बंद करें</string>
+    <string name="help_title">इस ऐप को कैसे सेट करें (छोड़ें नहीं)</string>
+    <string name="help_intro">ये कुछ चीज़ें हैं जो आपको खुद सेट करनी होंगी।</string>
+    <string name="help_again">यह पेज दोबारा यहाँ मिलेगा -</string>
+    <string name="help_numbered_title">%1$d.  %2$s</string>
+    <string name="help_path_help">IMD सेटिंग्स → परिचय → सहायता (readme)</string>
+    <string name="help_path_hide">IMD सेटिंग्स → डिफ़ॉल्ट IMD सेटिंग्स → छिपाई जाने वाली सेटिंग्स</string>
+    <string name="help_path_unhide">IMD सेटिंग्स → डिफ़ॉल्ट IMD सेटिंग्स → वापस लाने पर दिखाई जाने वाली सेटिंग्स</string>
+    <string name="help_path_accessibility">IMD सेटिंग्स → डिफ़ॉल्ट IMD सेटिंग्स → छिपाई जाने वाली एक्सेसिबिलिटी सेवाएँ</string>
+    <string name="help_path_shizuku">IMD सेटिंग्स → Shizuku कॉन्फ़िगरेशन</string>
+    <string name="help_hide_title">तय करें कि कौन-सी सेटिंग्स छिपानी हैं (अनिवार्य)</string>
+    <string name="help_hide_body">डिफ़ॉल्ट रूप से सभी सेटिंग्स छिपाई जाती हैं (अनुशंसित), पर आप इसे अपनी पसंद के अनुसार बदल सकते हैं।</string>
+    <string name="help_revert_title">तय करें कि वापस लाएँ पर कौन-सी सेटिंग्स दिखानी हैं (अनुशंसित)</string>
+    <string name="help_revert_body">डिफ़ॉल्ट रूप से केवल एक्सेसिबिलिटी सेवाएँ चालू की जाती हैं, क्योंकि उस सूची में बाक़ी सब डीबगिंग सेटिंग्स हैं और उन्हें अपने आप वापस चालू करना सुरक्षा के लिहाज़ से जोखिम भरा है। आप इसे अपनी पसंद के अनुसार बदल सकते हैं।</string>
+    <string name="help_accessibility_title">छिपाई जाने वाली एक्सेसिबिलिटी सेवाएँ चुनें</string>
+    <string name="help_accessibility_body">जब तक आप बताएँगे नहीं, यह ऐप किसी भी एक्सेसिबिलिटी सेवा को नहीं छुएगा; फिर उन्हें चुनें जो किसी प्रतिबंधित ऐप के खुले रहने के दौरान बंद रहनी चाहिए। वापस लाने पर वे फिर चालू कर दी जाती हैं।</string>
+    <string name="help_shizuku_title">Shizuku स्टार्ट इंटेंट सेट करें (केवल अगर आप Shizuku का उपयोग करते हैं)</string>
+    <string name="help_shizuku_body">अगर आप Shizuku सेवा का उपयोग करते हैं, तो IMD जब भी डीबगिंग सेटिंग्स बंद करेगा तो Shizuku सेवा भी बंद हो जाएगी, इसलिए Shizuku स्टार्ट इंटेंट सेट करके जाँच लेने की सलाह दी जाती है।</string>
+    <string name="help_general_title">सामान्य जानकारी</string>
+    <string name="help_general_how_title">IMD का उपयोग कैसे करें</string>
+    <string name="help_general_launch">1. प्रतिबंधित ऐप का उपयोग करने के लिए आपको उन्हें या तो IMD ऐप के अंदर से खोलना होगा, या IMD से बनाए गए होम स्क्रीन शॉर्टकट से।</string>
+    <string name="help_general_shortcuts">2. इस ऐप में आप सभी ऐप या पसंदीदा टैब में किसी ऐप के नाम को देर तक दबाकर सीधे अपनी होम स्क्रीन पर शॉर्टकट बना सकते हैं।</string>
+    <string name="help_general_revert">3. अपना ऐप इस्तेमाल कर लेने के बाद, अपनी पिछली सेटिंग्स फिर से दिखाने/चालू करने के लिए वापस लाएँ / डिफ़ॉल्ट पर वापस लाएँ बटन का उपयोग करें।</string>
+    <string name="help_general_revert_places">वापस लाने वाला बटन आपको इन जगहों पर मिलेगा:</string>
+    <string name="help_general_revert_items">•  ऐप खोलने के बाद आने वाले नोटिफ़िकेशन में\n•  Android क्विक सेटिंग टॉगल में\n•  पसंदीदा टैब में\n•  होम स्क्रीन शॉर्टकट में (शॉर्टकट बनाने के लिए IMD आइकॉन को देर तक दबाएँ)</string>
+    <string name="help_general_manager_title">IMD सेवा प्रबंधक</string>
+    <string name="help_general_manager">इस सेवा प्रबंधक से आप अपनी सेटिंग्स/सेवाओं की मौजूदा स्थिति तुरंत देख सकते हैं और उन्हें तुरंत चालू-बंद भी कर सकते हैं।</string>
+    <string name="help_general_manager_places">IMD सेवा प्रबंधक आप इन जगहों से खोल सकते हैं:</string>
+    <string name="help_general_manager_items">•  Android क्विक सेटिंग टॉगल से\n•  पसंदीदा टैब से\n•  होम स्क्रीन शॉर्टकट से (शॉर्टकट बनाने के लिए IMD आइकॉन को देर तक दबाएँ)</string>
+    <string name="help_name_mandatory">(अनिवार्य)</string>
+    <string name="help_name_revert">वापस लाएँ</string>
+    <string name="help_name_revert_button">वापस लाएँ / डिफ़ॉल्ट पर वापस लाएँ</string>
+
+    <string name="section_advanced">उन्नत</string>
+</resources>

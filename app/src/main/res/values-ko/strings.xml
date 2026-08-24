@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Korean. Machine translation, reviewed for consistency of terminology.
+
+      Left untranslated on purpose: the app name, Shizuku and ADB (product names), the adb
+      command itself, and WRITE_SECURE_SETTINGS, which has to be typed exactly as written.
+
+      setup_use_shizuku is matched as a substring inside setup_secure_settings_shizuku, to
+      bold it. Word it differently in the two places and nothing is bolded, silently.
+    -->
+    <string name="app_name">IMD</string>
+    <string name="favourite_apps">즐겨찾기</string>
+    <string name="all_apps">모든 앱</string>
+    <string name="settings">설정</string>
+
+    <!-- First-run setup -->
+    <string name="setup_purpose">은행 앱처럼 제한이 걸린 앱을 열 때마다 개발자 옵션, USB 디버깅, 접근성 서비스를 직접 끄지 않아도 됩니다. 앱을 하나 고르고 그 앱이 실행되는 동안 무엇을 바꿀지 정해 두면, 사용을 마친 뒤에 모두 원래대로 되돌려 놓습니다.</string>
+    <string name="setup_step">%1$d단계</string>
+    <string name="setup_granted">허용됨</string>
+    <string name="setup_not_granted">허용되지 않음</string>
+    <string name="setup_secure_settings_title">보안 설정 접근 권한</string>
+    <string name="setup_secure_settings_why">Android는 일반 앱이 이 설정을 바꾸도록 허용하지 않습니다. 이 권한은 셸에서 한 번만 부여하면 되고 재부팅 후에도 유지되지만, 앱을 다시 설치하면 사라집니다.</string>
+    <string name="setup_copy_command">명령 복사</string>
+    <string name="setup_check_again">다시 확인</string>
+    <string name="setup_use_shizuku">Shizuku 사용</string>
+    <string name="services_shortcut_label">서비스 관리자</string>
+    <string name="revert_shortcut_label">기본값으로 되돌리기</string>
+    <string name="shortcut_not_configured_title">이 앱에 설정된 항목이 없습니다</string>
+    <string name="shortcut_not_configured_message">먼저 이 앱에서 숨길 설정을 지정해야 합니다. IMD → 모든 앱 → 앱 이름 누르기 → 설정 템플릿 → 숨길 설정 선택 순서로 이동하세요.</string>
+    <string name="shortcut_not_configured_dismiss">알겠습니다</string>
+    <string name="obtainium_title">이 앱을 최신 상태로 유지하기</string>
+    <string name="obtainium_body">이 앱은 완전히 오프라인으로 동작하므로, 업데이트 확인과 설치는 Obtainium을 사용해 GitHub 릴리스에서 직접 진행하세요.</string>
+    <string name="obtainium_do_not_show_again">다시 표시하지 않기</string>
+    <string name="obtainium_add">Obtainium에 추가</string>
+    <string name="tip">팁</string>
+    <string name="tip_got_it">알겠습니다</string>
+    <string name="tip_developer_options">Shizuku를 사용하려고 개발자 옵션을 켜 둘 필요는 없으므로 꺼 두어도 됩니다. Shizuku는 서비스를 시작할 때 자체 WRITE_SECURE_SETTINGS 권한을 사용해, 개발자 설정을 켜지 않고도 USB 디버깅을 스스로 켭니다.</string>
+    <string name="setup_shizuku_working">Shizuku에 요청하는 중…</string>
+    <string name="setup_shizuku_granted">Shizuku를 통해 권한을 부여했습니다.</string>
+    <string name="setup_shizuku_not_running">Shizuku 서비스를 찾을 수 없습니다. Shizuku를 시작한 뒤 다시 시도하세요.</string>
+    <string name="setup_shizuku_denied">Shizuku가 요청을 거부했습니다. Shizuku에서 이 앱을 허용한 뒤 다시 시도하세요. “거부하고 다시 묻지 않음”을 선택했다면 먼저 Shizuku의 앱 목록에서 해당 항목을 지우세요.</string>
+    <string name="setup_shizuku_failed">Shizuku가 명령을 실행하지 못했습니다. 대신 ADB 명령을 사용하세요.</string>
+    <string name="setup_shizuku_once">참고: Shizuku는 이 권한을 한 번 부여할 때에만 필요합니다. 권한은 재부팅 후에도 유지되므로 그 뒤에는 Shizuku를 중지하거나 삭제해도 됩니다. 다만 설정에 있는 선택 기능인 “Shizuku 서비스 다시 시작”을 사용하려면 나중에 다시 필요합니다.</string>
+    <string name="setup_shizuku_once_extra">Shizuku를 설정하려고 디버깅과 개발자 설정을 켰다면 이제 꺼도 됩니다. 설정을 마친 뒤에는 이 앱에 둘 다 필요하지 않습니다.</string>
+    <string name="setup_secure_settings_adb">PC가 있을 때: USB 디버깅 켜기 → ADB 셸 터미널이 실행 중인 PC에 휴대전화 연결 → 위 명령 실행.</string>
+    <string name="setup_secure_settings_shizuku">PC 없이 (권장):\n1. Shizuku 앱을 설치하고 설정한 뒤 Shizuku 서비스를 시작합니다\n2. 위의 Shizuku 사용 버튼을 누릅니다\n3. 요청이 표시되면 허용을 누릅니다.</string>
+    <string name="setup_notifications_title">알림</string>
+    <string name="setup_notifications_why">설정이 적용될 때마다 되돌리기 동작이 들어 있는 진행 중인 알림이 표시됩니다. 기기를 원래대로 되돌릴 때 이 알림을 사용합니다. 설정을 되돌릴 때 빠른 설정 타일이나 홈 화면 바로가기를 사용하기로 했다면, 나중에 이 앱의 알림을 모두 꺼도 됩니다.</string>
+    <string name="setup_allow_notifications">허용</string>
+    <string name="setup_open_settings">설정 열기</string>
+    <string name="setup_notifications_denied_hint">이미 두 번 거부했나요? 그러면 Android가 더 이상 요청을 표시하지 않으므로 대신 “설정 열기”를 사용하세요.</string>
+    <string name="setup_next">다음</string>
+    <string name="setup_back">뒤로</string>
+    <string name="setup_finish">시작하기</string>
+
+    <!-- suIMD: the language step, shown once, ahead of the permissions screen -->
+    <string name="language_setup_title">언어 선택</string>
+    <string name="language_setup_subtitle">나중에 설정 → 사용자 인터페이스에서 변경할 수 있습니다.</string>
+    <string name="language_setup_continue">계속</string>
+    <string name="setup_blocked">두 단계 모두 필요합니다. 이 단계를 마치지 않으면 이 앱은 설정을 하나도 바꾸거나 되돌릴 수 없습니다.</string>
+    <string name="setup_copied">복사했습니다</string>
+    <string name="setup_open_settings_failed">이 기기에서는 설정을 열 수 없습니다</string>
+</resources>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Russian. Machine translation, reviewed for consistency of terminology. -->
+    <string name="app_settings_disabled">Включите хотя бы одну настройку</string>
+    <string name="empty_app_settings_list">Настройки не найдены</string>
+    <string name="geto_settings">IMD</string>
+    <string name="apply_success">Настройки скрыты/отключены</string>
+    <string name="apply_failure">Не удалось применить настройки</string>
+    <string name="revert_failure">Не удалось вернуть настройки</string>
+    <string name="revert_success">Настройки возвращены</string>
+    <string name="add_your_first_settings">Добавьте первую настройку</string>
+    <string name="add_app_setting">Добавить настройку приложения</string>
+    <string name="setting_label">Название настройки</string>
+    <string name="setting_key">Ключ настройки</string>
+    <string name="setting_value_on_launch">Значение при запуске</string>
+    <string name="setting_value_on_revert">Значение при возврате</string>
+    <string name="templates">Шаблоны</string>
+    <string name="add_shortcut">Добавить ярлык</string>
+    <string name="update_shortcut">Обновить ярлык</string>
+    <string name="short_label">Короткое название</string>
+    <string name="long_label">Полное название</string>
+    <string name="short_label_is_blank">Короткое название не заполнено</string>
+    <string name="long_label_is_blank">Полное название не заполнено</string>
+    <string name="setting_label_is_blank">Название настройки не заполнено</string>
+    <string name="setting_key_is_blank">Ключ настройки не заполнен</string>
+    <string name="setting_key_not_found">Ключ настройки не найден</string>
+    <string name="setting_value_on_launch_is_blank">Значение при запуске не заполнено</string>
+    <string name="setting_value_on_revert_is_blank">Значение при возврате не заполнено</string>
+    <string name="settings_has_invalid_values">В настройках есть недопустимые значения</string>
+    <string name="shortcut_update_immutable_shortcuts">Неизменяемые ярлыки нельзя обновить</string>
+    <string name="shortcut_update_failed">Не удалось обновить ярлык</string>
+    <string name="shortcut_update_success">Ярлык обновлён</string>
+    <string name="supported_launcher">Текущий лаунчер поддерживает ярлыки</string>
+    <string name="unsupported_launcher">Текущий лаунчер не поддерживает ярлыки</string>
+    <string name="no_settings_found">Настройки не найдены</string>
+    <string name="permission">Разрешение</string>
+    <string name="app_setting_already_exists">Такая настройка приложения уже есть</string>
+    <string name="app_setting_added_successfully">Настройка приложения добавлена</string>
+    <string name="no_permission">Выдайте разрешение WRITE_SECURE_SETTINGS через ADB</string>
+    <string name="write_secure_settings_message">Скопируйте команду ниже и выполните её через ADB, чтобы выдать разрешение Write Secure Settings</string>
+    <string name="add_to_favourites">Добавить в избранное</string>
+    <string name="remove_from_favourites">Убрать из избранного</string>
+    <string name="action_revert">Вернуть</string>
+    <string name="action_app_setting">Настройка приложения</string>
+    <string name="action_create_shortcut">Создать ярлык</string>
+    <string name="action_setting_template">Шаблон настроек</string>
+</resources>

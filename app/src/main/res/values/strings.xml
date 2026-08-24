@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">IMD</string>
-    <string name="app_full_form">SU IMD — Shut up! it’s my device</string>
+    <string name="app_full_form" translatable="false">SU IMD — Shut up! it’s my device</string>
     <string name="favourite_apps">Favourites</string>
     <string name="all_apps">All Apps</string>
     <string name="settings">Settings</string>
@@ -13,7 +13,7 @@
     <string name="setup_not_granted">Not granted</string>
     <string name="setup_secure_settings_title">Secure settings access</string>
     <string name="setup_secure_settings_why">Android will not let any normal app change these settings. The permission is granted once from a shell and survives reboots — but not a reinstall.</string>
-    <string name="setup_adb_command">adb shell pm grant %1$s android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="setup_adb_command" translatable="false">adb shell pm grant %1$s android.permission.WRITE_SECURE_SETTINGS</string>
     <string name="setup_copy_command">Copy command</string>
     <string name="setup_check_again">Check again</string>
     <string name="setup_use_shizuku">Use Shizuku</string>
@@ -46,6 +46,11 @@
     <string name="setup_next">Next</string>
     <string name="setup_back">Back</string>
     <string name="setup_finish">Get started</string>
+
+    <!-- suIMD: the language step, shown once, ahead of the permissions screen -->
+    <string name="language_setup_title">Choose your language</string>
+    <string name="language_setup_subtitle">You can change this later in Settings under User interface.</string>
+    <string name="language_setup_continue">Continue</string>
     <string name="setup_blocked">Both steps are required. The app cannot change or restore a single setting without them.</string>
     <string name="setup_copied">Copied</string>
     <string name="setup_open_settings_failed">Could not open settings on this device</string>

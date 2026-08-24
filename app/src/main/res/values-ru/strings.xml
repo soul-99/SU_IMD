@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Russian. Machine translation, reviewed for consistency of terminology.
+
+      Left untranslated on purpose: the app name, Shizuku and ADB (product names), the adb
+      command itself, and WRITE_SECURE_SETTINGS, which has to be typed exactly as written.
+
+      setup_use_shizuku is matched as a substring inside setup_secure_settings_shizuku to
+      bold it, so the button name is quoted there in the nominative rather than declined.
+    -->
+    <string name="app_name">IMD</string>
+    <string name="favourite_apps">Избранное</string>
+    <string name="all_apps">Все приложения</string>
+    <string name="settings">Настройки</string>
+
+    <!-- First-run setup -->
+    <string name="setup_purpose">Открывайте банковские и другие защищённые приложения, не отключая каждый раз вручную параметры разработчика, отладку по USB или службы специальных возможностей. Выберите приложение, укажите, что менять на время его работы, и после выхода всё вернётся на место.</string>
+    <string name="setup_step">Шаг %1$d</string>
+    <string name="setup_granted">Предоставлено</string>
+    <string name="setup_not_granted">Не предоставлено</string>
+    <string name="setup_secure_settings_title">Доступ к защищённым настройкам</string>
+    <string name="setup_secure_settings_why">Android не разрешает обычным приложениям менять эти настройки. Разрешение выдаётся один раз из командной строки и сохраняется после перезагрузок, но не после переустановки.</string>
+    <string name="setup_copy_command">Скопировать команду</string>
+    <string name="setup_check_again">Проверить снова</string>
+    <string name="setup_use_shizuku">Использовать Shizuku</string>
+    <string name="services_shortcut_label">Диспетчер служб</string>
+    <string name="revert_shortcut_label">Вернуть по умолчанию</string>
+    <string name="shortcut_not_configured_title">Для этого приложения ничего не настроено</string>
+    <string name="shortcut_not_configured_message">Сначала нужно указать, какие настройки скрывать для этого приложения: IMD → Все приложения → нажмите на название приложения → Шаблон настроек → выберите, какие настройки скрывать.</string>
+    <string name="shortcut_not_configured_dismiss">Понятно</string>
+    <string name="obtainium_title">Как обновлять это приложение</string>
+    <string name="obtainium_body">Приложение полностью работает офлайн, поэтому проверяйте обновления и устанавливайте их прямо из релизов GitHub через Obtainium.</string>
+    <string name="obtainium_do_not_show_again">Больше не показывать</string>
+    <string name="obtainium_add">Добавить в Obtainium</string>
+    <string name="tip">Совет</string>
+    <string name="tip_got_it">Понятно</string>
+    <string name="tip_developer_options">Для Shizuku не нужно держать параметры разработчика включёнными, их можно оставить выключенными. Запуская свою службу, Shizuku сам включает отладку по USB, не включая параметры разработчика, с помощью собственного разрешения WRITE_SECURE_SETTINGS.</string>
+    <string name="setup_shizuku_working">Запрос к Shizuku…</string>
+    <string name="setup_shizuku_granted">Разрешение выдано через Shizuku.</string>
+    <string name="setup_shizuku_not_running">Служба Shizuku не найдена. Запустите Shizuku и повторите попытку.</string>
+    <string name="setup_shizuku_denied">Shizuku отказал. Разрешите доступ этому приложению в Shizuku и повторите попытку. Если вы выбрали «Запретить и больше не спрашивать», сначала удалите приложение из списка в Shizuku.</string>
+    <string name="setup_shizuku_failed">Shizuku не смог выполнить команду. Воспользуйтесь командой ADB.</string>
+    <string name="setup_shizuku_once">Примечание: Shizuku нужен только для этой единственной выдачи разрешения. Разрешение сохраняется после перезагрузок, поэтому потом Shizuku можно остановить или удалить, если только вам не нужна дополнительная функция «Перезапуск службы Shizuku» в настройках, которая использует его позже ещё раз.</string>
+    <string name="setup_shizuku_once_extra">Если вы включали отладку и параметры разработчика ради настройки Shizuku, их тоже можно выключить: после успешной настройки приложению не нужно ни то, ни другое.</string>
+    <string name="setup_secure_settings_adb">С компьютером: включите отладку по USB → подключите телефон к компьютеру с терминалом ADB shell → выполните команду выше.</string>
+    <string name="setup_secure_settings_shizuku">Без компьютера (рекомендуется):\n1. Установите и настройте приложение Shizuku, запустите службу Shizuku\n2. Нажмите кнопку «Использовать Shizuku» выше\n3. Нажмите «Разрешить», когда появится запрос.</string>
+    <string name="setup_notifications_title">Уведомления</string>
+    <string name="setup_notifications_why">Каждый раз при применении настроек появляется постоянное уведомление с кнопкой «Вернуть». Именно через него вы возвращаете устройство в прежнее состояние. Позже все уведомления этого приложения можно отключить, если для возврата настроек вы будете пользоваться плитками быстрых настроек или ярлыками на главном экране.</string>
+    <string name="setup_allow_notifications">Разрешить</string>
+    <string name="setup_open_settings">Открыть настройки</string>
+    <string name="setup_notifications_denied_hint">Уже отказали дважды? Android больше не показывает запрос, поэтому воспользуйтесь кнопкой «Открыть настройки».</string>
+    <string name="setup_next">Далее</string>
+    <string name="setup_back">Назад</string>
+    <string name="setup_finish">Начать</string>
+
+    <!-- suIMD: the language step, shown once, ahead of the permissions screen -->
+    <string name="language_setup_title">Выберите язык</string>
+    <string name="language_setup_subtitle">Это можно изменить позже в разделе Настройки → Интерфейс пользователя.</string>
+    <string name="language_setup_continue">Продолжить</string>
+    <string name="setup_blocked">Оба шага обязательны. Без них приложение не сможет ни изменить, ни восстановить ни одной настройки.</string>
+    <string name="setup_copied">Скопировано</string>
+    <string name="setup_open_settings_failed">Не удалось открыть настройки на этом устройстве</string>
+</resources>

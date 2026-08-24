@@ -23,6 +23,10 @@
     <string name="secure">Secure</string>
     <string name="global">Global</string>
 
+    <!-- suIMD: language selection, shown both in settings and on the first-run screen -->
+    <string name="language_system">System / automatic</string>
+    <string name="language_ai_notice">Languages other than English were generated using AI assisted machine translation, so might contain errors. Users are recommended to flag translation errors to the developer in the GitHub issue tracker if you want rectification.</string>
+
     <string name="revert_to_default_toast">Revert to default</string>
     <string name="revert_from_memory_toast">Revert from memory</string>
 </resources>

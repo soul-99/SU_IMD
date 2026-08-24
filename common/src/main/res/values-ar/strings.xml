@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Arabic. Machine translation, reviewed for consistency of terminology.
+
+      Left in English on purpose: "System", "Secure" and "Global" name Android's three
+      settings tables, and a translated label would no longer match what the platform, its
+      documentation or any adb command calls them. Shizuku is a product name.
+
+      Right to left, so two conventions run through every Arabic file here: menu paths are
+      written with ← rather than →, since the reader moves that way, and digits stay Western
+      (0-9) to match what the format specifiers substitute in.
+    -->
+    <string name="add">إضافة</string>
+    <string name="update">تحديث</string>
+    <string name="cancel">إلغاء</string>
+    <string name="system">System</string>
+    <string name="secure">Secure</string>
+    <string name="global">Global</string>
+
+    <string name="language_system">النظام / تلقائي</string>
+    <string name="language_ai_notice">أُنشئت اللغات غير الإنجليزية بترجمة آلية بمساعدة الذكاء الاصطناعي، لذا قد تحتوي على أخطاء. وإذا رغبت في تصحيحها، يُنصح بالإبلاغ عن أخطاء الترجمة إلى المطوّر عبر متتبّع المشكلات في GitHub.</string>
+
+    <string name="revert_to_default_toast">استعادة الوضع الافتراضي</string>
+    <string name="revert_from_memory_toast">استعادة من الذاكرة</string>
+</resources>

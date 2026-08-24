@@ -17,6 +17,7 @@
  */
 package com.android.geto.activity.shortcut
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,10 +25,11 @@ import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.android.geto.broadcastreceiver.postAppliedSettingsNotification
+import com.android.geto.common.AppLocale
 import com.android.geto.designsystem.theme.GetoTheme
 import com.android.geto.domain.framework.ShortcutManagerCompatWrapper
 import com.android.geto.domain.model.AppSettingsResult
@@ -41,6 +43,12 @@ import com.android.geto.feature.appsettings.R as appSettingsR
 
 @AndroidEntryPoint
 class ShortcutActivity : ComponentActivity() {
+    // The chosen language, applied before anything reads a string. A no-op on Android 13
+    // and up, where the platform has already applied it to this context.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
     @Inject
     lateinit var androidNotificationManagerWrapper: AndroidNotificationManagerWrapper
 

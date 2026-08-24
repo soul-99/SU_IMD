@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Russian. Machine translation, reviewed for consistency of terminology.
+
+      Two things in here are load-bearing rather than cosmetic:
+
+      * The help page's menu paths have to name screens exactly as those screens are
+        named in this file. A path pointing at a heading that does not exist in Russian is
+        worse than one left in English.
+      * The short strings used for bolding (help_name_*, notif_name_*,
+        settings_to_hide_name_shizuku_hide) are matched as substrings inside the longer
+        strings they highlight. Word them differently in the two places and the bolding
+        silently does nothing. Russian case endings make this easy to break, so each of
+        those phrases is quoted in the nominative inside the longer sentence rather than
+        declined into it.
+
+      No em dashes, at the author's request: a colon, a comma or a plain hyphen instead.
+    -->
+    <string name="settings">Настройки</string>
+    <string name="dynamic_theme">Динамическая тема</string>
+    <string name="cancel">Отмена</string>
+    <string name="change">Изменить</string>
+    <string name="close">Закрыть</string>
+    <string name="theme">Тема</string>
+    <string name="available_on_android_12">Доступно на Android 12 +</string>
+    <string name="follow_system">Как в системе</string>
+    <string name="light">Светлая</string>
+    <string name="dark">Тёмная</string>
+    <string name="start_service">Запустить службу</string>
+    <string name="stop_service">Остановить службу</string>
+    <string name="settings_observer_service">Служба наблюдателя настроек</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">Конфигурация Shizuku</string>
+    <string name="restart_shizuku_service">Перезапуск службы Shizuku</string>
+    <string name="restart_shizuku_service_description">При возврате отладки по USB из уведомления (только в функции памяти) автоматически запускать службу Shizuku.</string>
+    <string name="shizuku_needs">Требуется</string>
+    <string name="shizuku_forks_suffix">/ другие форки Shizuku, поддерживающие intent запуска службы (RikkaApps и его прямые форки intent запуска службы не поддерживают).</string>
+    <string name="shizuku_fork_mode_thedjchi">Форки Shizuku на основе thedjchi</string>
+    <string name="shizuku_fork_mode_other">Shevery / другие форки Shizuku</string>
+    <string name="shizuku_choose_app">Выберите установленное приложение</string>
+    <string name="shizuku_fill_advanced">Сначала заполните раздел «Конфигурация Shizuku»</string>
+    <string name="show_value">Показать</string>
+    <string name="hide_value">Скрыть</string>
+    <string name="shizuku_view_intents_hint">Откройте приложение Shizuku &gt; view intents, чтобы скопировать значения</string>
+    <string name="shizuku_other_fork_hint">Если значения по умолчанию не работают, поищите значение intent запуска в самом форке Shizuku или в его репозитории</string>
+    <string name="shizuku_start_action">Intent запуска службы (action)</string>
+    <string name="shizuku_package_name">Имя пакета</string>
+    <string name="shizuku_auth_key">Ключ аутентификации (extras &gt; auth:)</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_services">Скрываемые службы специальных возможностей</string>
+    <string name="accessibility_services_dialog_description">Эти службы отключаются, когда настройка приложения скрывает специальные возможности, и снова включаются при возврате. Восстанавливаются только те, которые отключило это приложение.</string>
+    <string name="accessibility_services_none_selected">Ничего не выбрано. Сейчас на устройстве включено: %1$d.</string>
+    <string name="accessibility_services_selected">Выбрано: %1$d, сейчас на устройстве включено: %2$d.</string>
+    <string name="accessibility_service_enabled">Включено · %1$s</string>
+    <string name="accessibility_service_disabled">Отключено · %1$s</string>
+    <string name="no_accessibility_services">На этом устройстве не установлено ни одной службы специальных возможностей.</string>
+
+    <!-- About -->
+    <string name="about">О приложении</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_check_releases">Открыть страницу релизов GitHub, чтобы проверить обновления</string>
+    <string name="about_add_to_obtainium">Добавить в Obtainium</string>
+    <string name="about_obtainium_note">(для отслеживания обновлений / автообновления приложения)</string>
+    <string name="about_created_by">Автор приложения</string>
+    <string name="about_view_github">Открыть GitHub</string>
+    <string name="about_fork_of">Форк приложения</string>
+    <string name="about_geto_app">Geto</string>
+
+    <string name="long_live_foss">Да здравствует свободное программное обеспечение с открытым исходным кодом!</string>
+
+    <!-- suIMD: collapsible section headers -->
+    <string name="section_ui">Интерфейс пользователя</string>
+    <string name="language">Язык</string>
+    <string name="section_app_functions">Стандартные настройки IMD</string>
+
+    <!-- suIMD: notification function -->
+    <string name="notification_function">Функция уведомлений</string>
+    <string name="notification_function_memory">Функция памяти</string>
+    <string name="notification_function_memory_option">Функция памяти (старый способ)</string>
+    <string name="notification_function_memory_summary">Отдельное уведомление на каждый запуск приложения</string>
+    <string name="notification_function_memory_detail">сохраняет прежнее состояние настроек устройства перед тем, как отключить настройки, заданные для этого приложения, и восстанавливает только те из них, которые отключил IMD</string>
+    <string name="notification_function_memory_warning_config">Для каждого приложения придётся вручную задавать, какие настройки скрывать: нажмите и удерживайте значок приложения на вкладке «Все приложения» или «Избранное».</string>
+    <string name="notification_function_memory_warning_revert">Функцию памяти использует только кнопка «Вернуть» в уведомлениях; все остальные способы возврата (плитка быстрых настроек, кнопка в приложении… и т. д.) по-прежнему возвращают устройство к списку «Возвращаемые настройки» из настроек приложения IMD.</string>
+    <string name="notification_function_memory_note">Функция памяти позволяет скрывать и другие настройки, помимо четырёх стандартных настроек приложения IMD</string>
+    <string name="notif_name_all_apps">Все приложения</string>
+    <string name="notif_name_favourites">Избранное</string>
+    <string name="notif_name_revert_button">Вернуть</string>
+    <string name="notification_function_revert">Вернуть по умолчанию</string>
+    <string name="notification_function_revert_option">Вернуть по умолчанию (рекомендуется)</string>
+    <string name="notification_function_revert_summary">Только одно уведомление</string>
+    <string name="notification_function_revert_detail">возвращает настройки устройства к списку «Возвращаемые настройки», заданному в настройках IMD</string>
+    <string name="save">Сохранить</string>
+
+    <!-- suIMD: revert to default configuration -->
+    <string name="revert_defaults">Настройка возврата по умолчанию</string>
+    <string name="revert_defaults_entry">Возвращаемые настройки</string>
+    <string name="revert_defaults_notice_title">Внимание</string>
+    <string name="revert_defaults_notice_body">По соображениям безопасности стандартный список «Возвращаемые настройки» был сброшен. Задайте его заново здесь:</string>
+    <string name="revert_defaults_notice_dismiss">Понятно</string>
+    <string name="revert_defaults_description">Эти настройки снова показываются и включаются, когда вы нажимаете кнопку «Вернуть по умолчанию» в любом месте приложения.</string>
+    <string name="revert_defaults_summary">Включено %1$d из %2$d</string>
+
+    <string name="settings_to_hide">Скрываемые настройки</string>
+    <string name="settings_to_hide_title">Скрываемые / отключаемые настройки</string>
+    <string name="settings_to_hide_description">Эти настройки скрываются при запуске приложения.</string>
+    <string name="settings_to_hide_summary">Включено %1$d из %2$d</string>
+    <string name="settings_to_hide_usb_note">отключение отладки по USB также остановит службу Shizuku (если она запущена); чтобы после возврата служба Shizuku запускалась снова, настройте параметры Shizuku в приложении IMD</string>
+    <string name="settings_to_hide_info_per_app">Если вы хотите скрывать разные настройки для разных приложений, включите функцию памяти в разделе Настройки IMD &gt; Дополнительно &gt; Функция уведомлений</string>
+    <string name="settings_to_hide_info_all">Если скрыть только параметры разработчика, отладка по USB и беспроводная отладка не отключатся, и некоторые приложения всё равно могут счесть, что параметры разработчика включены, поэтому рекомендуется выбрать все три пункта</string>
+    <string name="settings_to_hide_info_shizuku">чтобы скрыть Shizuku от приложений, воспользуйтесь функцией «Скрыть Shizuku от других приложений» в самом приложении Shizuku.</string>
+    <string name="settings_to_hide_name_shizuku_hide">Скрыть Shizuku от других приложений</string>
+    <string name="settings_to_hide_info_watchdog">Рекомендуется, чтобы сторожевая служба Shizuku была выключена: если Shizuku перезапустится в фоне, он заодно включит ADB в тот момент, когда настройки скрыты, и ваши приложения смогут это заметить.</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">сторожевая служба Shizuku</string>
+    <string name="revert_defaults_developer_settings">Параметры разработчика</string>
+    <string name="revert_defaults_usb_debugging">Отладка по USB</string>
+    <string name="revert_defaults_wireless_debugging">Беспроводная отладка</string>
+    <string name="revert_defaults_accessibility_services">Службы специальных возможностей</string>
+    <string name="revert_defaults_accessibility_note">управляются только те службы, которые выбраны в настройках приложения IMD</string>
+    <string name="revert_defaults_shizuku">Служба Shizuku</string>
+    <string name="revert_defaults_shizuku_note">В зависимости от того, каким способом Shizuku запускает службу, он снова включит либо отладку по USB, либо беспроводную отладку: они же нужны ему, чтобы служба Shizuku продолжала работать</string>
+
+    <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
+    <string name="help_button">Справка (readme)</string>
+    <string name="help_close">Закрыть</string>
+    <string name="help_title">Как настроить это приложение (не пропускайте)</string>
+    <string name="help_intro">Вот что нужно настроить самостоятельно.</string>
+    <string name="help_again">Открыть эту страницу снова -</string>
+    <string name="help_numbered_title">%1$d.  %2$s</string>
+    <string name="help_path_help">Настройки IMD → О приложении → Справка (readme)</string>
+    <string name="help_path_hide">Настройки IMD → Стандартные настройки IMD → Скрываемые настройки</string>
+    <string name="help_path_unhide">Настройки IMD → Стандартные настройки IMD → Возвращаемые настройки</string>
+    <string name="help_path_accessibility">Настройки IMD → Стандартные настройки IMD → Скрываемые службы специальных возможностей</string>
+    <string name="help_path_shizuku">Настройки IMD → Конфигурация Shizuku</string>
+    <string name="help_hide_title">Задайте, какие настройки скрывать (ОБЯЗАТЕЛЬНО)</string>
+    <string name="help_hide_body">по умолчанию скрываются все настройки (рекомендуется), но вы можете изменить это на своё усмотрение.</string>
+    <string name="help_revert_title">Задайте, какие настройки показывать при нажатии кнопки «Вернуть» (РЕКОМЕНДУЕТСЯ)</string>
+    <string name="help_revert_body">по умолчанию включены только службы специальных возможностей, потому что всё остальное в этом списке относится к отладке, а включать такие настройки обратно автоматически небезопасно. Вы можете изменить это на своё усмотрение.</string>
+    <string name="help_accessibility_title">Выберите скрываемые службы специальных возможностей</string>
+    <string name="help_accessibility_body">Пока вы не укажете конкретные службы, приложение не тронет ни одну службу специальных возможностей. Отметьте те, которые должны быть выключены, пока открыто защищённое приложение. При возврате они снова включаются.</string>
+    <string name="help_shizuku_title">Настройте intent запуска Shizuku (только если вы пользуетесь Shizuku)</string>
+    <string name="help_shizuku_body">Если вы пользуетесь службой Shizuku, то при каждом отключении настроек отладки IMD будет останавливать эту службу, поэтому рекомендуется настроить и проверить intent запуска Shizuku.</string>
+    <string name="help_general_title">Общая информация</string>
+    <string name="help_general_how_title">КАК ПОЛЬЗОВАТЬСЯ IMD</string>
+    <string name="help_general_launch">1. Чтобы пользоваться заблокированными приложениями, запускайте их либо из приложения IMD, либо через созданные в IMD ярлыки на главном экране.</string>
+    <string name="help_general_shortcuts">2. В этом приложении можно создавать ярлыки прямо на главном экране: нажмите и удерживайте название приложения на вкладке «Все приложения» или «Избранное».</string>
+    <string name="help_general_revert">3. Закончив работу с приложением, нажмите кнопку «Вернуть / Вернуть по умолчанию», чтобы снова показать и включить прежние настройки.</string>
+    <string name="help_general_revert_places">Кнопка возврата доступна в этих местах:</string>
+    <string name="help_general_revert_items">•  уведомление после запуска приложения\n•  плитка быстрых настроек Android\n•  вкладка «Избранное»\n•  ярлык на главном экране (нажмите и удерживайте значок IMD, чтобы создать ярлык)</string>
+    <string name="help_general_manager_title">ДИСПЕТЧЕР СЛУЖБ IMD</string>
+    <string name="help_general_manager">С помощью диспетчера служб можно быстро посмотреть текущее состояние настроек и служб, а также быстро включить или выключить их.</string>
+    <string name="help_general_manager_places">Диспетчер служб IMD можно открыть в этих местах:</string>
+    <string name="help_general_manager_items">•  плитка быстрых настроек Android\n•  вкладка «Избранное»\n•  ярлык на главном экране (нажмите и удерживайте значок IMD, чтобы создать ярлык)</string>
+    <string name="help_name_mandatory">(ОБЯЗАТЕЛЬНО)</string>
+    <string name="help_name_revert">Вернуть</string>
+    <string name="help_name_revert_button">Вернуть / Вернуть по умолчанию</string>
+
+    <string name="section_advanced">Дополнительно</string>
+</resources>

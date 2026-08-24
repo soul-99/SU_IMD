@@ -24,12 +24,12 @@ import com.android.geto.domain.framework.PackageManagerWrapper
 import com.android.geto.domain.framework.ShizukuWrapper
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.repository.UserDataRepository
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * How long to keep asking whether Shizuku came up before calling it a failure.

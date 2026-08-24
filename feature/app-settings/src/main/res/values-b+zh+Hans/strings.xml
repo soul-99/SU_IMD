@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Simplified Chinese (zh-Hans). Machine translation, reviewed for consistency of
+         terminology. "Write Secure Settings" keeps its English name: it is the permission
+         as Android names it, and the adb command spells it the same way. -->
+    <string name="app_settings_disabled">请至少启用一项设置</string>
+    <string name="empty_app_settings_list">未找到任何设置</string>
+    <string name="geto_settings">IMD</string>
+    <string name="apply_success">设置已隐藏/停用</string>
+    <string name="apply_failure">设置应用失败</string>
+    <string name="revert_failure">设置还原失败</string>
+    <string name="revert_success">设置已还原</string>
+    <string name="add_your_first_settings">添加您的第一项设置</string>
+    <string name="add_app_setting">添加应用设置</string>
+    <string name="setting_label">设置名称</string>
+    <string name="setting_key">设置键名</string>
+    <string name="setting_value_on_launch">启动时的设置值</string>
+    <string name="setting_value_on_revert">还原时的设置值</string>
+    <string name="templates">模板</string>
+    <string name="add_shortcut">添加快捷方式</string>
+    <string name="update_shortcut">更新快捷方式</string>
+    <string name="short_label">短标签</string>
+    <string name="long_label">长标签</string>
+    <string name="short_label_is_blank">短标签为空</string>
+    <string name="long_label_is_blank">长标签为空</string>
+    <string name="setting_label_is_blank">设置名称为空</string>
+    <string name="setting_key_is_blank">设置键名为空</string>
+    <string name="setting_key_not_found">未找到该设置键名</string>
+    <string name="setting_value_on_launch_is_blank">启动时的设置值为空</string>
+    <string name="setting_value_on_revert_is_blank">还原时的设置值为空</string>
+    <string name="settings_has_invalid_values">设置中含有无效的值</string>
+    <string name="shortcut_update_immutable_shortcuts">无法更新不可变的快捷方式</string>
+    <string name="shortcut_update_failed">快捷方式更新失败</string>
+    <string name="shortcut_update_success">快捷方式更新成功</string>
+    <string name="supported_launcher">您当前的启动器支持快捷方式</string>
+    <string name="unsupported_launcher">您当前的启动器不支持快捷方式</string>
+    <string name="no_settings_found">未找到任何设置</string>
+    <string name="permission">权限</string>
+    <string name="app_setting_already_exists">该应用设置已存在</string>
+    <string name="app_setting_added_successfully">应用设置已添加</string>
+    <string name="no_permission">请通过 ADB 授予 WRITE_SECURE_SETTINGS 权限</string>
+    <string name="write_secure_settings_message">复制下面的命令并通过 ADB 运行，以授予 Write Secure Settings 权限</string>
+    <string name="add_to_favourites">添加到收藏</string>
+    <string name="remove_from_favourites">从收藏中移除</string>
+    <string name="action_revert">还原</string>
+    <string name="action_app_setting">应用设置</string>
+    <string name="action_create_shortcut">创建快捷方式</string>
+    <string name="action_setting_template">设置模板</string>
+</resources>

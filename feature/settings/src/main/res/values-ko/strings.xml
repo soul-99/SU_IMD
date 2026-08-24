@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Korean. Machine translation, reviewed for consistency of terminology.
+
+      Two things in here are load-bearing rather than cosmetic:
+
+      * The help page's menu paths have to name screens exactly as those screens are
+        named in this file. A path pointing at a heading that does not exist in Korean is
+        worse than one left in English.
+      * The short strings used for bolding (help_name_*, notif_name_*,
+        settings_to_hide_name_shizuku_hide) are matched as substrings inside the longer
+        strings they highlight. Word them differently in the two places and the bolding
+        silently does nothing. In Korean this means the particle goes after the phrase,
+        never inside it.
+    -->
+    <string name="settings">설정</string>
+    <string name="dynamic_theme">다이내믹 테마</string>
+    <string name="cancel">취소</string>
+    <string name="change">변경</string>
+    <string name="close">닫기</string>
+    <string name="theme">테마</string>
+    <string name="available_on_android_12">Android 12 이상에서 사용 가능</string>
+    <string name="follow_system">시스템 설정 따르기</string>
+    <string name="light">밝게</string>
+    <string name="dark">어둡게</string>
+    <string name="start_service">서비스 시작</string>
+    <string name="stop_service">서비스 중지</string>
+    <string name="settings_observer_service">설정 옵저버 서비스</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">Shizuku 구성</string>
+    <string name="restart_shizuku_service">Shizuku 서비스 다시 시작</string>
+    <string name="restart_shizuku_service_description">알림에서 USB 디버깅을 되돌릴 때(메모리 기능에서만) Shizuku 서비스를 자동으로 시작합니다.</string>
+    <string name="shizuku_needs">필요:</string>
+    <string name="shizuku_forks_suffix">/ 서비스 시작 인텐트를 지원하는 Shizuku의 기타 포크 (RikkaApps와 그 직계 포크는 서비스 시작 인텐트를 지원하지 않습니다).</string>
+    <string name="shizuku_fork_mode_thedjchi">Thedjchi 기반 Shizuku 포크</string>
+    <string name="shizuku_fork_mode_other">Shevery / 기타 Shizuku 포크</string>
+    <string name="shizuku_choose_app">설치된 앱 선택</string>
+    <string name="shizuku_fill_advanced">먼저 Shizuku 구성 섹션을 채워 주세요</string>
+    <string name="show_value">표시</string>
+    <string name="hide_value">숨기기</string>
+    <string name="shizuku_view_intents_hint">값을 복사하려면 Shizuku 앱 &gt; view intents로 이동하세요</string>
+    <string name="shizuku_other_fork_hint">기본값이 동작하지 않으면, 사용 중인 Shizuku 포크 앱이나 그 포크의 저장소에서 시작 인텐트 값을 찾아보세요</string>
+    <string name="shizuku_start_action">서비스 시작 인텐트 (action)</string>
+    <string name="shizuku_package_name">패키지 이름</string>
+    <string name="shizuku_auth_key">인증 키 (extras &gt; auth:)</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_services">숨길 접근성 서비스</string>
+    <string name="accessibility_services_dialog_description">앱 설정이 접근성 서비스를 숨길 때 이 서비스들이 꺼지고, 되돌릴 때 다시 켜집니다. 이 앱이 끈 서비스만 복원됩니다.</string>
+    <string name="accessibility_services_none_selected">선택된 항목이 없습니다. 이 기기에서 현재 %1$d개가 켜져 있습니다.</string>
+    <string name="accessibility_services_selected">%1$d개 선택됨, 이 기기에서 현재 %2$d개가 켜져 있습니다.</string>
+    <string name="accessibility_service_enabled">켜짐 · %1$s</string>
+    <string name="accessibility_service_disabled">꺼짐 · %1$s</string>
+    <string name="no_accessibility_services">이 기기에는 설치된 접근성 서비스가 없습니다.</string>
+
+    <!-- About -->
+    <string name="about">정보</string>
+    <string name="about_version">버전 %1$s</string>
+    <string name="about_check_releases">업데이트를 확인하려면 GitHub 릴리스 페이지 열기</string>
+    <string name="about_add_to_obtainium">Obtainium에 추가</string>
+    <string name="about_obtainium_note">(업데이트 추적 / 앱 자동 업데이트용)</string>
+    <string name="about_created_by">만든 사람:</string>
+    <string name="about_view_github">GitHub 보기</string>
+    <string name="about_fork_of">포크 원본:</string>
+    <string name="about_geto_app">Geto 앱</string>
+
+    <string name="long_live_foss">자유 오픈 소스 소프트웨어여 영원하라!</string>
+
+    <!-- suIMD: collapsible section headers -->
+    <string name="section_ui">사용자 인터페이스</string>
+    <string name="language">언어</string>
+    <string name="section_app_functions">기본 IMD 설정</string>
+
+    <!-- suIMD: notification function -->
+    <string name="notification_function">알림 기능</string>
+    <string name="notification_function_memory">메모리 기능</string>
+    <string name="notification_function_memory_option">메모리 기능 (이전 방식)</string>
+    <string name="notification_function_memory_summary">앱을 실행할 때마다 알림이 따로 표시됨</string>
+    <string name="notification_function_memory_detail">해당 앱에 지정된 기기 설정을 끄기 전에 이전 상태를 저장해 두고, IMD가 끈 항목만 복원합니다</string>
+    <string name="notification_function_memory_warning_config">모든 앱 또는 즐겨찾기 탭에서 앱 아이콘을 길게 눌러, 앱마다 숨길 설정을 직접 지정해야 합니다.</string>
+    <string name="notification_function_memory_warning_revert">알림의 되돌리기 버튼만 메모리 기능을 사용합니다. 나머지 되돌리기 방법(빠른 설정 타일, 앱 안의 버튼… 등)은 IMD 앱 설정에서 구성한 되돌리기 시 다시 표시할 설정에 따라 되돌립니다.</string>
+    <string name="notification_function_memory_note">메모리 기능을 사용하면 IMD 앱의 기본 4가지 설정 외에 다른 설정도 숨길 수 있습니다</string>
+    <string name="notif_name_all_apps">모든 앱</string>
+    <string name="notif_name_favourites">즐겨찾기</string>
+    <string name="notif_name_revert_button">되돌리기</string>
+    <string name="notification_function_revert">기본값으로 되돌리기</string>
+    <string name="notification_function_revert_option">기본값으로 되돌리기 (권장)</string>
+    <string name="notification_function_revert_summary">알림 하나만 표시됨</string>
+    <string name="notification_function_revert_detail">IMD 설정에서 구성한 되돌리기 시 다시 표시할 설정에 따라 기기 설정을 되돌립니다</string>
+    <string name="save">저장</string>
+
+    <!-- suIMD: revert to default configuration -->
+    <string name="revert_defaults">기본값으로 되돌리기 구성</string>
+    <string name="revert_defaults_entry">되돌리기 시 다시 표시할 설정</string>
+    <string name="revert_defaults_notice_title">안내</string>
+    <string name="revert_defaults_notice_body">보안상의 이유로 되돌리기 시 다시 표시할 설정의 기본값이 초기화되었습니다. 다음 위치에서 다시 구성해 주세요:</string>
+    <string name="revert_defaults_notice_dismiss">알겠습니다</string>
+    <string name="revert_defaults_description">어디에서든 \'기본값으로 되돌리기\' 버튼을 누르면 이 설정들이 다시 표시되거나 다시 켜집니다.</string>
+    <string name="revert_defaults_summary">%2$d개 중 %1$d개 켜짐</string>
+    <string name="settings_to_hide">숨길 설정</string>
+    <string name="settings_to_hide_title">숨기거나 끌 설정</string>
+    <string name="settings_to_hide_description">앱을 실행할 때 이 설정들이 숨겨집니다.</string>
+    <string name="settings_to_hide_summary">%2$d개 중 %1$d개 켜짐</string>
+    <string name="settings_to_hide_usb_note">USB 디버깅을 끄면 실행 중이던 Shizuku 서비스도 함께 종료됩니다. 되돌린 뒤 Shizuku 서비스를 다시 시작하려면 IMD 앱에서 Shizuku 설정을 구성해 주세요</string>
+    <string name="settings_to_hide_info_per_app">앱마다 서로 다른 설정을 숨기려면 IMD 설정 &gt; 고급 &gt; 알림 기능에서 메모리 기능을 사용하세요</string>
+    <string name="settings_to_hide_info_all">개발자 설정만 숨기면 USB 디버깅과 무선 디버깅은 꺼지지 않으며, 일부 앱은 이를 개발자 설정이 켜져 있는 상태로 감지할 수 있으므로 세 가지를 모두 선택하는 것을 권장합니다</string>
+    <string name="settings_to_hide_info_shizuku">앱에서 Shizuku를 숨기려면 Shizuku 앱 안에 있는 다른 앱에서 Shizuku 숨기기 기능을 사용하세요.</string>
+    <string name="settings_to_hide_name_shizuku_hide">다른 앱에서 Shizuku 숨기기</string>
+    <string name="settings_to_hide_info_watchdog">Shizuku의 워치독 서비스는 꺼 두는 것을 권장합니다. 설정이 숨겨진 상태에서 Shizuku가 백그라운드에서 다시 시작되면 ADB도 함께 켜지고, 앱이 이를 감지할 수 있기 때문입니다.</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">Shizuku의 워치독 서비스</string>
+    <string name="revert_defaults_developer_settings">개발자 설정</string>
+    <string name="revert_defaults_usb_debugging">USB 디버깅</string>
+    <string name="revert_defaults_wireless_debugging">무선 디버깅</string>
+    <string name="revert_defaults_accessibility_services">접근성 서비스</string>
+    <string name="revert_defaults_accessibility_note">IMD 앱 설정에서 선택한 서비스만 관리됩니다</string>
+    <string name="revert_defaults_shizuku">Shizuku 서비스</string>
+    <string name="revert_defaults_shizuku_note">Shizuku가 서비스를 시작하는 방식에 따라 USB 디버깅 또는 무선 디버깅 중 하나를 다시 켭니다. Shizuku 서비스를 계속 실행하려면 둘 중 하나가 필요하기 때문입니다</string>
+
+    <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
+    <string name="help_button">도움말 (readme)</string>
+    <string name="help_close">닫기</string>
+    <string name="help_title">이 앱을 설정하는 방법 (건너뛰지 마세요)</string>
+    <string name="help_intro">다음 항목은 직접 설정해야 합니다.</string>
+    <string name="help_again">이 페이지를 다시 열려면 -</string>
+    <string name="help_numbered_title">%1$d.  %2$s</string>
+    <string name="help_path_help">IMD 설정 → 정보 → 도움말 (readme)</string>
+    <string name="help_path_hide">IMD 설정 → 기본 IMD 설정 → 숨길 설정</string>
+    <string name="help_path_unhide">IMD 설정 → 기본 IMD 설정 → 되돌리기 시 다시 표시할 설정</string>
+    <string name="help_path_accessibility">IMD 설정 → 기본 IMD 설정 → 숨길 접근성 서비스</string>
+    <string name="help_path_shizuku">IMD 설정 → Shizuku 구성</string>
+    <string name="help_hide_title">숨길 설정 지정하기 (필수)</string>
+    <string name="help_hide_body">기본적으로 모든 설정이 숨겨지며 (권장), 원하는 대로 바꿀 수 있습니다.</string>
+    <string name="help_revert_title">되돌리기 시 다시 표시할 설정 지정하기 (권장)</string>
+    <string name="help_revert_body">기본적으로 접근성 서비스만 켜져 있습니다. 목록의 나머지 항목은 모두 디버깅 설정이고, 이를 자동으로 다시 켜는 것은 보안상 위험하기 때문입니다. 원하는 대로 바꿀 수 있습니다.</string>
+    <string name="help_accessibility_title">숨길 접근성 서비스 지정하기</string>
+    <string name="help_accessibility_body">어떤 서비스를 관리할지 지정하기 전까지 이 앱은 접근성 서비스를 건드리지 않습니다. 제한이 걸린 앱이 열려 있는 동안 꺼져 있어야 할 서비스를 선택하세요. 되돌릴 때 다시 켜집니다.</string>
+    <string name="help_shizuku_title">Shizuku 시작 인텐트 설정하기 (Shizuku를 사용할 때만)</string>
+    <string name="help_shizuku_body">Shizuku 서비스를 사용한다면, IMD가 디버깅 설정을 끌 때마다 Shizuku 서비스도 함께 종료됩니다. 따라서 Shizuku 시작 인텐트를 설정하고 확인해 두는 것을 권장합니다.</string>
+    <string name="help_general_title">일반 정보</string>
+    <string name="help_general_how_title">IMD 사용 방법</string>
+    <string name="help_general_launch">1. 차단된 앱을 사용하려면 IMD 앱 안에서 실행하거나, IMD가 만든 홈 화면의 앱 바로가기로 실행해야 합니다.</string>
+    <string name="help_general_shortcuts">2. 이 앱에서는 모든 앱 또는 즐겨찾기 탭에서 앱 이름을 길게 눌러 홈 화면에 바로가기를 바로 만들 수 있습니다.</string>
+    <string name="help_general_revert">3. 앱 사용을 마친 뒤에는 되돌리기 / 기본값으로 되돌리기 버튼을 눌러 이전 설정을 다시 표시하거나 다시 켜세요.</string>
+    <string name="help_general_revert_places">되돌리기 버튼은 다음 위치에서 사용할 수 있습니다:</string>
+    <string name="help_general_revert_items">•  앱 실행 후 표시되는 알림\n•  Android 빠른 설정 타일\n•  즐겨찾기 탭\n•  홈 화면 바로가기 (IMD 아이콘을 길게 눌러 바로가기 생성)</string>
+    <string name="help_general_manager_title">IMD 서비스 관리자</string>
+    <string name="help_general_manager">이 서비스 관리자를 사용하면 설정과 서비스의 현재 상태를 빠르게 확인하고, 바로 켜고 끌 수도 있습니다.</string>
+    <string name="help_general_manager_places">IMD 서비스 관리자는 다음 위치에서 열 수 있습니다:</string>
+    <string name="help_general_manager_items">•  Android 빠른 설정 타일\n•  즐겨찾기 탭\n•  홈 화면 바로가기 (IMD 아이콘을 길게 눌러 바로가기 생성)</string>
+    <string name="help_name_mandatory">(필수)</string>
+    <string name="help_name_revert">되돌리기</string>
+    <string name="help_name_revert_button">되돌리기 / 기본값으로 되돌리기</string>
+
+    <string name="section_advanced">고급</string>
+</resources>

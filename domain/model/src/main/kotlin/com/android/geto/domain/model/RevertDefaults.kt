@@ -43,22 +43,31 @@ object RevertDefaults {
     /**
      * What the dialog starts out with when it has never been saved.
      *
-     * Not all of them. Developer settings and wireless debugging are left off because
-     * turning either on for someone who keeps them off is a change to their device they
-     * never asked for — and unlike the other three, neither is something an app profile
-     * routinely needs put back. The three that are on are the ones a locked-down app
-     * actually breaks: USB debugging, the managed accessibility services, and the Shizuku
-     * service that rides on USB debugging.
+     * Accessibility services only, as of v1.6.6, and the reasoning is about safety rather
+     * than convenience. Every other target here is a debugging surface: developer settings,
+     * USB debugging, wireless debugging, and the Shizuku service that rides on one of them.
+     * Switching those back on automatically means a Revert can leave a device more open
+     * than the person pressing the button realised, on a schedule they did not choose -
+     * including a Revert fired from a tile with nothing on screen to report what happened.
      *
-     * A default, not a policy — the dialog exists precisely so this can be overridden, and
-     * once saved the stored answer wins for every target including these.
+     * Accessibility services are the exception because the app switched them off itself,
+     * they are not a debugging surface, and leaving them off silently breaks a screen
+     * reader. Restoring what this app turned off is the whole promise of the button.
+     *
+     * Earlier versions also defaulted USB debugging and Shizuku to on. v1.6.6 resets any
+     * install carrying that forward - see MigrateRevertDefaultsUseCase - and tells the user
+     * it has done so, because a default quietly changing underneath somebody is worse than
+     * the original default.
+     *
+     * A default, not a policy. The dialog exists precisely so this can be overridden, and
+     * once saved the stored answer wins for every target including this one.
      */
     val Default: Map<ManualRevertTarget, Boolean> = mapOf(
         ManualRevertTarget.DeveloperSettings to false,
-        ManualRevertTarget.UsbDebugging to true,
+        ManualRevertTarget.UsbDebugging to false,
         ManualRevertTarget.WirelessDebugging to false,
         ManualRevertTarget.AccessibilityServices to true,
-        ManualRevertTarget.Shizuku to true,
+        ManualRevertTarget.Shizuku to false,
     )
 
     fun encode(states: Map<ManualRevertTarget, Boolean>): List<String> =

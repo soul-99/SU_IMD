@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- German. Machine translation, reviewed for consistency of terminology. -->
+    <string name="search">Suchen</string>
+    <string name="sort">Sortieren</string>
+    <string name="name">Name</string>
+    <string name="update_time">Aktualisiert</string>
+    <string name="install_time">Installiert</string>
+    <string name="ascending">Aufsteigend</string>
+    <string name="descending">Absteigend</string>
+    <string name="show_system">System anzeigen</string>
+    <string name="show_system_applications">System-Apps anzeigen</string>
+
+    <!-- Favourites -->
+    <string name="add_to_favourites">Zu Favoriten hinzufügen</string>
+    <string name="remove_from_favourites">Aus Favoriten entfernen</string>
+    <string name="favourite_apps_options">Favoriten-Optionen</string>
+    <string name="no_favourite_apps">Noch keine Favoriten</string>
+    <string name="no_matching_favourite_apps">Keine Favoriten passen zu dieser Suche</string>
+    <string name="no_favourite_apps_subtitle">Tippe im Tab „Alle Apps“ auf den Stern neben einer App oder auf den Stern auf ihrem Einstellungsbildschirm.</string>
+    <string name="view">Ansicht</string>
+    <string name="custom">Eigene Reihenfolge</string>
+    <string name="alphabetical">A–Z</string>
+    <string name="list">Liste</string>
+    <string name="grid">Raster</string>
+    <string name="reorder">Favoriten neu anordnen</string>
+    <string name="reorder_favourites">Favoriten neu anordnen</string>
+    <string name="move_up">Nach oben</string>
+    <string name="move_down">Nach unten</string>
+    <string name="close">Schließen</string>
+
+    <string name="applied_settings_title">IMD</string>
+    <string name="applied_settings_success">Einstellungen ausgeblendet/deaktiviert</string>
+    <string name="settings_manager_configure_revert">Festlegen, was beim Wiederherstellen eingeblendet wird</string>
+    <string name="settings_manager_accessibility_unmanaged">Derzeit werden von der IMD-App keine Bedienungshilfen-Dienste verwaltet</string>
+    <string name="applied_settings_failure">Einstellungen konnten nicht angewendet werden</string>
+    <string name="applied_settings_invalid">Diese App hat Einstellungen mit ungültigen Werten</string>
+    <string name="settings_manager_title">IMD-Dienstmanager</string>
+
+    <!-- settings_manager_title and the two _name_ strings below are matched as substrings
+         inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_info">Was dieser Dialog macht</string>
+    <string name="settings_manager_info_live">Der IMD-Dienstmanager zeigt den aktuellen Status der Einstellungen und Dienste an. Er legt nicht fest, welche Einstellungen/Dienste aus- oder eingeblendet werden, wenn Apps über IMD oder über App-Verknüpfungen geöffnet werden, die IMD angelegt hat.</string>
+    <string name="settings_manager_info_live_extra">Um festzulegen, was beim Starten von Apps über IMD aus- und eingeblendet wird, konfiguriere bitte die Standard-IMD-Einstellungen in der IMD-App.</string>
+    <string name="settings_manager_info_name_defaults">Standard-IMD-Einstellungen</string>
+    <string name="settings_manager_info_developer">Das Ausschalten der Entwickleroptionen über IMD schaltet nur den Schalter für die Entwickleroptionen um. Änderungen, die in den Entwickleroptionen vorgenommen wurden (etwa Animationsskalierung, App für simulierte Standorte … usw.), werden dadurch nicht zurückgesetzt.</string>
+    <string name="settings_manager_info_developer_extra">Zum Zurücksetzen der Entwickleroptionen öffne die Seite der Entwickleroptionen und schalte sie dort aus.</string>
+    <string name="settings_manager_info_name_reset">Zurücksetzen der Entwickleroptionen</string>
+    <string name="revert_to_default">Standard wiederherstellen</string>
+    <string name="not_configured_title">Es gibt keine Einstellungen zum Ausblenden. Du musst für diese App festlegen, welche Einstellungen ausgeblendet werden sollen.</string>
+    <string name="not_configured_message">Halte diese App in der IMD-App gedrückt, um festzulegen, welche Einstellungen ausgeblendet werden sollen.</string>
+    <string name="got_it">Verstanden</string>
+    <string name="settings_manager_open">%1$s öffnen</string>
+    <string name="settings_manager_accessibility_note">es werden nur Dienste verwaltet, die in den Einstellungen der IMD-App ausgewählt sind</string>
+    <string name="settings_manager_enable_developer_options">Bitte aktiviere zuerst die Entwickleroptionen</string>
+    <string name="settings_manager_cannot_open">Dieser Bildschirm konnte auf diesem Gerät nicht geöffnet werden</string>
+    <string name="settings_manager_no_shizuku">Keine Shizuku-App gefunden, lege den Paketnamen in den Einstellungen fest</string>
+    <string name="ok">OK</string>
+    <string name="shizuku_help_title">Shizuku-Dienst nicht verfügbar</string>
+    <string name="shizuku_help_bullet">%1$d.</string>
+    <string name="shizuku_help_point_setup">Stelle bitte sicher, dass die Shizuku-App installiert, in ADB registriert und auf der Einstellungsseite der IMD-App korrekt konfiguriert ist.</string>
+    <string name="shizuku_help_point_permission">Die Shizuku-Berechtigung der IMD-App dient nur dazu, die privilegierte Android-Berechtigung WRITE_SECURE_SETTINGS einmalig zu erteilen. Sie wird weder genutzt, um den Status des Shizuku-Dienstes zu erkennen, noch um den Shizuku-Dienst ein- oder auszuschalten.</string>
+    <string name="shizuku_help_point_restart">Starte die IMD-App nach der Einrichtung bitte neu und versuche es erneut.</string>
+    <string name="settings_manager_shizuku_wait">Bitte warte 10 Sekunden, da manche Shizuku-Forks den Dienst über Intents nur langsam starten</string>
+    <string name="revert_developer_settings">Entwickleroptionen</string>
+    <string name="revert_usb_debugging">USB-Debugging</string>
+    <string name="revert_wireless_debugging">Drahtloses Debugging</string>
+    <string name="revert_accessibility">Bedienungshilfen-Dienste</string>
+    <string name="revert_shizuku">Shizuku-Dienst</string>
+    <string name="applied_settings_no_permission">Erteile zuerst WRITE_SECURE_SETTINGS, siehe Einrichtungsbildschirm</string>
+    <string name="settings_manager_shizuku_failed">Der Shizuku-Dienst konnte beim letzten Versuch nicht gestartet werden. Prüfe bitte die Einstellungen der Shizuku-App und die Shizuku-Konfiguration in IMD</string>
+    <string name="settings_manager_shizuku_failed_open">Warum der Shizuku-Dienst nicht gestartet wurde</string>
+    <string name="understood">Verstanden</string>
+</resources>

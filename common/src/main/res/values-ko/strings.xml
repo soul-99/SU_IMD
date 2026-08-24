@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Korean. Machine translation, reviewed for consistency of terminology.
+
+      Left in English on purpose: "System", "Secure" and "Global" name Android's three
+      settings tables, and a translated label would no longer match what the platform, its
+      documentation or any adb command calls them. Shizuku is a product name.
+    -->
+    <string name="add">추가</string>
+    <string name="update">업데이트</string>
+    <string name="cancel">취소</string>
+    <string name="system">System</string>
+    <string name="secure">Secure</string>
+    <string name="global">Global</string>
+
+    <string name="language_system">시스템 / 자동</string>
+    <string name="language_ai_notice">영어 이외의 언어는 AI 지원 기계 번역으로 만들어졌기 때문에 오류가 있을 수 있습니다. 수정을 원하시면 번역 오류를 GitHub 이슈 트래커를 통해 개발자에게 알려 주세요.</string>
+
+    <string name="revert_to_default_toast">기본값으로 되돌리기</string>
+    <string name="revert_from_memory_toast">메모리로 되돌리기</string>
+</resources>

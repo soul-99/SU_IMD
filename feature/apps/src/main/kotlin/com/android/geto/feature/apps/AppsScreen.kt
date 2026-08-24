@@ -29,11 +29,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,12 +51,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.LauncherAppsActivityInfo
-import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
-import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.LauncherAppsActivityInfoData
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
 import com.android.geto.feature.apps.dialog.SortLauncherAppsActivityInfoDialog
+import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -47,8 +47,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.android.geto.designsystem.component.DialogContainer
-import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.designsystem.component.emphasised
+import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.feature.settings.R
 
@@ -142,6 +142,21 @@ internal fun SettingsToHideDialog(
 
             InfoLine(text = AnnotatedString(stringResource(R.string.settings_to_hide_info_all)))
 
+            // Third, and red, because it is the one line here that describes a way the
+            // hiding can be undone without anybody touching the device. Shizuku's watchdog
+            // restarts the service on its own, and starting the service turns ADB back on -
+            // so the settings this dialog just hid come back mid-session, which is exactly
+            // the state a locked-down app is looking for.
+            InfoLine(
+                text = emphasised(
+                    text = stringResource(R.string.settings_to_hide_info_watchdog),
+                    names = listOf(
+                        stringResource(R.string.settings_to_hide_name_shizuku_watchdog),
+                    ),
+                ),
+                color = MaterialTheme.colorScheme.error,
+            )
+
             InfoLine(
                 text = emphasised(
                     text = stringResource(R.string.settings_to_hide_info_shizuku),
@@ -211,7 +226,8 @@ private fun SettingToHideRow(
  * of them.
  *
  * [color] tints the icon and the text together. Anything other than the default reads as a
- * warning, so it should stay rare: three coloured lines in a row would tell the eye nothing.
+ * warning, so it should stay rare, and the two that exist sit at opposite ends of the list:
+ * coloured lines next to each other stop being a warning and become a colour scheme.
  */
 @Composable
 private fun InfoLine(

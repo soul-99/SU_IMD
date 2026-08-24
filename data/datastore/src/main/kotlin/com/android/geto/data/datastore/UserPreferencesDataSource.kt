@@ -95,6 +95,9 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
             revertDefaults = RevertDefaults.decode(it.revertDefaultsList),
             settingsToHide = SettingsToHide.decode(it.settingsToHideList),
             notificationFunctionResetV16 = it.notificationFunctionResetV16,
+            revertDefaultsResetV166 = it.revertDefaultsResetV166,
+            revertDefaultsNoticePending = it.revertDefaultsNoticePending,
+            settingsManagerInfoShown = it.settingsManagerInfoShown,
             shizukuStartFailed = it.shizukuStartFailed,
             settingStateBefore = it.settingStateBeforeMap.mapValues { entry ->
                 SettingSnapshot.decode(entry.value)
@@ -306,6 +309,24 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
                 revertDefaults.clear()
                 revertDefaults.addAll(RevertDefaults.encode(states))
             }
+        }
+    }
+
+    suspend fun updateRevertDefaultsResetV166(done: Boolean) {
+        userPreferences.updateData {
+            it.copy { this.revertDefaultsResetV166 = done }
+        }
+    }
+
+    suspend fun updateRevertDefaultsNoticePending(pending: Boolean) {
+        userPreferences.updateData {
+            it.copy { this.revertDefaultsNoticePending = pending }
+        }
+    }
+
+    suspend fun updateSettingsManagerInfoShown(shown: Boolean) {
+        userPreferences.updateData {
+            it.copy { this.settingsManagerInfoShown = shown }
         }
     }
 

@@ -18,6 +18,7 @@
  */
 package com.android.geto.feature.settings
 
+import android.app.Activity
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
@@ -86,6 +87,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.android.geto.common.AppLocale
 import com.android.geto.common.ProjectLinks
 import com.android.geto.common.openObtainium
 import com.android.geto.common.openProjectUri
@@ -103,17 +105,19 @@ import com.android.geto.domain.model.Theme
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.feature.settings.dialog.AccessibilityServicesDialog
+import com.android.geto.feature.settings.dialog.LanguageDialog
 import com.android.geto.feature.settings.dialog.NotificationFunctionDialog
 import com.android.geto.feature.settings.dialog.RevertDefaultsDialog
 import com.android.geto.feature.settings.dialog.SettingsToHideDialog
 import com.android.geto.feature.settings.dialog.ThemeDialog
 import com.android.geto.feature.settings.help.SetupHelpDialog
 import com.android.geto.service.SettingsObserverService
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlin.time.Duration.Companion.milliseconds
+import com.android.geto.common.R as commonR
 
 /** How long the Shizuku text fields wait after the last keystroke before persisting. */
 private val COMMIT_DEBOUNCE = 500.milliseconds
@@ -246,6 +250,13 @@ private fun Success(
 
     var showThemeDialog by remember { mutableStateOf(false) }
 
+    var showLanguageDialog by remember { mutableStateOf(false) }
+
+    // Read from the platform rather than held in state: on Android 13 and up this can also
+    // be changed from Android's own per-app language screen, and coming back to a stale
+    // copy would show the wrong one until the app was killed.
+    var languageTag by remember { mutableStateOf(AppLocale.stored(context)) }
+
     var showAccessibilityServicesDialog by remember { mutableStateOf(false) }
 
     var showNotificationFunctionDialog by remember { mutableStateOf(false) }
@@ -286,9 +297,9 @@ private fun Success(
             .verticalScroll(rememberScrollState()),
     ) {
         CollapsibleSection(
-            title = stringResource(R.string.section_theme),
-            expanded = expanded == SettingsSection.Theme,
-            onToggle = { toggleSection(SettingsSection.Theme) },
+            title = stringResource(R.string.section_ui),
+            expanded = expanded == SettingsSection.Ui,
+            onToggle = { toggleSection(SettingsSection.Ui) },
         ) {
             DynamicThemeSetting(
                 dynamicTheme = userData.dynamicTheme,
@@ -299,6 +310,12 @@ private fun Success(
                 title = stringResource(R.string.theme),
                 subtitle = userData.theme.getTitle(),
                 onClick = { showThemeDialog = true },
+            )
+
+            SettingsColumn(
+                title = stringResource(R.string.language),
+                subtitle = languageLabel(languageTag),
+                onClick = { showLanguageDialog = true },
             )
         }
 
@@ -423,6 +440,27 @@ private fun Success(
         Spacer(modifier = Modifier.height(24.dp))
     }
 
+    if (showLanguageDialog) {
+        LanguageDialog(
+            selectedTag = languageTag,
+            onDismissRequest = { showLanguageDialog = false },
+            onSelect = { tag ->
+                showLanguageDialog = false
+
+                if (tag != languageTag) {
+                    languageTag = tag
+
+                    // Below Android 13 nothing else is going to redraw the screen in the
+                    // new language; from 13 up the platform recreates the activity itself
+                    // as part of applying the locale, and doing it twice is a visible flash.
+                    if (AppLocale.set(context, tag)) {
+                        (context as? Activity)?.recreate()
+                    }
+                }
+            },
+        )
+    }
+
     if (showThemeDialog) {
         ThemeDialog(
             onDismissRequest = { showThemeDialog = false },
@@ -478,7 +516,7 @@ private fun Success(
  * should not mean scrolling past another that was left open.
  */
 private enum class SettingsSection {
-    Theme,
+    Ui,
     AppFunctions,
     Shizuku,
     Advanced,
@@ -1375,3 +1413,16 @@ internal fun Theme.getTitle() = when (this) {
     Theme.LIGHT -> stringResource(R.string.light)
     Theme.DARK -> stringResource(R.string.dark)
 }
+
+/**
+ * What the settings row shows underneath "Language".
+ *
+ * The name of the chosen language written in that language, matching the picker. A tag with
+ * no entry falls back to the system label rather than showing a bare code: that can only
+ * happen if the platform hands back a locale this app no longer ships, and "System /
+ * automatic" is what the app is doing at that point anyway.
+ */
+@Composable
+private fun languageLabel(tag: String): String =
+    AppLocale.LANGUAGES.firstOrNull { it.first == tag }?.second
+        ?: stringResource(commonR.string.language_system)

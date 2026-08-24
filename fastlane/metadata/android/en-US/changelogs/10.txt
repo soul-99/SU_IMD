@@ -1,0 +1,5 @@
+v1.6.5
+
+* Language support, in testing: Brazilian Portuguese, Spanish, Simplified Chinese, French, German, Russian, Hindi, Arabic, Korean and Japanese. Machine translated, so please report anything wrong on the GitHub issue tracker.
+* The Theme section of Settings is now UI, and holds the language picker.
+* A language step now comes first on a new install.

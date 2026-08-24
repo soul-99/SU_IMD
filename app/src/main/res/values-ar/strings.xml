@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Arabic. Machine translation, reviewed for consistency of terminology.
+
+      Left untranslated on purpose: the app name, Shizuku, ADB and Obtainium (product
+      names), the adb command itself, and WRITE_SECURE_SETTINGS, which has to be typed
+      exactly as written.
+
+      setup_use_shizuku is matched as a substring inside setup_secure_settings_shizuku to
+      bold it, so the two must stay worded identically.
+
+      Menu paths use ← rather than →: the segments are in the same order as the English, but
+      the arrow points the way an Arabic reader moves.
+    -->
+    <string name="app_name">IMD</string>
+    <string name="favourite_apps">المفضّلة</string>
+    <string name="all_apps">كل التطبيقات</string>
+    <string name="settings">الإعدادات</string>
+
+    <!-- First-run setup -->
+    <string name="setup_purpose">افتح تطبيقات البنوك وغيرها من التطبيقات المقيَّدة دون أن توقف خيارات المطوّر أو تصحيح أخطاء USB أو خدمات إمكانية الوصول يدويًا في كل مرة. اختر تطبيقًا، وحدّد ما الذي ينبغي تغييره أثناء تشغيله، وسيعيد هذا التطبيق كل شيء إلى ما كان عليه بعد ذلك.</string>
+    <string name="setup_step">الخطوة %1$d</string>
+    <string name="setup_granted">مُنِح</string>
+    <string name="setup_not_granted">لم يُمنح</string>
+    <string name="setup_secure_settings_title">الوصول إلى الإعدادات الآمنة</string>
+    <string name="setup_secure_settings_why">لا يسمح Android لأي تطبيق عادي بتغيير هذه الإعدادات. ويُمنح هذا الإذن مرة واحدة من الطرفية ويبقى بعد إعادة تشغيل الجهاز، لكنه لا يبقى بعد إعادة تثبيت التطبيق.</string>
+    <string name="setup_copy_command">نسخ الأمر</string>
+    <string name="setup_check_again">إعادة التحقق</string>
+    <string name="setup_use_shizuku">استخدام Shizuku</string>
+    <string name="services_shortcut_label">مدير الخدمات</string>
+    <string name="revert_shortcut_label">استعادة الوضع الافتراضي</string>
+    <string name="shortcut_not_configured_title">لم يتم إعداد أي شيء لهذا التطبيق</string>
+    <string name="shortcut_not_configured_message">عليك أولًا تحديد الإعدادات المراد إخفاؤها لهذا التطبيق من: IMD ← كل التطبيقات ← اضغط على اسم التطبيق ← قالب الإعدادات ← اختر الإعدادات المراد إخفاؤها.</string>
+    <string name="shortcut_not_configured_dismiss">حسنًا</string>
+    <string name="obtainium_title">إبقاء هذا التطبيق محدَّثًا</string>
+    <string name="obtainium_body">بما أن هذا التطبيق يعمل دون اتصال بالكامل، يُرجى استخدام Obtainium للبحث عن التحديثات وتثبيتها مباشرةً من إصدارات GitHub.</string>
+    <string name="obtainium_do_not_show_again">عدم الإظهار مرة أخرى</string>
+    <string name="obtainium_add">إضافة إلى Obtainium</string>
+    <string name="tip">نصيحة</string>
+    <string name="tip_got_it">حسنًا</string>
+    <string name="tip_developer_options">لا حاجة إلى إبقاء خيارات المطوّر مفعَّلة من أجل Shizuku، لذا يمكنك تركها متوقفة. فعند بدء Shizuku لخدمته يفعّل تصحيح أخطاء USB بنفسه دون تفعيل إعدادات المطوّر، مستخدمًا إذن WRITE_SECURE_SETTINGS الخاص به.</string>
+    <string name="setup_shizuku_working">جارٍ الطلب من Shizuku…</string>
+    <string name="setup_shizuku_granted">تم منح الإذن عبر Shizuku.</string>
+    <string name="setup_shizuku_not_running">لم يُعثر على خدمة Shizuku. شغّل Shizuku ثم أعد المحاولة.</string>
+    <string name="setup_shizuku_denied">رفض Shizuku الطلب. اسمح لهذا التطبيق داخل Shizuku ثم أعد المحاولة، وإذا كنت قد اخترت “الرفض وعدم السؤال مرة أخرى” فامسحه أولًا من قائمة التطبيقات في Shizuku.</string>
+    <string name="setup_shizuku_failed">تعذّر على Shizuku تنفيذ الأمر. استخدم أمر ADB بدلًا من ذلك.</string>
+    <string name="setup_shizuku_once">تنويه: لا حاجة إلى Shizuku إلا لمنح هذا الإذن مرة واحدة. ويبقى الإذن بعد إعادة تشغيل الجهاز، لذا يمكنك بعد ذلك إيقاف Shizuku أو إزالته، إلا إذا كنت تريد أيضًا الميزة الاختيارية “إعادة تشغيل خدمة Shizuku” الموجودة في الإعدادات، فهي تستخدمه لاحقًا مرة أخرى.</string>
+    <string name="setup_shizuku_once_extra">ويمكنك أيضًا تعطيل تصحيح الأخطاء وإعدادات المطوّر إذا كنت قد فعّلتهما لإعداد Shizuku، فهذا التطبيق لا يحتاج إلى أي منهما بعد اكتمال الإعداد.</string>
+    <string name="setup_secure_settings_adb">باستخدام حاسوب: فعّل تصحيح أخطاء USB ← وصّل الهاتف بحاسوب تعمل عليه طرفية ADB ← نفّذ الأمر الموضّح أعلاه.</string>
+    <string name="setup_secure_settings_shizuku">بدون حاسوب (موصى به):\n1. ثبّت تطبيق Shizuku وأعدّه، ثم شغّل خدمة Shizuku\n2. اضغط على زر “استخدام Shizuku” الموضّح أعلاه\n3. اضغط على “سماح” عند ظهور الطلب.</string>
+    <string name="setup_notifications_title">الإشعارات</string>
+    <string name="setup_notifications_why">في كل مرة تُطبَّق فيها الإعدادات يظهر إشعار مستمر يحتوي على زر استعادة، وهذا الإشعار هو وسيلتك لإعادة جهازك إلى ما كان عليه. ويمكنك لاحقًا تعطيل كل إشعارات هذا التطبيق إن اخترت استخدام مفاتيح الإعدادات السريعة أو اختصارات الشاشة الرئيسية لاستعادة الإعدادات.</string>
+    <string name="setup_allow_notifications">سماح</string>
+    <string name="setup_open_settings">فتح الإعدادات</string>
+    <string name="setup_notifications_denied_hint">هل رفضت الطلب مرتين من قبل؟ عندها يتوقف Android عن عرضه، فاستخدم “فتح الإعدادات” بدلًا من ذلك.</string>
+    <string name="setup_next">التالي</string>
+    <string name="setup_back">رجوع</string>
+    <string name="setup_finish">لنبدأ</string>
+
+    <!-- suIMD: the language step, shown once, ahead of the permissions screen -->
+    <string name="language_setup_title">اختر لغتك</string>
+    <string name="language_setup_subtitle">يمكنك تغيير ذلك لاحقًا من الإعدادات ضمن قسم واجهة المستخدم.</string>
+    <string name="language_setup_continue">متابعة</string>
+    <string name="setup_blocked">كلتا الخطوتين مطلوبة. فبدونهما لا يستطيع التطبيق تغيير أي إعداد ولا استعادته.</string>
+    <string name="setup_copied">تم النسخ</string>
+    <string name="setup_open_settings_failed">تعذّر فتح الإعدادات على هذا الجهاز</string>
+</resources>

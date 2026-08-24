@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Arabic. Machine translation, reviewed for consistency of terminology.
+
+      Three things in here are load-bearing rather than cosmetic:
+
+      * The help page's menu paths have to name screens exactly as those screens are named
+        in this file. A path naming a heading that does not exist in Arabic is worse than
+        one left in English.
+      * The short strings used for bolding (help_name_*, notif_name_*,
+        settings_to_hide_name_shizuku_*) are matched as substrings inside the longer strings
+        they highlight. Word them differently in the two places and the bolding silently
+        does nothing. Note that the article has to be carried by the longer string, not
+        prefixed onto the bolded phrase, or the prefix falls outside the bold run.
+      * Arabic reads right to left, so the paths use ← rather than →, with the steps in the
+        same order as the English: first step first, arrow pointing the way the reader
+        moves. The same is done for the > separators in settings_to_hide_info_per_app.
+        Digits stay Western (0-9) to match what the format specifiers substitute in.
+    -->
+    <string name="settings">الإعدادات</string>
+    <string name="dynamic_theme">المظهر الديناميكي</string>
+    <string name="cancel">إلغاء</string>
+    <string name="change">تغيير</string>
+    <string name="close">إغلاق</string>
+    <string name="theme">المظهر</string>
+    <string name="available_on_android_12">متاح على Android 12 وأحدث</string>
+    <string name="follow_system">حسب النظام</string>
+    <string name="light">فاتح</string>
+    <string name="dark">داكن</string>
+    <string name="start_service">تشغيل الخدمة</string>
+    <string name="stop_service">إيقاف الخدمة</string>
+    <string name="settings_observer_service">خدمة مراقب الإعدادات</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">تهيئة Shizuku</string>
+    <string name="restart_shizuku_service">إعادة تشغيل خدمة Shizuku</string>
+    <string name="restart_shizuku_service_description">عند استعادة تصحيح أخطاء USB من الإشعار (في وظيفة الذاكرة فقط)، تُشغَّل خدمة Shizuku تلقائيًا.</string>
+    <string name="shizuku_needs">يتطلب</string>
+    <string name="shizuku_forks_suffix">/ غيرها من نسخ Shizuku المعدَّلة التي تدعم intents بدء الخدمة (RikkaApps والنسخ المعدَّلة منها مباشرةً لا تدعم intent بدء الخدمة).</string>
+    <string name="shizuku_fork_mode_thedjchi">نسخ Shizuku المعدَّلة المبنية على thedjchi</string>
+    <string name="shizuku_fork_mode_other">Shevery / نسخ Shizuku المعدَّلة الأخرى</string>
+    <string name="shizuku_choose_app">اختر تطبيقًا مثبَّتًا</string>
+    <string name="shizuku_fill_advanced">يُرجى ملء قسم تهيئة Shizuku أولًا</string>
+    <string name="show_value">إظهار</string>
+    <string name="hide_value">إخفاء</string>
+    <string name="shizuku_view_intents_hint">انتقل إلى تطبيق Shizuku &gt; view intents لنسخ القيم</string>
+    <string name="shizuku_other_fork_hint">إذا لم تعمل القيم الافتراضية، فابحث داخل تطبيق نسخة Shizuku المعدَّلة التي تستخدمها أو في مستودعها للحصول على قيمة intent البدء</string>
+    <string name="shizuku_start_action">intent بدء الخدمة (action)</string>
+    <string name="shizuku_package_name">اسم الحزمة</string>
+    <string name="shizuku_auth_key">مفتاح المصادقة (extras &gt; auth:)</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_services">خدمات إمكانية الوصول المراد إخفاؤها</string>
+    <string name="accessibility_services_dialog_description">تُوقَف هذه الخدمات عندما يُخفي أحد إعدادات التطبيق خدمات إمكانية الوصول، وتُشغَّل من جديد عند الاستعادة. ولا تُستعاد سوى الخدمات التي أوقفها هذا التطبيق.</string>
+    <string name="accessibility_services_none_selected">لم تُحدَّد أي خدمة. %1$d مفعَّلة حاليًا على هذا الجهاز.</string>
+    <string name="accessibility_services_selected">%1$d محدَّدة، و%2$d مفعَّلة حاليًا على هذا الجهاز.</string>
+    <string name="accessibility_service_enabled">مفعَّلة · %1$s</string>
+    <string name="accessibility_service_disabled">متوقفة · %1$s</string>
+    <string name="no_accessibility_services">لا توجد خدمات إمكانية وصول مثبَّتة على هذا الجهاز.</string>
+
+    <!-- About -->
+    <string name="about">حول التطبيق</string>
+    <string name="about_version">الإصدار %1$s</string>
+    <string name="about_check_releases">افتح صفحة الإصدارات على GitHub للبحث عن التحديثات</string>
+    <string name="about_add_to_obtainium">إضافة إلى Obtainium</string>
+    <string name="about_obtainium_note">(لتتبّع التحديثات / تحديث التطبيق تلقائيًا)</string>
+    <string name="about_created_by">التطبيق من إنشاء</string>
+    <string name="about_view_github">عرض GitHub</string>
+    <string name="about_fork_of">نسخة معدَّلة من</string>
+    <string name="about_geto_app">تطبيق Geto</string>
+
+    <string name="long_live_foss">عاشت البرمجيات الحرة والمفتوحة المصدر!</string>
+
+    <!-- suIMD: collapsible section headers -->
+    <string name="section_ui">واجهة المستخدم</string>
+    <string name="language">اللغة</string>
+    <string name="section_app_functions">إعدادات IMD الافتراضية</string>
+
+    <!-- suIMD: notification function -->
+    <string name="notification_function">وظيفة الإشعارات</string>
+    <string name="notification_function_memory">وظيفة الذاكرة</string>
+    <string name="notification_function_memory_option">وظيفة الذاكرة (الطريقة القديمة)</string>
+    <string name="notification_function_memory_summary">إشعار منفصل لكل عملية فتح تطبيق</string>
+    <string name="notification_function_memory_detail">تحفظ الحالة السابقة لإعدادات الجهاز قبل إيقاف الإعدادات المحدَّدة لذلك التطبيق، ولا تستعيد سوى ما أوقفه IMD</string>
+    <string name="notification_function_memory_warning_config">سيتعيّن عليك أن تحدّد يدويًا الإعدادات المراد إخفاؤها لكل تطبيق على حدة، بالضغط مطوّلًا على أيقونة ذلك التطبيق في تبويب كل التطبيقات أو المفضّلة.</string>
+    <string name="notification_function_memory_warning_revert">لن يستخدم وظيفة الذاكرة إلا زر الاستعادة الموجود في الإشعارات، أما بقية طرق الاستعادة (مفتاح الإعدادات السريعة، والزر داخل التطبيق... إلخ) فستظل تعتمد على الإعدادات التي تظهر عند الاستعادة المحدَّدة في إعدادات تطبيق IMD.</string>
+    <string name="notification_function_memory_note">تتيح لك وظيفة الذاكرة إخفاء إعدادات أخرى غير الإعدادات الأربعة الافتراضية في تطبيق IMD</string>
+    <string name="notif_name_all_apps">كل التطبيقات</string>
+    <string name="notif_name_favourites">المفضّلة</string>
+    <string name="notif_name_revert_button">زر الاستعادة</string>
+    <string name="notification_function_revert">استعادة الوضع الافتراضي</string>
+    <string name="notification_function_revert_option">استعادة الوضع الافتراضي (موصى به)</string>
+    <string name="notification_function_revert_summary">إشعار واحد فقط</string>
+    <string name="notification_function_revert_detail">يعيد إعدادات الجهاز إلى الإعدادات التي تظهر عند الاستعادة المحدَّدة في إعدادات IMD</string>
+    <string name="save">حفظ</string>
+
+    <!-- suIMD: revert to default configuration -->
+    <string name="revert_defaults">تهيئة الاستعادة إلى الوضع الافتراضي</string>
+    <string name="revert_defaults_entry">الإعدادات التي تظهر عند الاستعادة</string>
+    <string name="revert_defaults_notice_title">تنبيه</string>
+    <string name="revert_defaults_notice_body">لأسباب أمنية، أُعيد ضبط الإعدادات التي تظهر عند الاستعادة إلى الوضع الافتراضي. يُرجى ضبطها من جديد من:</string>
+    <string name="revert_defaults_notice_dismiss">فهمت</string>
+    <string name="revert_defaults_description">تظهر هذه الإعدادات من جديد أو تُفعَّل عند الضغط على زر \'استعادة الوضع الافتراضي\' في أي مكان.</string>
+    <string name="revert_defaults_summary">%1$d من %2$d مفعَّلة</string>
+
+    <string name="settings_to_hide">الإعدادات المراد إخفاؤها</string>
+    <string name="settings_to_hide_title">الإعدادات المراد إخفاؤها / تعطيلها</string>
+    <string name="settings_to_hide_description">تُخفى هذه الإعدادات عند فتح أي تطبيق.</string>
+    <string name="settings_to_hide_summary">%1$d من %2$d مفعَّلة</string>
+    <string name="settings_to_hide_usb_note">إيقاف تصحيح أخطاء USB سيؤدي أيضًا إلى إنهاء خدمة Shizuku (إن كانت تعمل)، لذا يُرجى ضبط إعدادات Shizuku داخل تطبيق IMD لإعادة تشغيل خدمة Shizuku بعد الاستعادة</string>
+    <string name="settings_to_hide_info_per_app">إذا أردت إخفاء إعدادات مختلفة لكل تطبيق على حدة، فاستخدم وظيفة الذاكرة من: إعدادات IMD ← الإعدادات المتقدمة ← وظيفة الإشعارات</string>
+    <string name="settings_to_hide_info_all">إخفاء إعدادات المطوّر وحدها لا يوقف تصحيح أخطاء USB ولا تصحيح الأخطاء لاسلكيًا، وقد تعتبر بعض التطبيقات ذلك دليلًا على أن إعدادات المطوّر مفعَّلة، لذا يُنصح باختيار الثلاثة جميعًا</string>
+    <string name="settings_to_hide_info_shizuku">لإخفاء Shizuku عن التطبيقات، استخدم ميزة إخفاء Shizuku عن التطبيقات الأخرى الموجودة داخل تطبيق Shizuku.</string>
+    <string name="settings_to_hide_name_shizuku_hide">إخفاء Shizuku عن التطبيقات الأخرى</string>
+    <string name="settings_to_hide_info_watchdog">يُنصح بإبقاء خدمة المراقبة في Shizuku متوقفة، لأن Shizuku إذا أُعيد تشغيله في الخلفية فسيُفعّل ADB أيضًا بينما تكون الإعدادات مخفية، وعندها قد تتمكن تطبيقاتك من اكتشاف ذلك.</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">خدمة المراقبة في Shizuku</string>
+    <string name="revert_defaults_developer_settings">إعدادات المطوّر</string>
+    <string name="revert_defaults_usb_debugging">تصحيح أخطاء USB</string>
+    <string name="revert_defaults_wireless_debugging">تصحيح الأخطاء لاسلكيًا</string>
+    <string name="revert_defaults_accessibility_services">خدمات إمكانية الوصول</string>
+    <string name="revert_defaults_accessibility_note">لا تُدار سوى الخدمات المحدَّدة في إعدادات تطبيق IMD</string>
+    <string name="revert_defaults_shizuku">خدمة Shizuku</string>
+    <string name="revert_defaults_shizuku_note">بحسب الطريقة التي يستخدمها Shizuku لبدء الخدمة، سيُعيد تفعيل أحد الخيارين: تصحيح أخطاء USB أو تصحيح الأخطاء لاسلكيًا، وهو يحتاج إليه أيضًا لإبقاء خدمة Shizuku قيد التشغيل</string>
+
+    <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
+    <string name="help_button">المساعدة (readme)</string>
+    <string name="help_close">إغلاق</string>
+    <string name="help_title">كيفية إعداد هذا التطبيق (لا تتخطَّ هذه الخطوة)</string>
+    <string name="help_intro">هذه أمور عليك إعدادها بنفسك.</string>
+    <string name="help_again">للوصول إلى هذه الصفحة مرة أخرى -</string>
+    <string name="help_numbered_title">%1$d.  %2$s</string>
+    <string name="help_path_help">إعدادات IMD ← حول التطبيق ← المساعدة (readme)</string>
+    <string name="help_path_hide">إعدادات IMD ← إعدادات IMD الافتراضية ← الإعدادات المراد إخفاؤها</string>
+    <string name="help_path_unhide">إعدادات IMD ← إعدادات IMD الافتراضية ← الإعدادات التي تظهر عند الاستعادة</string>
+    <string name="help_path_accessibility">إعدادات IMD ← إعدادات IMD الافتراضية ← خدمات إمكانية الوصول المراد إخفاؤها</string>
+    <string name="help_path_shizuku">إعدادات IMD ← تهيئة Shizuku</string>
+
+    <string name="help_hide_title">حدّد الإعدادات المراد إخفاؤها (إلزامي)</string>
+    <string name="help_hide_body">افتراضيًا تُخفى جميع الإعدادات (وهو الخيار الموصى به)، لكن يمكنك تخصيص ذلك كما تشاء.</string>
+
+    <string name="help_revert_title">حدّد الإعدادات التي تظهر عند الاستعادة (موصى به)</string>
+    <string name="help_revert_body">افتراضيًا لا تُفعَّل سوى خدمات إمكانية الوصول، لأن كل ما عداها في تلك القائمة إعدادات تصحيح أخطاء، وإعادة تفعيلها تلقائيًا تشكّل خطرًا أمنيًا. ويمكنك تخصيص ذلك كما تشاء.</string>
+
+    <string name="help_accessibility_title">حدّد خدمات إمكانية الوصول المراد إخفاؤها</string>
+    <string name="help_accessibility_body">لن يمسّ التطبيق أي خدمة من خدمات إمكانية الوصول حتى تحدّد الخدمات المقصودة، ثم علّم على ما ينبغي إيقافه أثناء فتح تطبيق مقيَّد. وتُشغَّل هذه الخدمات من جديد عند الاستعادة.</string>
+
+    <string name="help_shizuku_title">إعداد intents بدء Shizuku (فقط إن كنت تستخدم Shizuku)</string>
+    <string name="help_shizuku_body">إذا كنت تستخدم خدمة Shizuku، فكلما أوقف IMD إعدادات تصحيح الأخطاء أنهى معها خدمة Shizuku، لذا يُنصح بإعداد intents بدء Shizuku والتحقق منها.</string>
+
+    <string name="help_general_title">معلومات عامة</string>
+    <string name="help_general_how_title">كيفية استخدام IMD</string>
+    <string name="help_general_launch">1. لاستخدام التطبيقات المحجوبة عليك فتحها إما من داخل تطبيق IMD وإما عبر اختصارات التطبيقات التي أنشأها IMD على الشاشة الرئيسية.</string>
+    <string name="help_general_shortcuts">2. يمكنك في هذا التطبيق إنشاء اختصارات للتطبيقات مباشرةً على شاشتك الرئيسية بالضغط مطوّلًا على اسم التطبيق في تبويب كل التطبيقات أو المفضّلة.</string>
+    <string name="help_general_revert">3. بعد انتهائك من استخدام تطبيقك، اضغط على زر استعادة / استعادة الوضع الافتراضي لإظهار إعداداتك السابقة أو تفعيلها من جديد.</string>
+    <string name="help_general_revert_places">يمكنك استخدام زر الاستعادة من هذه الأماكن:</string>
+    <string name="help_general_revert_items">•  الإشعار الذي يظهر بعد فتح التطبيق\n•  مفتاح الإعدادات السريعة في Android\n•  تبويب المفضّلة\n•  اختصار الشاشة الرئيسية (اضغط مطوّلًا على أيقونة IMD لإنشاء الاختصار)</string>
+    <string name="help_general_manager_title">مدير خدمات IMD</string>
+    <string name="help_general_manager">استخدم مدير الخدمات هذا لعرض الحالة الحيّة لإعداداتك وخدماتك بسرعة، ولتشغيلها أو إيقافها بسرعة كذلك.</string>
+    <string name="help_general_manager_places">يمكنك فتح مدير خدمات IMD من هذه الأماكن:</string>
+    <string name="help_general_manager_items">•  مفتاح الإعدادات السريعة في Android\n•  تبويب المفضّلة\n•  اختصار الشاشة الرئيسية (اضغط مطوّلًا على أيقونة IMD لإنشاء الاختصار)</string>
+
+    <!-- Phrases bolded inside the sentences above -->
+    <string name="help_name_mandatory">(إلزامي)</string>
+    <string name="help_name_revert">الاستعادة</string>
+    <string name="help_name_revert_button">استعادة / استعادة الوضع الافتراضي</string>
+
+    <string name="section_advanced">الإعدادات المتقدمة</string>
+</resources>

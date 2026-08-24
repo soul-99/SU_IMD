@@ -19,11 +19,13 @@
 package com.android.geto.activity.revert
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.android.geto.activity.main.MainActivity
 import com.android.geto.activity.services.ServicesActivity
+import com.android.geto.common.AppLocale
 
 /**
  * Where a long press on either Quick Settings tile lands.
@@ -41,6 +43,12 @@ import com.android.geto.activity.services.ServicesActivity
  * manager cannot show.
  */
 class TilePreferencesActivity : ComponentActivity() {
+    // The chosen language, applied before anything reads a string. A no-op on Android 13
+    // and up, where the platform has already applied it to this context.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

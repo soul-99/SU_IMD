@@ -23,8 +23,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,11 +38,11 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -70,19 +70,19 @@ import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.domain.model.FavouriteAppsData
 import com.android.geto.domain.model.FavouriteAppsView
-import com.android.geto.domain.model.NotificationFunction
-import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
 import com.android.geto.domain.model.LauncherAppsActivityInfo
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.SortFavouriteApps
-import com.android.geto.feature.apps.manager.SettingsManagerRoute
 import com.android.geto.feature.apps.dialog.FavouriteAppsOptionsDialog
 import com.android.geto.feature.apps.dialog.ReorderFavouriteAppsDialog
+import com.android.geto.feature.apps.manager.SettingsManagerRoute
+import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
 import com.android.geto.ui.local.LocalLauncherApps
 import com.android.geto.ui.local.LocalNotificationManager
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlin.time.Duration.Companion.milliseconds
 import com.android.geto.designsystem.R as designR
 
 @Composable

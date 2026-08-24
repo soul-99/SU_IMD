@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      Japanese. Machine translation, reviewed for consistency of terminology.
+
+      Two things in here are load-bearing rather than cosmetic:
+
+      * The help page's menu paths have to name screens exactly as those screens are
+        named in this file. A path pointing at a heading that does not exist in Japanese is
+        worse than one left in English.
+      * The short strings used for bolding (help_name_*, notif_name_*,
+        settings_to_hide_name_shizuku_hide) are matched as substrings inside the longer
+        strings they highlight. Word them differently in the two places and the bolding
+        silently does nothing.
+    -->
+    <string name="settings">設定</string>
+    <string name="dynamic_theme">ダイナミックテーマ</string>
+    <string name="cancel">キャンセル</string>
+    <string name="change">変更</string>
+    <string name="close">閉じる</string>
+    <string name="theme">テーマ</string>
+    <string name="available_on_android_12">Android 12 以降で利用可能</string>
+    <string name="follow_system">システムに合わせる</string>
+    <string name="light">ライト</string>
+    <string name="dark">ダーク</string>
+    <string name="start_service">サービスを開始</string>
+    <string name="stop_service">サービスを停止</string>
+    <string name="settings_observer_service">設定オブザーバーサービス</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">Shizuku の構成</string>
+    <string name="restart_shizuku_service">Shizuku サービスを再起動</string>
+    <string name="restart_shizuku_service_description">通知から USB デバッグを元に戻すとき（メモリー機能のみ）、Shizuku サービスを自動的に開始します。</string>
+    <string name="shizuku_needs">必要なもの:</string>
+    <string name="shizuku_forks_suffix">/ サービス開始インテントに対応する Shizuku のその他のフォーク（RikkaApps とその直接のフォークはサービス開始インテントに対応していません）。</string>
+    <string name="shizuku_fork_mode_thedjchi">Shizuku の thedjchi 系フォーク</string>
+    <string name="shizuku_fork_mode_other">Shevery / Shizuku のその他のフォーク</string>
+    <string name="shizuku_choose_app">インストール済みのアプリを選択</string>
+    <string name="shizuku_fill_advanced">先に「Shizuku の構成」セクションを入力してください</string>
+    <string name="show_value">表示</string>
+    <string name="hide_value">非表示</string>
+    <string name="shizuku_view_intents_hint">値をコピーするには Shizuku アプリ &gt; view intents に移動してください</string>
+    <string name="shizuku_other_fork_hint">デフォルトの値で動作しない場合は、お使いの Shizuku フォークのアプリ内、またはそのリポジトリで開始インテントの値を探してください</string>
+    <string name="shizuku_start_action">サービス開始インテント（action）</string>
+    <string name="shizuku_package_name">パッケージ名</string>
+    <string name="shizuku_auth_key">認証キー（extras &gt; auth:）</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_services">非表示にするユーザー補助サービス</string>
+    <string name="accessibility_services_dialog_description">アプリ設定がユーザー補助サービスを非表示にすると、これらのサービスはオフになり、元に戻したときに再びオンになります。復元されるのは、このアプリがオフにしたサービスだけです。</string>
+    <string name="accessibility_services_none_selected">選択されていません。このデバイスでは現在 %1$d 件が有効です。</string>
+    <string name="accessibility_services_selected">%1$d 件を選択中。このデバイスでは現在 %2$d 件が有効です。</string>
+    <string name="accessibility_service_enabled">有効 · %1$s</string>
+    <string name="accessibility_service_disabled">オフ · %1$s</string>
+    <string name="no_accessibility_services">このデバイスにはユーザー補助サービスがインストールされていません。</string>
+
+    <!-- About -->
+    <string name="about">アプリについて</string>
+    <string name="about_version">バージョン %1$s</string>
+    <string name="about_check_releases">更新を確認するには GitHub のリリースページを開いてください</string>
+    <string name="about_add_to_obtainium">Obtainium に追加</string>
+    <string name="about_obtainium_note">（更新を追跡 / アプリを自動更新するため）</string>
+    <string name="about_created_by">アプリ作成者</string>
+    <string name="about_view_github">GitHub を見る</string>
+    <string name="about_fork_of">フォーク元</string>
+    <string name="about_geto_app">Geto アプリ</string>
+
+    <string name="long_live_foss">自由でオープンソースなソフトウェアよ、永遠なれ！</string>
+
+    <!-- suIMD: collapsible section headers -->
+    <string name="section_ui">ユーザーインターフェース</string>
+    <string name="language">言語</string>
+    <string name="section_app_functions">デフォルト IMD 設定</string>
+
+    <!-- suIMD: notification function -->
+    <string name="notification_function">通知機能</string>
+    <string name="notification_function_memory">メモリー機能</string>
+    <string name="notification_function_memory_option">メモリー機能（旧方式）</string>
+    <string name="notification_function_memory_summary">アプリの起動ごとに個別の通知</string>
+    <string name="notification_function_memory_detail">そのアプリ用に指定したデバイス設定をオフにする前に、以前の状態を保存し、IMD がオフにしたものだけを復元します</string>
+    <string name="notification_function_memory_warning_config">「すべてのアプリ」タブまたは「お気に入り」タブでアプリのアイコンを長押しして、アプリごとに非表示にする設定を手動で指定する必要があります。</string>
+    <string name="notification_function_memory_warning_revert">メモリー機能を使うのは通知の「元に戻す」ボタンだけです。それ以外の戻し方（クイック設定タイル、アプリ内のボタンなど）は、これまでどおり IMD アプリの設定にある元に戻すときに再表示する設定に従って戻します。</string>
+    <string name="notification_function_memory_note">メモリー機能を使うと、IMD アプリの標準の 4 つの設定以外の設定も非表示にできます</string>
+    <string name="notif_name_all_apps">すべてのアプリ</string>
+    <string name="notif_name_favourites">お気に入り</string>
+    <string name="notif_name_revert_button">元に戻す</string>
+    <string name="notification_function_revert">デフォルトに戻す</string>
+    <string name="notification_function_revert_option">デフォルトに戻す（推奨）</string>
+    <string name="notification_function_revert_summary">通知は 1 件のみ</string>
+    <string name="notification_function_revert_detail">デバイスの設定を、IMD 設定で指定した元に戻すときに再表示する設定に戻します</string>
+    <string name="save">保存</string>
+
+    <!-- suIMD: revert to default configuration -->
+    <string name="revert_defaults">「デフォルトに戻す」の構成</string>
+    <string name="revert_defaults_entry">元に戻すときに再表示する設定</string>
+    <string name="revert_defaults_notice_title">お知らせ</string>
+    <string name="revert_defaults_notice_body">セキュリティ上の理由により、デフォルトの元に戻すときに再表示する設定はリセットされました。次の場所から設定し直してください:</string>
+    <string name="revert_defaults_notice_dismiss">了解しました</string>
+    <string name="revert_defaults_description">どこかで「デフォルトに戻す」ボタンをタップすると、これらの設定が再表示 / 再度有効化されます。</string>
+    <string name="revert_defaults_summary">%2$d 件中 %1$d 件がオン</string>
+    <string name="settings_to_hide">非表示にする設定</string>
+    <string name="settings_to_hide_title">非表示 / 無効にする設定</string>
+    <string name="settings_to_hide_description">アプリを起動すると、これらの設定が非表示になります。</string>
+    <string name="settings_to_hide_summary">%2$d 件中 %1$d 件がオン</string>
+    <string name="settings_to_hide_usb_note">USB デバッグを停止すると、実行中の Shizuku サービスも終了します。元に戻したあとに Shizuku サービスを再開するには、IMD アプリで Shizuku の構成を行ってください</string>
+    <string name="settings_to_hide_info_per_app">アプリごとに異なる設定を非表示にしたい場合は、IMD 設定 &gt; 詳細設定 &gt; 通知機能 でメモリー機能をお使いください</string>
+    <string name="settings_to_hide_info_all">開発者向けオプションだけを非表示にしても USB デバッグとワイヤレス デバッグはオフにならず、それでも開発者向けオプションがオンだと判定するアプリがあります。そのため、3 つすべてを選択することをおすすめします</string>
+    <string name="settings_to_hide_info_shizuku">アプリから Shizuku を隠すには、Shizuku アプリ内の「他のアプリから Shizuku を隠す」機能をお使いください。</string>
+    <string name="settings_to_hide_name_shizuku_hide">他のアプリから Shizuku を隠す</string>
+    <string name="settings_to_hide_info_watchdog">Shizuku のウォッチドッグサービスはオフのままにすることをおすすめします。設定を非表示にしている間に Shizuku がバックグラウンドで再起動すると ADB もオンになり、アプリがそれを検出できてしまうためです。</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">Shizuku のウォッチドッグサービス</string>
+    <string name="revert_defaults_developer_settings">開発者向けオプション</string>
+    <string name="revert_defaults_usb_debugging">USB デバッグ</string>
+    <string name="revert_defaults_wireless_debugging">ワイヤレス デバッグ</string>
+    <string name="revert_defaults_accessibility_services">ユーザー補助サービス</string>
+    <string name="revert_defaults_accessibility_note">管理されるのは IMD アプリの設定で選択したサービスだけです</string>
+    <string name="revert_defaults_shizuku">Shizuku サービス</string>
+    <string name="revert_defaults_shizuku_note">Shizuku がサービスの開始に使う方式に応じて、USB デバッグかワイヤレス デバッグのどちらかが再びオンになります。Shizuku サービスを動かし続けるにも、それが必要です</string>
+
+    <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
+    <string name="help_button">ヘルプ（readme）</string>
+    <string name="help_close">閉じる</string>
+    <string name="help_title">このアプリの設定方法（飛ばさないでください）</string>
+    <string name="help_intro">ここに挙げるのは、ご自身で設定していただく必要がある項目です。</string>
+    <string name="help_again">このページをもう一度開くには -</string>
+    <string name="help_numbered_title">%1$d.  %2$s</string>
+    <string name="help_path_help">IMD 設定 → アプリについて → ヘルプ（readme）</string>
+    <string name="help_path_hide">IMD 設定 → デフォルト IMD 設定 → 非表示にする設定</string>
+    <string name="help_path_unhide">IMD 設定 → デフォルト IMD 設定 → 元に戻すときに再表示する設定</string>
+    <string name="help_path_accessibility">IMD 設定 → デフォルト IMD 設定 → 非表示にするユーザー補助サービス</string>
+    <string name="help_path_shizuku">IMD 設定 → Shizuku の構成</string>
+    <string name="help_hide_title">非表示にする設定を決める（必須）</string>
+    <string name="help_hide_body">デフォルトではすべての設定が非表示になります（推奨）が、お好みに合わせて変更できます。</string>
+    <string name="help_revert_title">「元に戻す」ときに再表示する設定を決める（推奨）</string>
+    <string name="help_revert_body">デフォルトで有効なのはユーザー補助サービスだけです。そのリストにある他の項目はすべてデバッグ用の設定で、自動的にオンへ戻すのはセキュリティ上のリスクになるためです。お好みに合わせて変更できます。</string>
+    <string name="help_accessibility_title">非表示にするユーザー補助サービスを決める</string>
+    <string name="help_accessibility_body">どのサービスを対象にするか指定するまで、このアプリはユーザー補助サービスに一切手を触れません。制限の厳しいアプリを開いている間はオフにしておきたいものにチェックを入れてください。元に戻すと、それらは再びオンになります。</string>
+    <string name="help_shizuku_title">Shizuku の開始インテントを設定する（Shizuku を使う場合のみ）</string>
+    <string name="help_shizuku_body">Shizuku サービスを使っている場合、IMD がデバッグ設定をオフにするたびに Shizuku サービスも終了します。そのため、Shizuku の開始インテントを設定して動作を確認しておくことをおすすめします。</string>
+    <string name="help_general_title">全般情報</string>
+    <string name="help_general_how_title">IMD の使い方</string>
+    <string name="help_general_launch">1. 制限の厳しいアプリを使うには、IMD アプリの中から起動するか、IMD で作成したホーム画面のアプリのショートカットから起動する必要があります。</string>
+    <string name="help_general_shortcuts">2. このアプリでは、「すべてのアプリ」タブまたは「お気に入り」タブでアプリ名を長押しすると、ホーム画面に直接アプリのショートカットを作成できます。</string>
+    <string name="help_general_revert">3. アプリを使い終わったら、「元に戻す / デフォルトに戻す」ボタンで、以前の設定を再表示または再度有効化してください。</string>
+    <string name="help_general_revert_places">元に戻すボタンは次の場所から使えます:</string>
+    <string name="help_general_revert_items">•  アプリ起動後の通知\n•  Android のクイック設定タイル\n•  「お気に入り」タブ\n•  ホーム画面のショートカット（IMD のアイコンを長押しするとショートカットを作成できます）</string>
+    <string name="help_general_manager_title">IMD サービスマネージャー</string>
+    <string name="help_general_manager">このサービスマネージャーを使うと、設定やサービスの現在の状態をすばやく確認でき、オン・オフの切り替えもその場でできます。</string>
+    <string name="help_general_manager_places">IMD サービスマネージャーは次の場所から開けます:</string>
+    <string name="help_general_manager_items">•  Android のクイック設定タイル\n•  「お気に入り」タブ\n•  ホーム画面のショートカット（IMD のアイコンを長押しするとショートカットを作成できます）</string>
+    <string name="help_name_mandatory">（必須）</string>
+    <string name="help_name_revert">元に戻す</string>
+    <string name="help_name_revert_button">元に戻す / デフォルトに戻す</string>
+
+    <string name="section_advanced">詳細設定</string>
+</resources>

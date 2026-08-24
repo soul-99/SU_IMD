@@ -16,6 +16,13 @@
   ~
   -->
 <resources>
-    <string name="revert">Revert</string>
+    <!--
+      The two notification actions, named for the mechanism each one runs rather than both
+      saying "Revert". Which notification is posted follows the notification function, so
+      the label is the only place on screen that says which of the two is about to happen -
+      and they do different things: one restores what this app changed for this app, the
+      other drives the whole device to the configured state.
+    -->
+    <string name="revert_using_memory">Revert using memory</string>
     <string name="revert_to_default">Revert to default</string>
 </resources>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Spanish. Machine translation, reviewed for consistency of terminology.
+
+      Left untranslated on purpose: the app name, Shizuku and ADB (product names), the adb
+      command itself, and WRITE_SECURE_SETTINGS, which has to be typed exactly as written.
+
+      setup_use_shizuku is matched as a substring inside setup_secure_settings_shizuku, to
+      bold it. Word it differently in the two places and nothing is bolded, silently.
+    -->
+    <string name="app_name">IMD</string>
+    <string name="favourite_apps">Favoritos</string>
+    <string name="all_apps">Todas las apps</string>
+    <string name="settings">Ajustes</string>
+
+    <!-- First-run setup -->
+    <string name="setup_purpose">Abre apps bancarias y otras apps restringidas sin tener que desactivar a mano las opciones de desarrollador, la depuración USB o tus servicios de accesibilidad cada vez. Elige una app, indica qué debe cambiar mientras se ejecuta, y esta app lo deja todo como estaba al terminar.</string>
+    <string name="setup_step">Paso %1$d</string>
+    <string name="setup_granted">Concedido</string>
+    <string name="setup_not_granted">No concedido</string>
+    <string name="setup_secure_settings_title">Acceso a los ajustes seguros</string>
+    <string name="setup_secure_settings_why">Android no permite que ninguna app normal cambie estos ajustes. El permiso se concede una sola vez desde un shell y se mantiene tras reiniciar, pero no tras una reinstalación.</string>
+    <string name="setup_copy_command">Copiar comando</string>
+    <string name="setup_check_again">Comprobar de nuevo</string>
+    <string name="setup_use_shizuku">Usar Shizuku</string>
+    <string name="services_shortcut_label">Administrador de servicios</string>
+    <string name="revert_shortcut_label">Revertir a valores predeterminados</string>
+    <string name="shortcut_not_configured_title">No hay nada configurado para esta app</string>
+    <string name="shortcut_not_configured_message">Primero tienes que configurar qué ajustes ocultar para esta app en IMD → Todas las apps → toca el nombre de la app → Plantilla de ajustes → selecciona qué ajustes ocultar.</string>
+    <string name="shortcut_not_configured_dismiss">Entendido</string>
+    <string name="obtainium_title">Mantener esta app actualizada</string>
+    <string name="obtainium_body">Como esta app funciona completamente sin conexión, usa Obtainium para buscar actualizaciones e instalarlas directamente desde las versiones publicadas en GitHub.</string>
+    <string name="obtainium_do_not_show_again">No volver a mostrar</string>
+    <string name="obtainium_add">Añadir a Obtainium</string>
+    <string name="tip">Consejo</string>
+    <string name="tip_got_it">Entendido</string>
+    <string name="tip_developer_options">No necesitas mantener activadas las opciones de desarrollador para Shizuku, así que puedes dejarlas desactivadas. Cuando Shizuku inicia su servicio, activa la depuración USB por su cuenta, sin activar las opciones de desarrollador, usando su propio permiso WRITE_SECURE_SETTINGS.</string>
+    <string name="setup_shizuku_working">Consultando a Shizuku…</string>
+    <string name="setup_shizuku_granted">Concedido mediante Shizuku.</string>
+    <string name="setup_shizuku_not_running">No se encontró ningún servicio de Shizuku. Inicia Shizuku y vuelve a intentarlo.</string>
+    <string name="setup_shizuku_denied">Shizuku lo ha denegado. Permite esta app en Shizuku y vuelve a intentarlo. Si elegiste “denegar y no volver a preguntar”, quítala primero de la lista de apps de Shizuku.</string>
+    <string name="setup_shizuku_failed">Shizuku no pudo ejecutar el comando. Usa el comando ADB en su lugar.</string>
+    <string name="setup_shizuku_once">Aviso: Shizuku solo hace falta para conceder este permiso. El permiso se mantiene tras reiniciar, así que después puedes detener o desinstalar Shizuku, salvo que quieras usar la función opcional “Reiniciar el servicio de Shizuku” de Ajustes, que vuelve a necesitarlo más adelante.</string>
+    <string name="setup_shizuku_once_extra">Si activaste la depuración y las opciones de desarrollador para configurar Shizuku, también puedes desactivarlas: esta app no necesita ninguna de las dos una vez completada la configuración.</string>
+    <string name="setup_secure_settings_adb">Con un PC: activa la depuración USB → conecta el teléfono a un PC con una terminal de shell ADB → ejecuta el comando de arriba.</string>
+    <string name="setup_secure_settings_shizuku">Sin PC (Recomendado):\n1. Instala y configura la app Shizuku e inicia el servicio de Shizuku\n2. Toca el botón Usar Shizuku de arriba\n3. Toca en permitir cuando aparezca el aviso.</string>
+    <string name="setup_notifications_title">Notificaciones</string>
+    <string name="setup_notifications_why">Cada vez que se aplican los ajustes aparece una notificación persistente con una acción Revertir. Esa notificación es lo que te permite dejar el dispositivo como estaba. Más adelante puedes desactivar todas las notificaciones de esta app si prefieres revertir los ajustes con los mosaicos de Ajustes rápidos o con accesos directos en la pantalla de inicio.</string>
+    <string name="setup_allow_notifications">Permitir</string>
+    <string name="setup_open_settings">Abrir ajustes</string>
+    <string name="setup_notifications_denied_hint">¿Ya lo has rechazado dos veces? Android deja de mostrar el aviso, así que usa Abrir ajustes.</string>
+    <string name="setup_next">Siguiente</string>
+    <string name="setup_back">Atrás</string>
+    <string name="setup_finish">Empezar</string>
+
+    <!-- suIMD: the language step, shown once, ahead of the permissions screen -->
+    <string name="language_setup_title">Elige tu idioma</string>
+    <string name="language_setup_subtitle">Puedes cambiarlo más adelante en Ajustes → Interfaz de usuario.</string>
+    <string name="language_setup_continue">Continuar</string>
+    <string name="setup_blocked">Ambos pasos son obligatorios. Sin ellos, la app no puede cambiar ni restaurar ni un solo ajuste.</string>
+    <string name="setup_copied">Copiado</string>
+    <string name="setup_open_settings_failed">No se pudieron abrir los ajustes en este dispositivo</string>
+</resources>

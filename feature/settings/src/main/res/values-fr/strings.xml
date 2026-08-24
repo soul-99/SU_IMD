@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      French. Machine translation, reviewed for consistency of terminology.
+
+      Two things in here are load-bearing rather than cosmetic:
+
+      * The help page's menu paths have to name screens exactly as those screens are
+        named in this file. A path pointing at a heading that does not exist in French is
+        worse than one left in English.
+      * The short strings used for bolding (help_name_*, notif_name_*,
+        settings_to_hide_name_shizuku_hide) are matched as substrings inside the longer
+        strings they highlight. Word them differently in the two places and the bolding
+        silently does nothing. None of them contains an apostrophe, so no escape has to
+        line up between the two copies.
+    -->
+    <string name="settings">Paramètres</string>
+    <string name="dynamic_theme">Thème dynamique</string>
+    <string name="cancel">Annuler</string>
+    <string name="change">Modifier</string>
+    <string name="close">Fermer</string>
+    <string name="theme">Thème</string>
+    <string name="available_on_android_12">Disponible sur Android 12 +</string>
+    <string name="follow_system">Suivre le système</string>
+    <string name="light">Clair</string>
+    <string name="dark">Sombre</string>
+    <string name="start_service">Démarrer le service</string>
+    <string name="stop_service">Arrêter le service</string>
+    <string name="settings_observer_service">Service Observateur de paramètres</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku">Configuration de Shizuku</string>
+    <string name="restart_shizuku_service">Redémarrer le service Shizuku</string>
+    <string name="restart_shizuku_service_description">Lors du rétablissement du débogage USB depuis la notification (fonction mémoire uniquement), démarrer automatiquement le service Shizuku.</string>
+    <string name="shizuku_needs">Nécessite</string>
+    <string name="shizuku_forks_suffix">/ autres forks de Shizuku qui prennent en charge les intents de démarrage du service (RikkaApps et ses forks directs ne prennent pas en charge l\'intent de démarrage du service).</string>
+    <string name="shizuku_fork_mode_thedjchi">Forks de Shizuku basés sur thedjchi</string>
+    <string name="shizuku_fork_mode_other">Shevery / autres forks de Shizuku</string>
+    <string name="shizuku_choose_app">Choisir une application installée</string>
+    <string name="shizuku_fill_advanced">Veuillez d\'abord remplir la section Configuration de Shizuku</string>
+    <string name="show_value">Afficher</string>
+    <string name="hide_value">Masquer</string>
+    <string name="shizuku_view_intents_hint">Allez dans l\'application Shizuku &gt; view intents pour copier les valeurs</string>
+    <string name="shizuku_other_fork_hint">Si les valeurs par défaut ne fonctionnent pas, cherchez la valeur de l\'intent de démarrage dans votre application fork de Shizuku ou dans son dépôt</string>
+    <string name="shizuku_start_action">Intent de démarrage du service (action)</string>
+    <string name="shizuku_package_name">Nom du package</string>
+    <string name="shizuku_auth_key">Clé d\'authentification (extras &gt; auth:)</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_services">Services d\'accessibilité à masquer</string>
+    <string name="accessibility_services_dialog_description">Ces services sont désactivés lorsqu\'un paramètre d\'application masque les services d\'accessibilité, et réactivés lorsque vous rétablissez. Seuls ceux que cette application a désactivés sont restaurés.</string>
+    <string name="accessibility_services_none_selected">Aucun sélectionné. %1$d actuellement activés sur cet appareil.</string>
+    <string name="accessibility_services_selected">%1$d sélectionnés, %2$d actuellement activés sur cet appareil.</string>
+    <string name="accessibility_service_enabled">Activé · %1$s</string>
+    <string name="accessibility_service_disabled">Désactivé · %1$s</string>
+    <string name="no_accessibility_services">Aucun service d\'accessibilité n\'est installé sur cet appareil.</string>
+
+    <!-- About -->
+    <string name="about">À propos</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_check_releases">Ouvrir la page des versions GitHub pour rechercher des mises à jour</string>
+    <string name="about_add_to_obtainium">Ajouter à Obtainium</string>
+    <string name="about_obtainium_note">(pour suivre les mises à jour / mettre à jour l\'application automatiquement)</string>
+    <string name="about_created_by">Application créée par</string>
+    <string name="about_view_github">Voir sur GitHub</string>
+    <string name="about_fork_of">Fork de</string>
+    <string name="about_geto_app">l\'application Geto</string>
+
+    <string name="long_live_foss">Vive les logiciels libres et open source !</string>
+
+    <!-- suIMD: collapsible section headers -->
+    <string name="section_ui">Interface utilisateur</string>
+    <string name="language">Langue</string>
+    <string name="section_app_functions">Paramètres IMD par défaut</string>
+
+    <!-- suIMD: notification function -->
+    <string name="notification_function">Fonction de notification</string>
+    <string name="notification_function_memory">Fonction mémoire</string>
+    <string name="notification_function_memory_option">Fonction mémoire (ancienne méthode)</string>
+    <string name="notification_function_memory_summary">Plusieurs notifications, une par lancement d\'application</string>
+    <string name="notification_function_memory_detail">enregistre l\'état précédent des paramètres de l\'appareil avant de désactiver ceux qui sont configurés pour cette application, et ne restaure que ceux qui ont été désactivés par IMD</string>
+    <string name="notification_function_memory_warning_config">Vous devrez configurer manuellement les paramètres à masquer pour chaque application, en appuyant de manière prolongée sur son icône dans l\'onglet Toutes les applications ou Favoris.</string>
+    <string name="notification_function_memory_warning_revert">Seul le bouton Rétablir des notifications utilisera la fonction mémoire ; tous les autres moyens de rétablissement (tuile des réglages rapides, bouton dans l\'application… etc.) appliqueront quand même la configuration Paramètres à réafficher avec Rétablir définie dans les paramètres de l\'application IMD.</string>
+    <string name="notification_function_memory_note">La fonction mémoire vous permet de masquer d\'autres paramètres que les 4 paramètres par défaut de l\'application IMD</string>
+    <string name="notif_name_all_apps">Toutes les applications</string>
+    <string name="notif_name_favourites">Favoris</string>
+    <string name="notif_name_revert_button">Rétablir</string>
+    <string name="notification_function_revert">Rétablir par défaut</string>
+    <string name="notification_function_revert_option">Rétablir par défaut (recommandé)</string>
+    <string name="notification_function_revert_summary">Une seule notification</string>
+    <string name="notification_function_revert_detail">rétablit les paramètres de l\'appareil selon les Paramètres à réafficher avec Rétablir configurés dans les paramètres IMD</string>
+    <string name="save">Enregistrer</string>
+
+    <!-- suIMD: revert to default configuration -->
+    <string name="revert_defaults">Configuration du rétablissement par défaut</string>
+    <string name="revert_defaults_entry">Paramètres à réafficher avec Rétablir</string>
+    <string name="revert_defaults_notice_title">Avis</string>
+    <string name="revert_defaults_notice_body">Pour des raisons de sécurité, la configuration par défaut des Paramètres à réafficher avec Rétablir a été réinitialisée. Veuillez la reconfigurer depuis :</string>
+    <string name="revert_defaults_notice_dismiss">Compris</string>
+    <string name="revert_defaults_description">Ces paramètres sont réaffichés ou réactivés lorsque vous appuyez sur le bouton « Rétablir par défaut », où qu\'il se trouve.</string>
+    <string name="revert_defaults_summary">%1$d sur %2$d activés</string>
+
+    <string name="settings_to_hide">Paramètres à masquer</string>
+    <string name="settings_to_hide_title">Paramètres à masquer / désactiver</string>
+    <string name="settings_to_hide_description">Ces paramètres sont masqués lorsque vous lancez une application.</string>
+    <string name="settings_to_hide_summary">%1$d sur %2$d activés</string>
+    <string name="settings_to_hide_usb_note">arrêter le débogage USB arrêtera aussi le service Shizuku (s\'il est en cours d\'exécution) ; veuillez configurer les paramètres Shizuku dans l\'application IMD pour redémarrer le service Shizuku après le rétablissement</string>
+    <string name="settings_to_hide_info_per_app">Si vous voulez masquer des paramètres différents pour chaque application, utilisez la fonction mémoire dans Paramètres IMD &gt; Avancé &gt; Fonction de notification</string>
+    <string name="settings_to_hide_info_all">Masquer uniquement les options pour les développeurs ne désactive pas le débogage USB ni le débogage sans fil, et certaines applications peuvent quand même considérer que les options pour les développeurs sont activées ; il est donc recommandé de sélectionner les trois</string>
+    <string name="settings_to_hide_info_shizuku">pour masquer Shizuku aux applications, utilisez la fonction Masquer Shizuku des autres applications présente dans l\'application Shizuku.</string>
+    <string name="settings_to_hide_name_shizuku_hide">Masquer Shizuku des autres applications</string>
+    <string name="settings_to_hide_info_watchdog">Il est recommandé de laisser le service watchdog de Shizuku désactivé, car si Shizuku redémarre en arrière-plan il activera aussi ADB alors que les paramètres sont masqués, et vos applications pourraient le détecter.</string>
+    <string name="settings_to_hide_name_shizuku_watchdog">service watchdog de Shizuku</string>
+    <string name="revert_defaults_developer_settings">Options pour les développeurs</string>
+    <string name="revert_defaults_usb_debugging">Débogage USB</string>
+    <string name="revert_defaults_wireless_debugging">Débogage sans fil</string>
+    <string name="revert_defaults_accessibility_services">Services d\'accessibilité</string>
+    <string name="revert_defaults_accessibility_note">seuls les services sélectionnés dans les paramètres de l\'application IMD sont gérés</string>
+    <string name="revert_defaults_shizuku">Service Shizuku</string>
+    <string name="revert_defaults_shizuku_note">Selon la méthode que Shizuku utilise pour démarrer son service, il réactivera soit le débogage USB, soit le débogage sans fil, dont il a aussi besoin pour maintenir le service Shizuku en fonctionnement</string>
+
+    <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
+    <string name="help_button">Aide (readme)</string>
+    <string name="help_close">Fermer</string>
+    <string name="help_title">Comment configurer cette application (à ne pas ignorer)</string>
+    <string name="help_intro">Voici les éléments que vous devez configurer vous-même.</string>
+    <string name="help_again">Pour revenir à cette page -</string>
+    <string name="help_numbered_title">%1$d.  %2$s</string>
+    <string name="help_path_help">Paramètres IMD → À propos → Aide (readme)</string>
+    <string name="help_path_hide">Paramètres IMD → Paramètres IMD par défaut → Paramètres à masquer</string>
+    <string name="help_path_unhide">Paramètres IMD → Paramètres IMD par défaut → Paramètres à réafficher avec Rétablir</string>
+    <string name="help_path_accessibility">Paramètres IMD → Paramètres IMD par défaut → Services d\'accessibilité à masquer</string>
+    <string name="help_path_shizuku">Paramètres IMD → Configuration de Shizuku</string>
+    <string name="help_hide_title">Configurer les paramètres à masquer (OBLIGATOIRE)</string>
+    <string name="help_hide_body">par défaut, tous les paramètres sont masqués (recommandé), mais vous pouvez adapter cela à votre convenance.</string>
+    <string name="help_revert_title">Configurer les paramètres à réafficher avec Rétablir (RECOMMANDÉ)</string>
+    <string name="help_revert_body">par défaut, seuls les services d\'accessibilité sont activés, car tout le reste de cette liste est un paramètre de débogage et les réactiver automatiquement présente un risque de sécurité. Vous pouvez adapter cela à votre convenance.</string>
+    <string name="help_accessibility_title">Configurer les services d\'accessibilité à masquer</string>
+    <string name="help_accessibility_body">L\'application ne touchera à aucun service d\'accessibilité tant que vous n\'aurez pas indiqué lesquels ; cochez ensuite ceux qui doivent être désactivés pendant qu\'une application verrouillée est ouverte. Ils sont réactivés lorsque vous rétablissez.</string>
+    <string name="help_shizuku_title">Configurer les intents de démarrage de Shizuku (uniquement si vous utilisez Shizuku)</string>
+    <string name="help_shizuku_body">Si vous utilisez le service Shizuku, chaque fois qu\'IMD désactivera les paramètres de débogage il arrêtera le service Shizuku ; il est donc recommandé de configurer &amp; de vérifier les intents de démarrage de Shizuku.</string>
+    <string name="help_general_title">Informations générales</string>
+    <string name="help_general_how_title">COMMENT UTILISER IMD</string>
+    <string name="help_general_launch">1. Pour utiliser les applications bloquées, vous devez les lancer soit depuis l\'application IMD, soit via les raccourcis créés par IMD sur l\'écran d\'accueil.</string>
+    <string name="help_general_shortcuts">2. Dans cette application, vous pouvez créer des raccourcis directement sur votre écran d\'accueil en appuyant de manière prolongée sur le nom d\'une application dans l\'onglet Toutes les applications ou Favoris.</string>
+    <string name="help_general_revert">3. Une fois que vous avez fini d\'utiliser votre application, utilisez le bouton Rétablir / Rétablir par défaut pour réafficher et réactiver vos paramètres précédents.</string>
+    <string name="help_general_revert_places">Vous pouvez utiliser le bouton de rétablissement depuis ces endroits :</string>
+    <string name="help_general_revert_items">•  les notifications après le lancement d\'une application\n•  la tuile des réglages rapides Android\n•  l\'onglet Favoris\n•  un raccourci de l\'écran d\'accueil (appui prolongé sur l\'icône IMD pour créer le raccourci)</string>
+    <string name="help_general_manager_title">GESTIONNAIRE DE SERVICES IMD</string>
+    <string name="help_general_manager">Utilisez ce gestionnaire de services pour voir rapidement l\'état en direct de vos paramètres et services, et pour les activer ou les désactiver rapidement.</string>
+    <string name="help_general_manager_places">Vous pouvez ouvrir le Gestionnaire de services IMD depuis ces endroits :</string>
+    <string name="help_general_manager_items">•  la tuile des réglages rapides Android\n•  l\'onglet Favoris\n•  un raccourci de l\'écran d\'accueil (appui prolongé sur l\'icône IMD pour créer le raccourci)</string>
+    <string name="help_name_mandatory">(OBLIGATOIRE)</string>
+    <string name="help_name_revert">Rétablir</string>
+    <string name="help_name_revert_button">Rétablir / Rétablir par défaut</string>
+
+    <string name="section_advanced">Avancé</string>
+</resources>

@@ -20,9 +20,9 @@ package com.android.geto.activity.shortcut
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.geto.domain.framework.PackageManagerWrapper
+import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.repository.UserDataRepository
-import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
 import com.android.geto.domain.usecase.ApplySettingsToHideUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

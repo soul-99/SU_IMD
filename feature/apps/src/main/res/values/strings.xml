@@ -56,6 +56,19 @@
     <!-- Not "revert": :framework:notification-manager owns that name for the
          notification action, and the two merge into one resource in :app. -->
     <string name="settings_manager_title">IMD services manager</string>
+
+    <!--
+      The manager's information popup. settings_manager_title, and the two _name_ strings
+      below, are matched as substrings inside the longer strings to bold them - word them
+      differently in the two places and nothing is bolded, silently.
+    -->
+    <string name="settings_manager_info">What this dialog does</string>
+    <string name="settings_manager_info_live">IMD services manager displays the live status of the settings and services. It does not decide which settings/services to hide or un-hide when apps are opened via IMD / IMD created app shortcuts.</string>
+    <string name="settings_manager_info_live_extra">To set what to hide and un-hide on launching apps via IMD, please configure the default IMD settings within the IMD app.</string>
+    <string name="settings_manager_info_name_defaults">default IMD settings</string>
+    <string name="settings_manager_info_developer">Turning developer options off via IMD only turns the developer settings flag on-off, it does not reset the changes made in developer settings (like animation scale settings, mock location app…etc).</string>
+    <string name="settings_manager_info_developer_extra">To reset developer settings open the developer settings page and turn it off from there.</string>
+    <string name="settings_manager_info_name_reset">reset developer settings</string>
     <string name="revert_to_default">Revert to default</string>
     <string name="not_configured_title">No settings to hide, you need to configure the settings to hide for this app.</string>
     <string name="not_configured_message">In IMD app long press this app to open what settings to hide.</string>

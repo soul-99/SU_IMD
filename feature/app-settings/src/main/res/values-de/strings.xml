@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- German. Machine translation, reviewed for consistency of terminology. -->
+    <string name="app_settings_disabled">Bitte aktiviere mindestens eine Einstellung</string>
+    <string name="empty_app_settings_list">Keine Einstellungen gefunden</string>
+    <string name="geto_settings">IMD</string>
+    <string name="apply_success">Einstellungen ausgeblendet/deaktiviert</string>
+    <string name="apply_failure">Einstellungen konnten nicht angewendet werden</string>
+    <string name="revert_failure">Einstellungen konnten nicht wiederhergestellt werden</string>
+    <string name="revert_success">Einstellungen wiederhergestellt</string>
+    <string name="add_your_first_settings">Füge deine ersten Einstellungen hinzu</string>
+    <string name="add_app_setting">App-Einstellung hinzufügen</string>
+    <string name="setting_label">Bezeichnung der Einstellung</string>
+    <string name="setting_key">Schlüssel der Einstellung</string>
+    <string name="setting_value_on_launch">Wert beim Start</string>
+    <string name="setting_value_on_revert">Wert beim Wiederherstellen</string>
+    <string name="templates">Vorlagen</string>
+    <string name="add_shortcut">Verknüpfung hinzufügen</string>
+    <string name="update_shortcut">Verknüpfung aktualisieren</string>
+    <string name="short_label">Kurze Bezeichnung</string>
+    <string name="long_label">Lange Bezeichnung</string>
+    <string name="short_label_is_blank">Kurze Bezeichnung ist leer</string>
+    <string name="long_label_is_blank">Lange Bezeichnung ist leer</string>
+    <string name="setting_label_is_blank">Bezeichnung der Einstellung ist leer</string>
+    <string name="setting_key_is_blank">Schlüssel der Einstellung ist leer</string>
+    <string name="setting_key_not_found">Schlüssel der Einstellung nicht gefunden</string>
+    <string name="setting_value_on_launch_is_blank">Wert beim Start ist leer</string>
+    <string name="setting_value_on_revert_is_blank">Wert beim Wiederherstellen ist leer</string>
+    <string name="settings_has_invalid_values">Einstellungen enthalten ungültige Werte</string>
+    <string name="shortcut_update_immutable_shortcuts">Unveränderliche Verknüpfungen können nicht aktualisiert werden</string>
+    <string name="shortcut_update_failed">Verknüpfung konnte nicht aktualisiert werden</string>
+    <string name="shortcut_update_success">Verknüpfung aktualisiert</string>
+    <string name="supported_launcher">Dein aktueller Launcher unterstützt Verknüpfungen</string>
+    <string name="unsupported_launcher">Dein aktueller Launcher unterstützt keine Verknüpfungen</string>
+    <string name="no_settings_found">Keine Einstellungen gefunden</string>
+    <string name="permission">Berechtigung</string>
+    <string name="app_setting_already_exists">Diese App-Einstellung existiert bereits</string>
+    <string name="app_setting_added_successfully">App-Einstellung hinzugefügt</string>
+    <string name="no_permission">Bitte erteile die Berechtigung WRITE_SECURE_SETTINGS über ADB</string>
+    <string name="write_secure_settings_message">Kopiere den folgenden Befehl und führe ihn über ADB aus, um die Berechtigung Write Secure Settings zu erteilen</string>
+    <string name="add_to_favourites">Zu Favoriten hinzufügen</string>
+    <string name="remove_from_favourites">Aus Favoriten entfernen</string>
+    <string name="action_revert">Wiederherstellen</string>
+    <string name="action_app_setting">App-Einstellung</string>
+    <string name="action_create_shortcut">Verknüpfung erstellen</string>
+    <string name="action_setting_template">Einstellungsvorlage</string>
+</resources>

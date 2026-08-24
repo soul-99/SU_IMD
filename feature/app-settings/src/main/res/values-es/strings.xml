@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- Spanish. Machine translation, reviewed for consistency of terminology. -->
+    <string name="app_settings_disabled">Activa al menos un ajuste</string>
+    <string name="empty_app_settings_list">No se encontró ningún ajuste</string>
+    <string name="geto_settings">IMD</string>
+    <string name="apply_success">Ajustes ocultados o desactivados</string>
+    <string name="apply_failure">No se pudieron aplicar los ajustes</string>
+    <string name="revert_failure">No se pudieron revertir los ajustes</string>
+    <string name="revert_success">Ajustes revertidos</string>
+    <string name="add_your_first_settings">Añade tus primeros ajustes</string>
+    <string name="add_app_setting">Añadir ajuste de app</string>
+    <string name="setting_label">Nombre del ajuste</string>
+    <string name="setting_key">Clave del ajuste</string>
+    <string name="setting_value_on_launch">Valor del ajuste al abrir</string>
+    <string name="setting_value_on_revert">Valor del ajuste al revertir</string>
+    <string name="templates">Plantillas</string>
+    <string name="add_shortcut">Añadir acceso directo</string>
+    <string name="update_shortcut">Actualizar acceso directo</string>
+    <string name="short_label">Nombre corto</string>
+    <string name="long_label">Nombre largo</string>
+    <string name="short_label_is_blank">El nombre corto está vacío</string>
+    <string name="long_label_is_blank">El nombre largo está vacío</string>
+    <string name="setting_label_is_blank">El nombre del ajuste está vacío</string>
+    <string name="setting_key_is_blank">La clave del ajuste está vacía</string>
+    <string name="setting_key_not_found">No se encontró la clave del ajuste</string>
+    <string name="setting_value_on_launch_is_blank">El valor del ajuste al abrir está vacío</string>
+    <string name="setting_value_on_revert_is_blank">El valor del ajuste al revertir está vacío</string>
+    <string name="settings_has_invalid_values">Los ajustes tienen valores no válidos</string>
+    <string name="shortcut_update_immutable_shortcuts">No se pueden actualizar los accesos directos inmutables</string>
+    <string name="shortcut_update_failed">No se pudo actualizar el acceso directo</string>
+    <string name="shortcut_update_success">Acceso directo actualizado</string>
+    <string name="supported_launcher">Tu launcher actual admite accesos directos</string>
+    <string name="unsupported_launcher">Tu launcher actual no admite accesos directos</string>
+    <string name="no_settings_found">No se encontró ningún ajuste</string>
+    <string name="permission">Permiso</string>
+    <string name="app_setting_already_exists">Este ajuste de app ya existe</string>
+    <string name="app_setting_added_successfully">Ajuste de app añadido correctamente</string>
+    <string name="no_permission">Concede el permiso WRITE_SECURE_SETTINGS mediante ADB</string>
+    <string name="write_secure_settings_message">Copia el comando de abajo y ejecútalo mediante ADB para conceder el permiso Write Secure Settings</string>
+    <string name="add_to_favourites">Añadir a favoritos</string>
+    <string name="remove_from_favourites">Quitar de favoritos</string>
+    <string name="action_revert">Revertir</string>
+    <string name="action_app_setting">Ajuste de app</string>
+    <string name="action_create_shortcut">Crear acceso directo</string>
+    <string name="action_setting_template">Plantilla de ajustes</string>
+</resources>

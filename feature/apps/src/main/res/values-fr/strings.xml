@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~   Modifications Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!-- French. Machine translation, reviewed for consistency of terminology. -->
+    <string name="search">Rechercher</string>
+    <string name="sort">Trier</string>
+    <string name="name">Nom</string>
+    <string name="update_time">Mise à jour</string>
+    <string name="install_time">Installation</string>
+    <string name="ascending">Croissant</string>
+    <string name="descending">Décroissant</string>
+    <string name="show_system">Afficher le système</string>
+    <string name="show_system_applications">Afficher les applications système</string>
+
+    <!-- Favourites -->
+    <string name="add_to_favourites">Ajouter aux favoris</string>
+    <string name="remove_from_favourites">Retirer des favoris</string>
+    <string name="favourite_apps_options">Options des favoris</string>
+    <string name="no_favourite_apps">Aucun favori pour l\'instant</string>
+    <string name="no_matching_favourite_apps">Aucun favori ne correspond à cette recherche</string>
+    <string name="no_favourite_apps_subtitle">Appuyez sur l\'étoile à côté d\'une application dans Toutes les applications, ou sur l\'étoile de son écran de paramètres.</string>
+    <string name="view">Affichage</string>
+    <string name="custom">Personnalisé</string>
+    <string name="alphabetical">A-Z</string>
+    <string name="list">Liste</string>
+    <string name="grid">Grille</string>
+    <string name="reorder">Réorganiser les favoris</string>
+    <string name="reorder_favourites">Réorganiser les favoris</string>
+    <string name="move_up">Déplacer vers le haut</string>
+    <string name="move_down">Déplacer vers le bas</string>
+    <string name="close">Fermer</string>
+
+    <!-- Launching a favourite applies its settings first, exactly like a pinned shortcut -->
+    <string name="applied_settings_title">IMD</string>
+    <string name="applied_settings_success">Paramètres masqués/désactivés</string>
+    <string name="settings_manager_configure_revert">Configurer ce que Rétablir restaure</string>
+    <string name="settings_manager_accessibility_unmanaged">Aucun service d\'accessibilité n\'est actuellement géré par l\'application IMD</string>
+    <string name="applied_settings_failure">Impossible d\'appliquer les paramètres</string>
+    <string name="applied_settings_invalid">Cette application a des paramètres aux valeurs non valides</string>
+    <string name="settings_manager_title">Gestionnaire de services IMD</string>
+
+    <!-- settings_manager_title and the two _name_ strings below are matched as substrings
+         inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_info">Ce que fait cette boîte de dialogue</string>
+    <string name="settings_manager_info_live">Le Gestionnaire de services IMD affiche l\'état en direct des paramètres et des services. Il ne décide pas quels paramètres ou services sont masqués ou réaffichés lorsque des applications sont ouvertes via IMD ou via les raccourcis créés par IMD.</string>
+    <string name="settings_manager_info_live_extra">Pour définir ce qui doit être masqué et réaffiché au lancement des applications via IMD, veuillez configurer les paramètres IMD par défaut dans l\'application IMD.</string>
+    <string name="settings_manager_info_name_defaults">paramètres IMD par défaut</string>
+    <string name="settings_manager_info_developer">Désactiver les options pour les développeurs via IMD ne fait qu\'activer ou désactiver leur indicateur ; cela ne réinitialise pas les modifications faites dans les options pour les développeurs (échelle d\'animation, application de position fictive… etc.).</string>
+    <string name="settings_manager_info_developer_extra">Pour réinitialiser les options pour les développeurs, ouvrez la page des options pour les développeurs et désactivez-les depuis cet écran.</string>
+    <string name="settings_manager_info_name_reset">réinitialiser les options pour les développeurs</string>
+    <string name="revert_to_default">Rétablir par défaut</string>
+    <string name="not_configured_title">Aucun paramètre à masquer : vous devez définir les paramètres à masquer pour cette application.</string>
+    <string name="not_configured_message">Dans l\'application IMD, appuyez de manière prolongée sur cette application pour choisir les paramètres à masquer.</string>
+    <string name="got_it">Compris</string>
+    <string name="settings_manager_open">Ouvrir %1$s</string>
+    <string name="settings_manager_accessibility_note">seuls les services sélectionnés dans les paramètres de l\'application IMD sont gérés</string>
+    <string name="settings_manager_enable_developer_options">Veuillez d\'abord activer les options pour les développeurs</string>
+    <string name="settings_manager_cannot_open">Impossible d\'ouvrir cet écran sur cet appareil</string>
+    <string name="settings_manager_no_shizuku">Aucune application Shizuku trouvée, indiquez le nom du package dans les Paramètres</string>
+    <string name="ok">OK</string>
+    <string name="shizuku_help_title">Service Shizuku indisponible</string>
+    <string name="shizuku_help_bullet">%1$d.</string>
+    <string name="shizuku_help_point_setup">Veuillez vérifier que l\'application Shizuku est installée, enregistrée dans ADB et correctement configurée dans la page des paramètres de l\'application IMD.</string>
+    <string name="shizuku_help_point_permission">L\'autorisation Shizuku de l\'application IMD sert uniquement à accorder une seule fois l\'autorisation Android privilégiée WRITE_SECURE_SETTINGS. Elle ne sert ni à détecter l\'état du service Shizuku, ni à activer ou désactiver ce service.</string>
+    <string name="shizuku_help_point_restart">Une fois la configuration correctement faite, veuillez redémarrer l\'application IMD et réessayer.</string>
+    <string name="settings_manager_shizuku_wait">Veuillez patienter 10 s, car certains forks de Shizuku sont lents à démarrer le service via les intents</string>
+    <string name="revert_developer_settings">Options pour les développeurs</string>
+    <string name="revert_usb_debugging">Débogage USB</string>
+    <string name="revert_wireless_debugging">Débogage sans fil</string>
+    <string name="revert_accessibility">Services d\'accessibilité</string>
+    <string name="revert_shizuku">Service Shizuku</string>
+    <string name="applied_settings_no_permission">Accordez d\'abord WRITE_SECURE_SETTINGS, voir l\'écran de configuration</string>
+    <string name="settings_manager_shizuku_failed">Le service Shizuku n\'a pas pu démarrer lors de la dernière tentative ; veuillez vérifier les paramètres de l\'application Shizuku et la configuration Shizuku d\'IMD</string>
+    <string name="settings_manager_shizuku_failed_open">Pourquoi le service Shizuku n\'a pas démarré</string>
+    <string name="understood">Compris</string>
+</resources>

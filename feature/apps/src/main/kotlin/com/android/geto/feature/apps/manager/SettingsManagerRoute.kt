@@ -61,6 +61,8 @@ fun SettingsManagerRoute(
 
     val accessibilityManaged by viewModel.accessibilityManaged.collectAsStateWithLifecycle()
 
+    val infoShown by viewModel.infoShown.collectAsStateWithLifecycle()
+
     // Polling runs only while this is composed. DisposableEffect rather than
     // LaunchedEffect so it also stops on a back press or an outside tap, not just when the
     // composable leaves the tree.
@@ -83,6 +85,8 @@ fun SettingsManagerRoute(
         busy = false,
         shizukuStarting = shizukuStarting,
         shizukuStartFailed = shizukuStartFailed,
+        infoShown = infoShown,
+        onInfoShown = viewModel::markInfoShown,
         onDismissRequest = onDismissRequest,
         onSetEnabled = { target, enabled ->
             viewModel.setTargetEnabled(target, enabled)

@@ -30,12 +30,12 @@ import com.android.geto.domain.model.UserData
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.repository.AppSettingsRepository
 import com.android.geto.domain.repository.UserDataRepository
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Wireless debugging does not come back the instant the Global flag is written; adbd has

@@ -1,0 +1,5 @@
+v1.6.7
+
+* All ten languages are now translated, for testing: Brazilian Portuguese, Spanish, Simplified Chinese, French, German, Russian, Hindi, Arabic, Korean and Japanese. Machine translated, so please report anything wrong on the GitHub issue tracker.
+* The revert button on the notification now says which revert it runs: Revert to default, or Revert using memory.
+* The UI settings section is now called User interface.

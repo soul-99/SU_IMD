@@ -75,6 +75,12 @@ interface UserDataRepository {
 
     suspend fun updateNotificationFunctionResetV16(done: Boolean)
 
+    suspend fun updateRevertDefaultsResetV166(done: Boolean)
+
+    suspend fun updateRevertDefaultsNoticePending(pending: Boolean)
+
+    suspend fun updateSettingsManagerInfoShown(shown: Boolean)
+
     suspend fun updateShizukuStartFailed(failed: Boolean)
 
     suspend fun updateSetupNoticeVersion(versionCode: Int)

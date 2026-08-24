@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2023 Einstein Blanco
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  ~
+  -->
+<resources>
+    <!--
+      German. Machine translation, reviewed for consistency of terminology.
+
+      Left in English on purpose: "System", "Secure" and "Global" name Android's three
+      settings tables, and a translated label would no longer match what the platform, its
+      documentation or any adb command calls them. Shizuku is a product name.
+
+      "Revert" is "wiederherstellen" throughout the app, never "zurücksetzen": the app
+      restores a previous state, it does not reset anything to factory values.
+    -->
+    <string name="add">Hinzufügen</string>
+    <string name="update">Aktualisieren</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="system">System</string>
+    <string name="secure">Secure</string>
+    <string name="global">Global</string>
+
+    <string name="language_system">System / automatisch</string>
+    <string name="language_ai_notice">Sprachen außer Englisch wurden mit KI-gestützter maschineller Übersetzung erstellt und können daher Fehler enthalten. Wenn du eine Korrektur möchtest, melde Übersetzungsfehler bitte im GitHub-Issue-Tracker an den Entwickler.</string>
+
+    <string name="revert_to_default_toast">Standard wiederherstellen</string>
+    <string name="revert_from_memory_toast">Aus dem Speicher wiederherstellen</string>
+</resources>
