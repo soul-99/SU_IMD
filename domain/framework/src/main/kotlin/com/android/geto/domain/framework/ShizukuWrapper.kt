@@ -36,6 +36,18 @@ interface ShizukuWrapper {
     suspend fun isShizukuRunning(): Boolean
 
     /**
+     * Packages whose SYSTEM_ALERT_WINDOW AppOp is currently allowed, or null when the
+     * Shizuku shell is unavailable.
+     */
+    suspend fun getAllowedOverlayPackages(): Set<String>?
+
+    /**
+     * Changes SYSTEM_ALERT_WINDOW and returns the packages successfully changed, or null
+     * when no Shizuku shell was available. Packages are attempted independently.
+     */
+    suspend fun setOverlayPermission(packages: Set<String>, allowed: Boolean): Set<String>?
+
+    /**
      * Fires the "start Shizuku" broadcast at the Shizuku manager app.
      *
      * Two fork families are supported. thedjchi's listens for an explicit broadcast

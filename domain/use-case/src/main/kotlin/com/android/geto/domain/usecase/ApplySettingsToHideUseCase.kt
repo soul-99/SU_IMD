@@ -21,6 +21,7 @@ package com.android.geto.domain.usecase
 import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers
 import com.android.geto.domain.model.AppSettingsResult
+import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.SettingsToHide
 import com.android.geto.domain.repository.UserDataRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -61,6 +62,19 @@ class ApplySettingsToHideUseCase @Inject constructor(
 
         val before = getManualTargetStatesUseCase()
 
+        // Overlay AppOps are changed through Shizuku. Start it before touching anything
+        // else, while the debugging transport is still available; the configured hide
+        // order will switch that transport (and therefore Shizuku) back off afterward.
+        if (wanted[ManualRevertTarget.DisplayOverOtherApps] == true &&
+            !before.isEnabled(ManualRevertTarget.Shizuku) &&
+            !setManualTargetUseCase(
+                target = ManualRevertTarget.Shizuku,
+                enabled = true,
+            )
+        ) {
+            return AppSettingsResult.Failure
+        }
+
         var failed = false
 
         for (target in SettingsToHide.HideOrder) {
@@ -69,7 +83,15 @@ class ApplySettingsToHideUseCase @Inject constructor(
             // Already off. Writing it again is not harmless: for the accessibility
             // services target a second disable would record a fresh hold over services
             // that are already held, and nothing would ever discharge the duplicate.
-            if (!before.isEnabled(target)) continue
+            // Overlay state is queried through Shizuku. A failed query reads as off in the
+            // live manager, but launch must still attempt the write so unavailable AppOps
+            // access becomes a visible Failure rather than silently leaving overlays on.
+            if (target != ManualRevertTarget.DisplayOverOtherApps &&
+                target != ManualRevertTarget.AccessibilityServices &&
+                !before.isEnabled(target)
+            ) {
+                continue
+            }
 
             if (!setManualTargetUseCase(target = target, enabled = false)) failed = true
         }

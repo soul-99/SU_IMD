@@ -46,6 +46,17 @@ internal class DefaultShizukuWrapper @Inject constructor(
             ShizukuPermission.grantWriteSecureSettings(packageName = packageName)
         }
 
+    override suspend fun getAllowedOverlayPackages(): Set<String>? = withContext(ioDispatcher) {
+        ShizukuPermission.getAllowedOverlayPackages()
+    }
+
+    override suspend fun setOverlayPermission(
+        packages: Set<String>,
+        allowed: Boolean,
+    ): Set<String>? = withContext(ioDispatcher) {
+        ShizukuPermission.setOverlayPermission(packages = packages, allowed = allowed)
+    }
+
     override suspend fun startShizuku(
         packageName: String,
         action: String,

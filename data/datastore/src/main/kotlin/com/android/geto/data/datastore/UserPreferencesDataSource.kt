@@ -90,6 +90,7 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
             heldAccessibilityServices = it.heldAccessibilityServicesMap.mapValues { entry ->
                 AccessibilityServicePlan.decode(entry.value)
             },
+            heldOverlayPackages = it.heldOverlayPackagesMap.toMap(),
             manualRevertTargets = ManualRevertTarget.decode(it.manualRevertTargetsList),
             notificationFunction = it.notificationFunction.asNotificationFunction(),
             revertDefaults = RevertDefaults.decode(it.revertDefaultsList),
@@ -255,6 +256,15 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
                 heldAccessibilityServices.putAll(
                     held.mapValues { entry -> AccessibilityServicePlan.encode(entry.value) },
                 )
+            }
+        }
+    }
+
+    suspend fun updateHeldOverlayPackages(packages: Map<String, String>) {
+        userPreferences.updateData {
+            it.copy {
+                heldOverlayPackages.clear()
+                heldOverlayPackages.putAll(packages)
             }
         }
     }

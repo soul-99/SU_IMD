@@ -30,6 +30,8 @@ private const val TAG = "ShizukuPermission"
 /** Any int; it only has to match between the request and the callback. */
 private const val REQUEST_CODE = 4919
 
+private val PACKAGE_NAME = Regex("""[A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+""")
+
 /**
  * Everything that talks to the Shizuku client library, kept in one file.
  *
@@ -60,6 +62,45 @@ internal object ShizukuPermission {
         )
 
         return if (granted) ShizukuGrant.Granted else ShizukuGrant.Failed
+    }
+
+    suspend fun getAllowedOverlayPackages(): Set<String>? {
+        if (!isRunning() || !ensurePermission()) return null
+
+        val output = runShellForOutput(
+            "cmd appops query-op --user current SYSTEM_ALERT_WINDOW allow",
+        ) ?: return null
+        val allowed = output.lineSequence()
+            .map(String::trim)
+            .filter(PACKAGE_NAME::matches)
+            .toSet()
+
+        return allowed
+    }
+
+    suspend fun setOverlayPermission(
+        packages: Set<String>,
+        allowed: Boolean,
+    ): Set<String>? {
+        if (packages.isEmpty()) return emptySet()
+        if (!packages.all(PACKAGE_NAME::matches)) return null
+        if (!isRunning() || !ensurePermission()) return null
+
+        val mode = if (allowed) "allow" else "ignore"
+        val command = packages.joinToString(separator = ";") { packageName ->
+            "cmd appops set --user current $packageName SYSTEM_ALERT_WINDOW $mode"
+        }
+
+        if (!runShell(command)) return emptySet()
+
+        val allowedAfter = getAllowedOverlayPackages() ?: return null
+        val changed = if (allowed) {
+            packages.intersect(allowedAfter)
+        } else {
+            packages - allowedAfter
+        }
+
+        return changed
     }
 
     private suspend fun ensurePermission(): Boolean {
@@ -112,6 +153,28 @@ internal object ShizukuPermission {
      * disappears this returns false and the ADB instructions on the same screen still work.
      */
     private fun runShell(command: String): Boolean = runCatching {
+        runShellProcess(command).waitFor() == 0
+    }.getOrElse {
+        Log.w(TAG, "Shizuku shell failed", it)
+
+        false
+    }
+
+    private fun runShellForOutput(command: String): String? = runCatching {
+        // Some OEM cmd services write successful query output to stderr. Merge it into
+        // stdout inside the remote shell because Shizuku's reflected Process exposes the
+        // two streams separately.
+        val process = runShellProcess("$command 2>&1")
+        val output = process.inputStream.bufferedReader().use { it.readText() }
+
+        if (process.waitFor() == 0) output else null
+    }.getOrElse {
+        Log.w(TAG, "Shizuku shell failed", it)
+
+        null
+    }
+
+    private fun runShellProcess(command: String): Process {
         val newProcess = Shizuku::class.java.getDeclaredMethod(
             "newProcess",
             Array<String>::class.java,
@@ -121,17 +184,11 @@ internal object ShizukuPermission {
 
         newProcess.isAccessible = true
 
-        val process = newProcess.invoke(
+        return newProcess.invoke(
             null,
             arrayOf("sh", "-c", command),
             null,
             null,
         ) as Process
-
-        process.waitFor() == 0
-    }.getOrElse {
-        Log.w(TAG, "Shizuku shell failed", it)
-
-        false
     }
 }

@@ -127,6 +127,8 @@
     <string name="settings_to_hide_description">These settings are hidden when you launch an app.</string>
     <string name="settings_to_hide_summary">%1$d of %2$d switched on</string>
     <string name="settings_to_hide_usb_note">stopping USB debugging will also kill Shizuku service(if running), please configure Shizuku settings under IMD app to restart the Shizuku service after Revert</string>
+    <string name="settings_to_hide_accessibility_note">every currently enabled accessibility service is temporarily disabled and exactly those services are restored on Revert</string>
+    <string name="settings_to_hide_overlay_note">requires Shizuku to be running; every app currently allowed to display over other apps is temporarily disabled</string>
     <string name="settings_to_hide_info_per_app">If you want to hide different settings per individual app, please use memory function in IMD settings &gt; Advanced &gt; Notification function</string>
     <string name="settings_to_hide_info_all">Hiding only developer settings does not turn off USB and wireless debugging, and some apps might still detect that as developer settings turned on, so it is recommended to select all three</string>
     <string name="settings_to_hide_info_shizuku">to hide Shizuku from apps use the Hide Shizuku from other apps function within the Shizuku app.</string>
@@ -138,8 +140,11 @@
     <string name="revert_defaults_wireless_debugging">Wireless debugging</string>
     <string name="revert_defaults_accessibility_services">Accessibility services</string>
     <string name="revert_defaults_accessibility_note">only services selected in the IMD app settings are managed</string>
+    <string name="revert_defaults_accessibility_all_note">restores only the accessibility services IMD disabled during device-wide hiding</string>
     <string name="revert_defaults_shizuku">Shizuku service</string>
     <string name="revert_defaults_shizuku_note">Depending on which method Shizuku uses to start the service it will re-enable either one of USB debugging or wireless debugging, which it also needs to keep the Shizuku service running</string>
+    <string name="revert_defaults_display_over_other_apps">Display over other apps</string>
+    <string name="revert_defaults_overlay_note">restores only the apps IMD previously disabled; Shizuku must be running</string>
 
     <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
     <string name="help_button">Help (readme)</string>

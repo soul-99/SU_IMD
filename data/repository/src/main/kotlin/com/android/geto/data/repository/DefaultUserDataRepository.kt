@@ -110,6 +110,10 @@ class DefaultUserDataRepository @Inject constructor(
         userPreferencesDataSource.updateHeldAccessibilityServices(held = held)
     }
 
+    override suspend fun updateHeldOverlayPackages(packages: Map<String, String>) {
+        userPreferencesDataSource.updateHeldOverlayPackages(packages = packages)
+    }
+
     override suspend fun updateManualRevertTargets(targets: Set<ManualRevertTarget>) {
         userPreferencesDataSource.updateManualRevertTargets(targets = targets)
     }

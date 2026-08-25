@@ -72,6 +72,13 @@ class GetManualTargetStatesUseCase @Inject constructor(
         val enabled = ManualRevertTarget.entries.associateWith { target ->
             when (target) {
                 ManualRevertTarget.AccessibilityServices -> {
+                    if (
+                        AccessibilityServicePlan.DEVICE_WIDE_HOLD in
+                        userData.heldAccessibilityServices
+                    ) {
+                        return@associateWith false
+                    }
+
                     // The row stands for the whole managed set, so it only reads "on" when
                     // every one of them is on — see AccessibilityServicePlan.allEnabled.
                     runCatching {
@@ -86,6 +93,12 @@ class GetManualTargetStatesUseCase @Inject constructor(
                 ManualRevertTarget.Shizuku -> {
                     shizukuAvailable &&
                         runCatching { shizukuWrapper.isShizukuRunning() }.getOrDefault(false)
+                }
+
+                ManualRevertTarget.DisplayOverOtherApps -> {
+                    runCatching {
+                        shizukuWrapper.getAllowedOverlayPackages()
+                    }.getOrNull()?.isNotEmpty() == true
                 }
 
                 else -> {

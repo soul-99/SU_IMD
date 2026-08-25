@@ -25,7 +25,7 @@ package com.android.geto.domain.model
  * says what to hide on the way in, that one says what to put back on the way out. Together
  * they replace having to write a profile for every app before any of them can be opened —
  * which was the single largest thing standing between installing this app and using it,
- * because the settings a locked-down app objects to are the same four whichever app it is.
+ * because the settings a locked-down app objects to are the same whichever app it is.
  *
  * Per-app profiles still exist and are still the more precise tool; they are what the
  * memory notification function uses. This is the answer for everyone who wants the common
@@ -43,9 +43,9 @@ object SettingsToHide {
     private const val OFF = "0"
 
     /**
-     * The four an app can actually detect, in the order the dialog lists them.
+     * The settings an app can actually detect, in the order the dialog lists them.
      *
-     * [ManualRevertTarget] carries a fifth, Shizuku, which belongs to reverting and not to
+     * [ManualRevertTarget] also carries Shizuku, which belongs to reverting and not to
      * hiding; taking a subset here rather than adding a second enum keeps one vocabulary
      * of targets across both configurations, so the dialogs and the audits line up.
      */
@@ -54,19 +54,24 @@ object SettingsToHide {
         ManualRevertTarget.UsbDebugging,
         ManualRevertTarget.WirelessDebugging,
         ManualRevertTarget.AccessibilityServices,
+        ManualRevertTarget.DisplayOverOtherApps,
     )
 
     /**
-     * All four, unlike [RevertDefaults.Default].
+     * The settings backed by WRITE_SECURE_SETTINGS default on. Overlay access is opt-in
+     * because changing AppOps requires a running Shizuku service; enabling it by default
+     * would make launches fail on otherwise correctly configured ADB-only installs.
      *
      * The two defaults differ because the risks are not symmetrical. Switching something
      * *on* that the user keeps off is a change to their device they never asked for, so
      * reverting starts conservative. Switching something off before launching an app is
      * the entire point of the app, is undone by the very next revert, and hiding only some
-     * of the four is the case that fails in a way nobody can diagnose: the app still sees
+     * of the debugging settings is the case that fails in a way nobody can diagnose: the app still sees
      * developer mode and still refuses to run.
      */
-    val Default: Map<ManualRevertTarget, Boolean> = Targets.associateWith { true }
+    val Default: Map<ManualRevertTarget, Boolean> = Targets.associateWith {
+        it != ManualRevertTarget.DisplayOverOtherApps
+    }
 
     /**
      * The order to switch things off in — the reverse of the order to switch them on in.

@@ -366,6 +366,61 @@ private fun accessibilityRoundTripTests() {
     enabled2 = ra2.enabledAfter
     checkEquals("A reverted last: everything is back", original.toSet(), enabled2.toSet())
     check("reverse order also empties the record", record2.isEmpty())
+
+    // 21. A device-wide hold claims every enabled service and anything already held by a
+    // per-app profile. Releasing the profile first must restore nothing; releasing the
+    // device-wide hold last restores the exact original set.
+    val deviceWide = AccessibilityServicePlan.DEVICE_WIDE_HOLD
+    var record3 = mapOf(appA to listOf(SWIPE))
+    var enabled3 = listOf(TALKBACK, TASKER)
+    val globalHold = AccessibilityServicePlan.hold(
+        managed = enabled3 + AccessibilityServicePlan.heldByOthers(record3, deviceWide),
+        currentlyEnabled = enabled3,
+        heldByOthers = AccessibilityServicePlan.heldByOthers(record3, deviceWide),
+    )
+    record3 = AccessibilityServicePlan.withHold(record3, deviceWide, globalHold.held)
+    enabled3 = globalHold.enabledAfter
+    checkEquals("device-wide hold disables every enabled service", emptyList<String>(), enabled3)
+    checkEquals(
+        "device-wide hold also claims services already held per app",
+        setOf(TALKBACK, TASKER, SWIPE),
+        record3[deviceWide]?.toSet(),
+    )
+
+    val profileRelease = AccessibilityServicePlan.release(
+        released = record3[appA].orEmpty(),
+        stillHeldByOthers = AccessibilityServicePlan.heldByOthers(record3, appA),
+        currentlyEnabled = enabled3,
+    )
+    record3 = AccessibilityServicePlan.withHold(record3, appA, emptyList())
+    enabled3 = profileRelease.enabledAfter
+    checkEquals("profile revert cannot pierce device-wide hold", emptyList<String>(), enabled3)
+
+    val globalRelease = AccessibilityServicePlan.release(
+        released = record3[deviceWide].orEmpty(),
+        stillHeldByOthers = AccessibilityServicePlan.heldByOthers(record3, deviceWide),
+        currentlyEnabled = enabled3,
+    )
+    enabled3 = globalRelease.enabledAfter
+    checkEquals(
+        "device-wide revert restores the exact original services",
+        setOf(TALKBACK, TASKER, SWIPE),
+        enabled3.toSet(),
+    )
+
+    // A later launch can find a newly enabled service, but must retain the debt from the
+    // first launch even though those earlier services are no longer in the live list.
+    val previousDebt = listOf(TALKBACK, TASKER)
+    val laterHold = AccessibilityServicePlan.hold(
+        managed = previousDebt + listOf(BIXBY),
+        currentlyEnabled = listOf(BIXBY),
+        heldByOthers = emptyList(),
+    )
+    checkEquals(
+        "repeated device-wide holds merge old and new restoration debt",
+        setOf(TALKBACK, TASKER, BIXBY),
+        (previousDebt + laterHold.held).toSet(),
+    )
 }
 
 private fun favouriteOrderingTests() {
@@ -623,7 +678,7 @@ private fun appListOrderingTests() {
 private fun manualRevertTests() {
     checkEquals(
         "default selection is every target",
-        5,
+        6,
         ManualRevertTarget.Default.size,
     )
     checkEquals(
@@ -632,8 +687,12 @@ private fun manualRevertTests() {
         ManualRevertTarget.entries.mapNotNull { it.globalSettingKey },
     )
     checkEquals(
-        "accessibility and shizuku are not a single settings row",
-        listOf(ManualRevertTarget.AccessibilityServices, ManualRevertTarget.Shizuku),
+        "special targets are not a single settings row",
+        listOf(
+            ManualRevertTarget.AccessibilityServices,
+            ManualRevertTarget.Shizuku,
+            ManualRevertTarget.DisplayOverOtherApps,
+        ),
         ManualRevertTarget.entries.filter { it.globalSettingKey == null },
     )
 
@@ -862,6 +921,7 @@ private fun userData(
     shizukuStartAction = startAction,
     managedAccessibilityServices = emptyList(),
     heldAccessibilityServices = emptyMap(),
+    heldOverlayPackages = emptyMap(),
     manualRevertTargets = emptySet(),
     notificationFunction = NotificationFunction.Default,
     revertDefaults = RevertDefaults.Default,
@@ -1118,10 +1178,9 @@ private fun accessibilityLiveStateTests() {
  * rule it enforces between two of its rows.
  */
 private fun revertDefaultsTests() {
-    // 45. Never configured falls back to accessibility services alone. Every other target
-    // is a debugging surface, and a Revert that switches those on can leave a device more
-    // open than the person pressing the button realised. Changed in v1.6.6; these assertions
-    // are what stops the old, wider default creeping back in.
+    // 45. Never configured falls back to accessibility services and restoring overlay
+    // permissions IMD previously disabled. The latter cannot grant anything new because
+    // the implementation only replays its held package set.
     checkEquals(
         "an empty configuration falls back to the default",
         RevertDefaults.Default,
@@ -1143,8 +1202,8 @@ private fun revertDefaultsTests() {
         RevertDefaults.Default[ManualRevertTarget.Shizuku],
     )
     checkEquals(
-        "accessibility services is the only target on by default",
-        1,
+        "only accessibility and held overlay permissions are restored by default",
+        2,
         RevertDefaults.Default.count { it.value },
     )
     checkEquals(
@@ -1156,6 +1215,11 @@ private fun revertDefaultsTests() {
         "wireless debugging is off by default",
         false,
         RevertDefaults.Default[ManualRevertTarget.WirelessDebugging],
+    )
+    checkEquals(
+        "held overlay permissions are restored by default",
+        true,
+        RevertDefaults.Default[ManualRevertTarget.DisplayOverOtherApps],
     )
     check(
         "the default covers every target, so decode can never be missing one",
@@ -1169,6 +1233,7 @@ private fun revertDefaultsTests() {
         ManualRevertTarget.WirelessDebugging to false,
         ManualRevertTarget.AccessibilityServices to true,
         ManualRevertTarget.Shizuku to false,
+        ManualRevertTarget.DisplayOverOtherApps to true,
     )
     checkEquals(
         "encode writes one entry per target",
@@ -1214,7 +1279,7 @@ private fun revertDefaultsTests() {
     checkEquals(
         "the encoding has no cross-target rule left to enforce",
         listOf("DeveloperSettings=0", "UsbDebugging=1", "WirelessDebugging=0",
-               "AccessibilityServices=1", "Shizuku=0"),
+               "AccessibilityServices=1", "Shizuku=0", "DisplayOverOtherApps=1"),
         RevertDefaults.encode(
             mapOf(
                 ManualRevertTarget.DeveloperSettings to false,
@@ -1222,6 +1287,7 @@ private fun revertDefaultsTests() {
                 ManualRevertTarget.WirelessDebugging to false,
                 ManualRevertTarget.AccessibilityServices to true,
                 ManualRevertTarget.Shizuku to false,
+                ManualRevertTarget.DisplayOverOtherApps to true,
             ),
         ),
     )
@@ -1234,6 +1300,7 @@ private fun revertDefaultsTests() {
         ManualRevertTarget.WirelessDebugging to true,
         ManualRevertTarget.AccessibilityServices to false,
         ManualRevertTarget.Shizuku to true,
+        ManualRevertTarget.DisplayOverOtherApps to true,
     )
     checkEquals(
         "Shizuku on with USB debugging off round-trips",
@@ -1260,8 +1327,8 @@ private fun revertDefaultsTests() {
  * "Settings to hide" — the device-wide configuration applied on the way into any app.
  *
  * Its rules differ from [RevertDefaults] in two ways that are easy to get wrong by copying
- * one from the other, so both are pinned here: it covers four targets rather than five, and
- * it defaults to all of them on rather than to a conservative subset.
+ * one from the other, so both are pinned here: Shizuku is excluded, and overlay access is
+ * opt-in because it requires a live Shizuku shell.
  */
 private fun settingsToHideTests() {
     // 51. Shizuku is not a target. It is not a setting an app reads, and hiding it belongs
@@ -1271,19 +1338,18 @@ private fun settingsToHideTests() {
         "Shizuku is not one of the targets",
         ManualRevertTarget.Shizuku !in SettingsToHide.Targets,
     )
-    checkEquals("there are exactly four targets", 4, SettingsToHide.Targets.size)
+    checkEquals("there are exactly five targets", 5, SettingsToHide.Targets.size)
 
-    // 52. All four on by default, unlike the revert configuration. Hiding only some of them
-    // is the case that fails without any way to diagnose it: the app still sees developer
-    // mode and still refuses to run, having changed the device for nothing.
+    // 52. Secure-setting targets remain on by default. Overlay access is opt-in because an
+    // ADB-only install has no AppOps shell and must continue to launch apps successfully.
     checkEquals(
         "an empty configuration falls back to the default",
         SettingsToHide.Default,
         SettingsToHide.decode(emptyList()),
     )
     check(
-        "every target is hidden by default",
-        SettingsToHide.Default.values.all { it },
+        "display-over-other-apps hiding is opt-in",
+        SettingsToHide.Default[ManualRevertTarget.DisplayOverOtherApps] == false,
     )
     checkEquals(
         "the default covers every target, so decode can never be missing one",
@@ -1311,6 +1377,7 @@ private fun settingsToHideTests() {
         ManualRevertTarget.UsbDebugging to false,
         ManualRevertTarget.WirelessDebugging to true,
         ManualRevertTarget.AccessibilityServices to false,
+        ManualRevertTarget.DisplayOverOtherApps to true,
     )
     checkEquals(
         "encode writes one entry per target",

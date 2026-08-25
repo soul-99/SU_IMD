@@ -37,6 +37,9 @@ object AccessibilityServicePlan {
 
     private const val SEPARATOR = ":"
 
+    /** Hold key used by the device-wide "Settings to hide" accessibility target. */
+    const val DEVICE_WIDE_HOLD = "__device_wide_settings_to_hide__"
+
     data class Hold(
         /** The new value for enabled_accessibility_services. */
         val enabledAfter: List<String>,
