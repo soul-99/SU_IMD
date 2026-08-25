@@ -53,10 +53,11 @@
     <string name="shizuku">تهيئة Shizuku</string>
     <string name="restart_shizuku_service">إعادة تشغيل خدمة Shizuku</string>
     <string name="restart_shizuku_service_description">عند استعادة تصحيح أخطاء USB من الإشعار (في وظيفة الذاكرة فقط)، تُشغَّل خدمة Shizuku تلقائيًا.</string>
-    <string name="shizuku_needs">يتطلب</string>
-    <string name="shizuku_forks_suffix">/ غيرها من نسخ Shizuku المعدَّلة التي تدعم intents بدء الخدمة (RikkaApps والنسخ المعدَّلة منها مباشرةً لا تدعم intent بدء الخدمة).</string>
+    <string name="shizuku_rikka_warning">إصدار Shizuku الأصلي من RikkaApps (Playstore / F-droid / Github) لا يدعم أوامر التشغيل والإيقاف</string>
+    <string name="shizuku_rikka_recommend_prefix">‏Shizuku من RikkaApps قديم ولم يعد يُصان، لذا يُنصح بتنزيل</string>
+    <string name="shizuku_rikka_recommend_link">نسخة Thedjchi من Shizuku (يصونها المجتمع)</string>
+    <string name="shizuku_fork_mode_other_suffix">/ نسخ Shizuku الأخرى التي تدعم أوامر التشغيل والإيقاف</string>
     <string name="shizuku_fork_mode_thedjchi">نسخ Shizuku المعدَّلة المبنية على thedjchi</string>
-    <string name="shizuku_fork_mode_other">Shevery / نسخ Shizuku المعدَّلة الأخرى</string>
     <string name="shizuku_choose_app">اختر تطبيقًا مثبَّتًا</string>
     <string name="shizuku_fill_advanced">يُرجى ملء قسم تهيئة Shizuku أولًا</string>
     <string name="show_value">إظهار</string>

@@ -1,0 +1,4 @@
+v1.6.8
+
+* Third party apps can no longer create IMD shortcuts. The services manager activity is no longer exported, so only your launcher can start it, the same way it already worked for Revert to default.
+* Shizuku configuration reworked: the package name list stays open while you type, the section says plainly that the original RikkaApps build does not support start-stop intents and links to the maintained fork, and the fork family is guessed from what is installed on first run.

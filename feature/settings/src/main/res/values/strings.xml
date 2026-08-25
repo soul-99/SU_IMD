@@ -35,12 +35,20 @@
     <string name="shizuku">Shizuku configuration</string>
     <string name="restart_shizuku_service">Restart Shizuku service</string>
     <string name="restart_shizuku_service_description">On reverting USB debugging from Notification (memory function only), autostart Shizuku service.</string>
-    <string name="shizuku_needs">Needs</string>
-    <string name="shizuku_fork_thedjchi" translatable="false">thedjchi</string>
-    <string name="shizuku_fork_shevery" translatable="false">shevery</string>
-    <string name="shizuku_forks_suffix">/ other forks of Shizuku that support start service intents (RikkaApps and its direct forks do not support service start intent).</string>
+    <!--
+      The section's opening warning, drawn in the error colour. Two lines: what does not
+      work, then what to install instead. shizuku_rikka_recommend_link is the clickable
+      half of the second line and is appended to the prefix, so the two must read as one
+      sentence.
+    -->
+    <string name="shizuku_rikka_warning">The original RikkaApps version of Shizuku (Playstore/ F-droid/ Github) does not support start-stop intents</string>
+    <string name="shizuku_rikka_recommend_prefix">RikkaApps Shizuku is outdated and not maintained now, so it is recommended to download</string>
+    <string name="shizuku_rikka_recommend_link">Thedjchi fork of Shizuku (community maintained)</string>
+
+    <string name="shizuku_fork_shevery" translatable="false">Shevery</string>
     <string name="shizuku_fork_mode_thedjchi">Thedjchi based forks of Shizuku</string>
-    <string name="shizuku_fork_mode_other">Shevery / other forks of Shizuku</string>
+    <!-- Appended after the linked word Shevery, so it begins mid-sentence. -->
+    <string name="shizuku_fork_mode_other_suffix">/ other forks of Shizuku that support start-stop intents</string>
     <string name="shizuku_choose_app">Choose an installed app</string>
     <string name="shizuku_fill_advanced">Please fill the Shizuku configuration section first</string>
     <string name="show_value">Show</string>

@@ -23,6 +23,7 @@ import android.content.Context
 import android.os.Build
 import com.android.geto.common.AppLocale
 import com.android.geto.common.ApplicationScope
+import com.android.geto.domain.usecase.DetectShizukuForkUseCase
 import com.android.geto.domain.usecase.MigrateNotificationFunctionUseCase
 import com.android.geto.domain.usecase.MigrateRevertDefaultsUseCase
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
@@ -41,6 +42,9 @@ class GetoApplication : Application() {
 
     @Inject
     lateinit var migrateRevertDefaultsUseCase: MigrateRevertDefaultsUseCase
+
+    @Inject
+    lateinit var detectShizukuForkUseCase: DetectShizukuForkUseCase
 
     @Inject
     @ApplicationScope
@@ -67,6 +71,11 @@ class GetoApplication : Application() {
         // a shortcut can fire a Revert in this process without an activity ever existing,
         // and that Revert must already be reading the narrowed configuration.
         appScope.launch { migrateRevertDefaultsUseCase() }
+
+        // Only writes when nobody has chosen a fork family yet, so it fills in a fresh
+        // install and leaves every other one alone. Here rather than on the settings
+        // screen because the guess should already be made by the time somebody opens it.
+        appScope.launch { detectShizukuForkUseCase() }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManagerWrapper.createNotificationChannel(

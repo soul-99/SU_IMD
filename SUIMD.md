@@ -29,6 +29,32 @@ that shipped broken.
 Newest first. Every release gets an entry here, including the ones that only change
 documentation.
 
+### v1.6.8 - 24 August 2026 · versionCode 13
+
+**Changed**
+
+- **Third-party apps can no longer create IMD shortcuts.** ServicesActivity was the last
+  exported component: a shortcut-maker app enumerates exported activities and builds a
+  launcher shortcut straight at one, which is how tools like Shortcut Maker and Pixel Search
+  were making their own. It is exported=false now, the same fix RevertActivity got in v1.6,
+  and the published shortcut still works because the launcher starts it through
+  LauncherApps.startShortcut on this app's behalf. The tile and the Favourites button start
+  it from inside the process.
+- **The package name list stays open while you type.** A DropdownMenu's popup takes focus by
+  default, which pulled focus off the text field underneath, closed the keyboard and left
+  the next keystroke nowhere to land. It is unfocusable now, and typing opens the list on
+  the first keystroke rather than only on the chevron.
+- **The Shizuku section says what does not work, in red.** Two lines: the original RikkaApps
+  build does not support start-stop intents, and the maintained thedjchi fork is the way
+  out, linked. Red because it is a dead end rather than a caveat - someone with the Play
+  Store build cannot make this work by filling in the fields below.
+- **The Shevery option links to its releases** from the word Shevery, and now says it covers
+  forks that support start-stop intents.
+- **The fork family is guessed on first run**, from an installed app called Shizuku, or
+  failing that Shevery, filling the package name and start action as picking it by hand
+  does. Keyed on ShizukuForkMode.Unset, which nothing in the UI can return to, so it writes
+  once and never over a choice.
+
 ### v1.6.7 - 24 August 2026 · versionCode 12
 
 **Changed**

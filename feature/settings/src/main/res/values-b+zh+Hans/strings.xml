@@ -53,10 +53,11 @@
     <string name="shizuku">Shizuku 配置</string>
     <string name="restart_shizuku_service">重启 Shizuku 服务</string>
     <string name="restart_shizuku_service_description">从通知还原 USB 调试时（仅限记忆功能），自动启动 Shizuku 服务。</string>
-    <string name="shizuku_needs">需要</string>
-    <string name="shizuku_forks_suffix">/ 支持启动服务 Intent 的其他 Shizuku 分支版本（RikkaApps 及其直接分支不支持服务启动 Intent）。</string>
+    <string name="shizuku_rikka_warning">RikkaApps 的原版 Shizuku（Playstore / F-droid / Github）不支持启动和停止 intent</string>
+    <string name="shizuku_rikka_recommend_prefix">RikkaApps 的 Shizuku 已过时且不再维护，因此建议下载</string>
+    <string name="shizuku_rikka_recommend_link">Shizuku 的 Thedjchi 分支（社区维护）</string>
+    <string name="shizuku_fork_mode_other_suffix">/ 其他支持启动和停止 intent 的 Shizuku 分支</string>
     <string name="shizuku_fork_mode_thedjchi">基于 thedjchi 的 Shizuku 分支版本</string>
-    <string name="shizuku_fork_mode_other">Shevery / 其他 Shizuku 分支版本</string>
     <string name="shizuku_choose_app">选择一个已安装的应用</string>
     <string name="shizuku_fill_advanced">请先填写 Shizuku 配置部分</string>
     <string name="show_value">显示</string>

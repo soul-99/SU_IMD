@@ -83,6 +83,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -718,11 +719,18 @@ private fun ShizukuSection(
         // Which forks this can drive at all. It belongs here rather than under the
         // restart switch, where it used to be: it is a precondition for everything in
         // this panel, not a footnote about one option.
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-            text = shizukuForkRequirement(),
-            style = MaterialTheme.typography.bodySmall,
+        //
+        // In the error colour because it is a dead end rather than a caveat: someone who
+        // installed Shizuku from the Play Store has the one build none of this works with,
+        // and no amount of filling in the fields below will change that. The second line
+        // is the way out, which is why it carries the link.
+        WarningLine(
+            text = AnnotatedString(stringResource(R.string.shizuku_rikka_warning)),
         )
+
+        WarningLine(text = shizukuRikkaRecommendation())
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         ForkModeSelector(
             selected = forkMode,
@@ -815,13 +823,13 @@ private fun ForkModeSelector(
 ) {
     Column(modifier = modifier.selectableGroup()) {
         ForkModeRow(
-            label = stringResource(R.string.shizuku_fork_mode_thedjchi),
+            label = AnnotatedString(stringResource(R.string.shizuku_fork_mode_thedjchi)),
             selected = selected == ShizukuForkMode.Thedjchi,
             onSelect = { onSelect(ShizukuForkMode.Thedjchi) },
         )
 
         ForkModeRow(
-            label = stringResource(R.string.shizuku_fork_mode_other),
+            label = sheveryForkLabel(),
             selected = selected == ShizukuForkMode.Other,
             onSelect = { onSelect(ShizukuForkMode.Other) },
         )
@@ -831,7 +839,7 @@ private fun ForkModeSelector(
 @Composable
 private fun ForkModeRow(
     modifier: Modifier = Modifier,
-    label: String,
+    label: AnnotatedString,
     selected: Boolean,
     onSelect: () -> Unit,
 ) {
@@ -892,7 +900,13 @@ private fun PackageNameField(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 6.dp),
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = {
+                onValueChange(it)
+
+                // Typing is a search, so the results open on the first keystroke rather
+                // than only when the chevron is tapped.
+                expanded = true
+            },
             label = { Text(text = stringResource(R.string.shizuku_package_name)) },
             singleLine = true,
             textStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -912,10 +926,17 @@ private fun PackageNameField(
             },
         )
 
+        // focusable = false is the whole fix for a list that would not stay open. A
+        // DropdownMenu's popup takes focus by default, which pulls it off the text field
+        // underneath: the keyboard closes, and the next keystroke has nowhere to land. Left
+        // unfocusable, the field keeps focus and the keyboard, and the list filters live
+        // underneath it. The cost is that the menu no longer dismisses on a back press, so
+        // the chevron and an outside tap are the ways out.
         DropdownMenu(
             modifier = Modifier.heightIn(max = 360.dp),
             expanded = expanded && matches.isNotEmpty(),
             onDismissRequest = { expanded = false },
+            properties = PopupProperties(focusable = false),
         ) {
             matches.forEach { app ->
                 DropdownMenuItem(
@@ -1170,26 +1191,80 @@ private fun VersionRow(modifier: Modifier = Modifier) {
  * sentence wraps as a sentence; two of its words happen to be links, which is a property of
  * the words rather than of the layout.
  */
+/**
+ * A red note with an information icon, for the two lines opening the Shizuku section.
+ *
+ * The icon carries the same weight as the colour and is why both lines have one: red alone
+ * is invisible to a red-green colour blind reader, and this is the part of the screen most
+ * worth not missing. Matches the notes in the Settings to hide dialog, which is the other
+ * place the app says "careful" in this shape.
+ */
 @Composable
-private fun shizukuForkRequirement(): AnnotatedString {
+private fun WarningLine(
+    modifier: Modifier = Modifier,
+    text: AnnotatedString,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+    ) {
+        Icon(
+            modifier = Modifier.size(16.dp),
+            imageVector = GetoIcons.Info,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error,
+        )
+
+        Spacer(modifier = Modifier.size(8.dp))
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.error,
+        )
+    }
+}
+
+@Composable
+private fun shizukuRikkaRecommendation(): AnnotatedString {
     val linkStyles = linkStyles()
 
-    val needs = stringResource(R.string.shizuku_needs)
+    val prefix = stringResource(R.string.shizuku_rikka_recommend_prefix)
 
-    val thedjchi = stringResource(R.string.shizuku_fork_thedjchi)
+    val link = stringResource(R.string.shizuku_rikka_recommend_link)
+
+    return remember(prefix, link, linkStyles) {
+        buildAnnotatedString {
+            // The separator is appended here because aapt strips trailing whitespace from
+            // an unquoted string resource, so a space typed at the end of the prefix never
+            // reaches the screen.
+            append(prefix)
+            append(" ")
+            withLink(LinkAnnotation.Url(url = SHIZUKU_THEDJCHI_URL, styles = linkStyles)) {
+                append(link)
+            }
+        }
+    }
+}
+
+/**
+ * The second fork option, with its name carrying the link to its releases.
+ *
+ * The word is the link rather than a separate "releases" link after the label, because the
+ * question this row answers is "which app is that?" and the name is what the reader is
+ * looking at when they ask it.
+ */
+@Composable
+private fun sheveryForkLabel(): AnnotatedString {
+    val linkStyles = linkStyles()
 
     val shevery = stringResource(R.string.shizuku_fork_shevery)
 
-    val suffix = stringResource(R.string.shizuku_forks_suffix)
+    val suffix = stringResource(R.string.shizuku_fork_mode_other_suffix)
 
-    return remember(needs, thedjchi, shevery, suffix, linkStyles) {
+    return remember(shevery, suffix, linkStyles) {
         buildAnnotatedString {
-            append(needs)
-            append(" ")
-            withLink(LinkAnnotation.Url(url = SHIZUKU_THEDJCHI_URL, styles = linkStyles)) {
-                append(thedjchi)
-            }
-            append(" / ")
             withLink(LinkAnnotation.Url(url = SHIZUKU_SHEVERY_URL, styles = linkStyles)) {
                 append(shevery)
             }

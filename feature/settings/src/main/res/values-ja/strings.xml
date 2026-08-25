@@ -48,10 +48,11 @@
     <string name="shizuku">Shizuku の構成</string>
     <string name="restart_shizuku_service">Shizuku サービスを再起動</string>
     <string name="restart_shizuku_service_description">通知から USB デバッグを元に戻すとき（メモリー機能のみ）、Shizuku サービスを自動的に開始します。</string>
-    <string name="shizuku_needs">必要なもの:</string>
-    <string name="shizuku_forks_suffix">/ サービス開始インテントに対応する Shizuku のその他のフォーク（RikkaApps とその直接のフォークはサービス開始インテントに対応していません）。</string>
+    <string name="shizuku_rikka_warning">RikkaApps 版のオリジナル Shizuku（Playstore / F-droid / Github）は開始と停止のインテントに対応していません</string>
+    <string name="shizuku_rikka_recommend_prefix">RikkaApps の Shizuku は古く、現在は保守されていません。そのため次のダウンロードを推奨します:</string>
+    <string name="shizuku_rikka_recommend_link">Shizuku の Thedjchi フォーク（コミュニティ管理）</string>
+    <string name="shizuku_fork_mode_other_suffix">/ 開始と停止のインテントに対応した他の Shizuku フォーク</string>
     <string name="shizuku_fork_mode_thedjchi">Shizuku の thedjchi 系フォーク</string>
-    <string name="shizuku_fork_mode_other">Shevery / Shizuku のその他のフォーク</string>
     <string name="shizuku_choose_app">インストール済みのアプリを選択</string>
     <string name="shizuku_fill_advanced">先に「Shizuku の構成」セクションを入力してください</string>
     <string name="show_value">表示</string>

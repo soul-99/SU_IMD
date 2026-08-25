@@ -30,7 +30,7 @@ It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the pa
 
 * No internet access or unnecessary continuous background services (so almost zero battery / system resource use).
 * Does not tamper with any apps on the device.
-* The parts of this app that change settings cannot be triggered by another app, so only you can change them.
+* This app's functions cannot be accessed by other apps, so only you can change settings.
 
 ## Install
 
@@ -54,6 +54,11 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 ## Functions
 
 ### Added in this fork
+
+#### v1.6.8
+
+1. updated shortcuts creation configuration so that third party apps cannot use them
+2. Updated shizuku configuration dialog
 
 #### v1.6.7
 

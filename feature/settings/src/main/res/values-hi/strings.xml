@@ -48,10 +48,11 @@
     <string name="shizuku">Shizuku कॉन्फ़िगरेशन</string>
     <string name="restart_shizuku_service">Shizuku सेवा पुनः चालू करें</string>
     <string name="restart_shizuku_service_description">नोटिफ़िकेशन से USB डीबगिंग वापस लाने पर (केवल मेमोरी फ़ंक्शन में), Shizuku सेवा अपने आप शुरू करें।</string>
-    <string name="shizuku_needs">ज़रूरत</string>
-    <string name="shizuku_forks_suffix">/ Shizuku के अन्य फ़ोर्क जो स्टार्ट सर्विस इंटेंट का समर्थन करते हैं (RikkaApps और उसके सीधे फ़ोर्क सर्विस स्टार्ट इंटेंट का समर्थन नहीं करते)।</string>
+    <string name="shizuku_rikka_warning">Shizuku का मूल RikkaApps संस्करण (Playstore / F-droid / Github) स्टार्ट-स्टॉप इंटेंट का समर्थन नहीं करता</string>
+    <string name="shizuku_rikka_recommend_prefix">RikkaApps Shizuku पुराना है और अब उसका रखरखाव नहीं होता, इसलिए डाउनलोड करने की सलाह दी जाती है</string>
+    <string name="shizuku_rikka_recommend_link">Shizuku का Thedjchi फ़ोर्क (समुदाय द्वारा रखरखाव)</string>
+    <string name="shizuku_fork_mode_other_suffix">/ Shizuku के अन्य फ़ोर्क जो स्टार्ट-स्टॉप इंटेंट का समर्थन करते हैं</string>
     <string name="shizuku_fork_mode_thedjchi">Shizuku के thedjchi आधारित फ़ोर्क</string>
-    <string name="shizuku_fork_mode_other">Shevery / Shizuku के अन्य फ़ोर्क</string>
     <string name="shizuku_choose_app">कोई इंस्टॉल किया हुआ ऐप चुनें</string>
     <string name="shizuku_fill_advanced">कृपया पहले Shizuku कॉन्फ़िगरेशन अनुभाग भरें</string>
     <string name="show_value">दिखाएँ</string>

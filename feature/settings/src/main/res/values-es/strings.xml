@@ -48,10 +48,11 @@
     <string name="shizuku">Configuración de Shizuku</string>
     <string name="restart_shizuku_service">Reiniciar el servicio de Shizuku</string>
     <string name="restart_shizuku_service_description">Al revertir la depuración USB desde la notificación (solo con la función de memoria), iniciar automáticamente el servicio de Shizuku.</string>
-    <string name="shizuku_needs">Requiere</string>
-    <string name="shizuku_forks_suffix">/ otros forks de Shizuku que admitan intents de inicio de servicio (RikkaApps y sus forks directos no admiten el intent de inicio de servicio).</string>
+    <string name="shizuku_rikka_warning">La versión original de Shizuku de RikkaApps (Playstore / F-droid / Github) no admite intents de inicio y parada</string>
+    <string name="shizuku_rikka_recommend_prefix">Shizuku de RikkaApps está desactualizado y ya no recibe mantenimiento, por eso se recomienda descargar el</string>
+    <string name="shizuku_rikka_recommend_link">fork Thedjchi de Shizuku (mantenido por la comunidad)</string>
+    <string name="shizuku_fork_mode_other_suffix">/ otros forks de Shizuku que admiten intents de inicio y parada</string>
     <string name="shizuku_fork_mode_thedjchi">Forks de Shizuku basados en thedjchi</string>
-    <string name="shizuku_fork_mode_other">Shevery / otros forks de Shizuku</string>
     <string name="shizuku_choose_app">Elige una app instalada</string>
     <string name="shizuku_fill_advanced">Rellena primero la sección Configuración de Shizuku</string>
     <string name="show_value">Mostrar</string>

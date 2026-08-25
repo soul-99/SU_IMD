@@ -49,10 +49,11 @@
     <string name="shizuku">Shizuku 구성</string>
     <string name="restart_shizuku_service">Shizuku 서비스 다시 시작</string>
     <string name="restart_shizuku_service_description">알림에서 USB 디버깅을 되돌릴 때(메모리 기능에서만) Shizuku 서비스를 자동으로 시작합니다.</string>
-    <string name="shizuku_needs">필요:</string>
-    <string name="shizuku_forks_suffix">/ 서비스 시작 인텐트를 지원하는 Shizuku의 기타 포크 (RikkaApps와 그 직계 포크는 서비스 시작 인텐트를 지원하지 않습니다).</string>
+    <string name="shizuku_rikka_warning">RikkaApps의 원본 Shizuku(Playstore / F-droid / Github)는 시작 및 중지 인텐트를 지원하지 않습니다</string>
+    <string name="shizuku_rikka_recommend_prefix">RikkaApps Shizuku는 오래되었고 더 이상 관리되지 않으므로 다음을 내려받는 것을 권장합니다:</string>
+    <string name="shizuku_rikka_recommend_link">Shizuku의 Thedjchi 포크(커뮤니티 관리)</string>
+    <string name="shizuku_fork_mode_other_suffix">/ 시작 및 중지 인텐트를 지원하는 다른 Shizuku 포크</string>
     <string name="shizuku_fork_mode_thedjchi">Thedjchi 기반 Shizuku 포크</string>
-    <string name="shizuku_fork_mode_other">Shevery / 기타 Shizuku 포크</string>
     <string name="shizuku_choose_app">설치된 앱 선택</string>
     <string name="shizuku_fill_advanced">먼저 Shizuku 구성 섹션을 채워 주세요</string>
     <string name="show_value">표시</string>

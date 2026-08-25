@@ -52,10 +52,11 @@
     <string name="shizuku">Shizuku-Konfiguration</string>
     <string name="restart_shizuku_service">Shizuku-Dienst neu starten</string>
     <string name="restart_shizuku_service_description">Beim Wiederherstellen des USB-Debuggings über die Benachrichtigung (nur Speicherfunktion) den Shizuku-Dienst automatisch starten.</string>
-    <string name="shizuku_needs">Benötigt</string>
-    <string name="shizuku_forks_suffix">/ andere Shizuku-Forks, die Service-Start-Intents unterstützen (RikkaApps und dessen direkte Forks unterstützen den Service-Start-Intent nicht).</string>
+    <string name="shizuku_rikka_warning">Die ursprüngliche RikkaApps-Version von Shizuku (Playstore / F-droid / Github) unterstützt keine Start-Stopp-Intents</string>
+    <string name="shizuku_rikka_recommend_prefix">RikkaApps Shizuku ist veraltet und wird nicht mehr gepflegt, daher wird empfohlen, den</string>
+    <string name="shizuku_rikka_recommend_link">Thedjchi-Fork von Shizuku (von der Community gepflegt)</string>
+    <string name="shizuku_fork_mode_other_suffix">/ andere Shizuku-Forks, die Start-Stopp-Intents unterstützen</string>
     <string name="shizuku_fork_mode_thedjchi">Shizuku-Forks auf Thedjchi-Basis</string>
-    <string name="shizuku_fork_mode_other">Shevery / andere Shizuku-Forks</string>
     <string name="shizuku_choose_app">Installierte App auswählen</string>
     <string name="shizuku_fill_advanced">Bitte fülle zuerst den Abschnitt Shizuku-Konfiguration aus</string>
     <string name="show_value">Anzeigen</string>

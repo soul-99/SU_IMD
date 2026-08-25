@@ -52,10 +52,11 @@
     <string name="shizuku">Конфигурация Shizuku</string>
     <string name="restart_shizuku_service">Перезапуск службы Shizuku</string>
     <string name="restart_shizuku_service_description">При возврате отладки по USB из уведомления (только в функции памяти) автоматически запускать службу Shizuku.</string>
-    <string name="shizuku_needs">Требуется</string>
-    <string name="shizuku_forks_suffix">/ другие форки Shizuku, поддерживающие intent запуска службы (RikkaApps и его прямые форки intent запуска службы не поддерживают).</string>
+    <string name="shizuku_rikka_warning">Исходная версия Shizuku от RikkaApps (Playstore / F-droid / Github) не поддерживает intent-ы запуска и остановки</string>
+    <string name="shizuku_rikka_recommend_prefix">Shizuku от RikkaApps устарел и больше не поддерживается, поэтому рекомендуется скачать</string>
+    <string name="shizuku_rikka_recommend_link">форк Thedjchi для Shizuku (поддерживается сообществом)</string>
+    <string name="shizuku_fork_mode_other_suffix">/ другие форки Shizuku с поддержкой intent-ов запуска и остановки</string>
     <string name="shizuku_fork_mode_thedjchi">Форки Shizuku на основе thedjchi</string>
-    <string name="shizuku_fork_mode_other">Shevery / другие форки Shizuku</string>
     <string name="shizuku_choose_app">Выберите установленное приложение</string>
     <string name="shizuku_fill_advanced">Сначала заполните раздел «Конфигурация Shizuku»</string>
     <string name="show_value">Показать</string>
