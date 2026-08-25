@@ -68,35 +68,93 @@ class RevertToDefaultUseCase @Inject constructor(
     }
 
     private suspend fun revert(): RevertToDefaultResult {
-        val wanted = userDataRepository.userData.first().revertDefaults
+        val userData = userDataRepository.userData.first()
+        val wanted = userData.revertDefaults
 
-        val before = getManualTargetStatesUseCase()
+        var before = getManualTargetStatesUseCase()
 
         val changed = mutableSetOf<ManualRevertTarget>()
         val failed = mutableSetOf<ManualRevertTarget>()
         val unchanged = mutableSetOf<ManualRevertTarget>()
 
-        // Declaration order, and it is load-bearing: USB debugging is meaningless with
-        // developer options off, and Shizuku cannot start without USB debugging. Working
-        // through the enum in order means each target is set up by the time the next one
-        // needs it.
-        for (target in ManualRevertTarget.entries) {
-            val enabled = wanted[target] ?: continue
-
+        suspend fun applyTarget(target: ManualRevertTarget, enabled: Boolean) {
             if (before.isEnabled(target) == enabled) {
-                unchanged += target
+                if (target !in changed) unchanged += target
 
-                continue
-            }
-
-            if (target == ManualRevertTarget.Shizuku && enabled && debuggingJustEnabled(changed)) {
-                delay(SHIZUKU_START_DELAY_MILLIS)
+                return
             }
 
             if (setManualTargetUseCase(target = target, enabled = enabled)) {
                 changed += target
+                failed -= target
+                unchanged -= target
             } else {
                 failed += target
+            }
+        }
+
+        val ordinaryTargets = listOf(
+            ManualRevertTarget.DeveloperSettings,
+            ManualRevertTarget.UsbDebugging,
+            ManualRevertTarget.WirelessDebugging,
+            ManualRevertTarget.AccessibilityServices,
+        )
+
+        for (target in ordinaryTargets) {
+            wanted[target]?.let { enabled -> applyTarget(target, enabled) }
+        }
+
+        before = getManualTargetStatesUseCase()
+
+        val overlayTarget = ManualRevertTarget.DisplayOverOtherApps
+        val overlayEnabled = wanted[overlayTarget]
+        val hasOverlayDebt = userData.heldOverlayPackages.isNotEmpty()
+        // Disabling is always attempted: a failed Shizuku query reads as off in the live
+        // state, and treating that as authoritative would silently leave overlays allowed.
+        // Enabling only restores IMD's persisted debt and cannot grant anything new.
+        val overlayNeedsWrite = overlayEnabled == false ||
+            (overlayEnabled == true && hasOverlayDebt)
+        var temporarilyStartedShizuku = false
+
+        if (overlayNeedsWrite) {
+            val shizukuWasRunning = before.isEnabled(ManualRevertTarget.Shizuku)
+
+            if (!shizukuWasRunning && debuggingJustEnabled(changed)) {
+                delay(SHIZUKU_START_DELAY_MILLIS)
+            }
+
+            val shizukuReady = if (shizukuWasRunning) {
+                true
+            } else {
+                setManualTargetUseCase(ManualRevertTarget.Shizuku, enabled = true).also {
+                    temporarilyStartedShizuku = it
+                }
+            }
+
+            if (shizukuReady &&
+                setManualTargetUseCase(overlayTarget, enabled = overlayEnabled)
+            ) {
+                changed += overlayTarget
+            } else {
+                failed += overlayTarget
+            }
+        } else if (overlayEnabled != null) {
+            unchanged += overlayTarget
+        }
+
+        before = getManualTargetStatesUseCase()
+
+        wanted[ManualRevertTarget.Shizuku]?.let { enabled ->
+            applyTarget(ManualRevertTarget.Shizuku, enabled)
+        }
+
+        if (temporarilyStartedShizuku && wanted[ManualRevertTarget.Shizuku] != true) {
+            // Starting a Shizuku fork can re-enable its debugging transport. The user's
+            // configured defaults, not that implementation detail, must be the final state.
+            before = getManualTargetStatesUseCase()
+
+            for (target in ordinaryTargets.take(3)) {
+                wanted[target]?.let { enabled -> applyTarget(target, enabled) }
             }
         }
 

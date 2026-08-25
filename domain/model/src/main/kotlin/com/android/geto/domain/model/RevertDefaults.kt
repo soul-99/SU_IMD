@@ -68,6 +68,9 @@ object RevertDefaults {
         ManualRevertTarget.WirelessDebugging to false,
         ManualRevertTarget.AccessibilityServices to true,
         ManualRevertTarget.Shizuku to false,
+        // Only packages IMD previously disabled are restored, so this does not grant
+        // overlay access to anything new.
+        ManualRevertTarget.DisplayOverOtherApps to true,
     )
 
     fun encode(states: Map<ManualRevertTarget, Boolean>): List<String> =

@@ -59,5 +59,8 @@ interface PackageManagerWrapper {
      */
     suspend fun getLastInstallTimes(): Map<String, Long>
 
+    /** Installation identities for the requested packages; missing packages are omitted. */
+    suspend fun getPackageIdentities(packageNames: Set<String>): Map<String, String>
+
     fun isSystem(flags: Int): Boolean
 }

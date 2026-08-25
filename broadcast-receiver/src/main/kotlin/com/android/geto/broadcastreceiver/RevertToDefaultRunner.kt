@@ -19,6 +19,8 @@
 package com.android.geto.broadcastreceiver
 
 import android.content.Context
+import android.content.Intent
+import com.android.geto.common.SettingsObservationGate
 import com.android.geto.common.showRevertToDefaultToast
 import com.android.geto.domain.model.RevertToDefaultResult
 import com.android.geto.domain.usecase.RevertToDefaultUseCase
@@ -52,8 +54,25 @@ class RevertToDefaultRunner @Inject constructor(
         // pressing one would write remembered values back over the defaults just applied.
         // The observer service's own notification survives this: the system keeps a
         // foreground service's notification up regardless.
-        notificationManagerWrapper.cancelAll()
+        SettingsObservationGate.pause()
 
-        return revertToDefaultUseCase()
+        return try {
+            notificationManagerWrapper.cancelAll()
+
+            revertToDefaultUseCase()
+        } finally {
+            SettingsObservationGate.resume()
+
+            // If the optional observer service is running, reset its foreground
+            // notification after suppressing IMD's own burst of settings writes. An
+            // explicit start to an already-running service only delivers this command.
+            if (SettingsObservationGate.isRunning) {
+                context.startService(
+                    Intent()
+                        .setClassName(context, SettingsObservationGate.SERVICE_CLASS_NAME)
+                        .setAction(SettingsObservationGate.ACTION_RESET),
+                )
+            }
+        }
     }
 }

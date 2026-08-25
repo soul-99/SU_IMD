@@ -21,6 +21,7 @@ package com.android.geto.domain.usecase
 import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers
 import com.android.geto.domain.framework.AccessibilityServicesWrapper
+import com.android.geto.domain.framework.PackageManagerWrapper
 import com.android.geto.domain.framework.SecureSettingsWrapper
 import com.android.geto.domain.framework.ShizukuWrapper
 import com.android.geto.domain.model.AccessibilityServicePlan
@@ -54,6 +55,7 @@ class SetManualTargetUseCase @Inject constructor(
     private val secureSettingsWrapper: SecureSettingsWrapper,
     private val accessibilityServicesWrapper: AccessibilityServicesWrapper,
     private val shizukuWrapper: ShizukuWrapper,
+    private val packageManagerWrapper: PackageManagerWrapper,
     private val userDataRepository: UserDataRepository,
     private val startShizukuUseCase: StartShizukuUseCase,
     @param:Dispatcher(GetoDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
@@ -81,47 +83,145 @@ class SetManualTargetUseCase @Inject constructor(
         return when (target) {
             ManualRevertTarget.AccessibilityServices -> setAccessibilityServices(enabled = enabled)
             ManualRevertTarget.Shizuku -> setShizuku(running = enabled)
+            ManualRevertTarget.DisplayOverOtherApps -> setOverlayPermission(enabled = enabled)
             else -> false
         }
+    }
+
+    private suspend fun setOverlayPermission(enabled: Boolean): Boolean {
+        val userData = userDataRepository.userData.first()
+
+        if (enabled) {
+            val held = userData.heldOverlayPackages
+
+            if (held.isEmpty()) return true
+
+            val requestingPackages = packageManagerWrapper.getPackageIdentities(held.keys)
+            val toRestore = held.filter { (packageName, identity) ->
+                requestingPackages[packageName] == identity
+            }.keys
+
+            // An uninstalled app, or one updated to stop requesting the permission, no
+            // longer has an AppOp to restore. A replacement with a different installation
+            // identity is also dropped rather than inheriting the previous app's access.
+            val restored = shizukuWrapper.setOverlayPermission(
+                packages = toRestore,
+                allowed = true,
+            ) ?: emptySet()
+            val remaining = held.filter { (packageName, identity) ->
+                requestingPackages[packageName] == identity && packageName !in restored
+            }
+
+            if (remaining != held) {
+                userDataRepository.updateHeldOverlayPackages(remaining)
+            }
+
+            return remaining.isEmpty()
+        }
+
+        val allowedPackages = shizukuWrapper.getAllowedOverlayPackages() ?: return false
+        val requestingPackages = packageManagerWrapper.getPackageIdentities(allowedPackages)
+        val toDisable = requestingPackages.keys
+
+        if (toDisable.isEmpty()) return true
+
+        // Record the debt before the shell command. A multi-package command can fail after
+        // changing an earlier package, and retaining the full set makes a later restore safe.
+        userDataRepository.updateHeldOverlayPackages(
+            userData.heldOverlayPackages + requestingPackages.filterKeys { it in toDisable },
+        )
+
+        val disabled = shizukuWrapper.setOverlayPermission(
+            packages = toDisable,
+            allowed = false,
+        ) ?: emptySet()
+
+        // Narrow the crash-safe provisional debt to what the shell actually changed.
+        // Every candidate was allowed before this attempt, so a process death before this
+        // cleanup can only re-allow something that never stopped being allowed.
+        userDataRepository.updateHeldOverlayPackages(
+            userData.heldOverlayPackages + requestingPackages.filterKeys { it in disabled },
+        )
+
+        return disabled == toDisable
     }
 
     private suspend fun setAccessibilityServices(enabled: Boolean): Boolean {
         val userData = userDataRepository.userData.first()
 
         val held = userData.heldAccessibilityServices
+        val holdKey = AccessibilityServicePlan.DEVICE_WIDE_HOLD
 
         val currentlyEnabled = runCatching {
             accessibilityServicesWrapper.getEnabledAccessibilityServices()
         }.getOrNull() ?: return false
 
-        // Switching on covers anything still held for a target app as well as the chosen
-        // set, so one press cannot leave a service down with no record of why.
-        val after = if (enabled) {
-            AccessibilityServicePlan.enable(
-                wanted = userData.managedAccessibilityServices + held.values.flatten(),
+        if (enabled) {
+            val released = held[holdKey].orEmpty()
+            val remaining = AccessibilityServicePlan.withHold(
+                held = held,
+                componentName = holdKey,
+                services = emptyList(),
+            )
+            val plan = AccessibilityServicePlan.release(
+                released = released,
+                stillHeldByOthers = AccessibilityServicePlan.heldByOthers(
+                    held = held,
+                    exceptComponentName = holdKey,
+                ),
                 currentlyEnabled = currentlyEnabled,
             )
-        } else {
-            AccessibilityServicePlan.disable(
-                unwanted = userData.managedAccessibilityServices,
-                currentlyEnabled = currentlyEnabled,
-            )
+
+            val written = runCatching {
+                accessibilityServicesWrapper.setEnabledAccessibilityServices(plan.enabledAfter)
+            }.getOrDefault(false)
+
+            if (written && remaining != held) {
+                userDataRepository.updateHeldAccessibilityServices(held = remaining)
+            }
+
+            return written
         }
+
+        val heldByOthers = AccessibilityServicePlan.heldByOthers(
+            held = held,
+            exceptComponentName = holdKey,
+        )
+        val plan = AccessibilityServicePlan.hold(
+            // Claim services already held by a per-app profile as well as everything
+            // currently enabled. That prevents the profile's Revert from bringing one
+            // back while the device-wide restricted app is still open.
+            managed = held[holdKey].orEmpty() + currentlyEnabled + heldByOthers,
+            currentlyEnabled = currentlyEnabled,
+            heldByOthers = heldByOthers,
+        )
+
+        if (plan.held.isEmpty() && !plan.listChanged) return true
+
+        val updatedHeld = AccessibilityServicePlan.withHold(
+            held = held,
+            componentName = holdKey,
+            // A second device-wide launch must extend the existing debt rather than
+            // replacing it. Services from the first launch are already off, so hold()
+            // cannot rediscover them from the live enabled list.
+            services = held[holdKey].orEmpty() + plan.held,
+        )
+
+        // Persist before writing so process death cannot leave a service disabled with no
+        // record capable of restoring it.
+        userDataRepository.updateHeldAccessibilityServices(held = updatedHeld)
 
         val written = runCatching {
-            accessibilityServicesWrapper.setEnabledAccessibilityServices(after)
+            accessibilityServicesWrapper.setEnabledAccessibilityServices(
+                plan.enabledAfter,
+            )
         }.getOrDefault(false)
 
-        if (!written) return false
-
-        // The holds describe services this app switched off on some app's behalf. Turning
-        // them all back on here discharges that debt; turning them off by hand does not
-        // create one, because nothing is waiting to put them back.
-        if (enabled && held.isNotEmpty()) {
-            userDataRepository.updateHeldAccessibilityServices(held = emptyMap())
+        if (!written) {
+            userDataRepository.updateHeldAccessibilityServices(held = held)
         }
 
-        return true
+        return written
     }
 
     private suspend fun setShizuku(running: Boolean): Boolean {

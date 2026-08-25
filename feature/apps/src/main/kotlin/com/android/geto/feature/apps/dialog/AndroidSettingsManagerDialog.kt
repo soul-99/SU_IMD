@@ -87,7 +87,6 @@ internal fun AndroidSettingsManagerDialog(
     busy: Boolean,
     shizukuStarting: Boolean,
     shizukuStartFailed: Boolean,
-    accessibilityManaged: Boolean,
     /** Null while the stored answer is still being read; see the ViewModel. */
     infoShown: Boolean? = true,
     onInfoShown: () -> Unit = {},
@@ -96,7 +95,6 @@ internal fun AndroidSettingsManagerDialog(
     onOpen: (ManualRevertTarget) -> Unit,
     onRevertToDefault: () -> Unit,
     onOpenRevertConfiguration: () -> Unit,
-    onAccessibilityUnmanaged: () -> Unit,
 ) {
     var showShizukuHelp by remember { mutableStateOf(false) }
 
@@ -172,15 +170,6 @@ internal fun AndroidSettingsManagerDialog(
             ManualRevertTarget.entries.forEach { target ->
                 val isShizuku = target == ManualRevertTarget.Shizuku
 
-                // Nothing is managed, so there is nothing this switch could do. Shown off
-                // and greyed rather than hidden: the row is what tells the user the
-                // capability exists and is unconfigured, and its own note points at where
-                // to configure it. Forced off regardless of the revert configuration --
-                // a configuration saying "restore accessibility services" cannot restore
-                // an empty list, and a switch reading on would be describing nothing.
-                val accessibilityUnmanaged =
-                    target == ManualRevertTarget.AccessibilityServices && !accessibilityManaged
-
                 TargetRow(
                     target = target,
                     // Only ever true for the Shizuku row: it is the one target the app can
@@ -191,16 +180,15 @@ internal fun AndroidSettingsManagerDialog(
                     // the two to show for a beat: it invites a press that helps, where a
                     // wrong "on" invites the user to walk away from a device still locked
                     // down.
-                    enabled = states.isEnabled(target) && !accessibilityUnmanaged,
+                    enabled = states.isEnabled(target),
                     // Shizuku is the only row that can be switched off in the sense of
                     // "there is nothing here to control".
                     // Locked while an attempt is in flight. The switch already reads on and
                     // the outcome is a few seconds away; letting it be pressed again would
                     // queue a second attempt against a service that is still deciding.
-                    usable = !busy && !accessibilityUnmanaged &&
+                    usable = !busy &&
                         (!isShizuku || (states.shizukuAvailable && !shizukuStarting)),
                     onClickWhenUnusable = when {
-                        accessibilityUnmanaged -> onAccessibilityUnmanaged
                         isShizuku -> {
                             { showShizukuHelp = true }
                         }
@@ -346,7 +334,7 @@ private fun TargetRow(
             // it means.
             if (target == ManualRevertTarget.AccessibilityServices) {
                 Text(
-                    text = stringResource(R.string.settings_manager_accessibility_note),
+                    text = stringResource(R.string.settings_manager_accessibility_all_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -500,6 +488,7 @@ private fun ShizukuHelpDialog(
 private val ManualRevertTarget.opensSomewhere: Boolean
     get() = this == ManualRevertTarget.DeveloperSettings ||
         this == ManualRevertTarget.AccessibilityServices ||
+        this == ManualRevertTarget.DisplayOverOtherApps ||
         this == ManualRevertTarget.Shizuku
 
 @Composable
@@ -509,5 +498,5 @@ internal fun ManualRevertTarget.getTitle(): String = when (this) {
     ManualRevertTarget.WirelessDebugging -> stringResource(R.string.revert_wireless_debugging)
     ManualRevertTarget.AccessibilityServices -> stringResource(R.string.revert_accessibility)
     ManualRevertTarget.Shizuku -> stringResource(R.string.revert_shizuku)
+    ManualRevertTarget.DisplayOverOtherApps -> stringResource(R.string.revert_display_over_other_apps)
 }
-

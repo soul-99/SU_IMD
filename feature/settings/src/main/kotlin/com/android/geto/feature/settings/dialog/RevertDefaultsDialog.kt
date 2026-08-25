@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -72,6 +74,7 @@ internal fun RevertDefaultsDialog(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(10.dp),
         ) {
             Text(
@@ -111,7 +114,7 @@ internal fun RevertDefaultsDialog(
 
             RevertDefaultRow(
                 label = stringResource(R.string.revert_defaults_accessibility_services),
-                note = stringResource(R.string.revert_defaults_accessibility_note),
+                note = stringResource(R.string.revert_defaults_accessibility_all_note),
                 checked = draft[ManualRevertTarget.AccessibilityServices] == true,
                 onCheckedChange = { toggle(ManualRevertTarget.AccessibilityServices, it) },
             )
@@ -121,6 +124,13 @@ internal fun RevertDefaultsDialog(
                 note = stringResource(R.string.revert_defaults_shizuku_note),
                 checked = draft[ManualRevertTarget.Shizuku] == true,
                 onCheckedChange = { toggle(ManualRevertTarget.Shizuku, it) },
+            )
+
+            RevertDefaultRow(
+                label = stringResource(R.string.revert_defaults_display_over_other_apps),
+                note = stringResource(R.string.revert_defaults_overlay_note),
+                checked = draft[ManualRevertTarget.DisplayOverOtherApps] == true,
+                onCheckedChange = { toggle(ManualRevertTarget.DisplayOverOtherApps, it) },
             )
 
             Row(

@@ -34,6 +34,7 @@ data class UserData(
     val shizukuStartAction: String,
     val managedAccessibilityServices: List<String>,
     val heldAccessibilityServices: Map<String, List<String>>,
+    val heldOverlayPackages: Map<String, String>,
     val manualRevertTargets: Set<ManualRevertTarget>,
     val notificationFunction: NotificationFunction,
     val revertDefaults: Map<ManualRevertTarget, Boolean>,

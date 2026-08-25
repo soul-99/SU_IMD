@@ -161,5 +161,26 @@ internal class DefaultPackageManagerWrapper @Inject constructor(
         packages.associate { it.packageName to it.lastUpdateTime }
     }
 
+    override suspend fun getPackageIdentities(packageNames: Set<String>): Map<String, String> =
+        withContext(ioDispatcher) {
+            packageNames.mapNotNull { packageName ->
+                val packageInfo = runCatching {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        packageManager.getPackageInfo(
+                            packageName,
+                            PackageManager.PackageInfoFlags.of(0),
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        packageManager.getPackageInfo(packageName, 0)
+                    }
+                }.getOrNull() ?: return@mapNotNull null
+
+                    val uid = packageInfo.applicationInfo?.uid ?: -1
+
+                    packageInfo.packageName to "${packageInfo.firstInstallTime}:$uid"
+            }.toMap()
+        }
+
     override fun isSystem(flags: Int): Boolean = (flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0
 }

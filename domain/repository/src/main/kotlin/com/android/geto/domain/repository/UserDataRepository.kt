@@ -65,6 +65,8 @@ interface UserDataRepository {
 
     suspend fun updateHeldAccessibilityServices(held: Map<String, List<String>>)
 
+    suspend fun updateHeldOverlayPackages(packages: Map<String, String>)
+
     suspend fun updateManualRevertTargets(targets: Set<ManualRevertTarget>)
 
     suspend fun updateNotificationFunction(notificationFunction: NotificationFunction)

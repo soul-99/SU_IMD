@@ -124,9 +124,16 @@ internal fun SettingsToHideDialog(
                 // caveat is about which services this app manages at all, so it is the
                 // same fact in both places and must not be able to drift.
                 label = stringResource(R.string.revert_defaults_accessibility_services),
-                note = stringResource(R.string.revert_defaults_accessibility_note),
+                note = stringResource(R.string.settings_to_hide_accessibility_note),
                 checked = draft[ManualRevertTarget.AccessibilityServices] == true,
                 onCheckedChange = { toggle(ManualRevertTarget.AccessibilityServices, it) },
+            )
+
+            SettingToHideRow(
+                label = stringResource(R.string.revert_defaults_display_over_other_apps),
+                note = stringResource(R.string.settings_to_hide_overlay_note),
+                checked = draft[ManualRevertTarget.DisplayOverOtherApps] == true,
+                onCheckedChange = { toggle(ManualRevertTarget.DisplayOverOtherApps, it) },
             )
 
             Spacer(modifier = Modifier.height(8.dp))

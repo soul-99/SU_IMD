@@ -59,8 +59,6 @@ fun SettingsManagerRoute(
 
     val shizukuStartFailed by viewModel.shizukuStartFailed.collectAsStateWithLifecycle()
 
-    val accessibilityManaged by viewModel.accessibilityManaged.collectAsStateWithLifecycle()
-
     val infoShown by viewModel.infoShown.collectAsStateWithLifecycle()
 
     // Polling runs only while this is composed. DisposableEffect rather than
@@ -107,14 +105,6 @@ fun SettingsManagerRoute(
 
             context.openRevertConfiguration()
         },
-        onAccessibilityUnmanaged = {
-            Toast.makeText(
-                context,
-                R.string.settings_manager_accessibility_unmanaged,
-                Toast.LENGTH_LONG,
-            ).show()
-        },
-        accessibilityManaged = accessibilityManaged,
     )
 }
 
@@ -134,6 +124,10 @@ internal fun Context.openTarget(target: ManualRevertTarget, shizukuPackage: Stri
 
         ManualRevertTarget.AccessibilityServices -> {
             Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        }
+
+        ManualRevertTarget.DisplayOverOtherApps -> {
+            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
         }
 
         ManualRevertTarget.Shizuku -> {

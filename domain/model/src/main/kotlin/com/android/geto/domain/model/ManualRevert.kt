@@ -26,7 +26,7 @@ package com.android.geto.domain.model
  * remaining route is Android's own developer-options screen, which is exactly the screen
  * that is switched off.
  *
- * [globalSettingKey] is the Global setting written back to "1"; the two targets that are
+ * [globalSettingKey] is the Global setting written back to "1"; targets that are
  * not a single settings row carry null and are handled specifically.
  */
 enum class ManualRevertTarget(val globalSettingKey: String?) {
@@ -35,6 +35,7 @@ enum class ManualRevertTarget(val globalSettingKey: String?) {
     WirelessDebugging(AppSettingKeys.ADB_WIFI_ENABLED),
     AccessibilityServices(null),
     Shizuku(null),
+    DisplayOverOtherApps(null),
     ;
 
     companion object {

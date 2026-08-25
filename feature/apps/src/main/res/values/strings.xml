@@ -75,6 +75,7 @@
     <string name="got_it">Got it</string>
     <string name="settings_manager_open">Open %1$s</string>
     <string name="settings_manager_accessibility_note">only services selected in the IMD app settings are managed</string>
+    <string name="settings_manager_accessibility_all_note">switching this off temporarily disables every enabled accessibility service; switching it on restores only services IMD held</string>
     <string name="settings_manager_enable_developer_options">Please enable developer options first</string>
     <string name="settings_manager_cannot_open">Could not open that screen on this device</string>
     <string name="settings_manager_no_shizuku">No Shizuku app found — set the package name in Settings</string>
@@ -90,6 +91,7 @@
     <string name="revert_wireless_debugging">Wireless debugging</string>
     <string name="revert_accessibility">Accessibility services</string>
     <string name="revert_shizuku">Shizuku service</string>
+    <string name="revert_display_over_other_apps">Display over other apps</string>
     <string name="applied_settings_no_permission">Grant WRITE_SECURE_SETTINGS first — see the setup screen</string>
     <string name="settings_manager_shizuku_failed">Failed to start shizuku service on last attempt, please check shizuku app settings and IMD shizuku configuration</string>
     <string name="settings_manager_shizuku_failed_open">Why the Shizuku service did not start</string>

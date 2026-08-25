@@ -33,6 +33,7 @@ import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.android.geto.common.AppLocale
+import com.android.geto.common.SettingsObservationGate
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,6 +59,8 @@ class SettingsObserverService : Service() {
     private val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
         override fun onChange(selfChange: Boolean, uri: Uri?) {
             super.onChange(selfChange, uri)
+
+            if (SettingsObservationGate.isPaused) return
 
             val category = when {
                 uri.toString().startsWith(Settings.System.CONTENT_URI.toString()) -> getString(
@@ -107,6 +110,7 @@ class SettingsObserverService : Service() {
         _isRunning.update {
             true
         }
+        SettingsObservationGate.setRunning(true)
 
         ServiceCompat.startForeground(
             this,
@@ -153,6 +157,16 @@ class SettingsObserverService : Service() {
 
                 return START_NOT_STICKY
             }
+
+            SettingsObservationGate.ACTION_RESET -> {
+                androidNotificationManagerWrapper.notify(
+                    id = NOTIFICATION_ID,
+                    notification = getNotification(
+                        title = getString(R.string.settings_observer),
+                        text = getString(R.string.waiting_for_changes),
+                    ),
+                )
+            }
         }
 
         return START_STICKY
@@ -164,6 +178,7 @@ class SettingsObserverService : Service() {
         _isRunning.update {
             false
         }
+        SettingsObservationGate.setRunning(false)
 
         contentResolver.unregisterContentObserver(observer)
     }

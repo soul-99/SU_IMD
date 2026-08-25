@@ -169,6 +169,11 @@ message UserPreferences {
   // which is the single most common thing to misread about it.
   bool settingsManagerInfoShown = 31;
 
+  // Packages whose display-over-other-apps AppOp IMD changed from allow to ignore, mapped
+  // to "<firstInstallTime>:<uid>". Revert drops an entry if that identity changed, so an
+  // app installed later under the same package name is never granted the old app's access.
+  map<string, string> heldOverlayPackages = 32;
+
   // 9 was favouriteAppsTapAction. What a tap and a long press do is now decided by the
   // notification function rather than chosen, so there is nothing left for it to store.
   // 14 was a single global suspended-services list, replaced by the map above.
