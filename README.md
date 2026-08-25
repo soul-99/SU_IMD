@@ -29,7 +29,7 @@ It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the pa
 
 * No internet access or unnecessary continuous background services (so almost zero battery / system resource use).
 * Does not tamper with any apps on the device.
-* This app's functions cannot be accessed by other apps, so only you can change settings.
+* The parts of this app that change settings cannot be triggered by another app, so only you can change them.
 
 ## Install
 
