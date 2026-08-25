@@ -6,7 +6,7 @@
   <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the Favourites tab, creating a shortcut, the IMD services manager, the settings screen and the Quick Settings tiles">
 </p>
 
-Open banking and other locked-down apps without turning developer options, debugging, accessibility services, Shizuku service off-on by hand every single time.
+Open banking and other locked-down apps without turning developer options, debugging, accessibility services or Shizuku service off-on by hand every single time.
 
 Some apps refuse to run or quietly disable parts of themselves when they detect developer options, an ADB connection or an active accessibility service. The usual workaround is to go and switch those things off before opening the app and switch them back on afterwards, every time. IMD does that for you: pick an app, say which settings should change while it runs, and launch it from here. The settings are applied, the app opens, and an ongoing notification with a **Revert** action puts your device back the way it was.
 
