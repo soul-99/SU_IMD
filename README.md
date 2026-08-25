@@ -1,6 +1,4 @@
-# (SU) IMD
-
-**(SU) IMD — Shut up! it's my device**
+# (SU) IMD - Shut up! it's my device
 
 ## Description
 
