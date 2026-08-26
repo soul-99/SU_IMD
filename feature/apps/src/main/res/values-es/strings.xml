@@ -49,7 +49,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">Ajustes ocultados o desactivados</string>
     <string name="settings_manager_configure_revert">Configura qué restaura Revertir</string>
-    <string name="settings_manager_accessibility_unmanaged">Ahora mismo la app IMD no gestiona ningún servicio de accesibilidad</string>
     <string name="applied_settings_failure">No se pudieron aplicar los ajustes</string>
     <string name="applied_settings_invalid">Esta app tiene ajustes con valores no válidos</string>
     <string name="settings_manager_title">Administrador de servicios de IMD</string>
@@ -88,4 +87,14 @@
     <string name="settings_manager_shizuku_failed">No se pudo iniciar el servicio de Shizuku en el último intento; revisa los ajustes de la app Shizuku y la configuración de Shizuku en IMD</string>
     <string name="settings_manager_shizuku_failed_open">Por qué no se inició el servicio de Shizuku</string>
     <string name="understood">Entendido</string>
+    <string name="overlay_failure_title">No se ha podido modificar el permiso Mostrar sobre otras aplicaciones con Shizuku</string>
+    <string name="overlay_failure_check">Comprueba que:</string>
+    <string name="overlay_failure_point_permission">IMD tiene concedido el permiso de Shizuku</string>
+    <string name="overlay_failure_point_configuration">Revisa tu configuración de Shizuku en los ajustes de la aplicación IMD</string>
+    <string name="shizuku_starting_to_hide_overlay">Iniciando el servicio Shizuku para ocultar el permiso Mostrar sobre otras aplicaciones</string>
+    <string name="revert_display_over_other_apps">Mostrar sobre otras aplicaciones</string>
+    <string name="settings_manager_overlay_restore_failed">No se ha podido restaurar el permiso Mostrar sobre otras aplicaciones con Shizuku. Inicia el servicio Shizuku manualmente desde la aplicación Shizuku e inténtalo de nuevo</string>
+    <string name="settings_manager_overlay_restore_failed_open">Por qué no se restauró Mostrar sobre otras aplicaciones</string>
+    <string name="shizuku_starting_to_restore_overlay">Iniciando el servicio Shizuku para restaurar el permiso Mostrar sobre otras aplicaciones</string>
+    <string name="settings_manager_overlay_note">solo se gestionan las aplicaciones seleccionadas en los ajustes de IMD</string>
 </resources>

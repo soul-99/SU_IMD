@@ -35,4 +35,10 @@
 
     <string name="revert_to_default_toast">Reverter para o padrão</string>
     <string name="revert_from_memory_toast">Reverter da memória</string>
+    <string name="revert_failed_shizuku_toast">Falha ao reiniciar o serviço Shizuku</string>
+    <string name="revert_failed_overlay_toast">Falha ao restaurar a permissão Sobreposição a outros apps usando o Shizuku, veja a notificação</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">Falha ao restaurar o serviço Shizuku e as permissões Sobreposição a outros apps</string>
+    <string name="settings_hidden_toast">Configurações ocultadas</string>
+    <string name="auto_revert_to_default_toast">Reversão automática para o padrão</string>
+    <string name="auto_revert_from_memory_toast">Reversão automática usando a Memory function</string>
 </resources>

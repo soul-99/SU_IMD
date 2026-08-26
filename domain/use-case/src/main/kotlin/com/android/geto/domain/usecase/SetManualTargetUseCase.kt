@@ -60,13 +60,29 @@ class SetManualTargetUseCase @Inject constructor(
     private val startShizukuUseCase: StartShizukuUseCase,
     @param:Dispatcher(GetoDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
 ) {
+    /**
+     * False for a target that could not be written, and never an exception.
+     *
+     * The false-versus-throw distinction is the whole contract, because every caller that
+     * matters is part-way through changing the device when it asks. A revert writes overlay
+     * access, then four settings, then Shizuku; a thrown exception out of the first of those
+     * skips the other five and leaves the device in the half-reverted state the revert
+     * exists to prevent - with no notification either, since the caller never reaches the
+     * line that raises one.
+     *
+     * The overlay and Shizuku branches are the ones that made this real rather than
+     * theoretical: both end in a binder call to a service that can die between the check
+     * that it is alive and the call itself, and a dead binder throws rather than returning.
+     */
     suspend operator fun invoke(
         target: ManualRevertTarget,
         enabled: Boolean,
     ): Boolean = withContext(defaultDispatcher) {
         // Same reasoning as the manual revert: a half-applied change to developer options
         // is worse than none, so navigating away must not cancel it mid-write.
-        withContext(NonCancellable) { set(target = target, enabled = enabled) }
+        withContext(NonCancellable) {
+            runCatching { set(target = target, enabled = enabled) }.getOrDefault(false)
+        }
     }
 
     private suspend fun set(target: ManualRevertTarget, enabled: Boolean): Boolean {
@@ -88,59 +104,138 @@ class SetManualTargetUseCase @Inject constructor(
         }
     }
 
+    /**
+     * The device-wide half of overlay access, scoped to the user's selection.
+     *
+     * A near-copy of [setAccessibilityServices] below, and deliberately so: both manage a
+     * chosen subset of something the whole system shares, both have to survive two apps
+     * holding the same item down at once, and both are wrong in exactly the same way if they
+     * take everything they find rather than everything the user picked.
+     */
     private suspend fun setOverlayPermission(enabled: Boolean): Boolean {
         val userData = userDataRepository.userData.first()
 
+        val held = userData.heldOverlayPackages
+        val holdKey = AccessibilityServicePlan.DEVICE_WIDE_HOLD
+
         if (enabled) {
-            val held = userData.heldOverlayPackages
+            val released = held[holdKey].orEmpty()
 
-            if (held.isEmpty()) return true
+            if (released.isEmpty()) return true
 
-            val requestingPackages = packageManagerWrapper.getPackageIdentities(held.keys)
-            val toRestore = held.filter { (packageName, identity) ->
-                requestingPackages[packageName] == identity
-            }.keys
+            val stillHeld = AccessibilityServicePlan.heldByOthers(
+                held = held,
+                exceptComponentName = holdKey,
+            )
 
-            // An uninstalled app, or one updated to stop requesting the permission, no
-            // longer has an AppOp to restore. A replacement with a different installation
-            // identity is also dropped rather than inheriting the previous app's access.
-            val restored = shizukuWrapper.setOverlayPermission(
-                packages = toRestore,
-                allowed = true,
-            ) ?: emptySet()
-            val remaining = held.filter { (packageName, identity) ->
-                requestingPackages[packageName] == identity && packageName !in restored
+            // Only what this holder took, minus anything another profile is still holding
+            // down. Identities are checked because an app uninstalled or replaced since has
+            // no permission of ours to give back.
+            val identities: Map<String, String> = userData.heldOverlayIdentities
+            val current: Map<String, String> =
+                packageManagerWrapper.getPackageIdentities(released.toSet())
+            val toRestore = released
+                .filterNot { it in stillHeld }
+                .filter { current[it] != null && current[it] == identities[it] }
+                .toSet()
+
+            val restored = if (toRestore.isEmpty()) {
+                emptySet()
+            } else {
+                shizukuWrapper.setOverlayPermission(packages = toRestore, allowed = true)
+                    ?: emptySet()
             }
 
-            if (remaining != held) {
-                userDataRepository.updateHeldOverlayPackages(remaining)
+            // Anything neither restored nor restorable leaves this holder's debt; a package
+            // whose app is gone is dropped, because there is nothing left to give it back to.
+            val outstanding = released.filter {
+                it !in restored && (it in stillHeld || current[it] == identities[it])
             }
 
-            return remaining.isEmpty()
+            val remaining = AccessibilityServicePlan.withHold(
+                held = held,
+                componentName = holdKey,
+                services = outstanding,
+            )
+
+            val stillOwed = remaining.values.flatten().toSet()
+
+            userDataRepository.updateHeldOverlayPackages(
+                held = remaining,
+                identities = identities.filterKeys { it in stillOwed },
+            )
+
+            // The debt is what remembers that overlay access is still withdrawn. The flag is
+            // separate: a non-empty debt is the ordinary state between hiding and reverting,
+            // whereas this says a restore was tried and did not work, which is what earns a
+            // red row and a notification.
+            val restoredEverything = outstanding.none { it !in stillHeld }
+
+            if (userData.overlayRestoreFailed == restoredEverything) {
+                userDataRepository.updateOverlayRestoreFailed(failed = !restoredEverything)
+            }
+
+            return restoredEverything
         }
 
-        val allowedPackages = shizukuWrapper.getAllowedOverlayPackages() ?: return false
-        val requestingPackages = packageManagerWrapper.getPackageIdentities(allowedPackages)
-        val toDisable = requestingPackages.keys
+        val selected = userData.managedOverlayPackages
+
+        if (selected.isEmpty()) return true
+
+        val allowed = shizukuWrapper.getAllowedOverlayPackages() ?: return false
+
+        val heldByOthers = AccessibilityServicePlan.heldByOthers(
+            held = held,
+            exceptComponentName = holdKey,
+        )
+
+        // Claim a selected package that is allowed now, and one another profile is already
+        // holding down - without the second, that profile's revert would hand overlay access
+        // back while the device-wide hide is still meant to be in force.
+        val toClaim = selected.filter { it in allowed || it in heldByOthers }
+
+        val toDisable = toClaim.filter { it in allowed }.toSet()
+
+        if (toClaim.isEmpty()) return true
+
+        val identities: Map<String, String> =
+            packageManagerWrapper.getPackageIdentities(toDisable)
+
+        // Written before the shell command, and extending rather than replacing: a second
+        // launch must not lose the first one's debt, and a multi-package command can fail
+        // after changing an earlier package.
+        val provisional = AccessibilityServicePlan.withHold(
+            held = held,
+            componentName = holdKey,
+            services = held[holdKey].orEmpty() + toClaim,
+        )
+
+        userDataRepository.updateHeldOverlayPackages(
+            held = provisional,
+            identities = userData.heldOverlayIdentities + identities,
+        )
 
         if (toDisable.isEmpty()) return true
-
-        // Record the debt before the shell command. A multi-package command can fail after
-        // changing an earlier package, and retaining the full set makes a later restore safe.
-        userDataRepository.updateHeldOverlayPackages(
-            userData.heldOverlayPackages + requestingPackages.filterKeys { it in toDisable },
-        )
 
         val disabled = shizukuWrapper.setOverlayPermission(
             packages = toDisable,
             allowed = false,
         ) ?: emptySet()
 
-        // Narrow the crash-safe provisional debt to what the shell actually changed.
-        // Every candidate was allowed before this attempt, so a process death before this
-        // cleanup can only re-allow something that never stopped being allowed.
+        // Narrow the crash-safe provisional debt to what the shell actually changed. Every
+        // candidate was allowed before this attempt, so a process death before this cleanup
+        // can only re-allow something that never stopped being allowed.
+        val settled = held[holdKey].orEmpty() + toClaim.filter {
+            it in disabled || it in heldByOthers
+        }
+
         userDataRepository.updateHeldOverlayPackages(
-            userData.heldOverlayPackages + requestingPackages.filterKeys { it in disabled },
+            held = AccessibilityServicePlan.withHold(
+                held = held,
+                componentName = holdKey,
+                services = settled,
+            ),
+            identities = userData.heldOverlayIdentities + identities.filterKeys { it in disabled },
         )
 
         return disabled == toDisable
@@ -157,18 +252,19 @@ class SetManualTargetUseCase @Inject constructor(
         }.getOrNull() ?: return false
 
         if (enabled) {
-            val released = held[holdKey].orEmpty()
-            val remaining = AccessibilityServicePlan.withHold(
+            // A full restore, not a scoped one. This runs for the manager's own toggle and
+            // for "Revert to default", and both mean "put my accessibility services back" -
+            // so every hold IMD is carrying is released, whoever placed it, and the record is
+            // cleared. Scoping this to the device-wide holder, as an earlier build did, is the
+            // reported bug: a launch always claims a service the manager already switched off,
+            // so the device-wide hold was shadowed by a per-app one and releasing only the
+            // device-wide holder found everything "held by others" and restored nothing.
+            //
+            // The per-app memory revert does not come through here - RevertAppSettingsUseCase
+            // releases one app's holder and leaves the rest - which is what keeps a per-app
+            // revert from undoing a manager hide, exactly as asked.
+            val plan = AccessibilityServicePlan.releaseAll(
                 held = held,
-                componentName = holdKey,
-                services = emptyList(),
-            )
-            val plan = AccessibilityServicePlan.release(
-                released = released,
-                stillHeldByOthers = AccessibilityServicePlan.heldByOthers(
-                    held = held,
-                    exceptComponentName = holdKey,
-                ),
                 currentlyEnabled = currentlyEnabled,
             )
 
@@ -176,8 +272,8 @@ class SetManualTargetUseCase @Inject constructor(
                 accessibilityServicesWrapper.setEnabledAccessibilityServices(plan.enabledAfter)
             }.getOrDefault(false)
 
-            if (written && remaining != held) {
-                userDataRepository.updateHeldAccessibilityServices(held = remaining)
+            if (written && held.isNotEmpty()) {
+                userDataRepository.updateHeldAccessibilityServices(held = emptyMap())
             }
 
             return written
@@ -187,11 +283,19 @@ class SetManualTargetUseCase @Inject constructor(
             held = held,
             exceptComponentName = holdKey,
         )
+        // Only the services the user picked in IMD settings are ever touched. Taking the
+        // whole live enabled list instead would switch off services the user never chose
+        // and had no way to exempt, which is the one thing this app has always refused to
+        // do to a device — see the rule at the top of AccessibilityServicePlan.
+        val selected = userData.managedAccessibilityServices.toSet()
+
         val plan = AccessibilityServicePlan.hold(
-            // Claim services already held by a per-app profile as well as everything
-            // currently enabled. That prevents the profile's Revert from bringing one
-            // back while the device-wide restricted app is still open.
-            managed = held[holdKey].orEmpty() + currentlyEnabled + heldByOthers,
+            // Services already held for this target are re-claimed so a repeat launch
+            // extends the existing debt, and a service a per-app profile is holding is
+            // claimed too — but only within the selection, so the profile's Revert cannot
+            // bring one back while the device-wide restricted app is still open.
+            managed = held[holdKey].orEmpty() + userData.managedAccessibilityServices +
+                heldByOthers.filter { it in selected },
             currentlyEnabled = currentlyEnabled,
             heldByOthers = heldByOthers,
         )

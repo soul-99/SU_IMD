@@ -59,6 +59,13 @@ fun SettingsManagerRoute(
 
     val shizukuStartFailed by viewModel.shizukuStartFailed.collectAsStateWithLifecycle()
 
+    val overlayRestoreFailed by viewModel.overlayRestoreFailed.collectAsStateWithLifecycle()
+
+    val manageOverlay by viewModel.manageOverlay.collectAsStateWithLifecycle()
+
+    val overlayWriteInFlight by viewModel.overlayWriteInFlight
+        .collectAsStateWithLifecycle()
+
     val infoShown by viewModel.infoShown.collectAsStateWithLifecycle()
 
     // Polling runs only while this is composed. DisposableEffect rather than
@@ -83,6 +90,9 @@ fun SettingsManagerRoute(
         busy = false,
         shizukuStarting = shizukuStarting,
         shizukuStartFailed = shizukuStartFailed,
+        overlayRestoreFailed = overlayRestoreFailed,
+        overlayWriteInFlight = overlayWriteInFlight,
+        manageOverlay = manageOverlay,
         infoShown = infoShown,
         onInfoShown = viewModel::markInfoShown,
         onDismissRequest = onDismissRequest,
@@ -138,7 +148,7 @@ internal fun Context.openTarget(target: ManualRevertTarget, shizukuPackage: Stri
     }
 
     if (intent == null) {
-        Toast.makeText(this, R.string.settings_manager_no_shizuku, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, R.string.settings_manager_no_shizuku, Toast.LENGTH_LONG).show()
 
         return
     }

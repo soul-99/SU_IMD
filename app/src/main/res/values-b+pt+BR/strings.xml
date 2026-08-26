@@ -12,7 +12,13 @@
     <string name="settings">Configurações</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Abra apps de banco e outros apps restritos sem precisar desligar na mão as opções do desenvolvedor, a Depuração USB ou os seus serviços de acessibilidade todas as vezes. Escolha um app, diga o que deve mudar enquanto ele estiver aberto, e o IMD devolve tudo ao normal depois.</string>
+    <string name="setup_purpose">Abra apps bancários e outros apps restritos sem ligar/desligar estas configurações manualmente toda vez:
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. Sobreposição a outros apps (requer o serviço Shizuku ativo)
+5. Serviço Shizuku
+6. e muitos outros (você precisa configurá-los manualmente com a Memory function do app, dica: use o Settings observer para ajudar)</string>
     <string name="setup_step">Etapa %1$d</string>
     <string name="setup_granted">Concedida</string>
     <string name="setup_not_granted">Não concedida</string>
@@ -38,7 +44,7 @@
     <string name="setup_shizuku_not_running">Nenhum serviço do Shizuku encontrado. Inicie o Shizuku e tente de novo.</string>
     <string name="setup_shizuku_denied">O Shizuku recusou. Permita este app no Shizuku e tente de novo. Se você escolheu “negar e não perguntar de novo”, remova este app da lista de apps do Shizuku primeiro.</string>
     <string name="setup_shizuku_failed">O Shizuku não conseguiu executar o comando. Use o comando ADB.</string>
-    <string name="setup_shizuku_once">Aviso: o Shizuku só é necessário para esta única concessão. A permissão sobrevive a reinicializações, então depois você pode parar ou desinstalar o Shizuku, a menos que também queira o recurso opcional “Reiniciar o serviço do Shizuku” em Configurações, que o usa de novo mais tarde.</string>
+    <string name="setup_shizuku_once">Aviso: o Shizuku só é necessário para esta concessão única. A permissão continua valendo após reinicializações, então depois você pode parar ou desinstalar o Shizuku - a não ser que você também queira ocultar a permissão Sobreposição a outros apps, que usa o serviço Shizuku todas as vezes.</string>
     <string name="setup_shizuku_once_extra">Se você ativou a depuração e as opções do desenvolvedor para configurar o Shizuku, também pode desativá-las: este app não precisa de nenhuma das duas depois da configuração concluída.</string>
     <string name="setup_secure_settings_adb">Com um PC: ative a Depuração USB → conecte o telefone a um PC com um terminal ADB shell → execute o comando acima.</string>
     <string name="setup_secure_settings_shizuku">Sem um PC (Recomendado):\n1. Instale e configure o app Shizuku e inicie o serviço do Shizuku\n2. Toque no botão “Usar o Shizuku” acima\n3. Toque em permitir quando o aviso aparecer.</string>
@@ -58,4 +64,12 @@
     <string name="setup_blocked">As duas etapas são obrigatórias. Sem elas, o app não consegue alterar nem restaurar uma única configuração.</string>
     <string name="setup_copied">Copiado</string>
     <string name="setup_open_settings_failed">Não foi possível abrir as configurações neste dispositivo</string>
+    <string name="setup_name_display_over_other_apps">Sobreposição a outros apps</string>
+    <string name="setup_how_title">Como isto funciona</string>
+    <string name="setup_how_off">O IMD desliga estas configurações</string>
+    <string name="setup_how_off_note">Nenhuma política de segurança de app é quebrada</string>
+    <string name="setup_how_use">Você usa o seu app</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">O IMD liga essas configurações de novo</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

@@ -96,9 +96,28 @@ class GetManualTargetStatesUseCase @Inject constructor(
                 }
 
                 ManualRevertTarget.DisplayOverOtherApps -> {
+                    // This app's own record comes first, and it is the only reading that is
+                    // true whether or not Shizuku can be reached: a device-wide hold means
+                    // IMD took overlay access away and has not given it back yet.
+                    if (
+                        AccessibilityServicePlan.DEVICE_WIDE_HOLD in userData.heldOverlayPackages
+                    ) {
+                        return@associateWith false
+                    }
+
+                    // The row stands for the chosen set, exactly as the accessibility row
+                    // does, so it only reads "on" when every selected app still holds the
+                    // permission. Nothing selected means nothing to report on.
+                    val selected = userData.managedOverlayPackages
+
+                    if (selected.isEmpty()) return@associateWith true
+
+                    // A failed query falls back to "on" rather than "off": it only fails when
+                    // Shizuku is out of reach, and Shizuku being out of reach says nothing
+                    // about what apps hold.
                     runCatching {
                         shizukuWrapper.getAllowedOverlayPackages()
-                    }.getOrNull()?.isNotEmpty() == true
+                    }.getOrNull()?.let { allowed -> selected.all { it in allowed } } ?: true
                 }
 
                 else -> {

@@ -40,16 +40,65 @@ fun Context.showRevertToDefaultToast() = showRevertToast(R.string.revert_to_defa
 fun Context.showRevertFromMemoryToast() = showRevertToast(R.string.revert_from_memory_toast)
 
 /**
+ * The same two, for a revert nobody pressed a button for.
+ *
+ * Worded apart from the manual pair on purpose. A revert the user asked for needs only to
+ * confirm it ran; one that happened because they came back to the app has to say why the
+ * device just changed, or it reads as the app doing something at random.
+ */
+fun Context.showAutoRevertToDefaultToast() =
+    showRevertToast(R.string.auto_revert_to_default_toast)
+
+fun Context.showAutoRevertFromMemoryToast() =
+    showRevertToast(R.string.auto_revert_from_memory_toast)
+
+/**
+ * And the three ways a revert can end without having finished.
+ *
+ * Only Shizuku and overlay access get a message, because they are the only two that depend on
+ * something outside this app and so the only two a user cannot simply fix from the services
+ * manager. A failed settings write is already visible there as a switch in the wrong position.
+ *
+ * Fired after the "Revert to default" toast rather than instead of it: the first says what ran,
+ * this says what did not land, and losing the first would make a revert that half worked look
+ * like a revert that never started.
+ */
+fun Context.showRevertShizukuFailedToast() =
+    showRevertToast(R.string.revert_failed_shizuku_toast, long = true)
+
+fun Context.showRevertOverlayFailedToast() =
+    showRevertToast(R.string.revert_failed_overlay_toast, long = true)
+
+fun Context.showRevertShizukuAndOverlayFailedToast() =
+    showRevertToast(R.string.revert_failed_shizuku_and_overlay_toast, long = true)
+
+/**
+ * The one the Tasker integration adds: "Settings hidden", for the hide trigger.
+ *
+ * Hiding from a launch needs no toast - the app it hides for opens a beat later and is the
+ * confirmation. Hiding from a macro opens nothing, so without a word the trigger looks like it
+ * did nothing, which is the same reason the shortcut path grew its own feedback.
+ */
+fun Context.showSettingsHiddenToast() = showRevertToast(R.string.settings_hidden_toast)
+
+/**
  * Posted to the main looper rather than shown directly: half of these callers are broadcast
  * receivers and tile services running on a background thread, where Toast.makeText throws.
  *
  * The application context, not this one, so a toast outliving the activity that asked for it
  * cannot hold it in memory.
  */
-private fun Context.showRevertToast(message: Int) {
+private fun Context.showRevertToast(message: Int, long: Boolean = false) {
     val application = applicationContext
 
+    // LENGTH_LONG for the failures. They are a sentence and a half naming two things and
+    // where to fix them, and the short duration is about two seconds - enough to notice a
+    // toast, not enough to read one. Android allows no third option: the duration is a flag,
+    // not a number, and anything longer than this needs a dialog or the notification, both of
+    // which the failures already have.
+    val duration = if (long) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+
     Handler(Looper.getMainLooper()).post {
-        Toast.makeText(application, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(application, message, duration).show()
     }
 }

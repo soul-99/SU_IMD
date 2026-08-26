@@ -12,7 +12,13 @@
     <string name="settings">Paramètres</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Ouvrez vos applications bancaires et autres applications verrouillées sans avoir à désactiver à la main les options pour les développeurs, le débogage USB ou vos services d\'accessibilité à chaque fois. Choisissez une application, indiquez ce qui doit changer pendant son exécution, et tout est remis en place ensuite.</string>
+    <string name="setup_purpose">Ouvrez vos applis bancaires et autres applis restreintes sans activer/désactiver ces paramètres à la main à chaque fois :
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. Superposition à d\'autres applis (nécessite le service Shizuku actif)
+5. Service Shizuku
+6. et bien d\'autres (à configurer à la main avec la Memory function de l\'appli, astuce : servez-vous du Settings observer)</string>
     <string name="setup_step">Étape %1$d</string>
     <string name="setup_granted">Accordée</string>
     <string name="setup_not_granted">Non accordée</string>
@@ -38,7 +44,7 @@
     <string name="setup_shizuku_not_running">Aucun service Shizuku trouvé. Démarrez Shizuku, puis réessayez.</string>
     <string name="setup_shizuku_denied">Shizuku a refusé. Autorisez cette application dans Shizuku, puis réessayez. Si vous aviez choisi « Refuser et ne plus demander », retirez-la d\'abord de la liste des applications de Shizuku.</string>
     <string name="setup_shizuku_failed">Shizuku n\'a pas pu exécuter la commande. Utilisez plutôt la commande ADB.</string>
-    <string name="setup_shizuku_once">Avertissement : Shizuku n\'est nécessaire que pour cette seule autorisation. Celle-ci survit aux redémarrages, vous pouvez donc ensuite arrêter ou désinstaller Shizuku, sauf si vous voulez aussi la fonction facultative « Redémarrer le service Shizuku » des Paramètres, qui l\'utilise à nouveau plus tard.</string>
+    <string name="setup_shizuku_once">Avertissement : Shizuku n\'est nécessaire que pour cette autorisation unique. Elle survit aux redémarrages, vous pouvez donc ensuite arrêter ou désinstaller Shizuku - sauf si vous voulez aussi masquer l\'autorisation Superposition à d\'autres applis, qui utilise le service Shizuku à chaque fois.</string>
     <string name="setup_shizuku_once_extra">Si vous aviez activé le débogage et les options pour les développeurs pour configurer Shizuku, vous pouvez aussi les désactiver : cette application n\'a besoin ni de l\'un ni de l\'autre une fois la configuration réussie.</string>
     <string name="setup_secure_settings_adb">Avec un PC : activez le débogage USB → branchez le téléphone à un PC disposant d\'un terminal ADB shell → exécutez la commande ci-dessus.</string>
     <string name="setup_secure_settings_shizuku">Sans PC (recommandé) :\n1. Installez et configurez l\'application Shizuku, puis démarrez le service Shizuku\n2. Appuyez sur le bouton Utiliser Shizuku ci-dessus\n3. Appuyez sur Autoriser lorsque la demande apparaît.</string>
@@ -58,4 +64,12 @@
     <string name="setup_blocked">Les deux étapes sont obligatoires. Sans elles, l\'application ne peut ni modifier ni restaurer le moindre paramètre.</string>
     <string name="setup_copied">Copié</string>
     <string name="setup_open_settings_failed">Impossible d\'ouvrir les paramètres sur cet appareil</string>
+    <string name="setup_name_display_over_other_apps">Superposition à d\'autres applis</string>
+    <string name="setup_how_title">Comment ça marche</string>
+    <string name="setup_how_off">IMD désactive ces paramètres</string>
+    <string name="setup_how_off_note">Aucune politique de sécurité d\'appli n\'est contournée</string>
+    <string name="setup_how_use">Vous utilisez votre appli</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">IMD réactive ces paramètres</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

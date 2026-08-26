@@ -48,7 +48,7 @@
     <string name="shizuku_fork_shevery" translatable="false">Shevery</string>
     <string name="shizuku_fork_mode_thedjchi">Thedjchi based forks of Shizuku</string>
     <!-- Appended after the linked word Shevery, so it begins mid-sentence. -->
-    <string name="shizuku_fork_mode_other_suffix">/ other forks of Shizuku that support start-stop intents</string>
+    <string name="shizuku_fork_mode_other_suffix">/ other forks of Shizuku that support start-stop intents without auth key</string>
     <string name="shizuku_choose_app">Choose an installed app</string>
     <string name="shizuku_fill_advanced">Please fill the Shizuku configuration section first</string>
     <string name="show_value">Show</string>
@@ -77,9 +77,35 @@
     <string name="about_obtainium_note">(to track updates/ auto-update app)</string>
     <string name="about_created_by">App created by</string>
     <string name="about_author_name" translatable="false">soul_99</string>
+    <!-- The Support button above the author line, and its popup. The author's own message,
+      kept in the first person, as four separate paragraphs. In point 2 a yellow star is drawn
+      before the sentence and the phrase in support_point_star_link is turned into the repo
+      link, so that phrase must appear inside support_point_star verbatim. -->
+    <string name="support_button">Support the project 🫶 (for free)</string>
+    <string name="support_intro_1">I created this app in my busy schedule of full-time medical residency.</string>
+    <string name="support_intro_2">Initially it was born out of my personal needs, but after positive community feedback, I decided to share it with the FOSS community.</string>
+    <string name="support_intro_3">You can do these for free, if you want to support my work and keep this project alive</string>
+    <string name="support_intro_4">I want it to be taken over by a more capable developer in future, as my profession does not allow me to maintain it all year round.</string>
+    <string name="support_point_number">%1$d.</string>
+    <string name="support_point_share">Spread the word if you can - it helps the community, and I don\'t need any credit or mention.</string>
+    <string name="support_point_star">the GitHub repo to increase its visibility.</string>
+    <string name="support_point_star_link">GitHub repo</string>
+    <string name="support_point_bugs">Report bugs in the main repo.</string>
+    <string name="support_point_discuss">Join discussions.</string>
+    <string name="support_point_contribute">Contribute to the code or docs, if you are a developer.</string>
+    <string name="support_share_button">Share</string>
+    <string name="support_share_message">Hey! checkout this FOSS app, I found it useful</string>
+    <string name="about_contributions">Contributions</string>
+    <string name="about_contributor_name" translatable="false">RafayGhafoor</string>
+    <string name="about_contributor_scope">(Display over other apps)</string>
     <string name="about_view_github">View GitHub</string>
     <string name="about_fork_of">Fork of</string>
     <string name="about_geto_app">Geto app</string>
+    <!-- "Fork of Geto by JackEblan (Blanc)" - about_fork_by is the "by", about_fork_author is
+      the original author's name (a proper name, so not translated) linking to his profile. -->
+    <string name="about_fork_by">by</string>
+    <string name="about_fork_author" translatable="false">JackEblan (Blanc)</string>
+    <string name="about_license_heading">License:</string>
     <string name="about_licence_name" translatable="false">GNU General Public License v3.0</string>
 
     <string name="long_live_foss">Long live free and open source software!</string>
@@ -135,8 +161,7 @@
     <string name="settings_to_hide_description">These settings are hidden when you launch an app.</string>
     <string name="settings_to_hide_summary">%1$d of %2$d switched on</string>
     <string name="settings_to_hide_usb_note">stopping USB debugging will also kill Shizuku service(if running), please configure Shizuku settings under IMD app to restart the Shizuku service after Revert</string>
-    <string name="settings_to_hide_accessibility_note">every currently enabled accessibility service is temporarily disabled and exactly those services are restored on Revert</string>
-    <string name="settings_to_hide_overlay_note">requires Shizuku to be running; every app currently allowed to display over other apps is temporarily disabled</string>
+    <string name="settings_to_hide_overlay_note">Shizuku must be configured properly in IMD settings\nOnly apps selected in IMD settings are managed</string>
     <string name="settings_to_hide_info_per_app">If you want to hide different settings per individual app, please use memory function in IMD settings &gt; Advanced &gt; Notification function</string>
     <string name="settings_to_hide_info_all">Hiding only developer settings does not turn off USB and wireless debugging, and some apps might still detect that as developer settings turned on, so it is recommended to select all three</string>
     <string name="settings_to_hide_info_shizuku">to hide Shizuku from apps use the Hide Shizuku from other apps function within the Shizuku app.</string>
@@ -147,12 +172,13 @@
     <string name="revert_defaults_usb_debugging">USB debugging</string>
     <string name="revert_defaults_wireless_debugging">Wireless debugging</string>
     <string name="revert_defaults_accessibility_services">Accessibility services</string>
-    <string name="revert_defaults_accessibility_note">only services selected in the IMD app settings are managed</string>
-    <string name="revert_defaults_accessibility_all_note">restores only the accessibility services IMD disabled during device-wide hiding</string>
+    <string name="settings_to_hide_accessibility_note">Only services selected in IMD settings are managed</string>
+    <string name="revert_defaults_accessibility_note">Only apps selected in IMD settings are turned on again if turned off by IMD</string>
     <string name="revert_defaults_shizuku">Shizuku service</string>
     <string name="revert_defaults_shizuku_note">Depending on which method Shizuku uses to start the service it will re-enable either one of USB debugging or wireless debugging, which it also needs to keep the Shizuku service running</string>
     <string name="revert_defaults_display_over_other_apps">Display over other apps</string>
-    <string name="revert_defaults_overlay_note">restores only the apps IMD previously disabled; Shizuku must be running</string>
+    <string name="revert_defaults_overlay_note">Shizuku must be configured properly in IMD settings\nOnly apps selected in IMD settings are turned on again if turned off by IMD</string>
+    <string name="overlay_needs_shizuku_configured">Shizuku must be configured properly in IMD settings before this can be used</string>
 
     <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
     <string name="help_button">Help (readme)</string>
@@ -202,4 +228,72 @@
     <string name="help_name_revert_button">Revert / Revert to default</string>
 
     <string name="section_advanced">Advanced</string>
+    <!-- The master switch for overlay management, first in Advanced. Its three rows under
+      Default IMD settings are what the notice sends the user off to fill in, and the
+      section name inside it is bolded by matching this module's section_app_functions, so
+      the two must stay worded identically in every language. -->
+    <string name="manage_overlay">Manage \'Display over other apps\'</string>
+    <string name="manage_overlay_subtitle">needs active Shizuku service</string>
+    <string name="manage_overlay_notice">Please configure all the three options under Default IMD settings for Display over other apps now.</string>
+    <string name="understood">Understood</string>
+    <!-- The Tasker / MacroDroid integration, above the observer in Advanced. "Experimental"
+      is inside the title so it is never separated from the name. Tasker, MacroDroid and IMD
+      are product names and stay as they are; the rest may be translated. The four function
+      names below match IMD's own actions. The intent field labels (Type, Package, Class,
+      Action, Extra) are not resources - they are shown in English to match the automation
+      apps' own editors. -->
+    <string name="tasker_integration">Tasker / MacroDroid integration (Experimental)</string>
+    <string name="tasker_integration_subtitle">Trigger IMD from automation apps with an auth key</string>
+    <string name="tasker_integration_intro">Set these up as intents in your automation app. Three are broadcasts, secured by the auth key below; opening the services manager is an activity and needs no key.</string>
+    <string name="tasker_integration_package_warning">Always set the Package field to this app, so the auth key reaches only IMD and is not broadcast to other apps.</string>
+    <string name="tasker_auth_key">Auth key</string>
+    <string name="tasker_auth_key_note">One key for every trigger, and the only thing protecting them, so keep it private. Refresh to retire every macro built on the old key.</string>
+    <string name="tasker_refresh_key">Refresh key</string>
+    <string name="tasker_copy">Copy</string>
+    <string name="tasker_fn_services">Open IMD services manager</string>
+    <string name="tasker_fn_services_note">No auth key - it only opens a screen you toggle by hand.</string>
+    <string name="tasker_fn_revert_default">Revert to default</string>
+    <string name="tasker_fn_revert_memory">Revert using memory</string>
+    <string name="tasker_fn_hide">Hide settings and services</string>
+    <!-- The settings observer's log. The four fields shown per entry are exactly the four
+      the Add setting form asks for, which is the whole point of running the observer. -->
+    <string name="page_back">Back</string>
+    <!-- The overlay picker, the counterpart of the accessibility one above it. -->
+    <string name="overlay_packages">Display over other apps to hide</string>
+    <string name="overlay_packages_dialog_description">These apps lose permission to display over other apps when an app setting hides Display over other apps, and get it back when you revert. Only the ones this app turned off are ever restored.</string>
+    <string name="overlay_packages_none_selected">None selected. %1$d currently allowed on this device.</string>
+    <string name="overlay_packages_selected">%1$d selected, %2$d currently allowed on this device.</string>
+    <string name="overlay_package_allowed">Allowed · %1$s</string>
+    <string name="overlay_package_held">Held off by IMD · %1$s</string>
+    <string name="no_overlay_packages">No app on this device is allowed to display over other apps.</string>
+    <string name="overlay_needs_shizuku_running">Needs active Shizuku service to configure</string>
+    <string name="overlay_system_settings">Display over other apps System settings</string>
+    <string name="accessibility_system_settings">Accessibility services System settings</string>
+    <string name="system_settings_unavailable">This device has no screen for that setting</string>
+    <string name="settings_log_view">View log</string>
+    <string name="settings_log_clear">Clear log</string>
+    <string name="settings_log_title">Settings changed</string>
+    <string name="settings_log_description">Every change the observer has seen, newest first. These are the values you need to add a setting to an app profile.</string>
+    <string name="settings_log_empty">Nothing recorded yet. Start the observer, change a setting, and it will appear here. The log is kept only while the observer is running.</string>
+    <string name="settings_log_entry_heading">%1$s · %2$s</string>
+    <string name="settings_log_value">Value: %1$s</string>
+    <string name="settings_log_value_change">Value: %1$s → %2$s</string>
+    <string name="settings_log_unset">unset</string>
+    <string name="settings_log_unknown_table">Unknown</string>
+    <!-- Auto revert. auto_revert_name_shortcuts and auto_revert_name_early are bolded inside
+      the point above them by substring match, so they must appear in it word for word. -->
+    <string name="auto_revert">Auto Revert on returning</string>
+    <string name="auto_revert_subtitle">Revert automatically when you come back to IMD after launching an app from here</string>
+    <string name="auto_revert_notice_number">%1$d.</string>
+    <string name="auto_revert_name_shortcuts">not IMD created app shortcuts</string>
+    <string name="auto_revert_notice_scope">Auto revert works only when you launch an app from within IMD, not IMD created app shortcuts.</string>
+    <string name="auto_revert_notice_trigger">It auto reverts when you return to the IMD app.</string>
+    <string name="auto_revert_notice_trigger_example">For example when you close the app using the back button after using it from IMD.</string>
+    <string name="auto_revert_notice_trigger_both">It works for both Revert to default configuration and the Memory function.</string>
+    <string name="auto_revert_name_early">the settings will get reverted</string>
+    <string name="auto_revert_notice_early">For whatever reason, if you return to the IMD app before being done using your app, the settings will get reverted.</string>
+    <string name="auto_revert_notice_early_relaunch">You will need to relaunch your app from within the IMD app to hide settings again.</string>
+    <string name="auto_revert_notice_early_resume">Opening your app from within IMD won\'t start it fresh, your app will launch from wherever you left it  : )</string>
+    <string name="auto_revert_turn_on">I understand, turn it on</string>
+    <string name="auto_revert_keep_off">No, keep it off</string>
 </resources>

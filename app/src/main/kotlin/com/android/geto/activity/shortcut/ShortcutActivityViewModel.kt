@@ -25,6 +25,8 @@ import com.android.geto.domain.model.UserData
 import com.android.geto.domain.repository.UserDataRepository
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
 import com.android.geto.domain.usecase.ApplySettingsToHideUseCase
+import com.android.geto.domain.usecase.OverlayStart
+import com.android.geto.domain.usecase.ShizukuStartTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,7 +43,21 @@ class ShortcutActivityViewModel @Inject constructor(
     private val applySettingsToHideUseCase: ApplySettingsToHideUseCase,
     private val packageManagerWrapper: PackageManagerWrapper,
     private val userDataRepository: UserDataRepository,
+    shizukuStartTracker: ShizukuStartTracker,
 ) : ViewModel() {
+    /**
+     * The overlay Shizuku start, so a shortcut can show the same spinner the app does.
+     *
+     * A shortcut opens over whatever the user was looking at and its own window is
+     * transparent, so ten seconds spent starting Shizuku to hide overlay access looked like
+     * a tap that did nothing. Only the hide direction reaches a shortcut - a shortcut applies
+     * settings, it never reverts - so the restore case is left where it was, inside the app.
+     */
+    val overlayStart = shizukuStartTracker.overlayStart.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null as OverlayStart?,
+    )
     private val _shortcutActivityUiState =
         MutableStateFlow<ShortcutActivityUiState>(ShortcutActivityUiState.Loading)
     val shortcutActivityUiState = _shortcutActivityUiState.asStateFlow()

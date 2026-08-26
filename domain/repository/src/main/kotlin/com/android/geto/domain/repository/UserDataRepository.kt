@@ -65,7 +65,27 @@ interface UserDataRepository {
 
     suspend fun updateHeldAccessibilityServices(held: Map<String, List<String>>)
 
-    suspend fun updateHeldOverlayPackages(packages: Map<String, String>)
+    suspend fun updateManagedOverlayPackages(packages: List<String>)
+
+    suspend fun updateHeldOverlayPackages(
+        held: Map<String, List<String>>,
+        identities: Map<String, String>,
+    )
+
+    suspend fun updateManageOverlay(enabled: Boolean)
+
+    /** Returns the Tasker auth key, generating and storing one the first time. */
+    suspend fun ensureTaskerAuthKey(): String
+
+    /** Replaces the Tasker auth key with a new one and returns it. */
+    suspend fun refreshTaskerAuthKey(): String
+
+    /** Turns the Tasker integration on or off; enabling also ensures a key exists. */
+    suspend fun updateTaskerIntegrationEnabled(enabled: Boolean)
+
+    suspend fun updateOverlayRestoreFailed(failed: Boolean)
+
+    suspend fun updateAutoRevertOnReturn(enabled: Boolean)
 
     suspend fun updateManualRevertTargets(targets: Set<ManualRevertTarget>)
 

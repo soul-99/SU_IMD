@@ -49,7 +49,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">Settings hidden/disabled</string>
     <string name="settings_manager_configure_revert">Configure what Revert restores</string>
-    <string name="settings_manager_accessibility_unmanaged">No accessibility services are currently being managed by the IMD app</string>
     <string name="applied_settings_failure">Could not apply settings</string>
     <string name="applied_settings_invalid">This app has settings with invalid values</string>
     <!-- Manual revert -->
@@ -75,7 +74,7 @@
     <string name="got_it">Got it</string>
     <string name="settings_manager_open">Open %1$s</string>
     <string name="settings_manager_accessibility_note">only services selected in the IMD app settings are managed</string>
-    <string name="settings_manager_accessibility_all_note">switching this off temporarily disables every enabled accessibility service; switching it on restores only services IMD held</string>
+    <string name="settings_manager_overlay_note">only apps selected in the IMD app settings are managed</string>
     <string name="settings_manager_enable_developer_options">Please enable developer options first</string>
     <string name="settings_manager_cannot_open">Could not open that screen on this device</string>
     <string name="settings_manager_no_shizuku">No Shizuku app found — set the package name in Settings</string>
@@ -96,4 +95,14 @@
     <string name="settings_manager_shizuku_failed">Failed to start shizuku service on last attempt, please check shizuku app settings and IMD shizuku configuration</string>
     <string name="settings_manager_shizuku_failed_open">Why the Shizuku service did not start</string>
     <string name="understood">Understood</string>
+    <!-- Shown over a launch that is waiting for a Shizuku fork to come up, and over the
+      failure that follows if it never does. -->
+    <string name="shizuku_starting_to_hide_overlay">Starting Shizuku service to hide Display over other apps permission</string>
+    <string name="shizuku_starting_to_restore_overlay">Starting Shizuku service to restore Display over other apps permission</string>
+    <string name="overlay_failure_title">Unable to modify Display over other apps permission using Shizuku</string>
+    <string name="overlay_failure_check">Please make sure:</string>
+    <string name="overlay_failure_point_permission">Shizuku permission is granted to IMD</string>
+    <string name="overlay_failure_point_configuration">Recheck your Shizuku configuration under IMD app\'s Settings</string>
+    <string name="settings_manager_overlay_restore_failed">Failed to restore Display over other apps permissions using Shizuku, please start Shizuku service manually from the Shizuku app and try again</string>
+    <string name="settings_manager_overlay_restore_failed_open">Why Display over other apps was not restored</string>
 </resources>

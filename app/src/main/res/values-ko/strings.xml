@@ -15,7 +15,13 @@
     <string name="settings">설정</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">은행 앱처럼 제한이 걸린 앱을 열 때마다 개발자 옵션, USB 디버깅, 접근성 서비스를 직접 끄지 않아도 됩니다. 앱을 하나 고르고 그 앱이 실행되는 동안 무엇을 바꿀지 정해 두면, 사용을 마친 뒤에 모두 원래대로 되돌려 놓습니다.</string>
+    <string name="setup_purpose">매번 이 설정들을 직접 켜고 끄지 않고도 뱅킹 앱과 그 밖의 제한된 앱을 실행하세요:
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. 다른 앱 위에 표시(실행 중인 Shizuku 서비스 필요)
+5. Shizuku 서비스
+6. 그 밖에도 많습니다 (앱의 Memory function으로 직접 설정해야 하며, 힌트: Settings observer를 활용하세요)</string>
     <string name="setup_step">%1$d단계</string>
     <string name="setup_granted">허용됨</string>
     <string name="setup_not_granted">허용되지 않음</string>
@@ -41,7 +47,7 @@
     <string name="setup_shizuku_not_running">Shizuku 서비스를 찾을 수 없습니다. Shizuku를 시작한 뒤 다시 시도하세요.</string>
     <string name="setup_shizuku_denied">Shizuku가 요청을 거부했습니다. Shizuku에서 이 앱을 허용한 뒤 다시 시도하세요. “거부하고 다시 묻지 않음”을 선택했다면 먼저 Shizuku의 앱 목록에서 해당 항목을 지우세요.</string>
     <string name="setup_shizuku_failed">Shizuku가 명령을 실행하지 못했습니다. 대신 ADB 명령을 사용하세요.</string>
-    <string name="setup_shizuku_once">참고: Shizuku는 이 권한을 한 번 부여할 때에만 필요합니다. 권한은 재부팅 후에도 유지되므로 그 뒤에는 Shizuku를 중지하거나 삭제해도 됩니다. 다만 설정에 있는 선택 기능인 “Shizuku 서비스 다시 시작”을 사용하려면 나중에 다시 필요합니다.</string>
+    <string name="setup_shizuku_once">알림: Shizuku는 이 한 번의 권한 부여에만 필요합니다. 이 권한은 재부팅 후에도 유지되므로 이후에는 Shizuku를 중지하거나 삭제해도 됩니다 - 다만 다른 앱 위에 표시 권한도 숨기려는 경우는 예외이며, 이 기능은 매번 Shizuku 서비스를 사용합니다.</string>
     <string name="setup_shizuku_once_extra">Shizuku를 설정하려고 디버깅과 개발자 설정을 켰다면 이제 꺼도 됩니다. 설정을 마친 뒤에는 이 앱에 둘 다 필요하지 않습니다.</string>
     <string name="setup_secure_settings_adb">PC가 있을 때: USB 디버깅 켜기 → ADB 셸 터미널이 실행 중인 PC에 휴대전화 연결 → 위 명령 실행.</string>
     <string name="setup_secure_settings_shizuku">PC 없이 (권장):\n1. Shizuku 앱을 설치하고 설정한 뒤 Shizuku 서비스를 시작합니다\n2. 위의 Shizuku 사용 버튼을 누릅니다\n3. 요청이 표시되면 허용을 누릅니다.</string>
@@ -61,4 +67,12 @@
     <string name="setup_blocked">두 단계 모두 필요합니다. 이 단계를 마치지 않으면 이 앱은 설정을 하나도 바꾸거나 되돌릴 수 없습니다.</string>
     <string name="setup_copied">복사했습니다</string>
     <string name="setup_open_settings_failed">이 기기에서는 설정을 열 수 없습니다</string>
+    <string name="setup_name_display_over_other_apps">다른 앱 위에 표시</string>
+    <string name="setup_how_title">작동 방식</string>
+    <string name="setup_how_off">IMD가 이 설정들을 끕니다</string>
+    <string name="setup_how_off_note">어떤 앱의 보안 정책도 위반하지 않습니다</string>
+    <string name="setup_how_use">원하는 앱을 사용합니다</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">IMD가 해당 설정을 다시 켭니다</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

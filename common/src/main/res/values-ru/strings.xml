@@ -39,4 +39,10 @@
 
     <string name="revert_to_default_toast">Вернуть по умолчанию</string>
     <string name="revert_from_memory_toast">Вернуть из памяти</string>
+    <string name="revert_failed_shizuku_toast">Не удалось перезапустить службу Shizuku</string>
+    <string name="revert_failed_overlay_toast">Не удалось восстановить разрешение «Поверх других приложений» с помощью Shizuku, см. уведомление</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">Не удалось восстановить службу Shizuku и разрешения «Поверх других приложений»</string>
+    <string name="settings_hidden_toast">Настройки скрыты</string>
+    <string name="auto_revert_to_default_toast">Автовозврат к значениям по умолчанию</string>
+    <string name="auto_revert_from_memory_toast">Автовозврат с помощью Memory function</string>
 </resources>

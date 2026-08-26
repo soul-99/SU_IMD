@@ -33,6 +33,18 @@ object AppSettingKeys {
     const val ENABLED_ACCESSIBILITY_SERVICES = "enabled_accessibility_services"
 
     /**
+     * A marker, not a settings key. There is no Settings row behind overlay access: it is an
+     * AppOp held per package, written through Shizuku.
+     *
+     * It is shaped like a key anyway so a per-app profile can carry it in the same list as
+     * everything else, and it is named after the AppOp so it reads as what it is rather than
+     * as an invented string. Filtered out of the plain write loop wherever it appears -
+     * handing it to the secure settings wrapper would be writing a key Android has never
+     * heard of.
+     */
+    const val SYSTEM_ALERT_WINDOW = "op_system_alert_window"
+
+    /**
      * Turning any of these back on is what Shizuku needs in order to be startable again.
      *
      * Kept as a set even though only [ADB_ENABLED] triggers the restart now, because the
@@ -78,5 +90,18 @@ object AppSettingKeys {
     /** True when reverting these settings should put suspended services back. */
     fun restoresAccessibilityServices(appSettings: List<AppSetting>): Boolean = appSettings.any {
         it.enabled && it.key == ACCESSIBILITY_ENABLED
+    }
+
+    /**
+     * True when applying this profile is meant to withdraw overlay access. As above, only a
+     * launch value of "0" counts, so a row that grants it cannot trigger a hide.
+     */
+    fun hidesOverlayAccess(appSettings: List<AppSetting>): Boolean = appSettings.any {
+        it.enabled && it.key == SYSTEM_ALERT_WINDOW && it.valueOnLaunch == "0"
+    }
+
+    /** True when reverting this profile should give overlay access back. */
+    fun restoresOverlayAccess(appSettings: List<AppSetting>): Boolean = appSettings.any {
+        it.enabled && it.key == SYSTEM_ALERT_WINDOW
     }
 }

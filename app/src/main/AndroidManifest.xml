@@ -58,19 +58,18 @@
           appears behind the dialog, over whatever the user was actually looking at. Its own
           task means only the dialog comes to the front.
 
-          Not exported, as of v1.6.8. Exported, it was the last component any installed
-          app could reach: a shortcut-maker app enumerates exported activities and builds a
-          launcher shortcut straight at one, which is how third-party tools were creating
-          their own IMD shortcuts.
-
-          Nothing legitimate needed the flag. The launcher starts the published shortcut
-          through LauncherApps.startShortcut, which the system performs on behalf of this
-          app, and the tile and the Favourites button both start it from inside this
-          process. Same argument, and same fix, as RevertActivity below.
+          Exported, on purpose and unlike RevertActivity below. v1.6.8 closed it off so only
+          the default launcher could reach it, along with the revert one, because at the time
+          both were routes an installed app could use to fire a privileged change. The two are
+          not the same risk, though, and the difference is the reason this one is open again:
+          opening the manager changes nothing by itself. It shows the live state and waits for
+          the user to flip a switch. There is no automatic state change to protect against, so
+          letting a shortcut-maker or another launcher build a shortcut to it is fine. Revert
+          stays closed precisely because it does change the device the moment it is reached.
         -->
         <activity
             android:name=".activity.services.ServicesActivity"
-            android:exported="false"
+            android:exported="true"
             android:excludeFromRecents="true"
             android:label="@string/services_shortcut_label"
             android:launchMode="singleTop"

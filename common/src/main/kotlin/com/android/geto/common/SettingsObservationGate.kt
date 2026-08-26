@@ -18,8 +18,8 @@
  */
 package com.android.geto.common
 
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Prevents the diagnostic settings observer from reporting changes IMD is making itself.
@@ -29,6 +29,16 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 object SettingsObservationGate {
     const val SERVICE_CLASS_NAME = "com.android.geto.service.SettingsObserverService"
+
+    /**
+     * The services manager activity, addressed by name for the same reason the service above
+     * is: it lives in the app module, and the modules that need to launch it sit underneath.
+     *
+     * It is exported="false", which is not a problem here - a PendingIntent is built and sent
+     * by this app, so it launches with this app's own identity rather than the shade's.
+     */
+    const val SERVICES_ACTIVITY_CLASS_NAME =
+        "com.android.geto.activity.services.ServicesActivity"
     const val ACTION_RESET = "com.android.geto.action.RESET_SETTINGS_OBSERVER"
 
     private val pauseCount = AtomicInteger(0)

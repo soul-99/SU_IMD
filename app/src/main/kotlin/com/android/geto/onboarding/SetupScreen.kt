@@ -59,6 +59,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -77,6 +78,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.android.geto.R
 import com.android.geto.designsystem.component.emphasised
+import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.ShizukuGrant
 import com.android.geto.feature.settings.help.SetupHelpContent
 import kotlinx.coroutines.launch
@@ -204,11 +206,17 @@ private fun PermissionsPage(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Left aligned, unlike the name and full form above it. It is a numbered list now,
+        // and a centred list has no left edge for the eye to come back to.
         Text(
+            modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.setup_purpose),
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        HowItWorksFlow(modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -309,7 +317,10 @@ private fun PermissionsPage(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = stringResource(R.string.setup_shizuku_once),
+                text = emphasised(
+                    text = stringResource(R.string.setup_shizuku_once),
+                    names = listOf(stringResource(R.string.setup_name_display_over_other_apps)),
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -453,6 +464,132 @@ private fun ConfigurePage(
     }
 }
 
+/**
+ * What the app does to the device, drawn rather than described.
+ *
+ * The three steps were one sentence with chevrons in it, which reads as a list of features
+ * rather than as a sequence with a beginning and an end. Drawn as a flow, the shape carries
+ * the argument the sentence was making: the settings come back, and the middle step is the
+ * user's, not the app's.
+ *
+ * The note under the first step is the point of the whole block. Nothing here works around an
+ * app's checks - the settings really are off while that app runs, which is why it is satisfied
+ * and why they have to be put back afterwards.
+ */
+@Composable
+private fun HowItWorksFlow(modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(R.string.setup_how_title),
+            style = MaterialTheme.typography.titleSmall,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        FlowStep(
+            number = 1,
+            text = stringResource(R.string.setup_how_off),
+            note = stringResource(R.string.setup_how_off_note),
+        )
+
+        FlowConnector()
+
+        FlowStep(
+            number = 2,
+            text = stringResource(R.string.setup_how_use),
+        )
+
+        // The only labelled edge, because it is the only transition the user has to cause.
+        FlowConnector(label = stringResource(R.string.setup_how_revert))
+
+        FlowStep(
+            number = 3,
+            text = stringResource(R.string.setup_how_on),
+        )
+    }
+}
+
+/** One box in the flow. */
+@Composable
+private fun FlowStep(
+    modifier: Modifier = Modifier,
+    number: Int,
+    text: String,
+    note: String? = null,
+) {
+    OutlinedCard(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Text(
+                text = stringResource(R.string.setup_how_number, number),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = text, style = MaterialTheme.typography.bodyMedium)
+
+                if (note != null) {
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Text(
+                        text = note,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * The line and arrowhead between two steps, with an optional word on the edge.
+ *
+ * Drawn from a divider and an icon rather than a character, so it inherits the theme's colours
+ * and stays the same weight as everything else on the page in every font and locale.
+ */
+@Composable
+private fun FlowConnector(
+    modifier: Modifier = Modifier,
+    label: String? = null,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            VerticalDivider(
+                modifier = Modifier.height(14.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+
+            Icon(
+                modifier = Modifier.size(14.dp),
+                imageVector = GetoIcons.ArrowDownward,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.outline,
+            )
+        }
+
+        if (label != null) {
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
 @Composable
 private fun SetupStep(
     modifier: Modifier = Modifier,
@@ -563,6 +700,6 @@ private fun Context.openNotificationSettings() {
     try {
         startActivity(intent)
     } catch (_: ActivityNotFoundException) {
-        Toast.makeText(this, R.string.setup_open_settings_failed, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, R.string.setup_open_settings_failed, Toast.LENGTH_LONG).show()
     }
 }

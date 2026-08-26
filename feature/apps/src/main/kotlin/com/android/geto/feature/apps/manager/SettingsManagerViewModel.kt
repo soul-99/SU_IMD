@@ -20,6 +20,7 @@ package com.android.geto.feature.apps.manager
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.geto.broadcastreceiver.OverlayRestoreRunner
 import com.android.geto.broadcastreceiver.RevertToDefaultRunner
 import com.android.geto.common.ApplicationScope
 import com.android.geto.domain.framework.PackageManagerWrapper
@@ -68,6 +69,7 @@ class SettingsManagerViewModel @Inject constructor(
     private val packageManagerWrapper: PackageManagerWrapper,
     private val userDataRepository: UserDataRepository,
     private val revertToDefaultRunner: RevertToDefaultRunner,
+    private val overlayRestoreRunner: OverlayRestoreRunner,
     private val shizukuStartTracker: ShizukuStartTracker,
     @param:ApplicationScope private val appScope: CoroutineScope,
 ) : ViewModel() {
@@ -101,6 +103,55 @@ class SettingsManagerViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = false,
         )
+
+    /**
+     * Whether a revert could not put overlay access back.
+     *
+     * Persisted, like [shizukuStartFailed], and for the same reason: the failure usually
+     * happens during a revert with no UI on screen at all. Unlike that one it is not cleared
+     * when the dialog closes - it describes apps that are still missing a permission, and it
+     * stays until a restore actually succeeds.
+     */
+    val overlayRestoreFailed = userDataRepository.userData
+        .map { it.overlayRestoreFailed }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false,
+        )
+
+    /**
+     * Whether IMD manages overlay access at all - the master switch in Advanced settings.
+     *
+     * With it off the overlay row is not drawn here either, matching the three rows it
+     * already removes from Settings. What replaces it is the revert failure notification:
+     * it is ongoing, it survives the tap that opens this dialog, and its **Try again**
+     * button runs the same restore the row would have. Reaching that restore therefore
+     * never depends on a row that is not on screen.
+     *
+     * The "Revert to default" button below the rows is the other way back: a debt taken
+     * while the switch was on is still owed after it is switched off, so a revert still
+     * hands overlay access back - see UserData.effectiveRevertDefaults.
+     */
+    val manageOverlay = userDataRepository.userData
+        .map { it.manageOverlay }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false,
+        )
+
+    private val _overlayWriteInFlight = MutableStateFlow(false)
+
+    /**
+     * Whether a restore started from this dialog is running.
+     *
+     * Restoring overlay access needs Shizuku, and starting a Shizuku fork switches the
+     * debugging settings on by itself. Those rows are therefore locked for the duration and
+     * put back afterwards, because otherwise the user watches three switches they did not
+     * touch move on their own, and any press they make in that window races the restore.
+     */
+    val overlayWriteInFlight = _overlayWriteInFlight.asStateFlow()
 
     /**
      * Whether the manager has already explained itself, or null while that is still being
@@ -161,10 +212,86 @@ class SettingsManagerViewModel @Inject constructor(
      * a moment later.
      */
     fun setTargetEnabled(target: ManualRevertTarget, enabled: Boolean) {
+        if (target == ManualRevertTarget.DisplayOverOtherApps) {
+            setOverlayAccess(enabled = enabled)
+
+            return
+        }
+
         viewModelScope.launch {
             setManualTargetUseCase(target = target, enabled = enabled)
 
             _targetStates.value = getManualTargetStatesUseCase()
+        }
+    }
+
+    /**
+     * Moves overlay access from the manager, and leaves nothing else moved.
+     *
+     * Either direction is one write, but neither can happen without Shizuku running, and
+     * starting a fork turns the debugging transport on as a side effect. So the states of
+     * everything a start disturbs are read first and written back afterwards: the user pressed
+     * one switch, and one switch is all that should end up different.
+     *
+     * Both directions, not only the restore. This row now reads "on" whenever nothing is being
+     * held - which is the honest answer, since a failed Shizuku query says nothing about
+     * whether apps hold the permission - so a user with Shizuku stopped is far more likely to
+     * press it *off*. Without the start, that press would fail silently and spring back.
+     *
+     * On the application scope rather than [viewModelScope]: this dialog is often opened from
+     * a tile or a shortcut, where dismissing it finishes the activity and takes the ViewModel
+     * with it, and a half-finished write is the one outcome worth avoiding here.
+     */
+    private fun setOverlayAccess(enabled: Boolean) {
+        if (_overlayWriteInFlight.value) return
+
+        appScope.launch {
+            _overlayWriteInFlight.value = true
+
+            try {
+                val before = getManualTargetStatesUseCase()
+
+                val disturbed = listOf(
+                    ManualRevertTarget.DeveloperSettings,
+                    ManualRevertTarget.UsbDebugging,
+                    ManualRevertTarget.WirelessDebugging,
+                    ManualRevertTarget.Shizuku,
+                )
+
+                val previous = disturbed.associateWith { before.isEnabled(it) }
+
+                if (!before.isEnabled(ManualRevertTarget.Shizuku)) {
+                    setManualTargetUseCase(ManualRevertTarget.Shizuku, enabled = true)
+                }
+
+                // The runner on the way back, because it also clears or reposts the retry
+                // notification; a plain write on the way out, which has no notification.
+                if (enabled) {
+                    overlayRestoreRunner.retry()
+                } else {
+                    setManualTargetUseCase(
+                        target = ManualRevertTarget.DisplayOverOtherApps,
+                        enabled = false,
+                    )
+                }
+
+                val after = getManualTargetStatesUseCase()
+
+                // Reverse order, so Shizuku is stopped before the transport it rode in on is
+                // taken away, and developer options goes last for the same reason it does
+                // everywhere else in the app.
+                for (target in disturbed.reversed()) {
+                    val wanted = previous.getValue(target)
+
+                    if (after.isEnabled(target) != wanted) {
+                        setManualTargetUseCase(target = target, enabled = wanted)
+                    }
+                }
+
+                _targetStates.value = getManualTargetStatesUseCase()
+            } finally {
+                _overlayWriteInFlight.value = false
+            }
         }
     }
 

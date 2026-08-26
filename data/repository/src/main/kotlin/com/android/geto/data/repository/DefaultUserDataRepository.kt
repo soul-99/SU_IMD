@@ -110,8 +110,40 @@ class DefaultUserDataRepository @Inject constructor(
         userPreferencesDataSource.updateHeldAccessibilityServices(held = held)
     }
 
-    override suspend fun updateHeldOverlayPackages(packages: Map<String, String>) {
-        userPreferencesDataSource.updateHeldOverlayPackages(packages = packages)
+    override suspend fun updateAutoRevertOnReturn(enabled: Boolean) {
+        userPreferencesDataSource.updateAutoRevertOnReturn(enabled = enabled)
+    }
+
+    override suspend fun updateManageOverlay(enabled: Boolean) {
+        userPreferencesDataSource.updateManageOverlay(enabled = enabled)
+    }
+
+    override suspend fun ensureTaskerAuthKey(): String =
+        userPreferencesDataSource.ensureTaskerAuthKey()
+
+    override suspend fun refreshTaskerAuthKey(): String =
+        userPreferencesDataSource.refreshTaskerAuthKey()
+
+    override suspend fun updateTaskerIntegrationEnabled(enabled: Boolean) {
+        userPreferencesDataSource.updateTaskerIntegrationEnabled(enabled = enabled)
+    }
+
+    override suspend fun updateOverlayRestoreFailed(failed: Boolean) {
+        userPreferencesDataSource.updateOverlayRestoreFailed(failed = failed)
+    }
+
+    override suspend fun updateManagedOverlayPackages(packages: List<String>) {
+        userPreferencesDataSource.updateManagedOverlayPackages(packages = packages)
+    }
+
+    override suspend fun updateHeldOverlayPackages(
+        held: Map<String, List<String>>,
+        identities: Map<String, String>,
+    ) {
+        userPreferencesDataSource.updateHeldOverlayPackages(
+            held = held,
+            identities = identities,
+        )
     }
 
     override suspend fun updateManualRevertTargets(targets: Set<ManualRevertTarget>) {

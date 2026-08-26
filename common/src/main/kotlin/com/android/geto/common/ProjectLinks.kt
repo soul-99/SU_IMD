@@ -70,6 +70,29 @@ fun Context.openProjectUri(uri: String) {
 }
 
 /**
+ * Opens the system share sheet with [message] followed by the repository link.
+ *
+ * The link is appended here rather than left to the caller so every share carries the same
+ * URL, the one in [ProjectLinks]; a share message with the address typed into it by hand is
+ * the one that goes out pointing at last year's repo. Does nothing if no app can share, which
+ * on a device with no messaging or mail app is the only way it fails.
+ */
+fun Context.shareProject(message: String) {
+    val send = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, "$message\n${ProjectLinks.REPOSITORY}")
+    }
+
+    runCatching {
+        startActivity(
+            Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+    }.onFailure {
+        if (it !is ActivityNotFoundException && it !is SecurityException) throw it
+    }
+}
+
+/**
  * Hands this app's repository to Obtainium, falling back to the web redirect when
  * Obtainium is not installed.
  *

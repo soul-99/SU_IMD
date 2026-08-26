@@ -39,4 +39,10 @@
 
     <string name="revert_to_default_toast">Revertir a valores predeterminados</string>
     <string name="revert_from_memory_toast">Revertir desde la memoria</string>
+    <string name="revert_failed_shizuku_toast">No se ha podido reiniciar el servicio Shizuku</string>
+    <string name="revert_failed_overlay_toast">No se ha podido restaurar el permiso Mostrar sobre otras aplicaciones con Shizuku, consulta la notificación</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">No se han podido restaurar el servicio Shizuku ni los permisos Mostrar sobre otras aplicaciones</string>
+    <string name="settings_hidden_toast">Ajustes ocultados</string>
+    <string name="auto_revert_to_default_toast">Reversión automática a los valores predeterminados</string>
+    <string name="auto_revert_from_memory_toast">Reversión automática con la Memory function</string>
 </resources>

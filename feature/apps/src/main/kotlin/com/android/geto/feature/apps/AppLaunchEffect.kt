@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.geto.broadcastreceiver.postAppliedSettingsNotification
+import com.android.geto.common.AutoRevertPending
 import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.ui.local.LocalLauncherApps
@@ -62,6 +63,7 @@ internal fun ApplyThenLaunchEffect(
     appLaunch: FavouriteAppLaunch?,
     snackbarHostState: SnackbarHostState,
     onNotConfigured: (componentName: String) -> Unit,
+    onOverlayFailure: () -> Unit,
     onConsumed: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -99,6 +101,13 @@ internal fun ApplyThenLaunchEffect(
                         contentText = successText,
                     )
 
+                    // Armed only here: this is the one branch where settings were actually
+                    // applied and a launch left the app. DisabledAppSettings below opens the
+                    // app having changed nothing, so there is nothing to come back and undo,
+                    // and a shortcut launch never reaches this file at all - which is what
+                    // makes "only apps launched from within IMD" true rather than a promise.
+                    AutoRevertPending.arm(componentName = launch.componentName)
+
                     launcherApps.startMainActivity(componentName = launch.componentName)
                 }
 
@@ -114,6 +123,11 @@ internal fun ApplyThenLaunchEffect(
                 }
 
                 AppSettingsResult.Failure -> snackbarHostState.showSnackbar(message = failureText)
+
+                // A dialog rather than the snackbar the other failures get. This one has a
+                // cause the user can act on and a fix that is two steps long, and the app
+                // they asked for is not opening either way.
+                AppSettingsResult.OverlayFailure -> onOverlayFailure()
 
                 AppSettingsResult.InvalidValues -> snackbarHostState.showSnackbar(message = invalidText)
 

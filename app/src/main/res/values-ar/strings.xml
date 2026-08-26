@@ -19,7 +19,13 @@
     <string name="settings">الإعدادات</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">افتح تطبيقات البنوك وغيرها من التطبيقات المقيَّدة دون أن توقف خيارات المطوّر أو تصحيح أخطاء USB أو خدمات إمكانية الوصول يدويًا في كل مرة. اختر تطبيقًا، وحدّد ما الذي ينبغي تغييره أثناء تشغيله، وسيعيد هذا التطبيق كل شيء إلى ما كان عليه بعد ذلك.</string>
+    <string name="setup_purpose">افتح التطبيقات المصرفية وغيرها من التطبيقات المقيَّدة دون تشغيل/إيقاف هذه الإعدادات يدويًا في كل مرة:
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. العرض فوق التطبيقات الأخرى (تتطلب خدمة Shizuku قيد التشغيل)
+5. خدمة Shizuku
+6. وغير ذلك الكثير (عليك ضبطها يدويًا عبر Memory function في التطبيق، تلميح: استعن بـ Settings observer)</string>
     <string name="setup_step">الخطوة %1$d</string>
     <string name="setup_granted">مُنِح</string>
     <string name="setup_not_granted">لم يُمنح</string>
@@ -45,7 +51,7 @@
     <string name="setup_shizuku_not_running">لم يُعثر على خدمة Shizuku. شغّل Shizuku ثم أعد المحاولة.</string>
     <string name="setup_shizuku_denied">رفض Shizuku الطلب. اسمح لهذا التطبيق داخل Shizuku ثم أعد المحاولة، وإذا كنت قد اخترت “الرفض وعدم السؤال مرة أخرى” فامسحه أولًا من قائمة التطبيقات في Shizuku.</string>
     <string name="setup_shizuku_failed">تعذّر على Shizuku تنفيذ الأمر. استخدم أمر ADB بدلًا من ذلك.</string>
-    <string name="setup_shizuku_once">تنويه: لا حاجة إلى Shizuku إلا لمنح هذا الإذن مرة واحدة. ويبقى الإذن بعد إعادة تشغيل الجهاز، لذا يمكنك بعد ذلك إيقاف Shizuku أو إزالته، إلا إذا كنت تريد أيضًا الميزة الاختيارية “إعادة تشغيل خدمة Shizuku” الموجودة في الإعدادات، فهي تستخدمه لاحقًا مرة أخرى.</string>
+    <string name="setup_shizuku_once">تنويه: Shizuku مطلوب لهذا المنح لمرة واحدة فقط. يبقى الإذن ساريًا بعد إعادة التشغيل، لذا يمكنك بعد ذلك إيقاف Shizuku أو إزالته - إلا إذا كنت تريد أيضًا إخفاء إذن العرض فوق التطبيقات الأخرى، فهو يستخدم خدمة Shizuku في كل مرة.</string>
     <string name="setup_shizuku_once_extra">ويمكنك أيضًا تعطيل تصحيح الأخطاء وإعدادات المطوّر إذا كنت قد فعّلتهما لإعداد Shizuku، فهذا التطبيق لا يحتاج إلى أي منهما بعد اكتمال الإعداد.</string>
     <string name="setup_secure_settings_adb">باستخدام حاسوب: فعّل تصحيح أخطاء USB ← وصّل الهاتف بحاسوب تعمل عليه طرفية ADB ← نفّذ الأمر الموضّح أعلاه.</string>
     <string name="setup_secure_settings_shizuku">بدون حاسوب (موصى به):\n1. ثبّت تطبيق Shizuku وأعدّه، ثم شغّل خدمة Shizuku\n2. اضغط على زر “استخدام Shizuku” الموضّح أعلاه\n3. اضغط على “سماح” عند ظهور الطلب.</string>
@@ -65,4 +71,12 @@
     <string name="setup_blocked">كلتا الخطوتين مطلوبة. فبدونهما لا يستطيع التطبيق تغيير أي إعداد ولا استعادته.</string>
     <string name="setup_copied">تم النسخ</string>
     <string name="setup_open_settings_failed">تعذّر فتح الإعدادات على هذا الجهاز</string>
+    <string name="setup_name_display_over_other_apps">العرض فوق التطبيقات الأخرى</string>
+    <string name="setup_how_title">كيف يعمل هذا</string>
+    <string name="setup_how_off">يقوم IMD بإيقاف هذه الإعدادات</string>
+    <string name="setup_how_off_note">دون خرق سياسة أمان أي تطبيق</string>
+    <string name="setup_how_use">تستخدم تطبيقك</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">يعيد IMD تشغيل تلك الإعدادات</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

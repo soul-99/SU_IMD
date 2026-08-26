@@ -25,6 +25,7 @@ import com.android.geto.domain.framework.SecureSettingsWrapper
 import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.AppSettingsResult
+import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.SettingSnapshot
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.model.isShizukuConfigured
@@ -53,6 +54,9 @@ class RevertAppSettingsUseCase @Inject constructor(
     private val accessibilityServicesWrapper: AccessibilityServicesWrapper,
     private val userDataRepository: UserDataRepository,
     private val startShizukuUseCase: StartShizukuUseCase,
+    private val setManualTargetUseCase: SetManualTargetUseCase,
+    private val getManualTargetStatesUseCase: GetManualTargetStatesUseCase,
+    private val shizukuStartTracker: ShizukuStartTracker,
     @param:Dispatcher(GetoDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(componentName: String): AppSettingsResult = withContext(defaultDispatcher) {
@@ -76,10 +80,41 @@ class RevertAppSettingsUseCase @Inject constructor(
                     componentName in userData.heldAccessibilityServices
                 )
 
-        val settingsToWrite = if (managesAccessibility) {
-            enabledAppSettings.filterNot { it.key == AppSettingKeys.ACCESSIBILITY_ENABLED }
-        } else {
-            enabledAppSettings
+        val restoresOverlay = AppSettingKeys.restoresOverlayAccess(enabledAppSettings) &&
+            userData.heldOverlayPackages.isNotEmpty()
+
+        val settingsToWrite = enabledAppSettings
+            .filterNot { managesAccessibility && it.key == AppSettingKeys.ACCESSIBILITY_ENABLED }
+            .filterNot { it.key == AppSettingKeys.SYSTEM_ALERT_WINDOW }
+
+        // Overlay first, mirroring the apply side: it is the only part of this revert that
+        // needs Shizuku, and the settings writes below are what take its transport away.
+        // A failure here is recorded rather than returned, so the rest of the profile is
+        // still put back - the retry notification carries the news instead.
+        //
+        // runCatching is what makes that sentence true rather than merely intended. Both
+        // calls in here end in a binder call to a service that can die between the check
+        // that it is alive and the call itself, and a dead binder throws; an escaping throw
+        // would abandon every setting this profile remembers, none of which needs Shizuku.
+        if (restoresOverlay) {
+            runCatching {
+                if (!getManualTargetStatesUseCase().isEnabled(ManualRevertTarget.Shizuku)) {
+                    shizukuStartTracker.beginOverlay(OverlayStart.Restore)
+
+                    try {
+                        setManualTargetUseCase(ManualRevertTarget.Shizuku, enabled = true)
+                    } finally {
+                        shizukuStartTracker.endOverlay(OverlayStart.Restore)
+                    }
+                }
+
+                withContext(NonCancellable) {
+                    setManualTargetUseCase(
+                        target = ManualRevertTarget.DisplayOverOtherApps,
+                        enabled = true,
+                    )
+                }
+            }
         }
 
         // What these settings were really set to before this app's profile was applied.

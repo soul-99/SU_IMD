@@ -74,7 +74,9 @@ import com.android.geto.domain.model.LauncherAppsActivityInfo
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.feature.apps.dialog.FavouriteAppsOptionsDialog
+import com.android.geto.feature.apps.dialog.OverlayFailureDialog
 import com.android.geto.feature.apps.dialog.ReorderFavouriteAppsDialog
+import com.android.geto.feature.apps.dialog.ShizukuStartingDialog
 import com.android.geto.feature.apps.manager.SettingsManagerRoute
 import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
 import com.android.geto.ui.local.LocalLauncherApps
@@ -101,15 +103,30 @@ internal fun FavouriteAppsRoute(
 
     var notConfigured by rememberSaveable { mutableStateOf(false) }
 
+    var overlayFailure by rememberSaveable { mutableStateOf(false) }
+
+    // Survives the launch that raised it: the wait runs in a NonCancellable scope
+    // that outlives this composition, and the spinner has to still be there when it
+    // returns.
+    val overlayStart by viewModel.overlayStart
+        .collectAsStateWithLifecycle(initialValue = null)
+
     ApplyThenLaunchEffect(
         appLaunch = appLaunch,
         snackbarHostState = snackbarHostState,
         onNotConfigured = { notConfigured = true },
+        onOverlayFailure = { overlayFailure = true },
         onConsumed = viewModel::consumeAppLaunch,
     )
 
     if (notConfigured) {
         NotConfiguredDialog(onDismissRequest = { notConfigured = false })
+    }
+
+    overlayStart?.let { ShizukuStartingDialog(reason = it) }
+
+    if (overlayFailure) {
+        OverlayFailureDialog(onDismissRequest = { overlayFailure = false })
     }
 
     FavouriteAppsScreen(
@@ -141,7 +158,7 @@ internal fun FavouriteAppsScreen(
     onUpdateFavouriteComponentNames: (List<String>) -> Unit,
     onRevertToDefault: () -> Unit,
 ) {
-    var showRevertDialog by rememberSaveable { mutableStateOf(false) }
+    var showManagerDialog by rememberSaveable { mutableStateOf(false) }
 
     // Read from the persisted preferences, so the ticks survive closing the dialog, the
     // app, and the device. Before they have loaded the dialog cannot be opened anyway.
@@ -176,40 +193,42 @@ internal fun FavouriteAppsScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Left of the manager, and visibly secondary to it: this one acts, the
-                // other one opens something. A tonal container rather than the primary one
-                // keeps a one-press device-wide change from being the loudest thing on the
-                // screen.
+                // Left of Revert, and the smaller of the two. A tonal container rather than
+                // the primary one, so the pair reads as one prominent action with a way in
+                // to the detail beside it rather than as two equal buttons.
                 SmallFloatingActionButton(
-                    onClick = onRevertToDefault,
+                    onClick = { showManagerDialog = true },
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        painter = painterResource(designR.drawable.ic_revert_glyph),
-                        contentDescription = stringResource(R.string.revert_to_default),
-                    )
-                }
-
-                FloatingActionButton(onClick = { showRevertDialog = true }) {
                     // The Quick Settings tile artwork rather than two stacked Material
                     // icons: the tile, the launcher shortcut and this button all open the
                     // same dialog, and looking like each other is how that reads as one
-                    // thing rather than three. Tinted by the FAB, so it keeps the colours
-                    // the composed pair had.
+                    // thing rather than three.
                     Icon(
                         modifier = Modifier.size(24.dp),
                         painter = painterResource(designR.drawable.ic_services_glyph),
                         contentDescription = stringResource(R.string.settings_manager_title),
                     )
                 }
+
+                // The primary FAB, on the right, where a thumb lands. It is the one press
+                // that fixes the situation this tab exists for - an app has just refused to
+                // start and the device needs putting back - so it is the one that gets the
+                // weight.
+                FloatingActionButton(onClick = onRevertToDefault) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(designR.drawable.ic_revert_glyph),
+                        contentDescription = stringResource(R.string.revert_to_default),
+                    )
+                }
             }
         }
     }
 
-    if (showRevertDialog && managerAvailable) {
-        SettingsManagerRoute(onDismissRequest = { showRevertDialog = false })
+    if (showManagerDialog && managerAvailable) {
+        SettingsManagerRoute(onDismissRequest = { showManagerDialog = false })
     }
 }
 

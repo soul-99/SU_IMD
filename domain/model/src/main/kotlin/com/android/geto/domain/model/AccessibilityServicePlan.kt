@@ -109,6 +109,36 @@ object AccessibilityServicePlan {
     }
 
     /**
+     * The enabled list after releasing *every* hold, whoever placed it, and the record that
+     * remains once they are all gone - which is nothing.
+     *
+     * This is what "turn accessibility services on" from the services manager and "Revert to
+     * default" both use, and the difference from [release] is the whole point of the reported
+     * bug. [release] restores one holder's services and treats every other holder as a reason
+     * to keep a service off. That is right for a per-app revert - another app may still need
+     * the service down - but wrong for these two, where the user is asking for their services
+     * back full stop. Because a launch claims a service that the manager already switched off,
+     * every device-wide hold ends up shadowed by a per-app one, and a [release] of just the
+     * device-wide holder then finds them all "held by others" and restores nothing.
+     *
+     * Releasing everything is also what makes a revert cumulative: services switched off from
+     * the manager and services switched off across any number of launches all come back
+     * together, because all their holders are cleared at once.
+     *
+     * The per-app memory revert deliberately does not come here - it releases its own holder
+     * and leaves the others - which is what keeps it from undoing a manager hide or another
+     * app's.
+     */
+    fun releaseAll(
+        held: Map<String, List<String>>,
+        currentlyEnabled: List<String>,
+    ): Release = release(
+        released = held.values.flatten().distinct(),
+        stillHeldByOthers = emptyList(),
+        currentlyEnabled = currentlyEnabled,
+    )
+
+    /**
      * The enabled list after switching [wanted] on, whatever state they were in before.
      *
      * This is what the manual Re-enable control uses, and it is deliberately not

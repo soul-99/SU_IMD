@@ -49,7 +49,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">설정을 숨기거나 껐습니다</string>
     <string name="settings_manager_configure_revert">되돌리기가 복원할 항목 구성</string>
-    <string name="settings_manager_accessibility_unmanaged">현재 IMD 앱이 관리하고 있는 접근성 서비스가 없습니다</string>
     <string name="applied_settings_failure">설정을 적용하지 못했습니다</string>
     <string name="applied_settings_invalid">이 앱의 설정에 잘못된 값이 있습니다</string>
     <string name="settings_manager_title">IMD 서비스 관리자</string>
@@ -88,4 +87,14 @@
     <string name="settings_manager_shizuku_failed">지난 시도에서 Shizuku 서비스를 시작하지 못했습니다. Shizuku 앱 설정과 IMD의 Shizuku 구성을 확인해 주세요</string>
     <string name="settings_manager_shizuku_failed_open">Shizuku 서비스가 시작되지 않은 이유</string>
     <string name="understood">알겠습니다</string>
+    <string name="overlay_failure_title">Shizuku로 다른 앱 위에 표시 권한을 변경할 수 없습니다</string>
+    <string name="overlay_failure_check">다음을 확인해 주세요:</string>
+    <string name="overlay_failure_point_permission">IMD에 Shizuku 권한이 부여되어 있는지</string>
+    <string name="overlay_failure_point_configuration">IMD 앱 설정에서 Shizuku 구성을 다시 확인하세요</string>
+    <string name="shizuku_starting_to_hide_overlay">다른 앱 위에 표시 권한을 숨기기 위해 Shizuku 서비스를 시작하는 중</string>
+    <string name="revert_display_over_other_apps">다른 앱 위에 표시</string>
+    <string name="settings_manager_overlay_restore_failed">Shizuku로 다른 앱 위에 표시 권한을 복원하지 못했습니다. Shizuku 앱에서 Shizuku 서비스를 직접 시작한 후 다시 시도해 주세요</string>
+    <string name="settings_manager_overlay_restore_failed_open">다른 앱 위에 표시 권한이 복원되지 않은 이유</string>
+    <string name="shizuku_starting_to_restore_overlay">다른 앱 위에 표시 권한을 복원하기 위해 Shizuku 서비스를 시작하는 중</string>
+    <string name="settings_manager_overlay_note">IMD 앱 설정에서 선택한 앱만 관리됩니다</string>
 </resources>

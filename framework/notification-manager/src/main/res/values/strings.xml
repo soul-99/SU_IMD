@@ -25,4 +25,13 @@
     -->
     <string name="revert_using_memory">Revert using memory</string>
     <string name="revert_to_default">Revert to default</string>
+    <!-- Posted when a revert could not give overlay access back, because Shizuku was out
+      of reach. The button retries the restore only; it never tries to start Shizuku, which
+      is the thing the user has just been asked to do by hand. -->
+    <string name="overlay_restore_failed_title">Revert Failure</string>
+    <string name="overlay_restore_failed_text">Unable to restore Display over other apps permissions using Shizuku, please turn on Shizuku service manually and click the button below</string>
+    <string name="overlay_restore_retry">Try again</string>
+    <!-- The name of the high-importance channel, as it appears in Android's notification
+      settings for this app. -->
+    <string name="alert_notification_channel">Revert failures</string>
 </resources>

@@ -15,7 +15,13 @@
     <string name="settings">設定</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">銀行アプリなどの制限の厳しいアプリを、毎回手作業で開発者向けオプション、USB デバッグ、ユーザー補助サービスをオフにしなくても開けます。アプリを選び、そのアプリの実行中に何を変更するかを指定すれば、終わったあとはこのアプリがすべて元に戻します。</string>
+    <string name="setup_purpose">毎回これらの設定を手動でオン・オフすることなく、銀行アプリなどの制限されたアプリを開けます:
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. 他のアプリの上に重ねて表示（実行中の Shizuku サービスが必要）
+5. Shizuku サービス
+6. そのほか多数（アプリの Memory function で手動設定が必要です。ヒント: Settings observer が役立ちます）</string>
     <string name="setup_step">ステップ %1$d</string>
     <string name="setup_granted">許可済み</string>
     <string name="setup_not_granted">未許可</string>
@@ -41,7 +47,7 @@
     <string name="setup_shizuku_not_running">Shizuku サービスが見つかりません。Shizuku を起動してから、もう一度お試しください。</string>
     <string name="setup_shizuku_denied">Shizuku に拒否されました。Shizuku でこのアプリを許可してから、もう一度お試しください。「拒否して今後表示しない」を選んでいた場合は、先に Shizuku のアプリ一覧から削除してください。</string>
     <string name="setup_shizuku_failed">Shizuku がコマンドを実行できませんでした。代わりに ADB コマンドをご利用ください。</string>
-    <string name="setup_shizuku_once">免責事項: Shizuku が必要なのは、この 1 回の権限付与だけです。この権限は再起動後も残るため、そのあとは Shizuku を停止またはアンインストールしても構いません。ただし、設定にある任意機能「Shizuku サービスを再起動」も使いたい場合は、あとでもう一度必要になります。</string>
+    <string name="setup_shizuku_once">免責事項: Shizuku はこの 1 回の許可にのみ必要です。この権限は再起動後も維持されるため、その後は Shizuku を停止またはアンインストールできます - ただし他のアプリの上に重ねて表示の権限も隠したい場合は例外で、そちらは毎回 Shizuku サービスを使用します。</string>
     <string name="setup_shizuku_once_extra">Shizuku を設定するためにデバッグや開発者向けオプションを有効にした場合は、それらをオフにしても構いません。セットアップが完了すれば、このアプリにはどちらも不要です。</string>
     <string name="setup_secure_settings_adb">PC がある場合: USB デバッグを有効にする → ADB シェルターミナルを使える PC にスマートフォンを接続する → 上のコマンドを実行する。</string>
     <string name="setup_secure_settings_shizuku">PC がない場合（推奨）:\n1. Shizuku アプリをインストールして設定し、Shizuku サービスを開始する\n2. 上の「Shizuku を使う」ボタンをタップする\n3. 確認画面が表示されたら「許可」をタップする。</string>
@@ -61,4 +67,12 @@
     <string name="setup_blocked">どちらのステップも必須です。これがないと、このアプリは設定を 1 つも変更できず、復元もできません。</string>
     <string name="setup_copied">コピーしました</string>
     <string name="setup_open_settings_failed">このデバイスでは設定を開けませんでした</string>
+    <string name="setup_name_display_over_other_apps">他のアプリの上に重ねて表示</string>
+    <string name="setup_how_title">仕組み</string>
+    <string name="setup_how_off">IMD がこれらの設定をオフにします</string>
+    <string name="setup_how_off_note">どのアプリのセキュリティポリシーも破りません</string>
+    <string name="setup_how_use">ご自身のアプリを使います</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">IMD がそれらの設定を再びオンに戻します</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

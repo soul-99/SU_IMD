@@ -18,4 +18,8 @@
 <resources>
     <string name="revert_using_memory">메모리로 되돌리기</string>
     <string name="revert_to_default">기본값으로 되돌리기</string>
+    <string name="overlay_restore_failed_title">되돌리기 실패</string>
+    <string name="overlay_restore_failed_text">Shizuku로 다른 앱 위에 표시 권한을 복원하지 못했습니다. Shizuku 서비스를 직접 켠 후 아래 버튼을 눌러 주세요</string>
+    <string name="overlay_restore_retry">다시 시도</string>
+    <string name="alert_notification_channel">되돌리기 실패</string>
 </resources>

@@ -12,7 +12,13 @@
     <string name="settings">सेटिंग्स</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">बैंकिंग और दूसरे प्रतिबंधित ऐप हर बार डेवलपर विकल्प, USB डीबगिंग या एक्सेसिबिलिटी सेवाएँ हाथ से बंद किए बिना खोलें। एक ऐप चुनिए, बताइए कि उसके चलते समय क्या बदलना चाहिए, और यह ऐप बाद में सब कुछ वापस पहले जैसा कर देता है।</string>
+    <string name="setup_purpose">बैंकिंग और दूसरे प्रतिबंधित ऐप्लिकेशन खोलें, बिना हर बार इन सेटिंग को हाथ से चालू/बंद किए:
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. दूसरे ऐप्लिकेशन के ऊपर दिखाएं (चालू Shizuku सेवा ज़रूरी)
+5. Shizuku सेवा
+6. और भी बहुत कुछ (इन्हें ऐप्लिकेशन के Memory function से खुद कॉन्फ़िगर करना होता है, सुझाव: मदद के लिए Settings observer का इस्तेमाल करें)</string>
     <string name="setup_step">चरण %1$d</string>
     <string name="setup_granted">मिल गई</string>
     <string name="setup_not_granted">नहीं मिली</string>
@@ -38,7 +44,7 @@
     <string name="setup_shizuku_not_running">कोई Shizuku सेवा नहीं मिली। Shizuku शुरू करें, फिर दोबारा कोशिश करें।</string>
     <string name="setup_shizuku_denied">Shizuku ने मना कर दिया। Shizuku में इस ऐप को अनुमति दें और दोबारा कोशिश करें, अगर आपने “मना करें और दोबारा न पूछें” चुना था, तो पहले Shizuku की ऐप सूची से उसे हटाएँ।</string>
     <string name="setup_shizuku_failed">Shizuku कमांड नहीं चला सका। इसके बजाय ADB कमांड का उपयोग करें।</string>
-    <string name="setup_shizuku_once">अस्वीकरण: Shizuku सिर्फ़ इसी एक अनुमति के लिए चाहिए। यह अनुमति रीबूट के बाद भी बनी रहती है, इसलिए बाद में आप Shizuku बंद या अनइंस्टॉल कर सकते हैं, बशर्ते आपको सेटिंग्स में मौजूद वैकल्पिक “Shizuku सेवा पुनः चालू करें” सुविधा न चाहिए, जो इसका दोबारा उपयोग करती है।</string>
+    <string name="setup_shizuku_once">अस्वीकरण: Shizuku सिर्फ़ इस एक बार की अनुमति देने के लिए ज़रूरी है. यह अनुमति रीबूट के बाद भी बनी रहती है, इसलिए बाद में आप Shizuku बंद कर सकते हैं या हटा सकते हैं - बशर्ते आप दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति भी छिपाना न चाहें, जो हर बार Shizuku सेवा का इस्तेमाल करती है.</string>
     <string name="setup_shizuku_once_extra">अगर आपने Shizuku सेट करने के लिए डीबगिंग और डेवलपर सेटिंग्स चालू की थीं, तो उन्हें बंद भी कर सकते हैं; सफल सेटअप के बाद इस ऐप को इनमें से किसी की ज़रूरत नहीं है।</string>
     <string name="setup_secure_settings_adb">PC के साथ: USB डीबगिंग चालू करें → फ़ोन को ADB शेल टर्मिनल वाले PC से जोड़ें → ऊपर दी गई कमांड चलाएँ।</string>
     <string name="setup_secure_settings_shizuku">बिना PC के (अनुशंसित):\n1. Shizuku ऐप इंस्टॉल और सेट करें, Shizuku सेवा शुरू करें\n2. ऊपर दिए गए “Shizuku का उपयोग करें” बटन पर टैप करें\n3. संकेत आने पर “अनुमति दें” चुनें।</string>
@@ -58,4 +64,12 @@
     <string name="setup_blocked">दोनों चरण ज़रूरी हैं। इनके बिना यह ऐप एक भी सेटिंग न बदल सकता है, न वापस ला सकता है।</string>
     <string name="setup_copied">कॉपी हो गया</string>
     <string name="setup_open_settings_failed">इस डिवाइस पर सेटिंग्स नहीं खोली जा सकीं</string>
+    <string name="setup_name_display_over_other_apps">दूसरे ऐप्लिकेशन के ऊपर दिखाएं</string>
+    <string name="setup_how_title">यह कैसे काम करता है</string>
+    <string name="setup_how_off">IMD इन सेटिंग को बंद कर देता है</string>
+    <string name="setup_how_off_note">किसी ऐप्लिकेशन की सुरक्षा नीति नहीं तोड़ी जाती</string>
+    <string name="setup_how_use">आप अपना ऐप्लिकेशन इस्तेमाल करते हैं</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">IMD उन सेटिंग को फिर से चालू कर देता है</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

@@ -25,4 +25,8 @@
     -->
     <string name="revert_using_memory">メモリーを使って元に戻す</string>
     <string name="revert_to_default">デフォルトに戻す</string>
+    <string name="overlay_restore_failed_title">復元に失敗しました</string>
+    <string name="overlay_restore_failed_text">Shizuku で他のアプリの上に重ねて表示の権限を復元できませんでした。Shizuku サービスを手動でオンにしてから、下のボタンをタップしてください</string>
+    <string name="overlay_restore_retry">再試行</string>
+    <string name="alert_notification_channel">復元の失敗</string>
 </resources>

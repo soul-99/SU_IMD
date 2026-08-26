@@ -29,4 +29,14 @@
 
     <string name="revert_to_default_toast">Revert to default</string>
     <string name="revert_from_memory_toast">Revert from memory</string>
+    <string name="auto_revert_to_default_toast">Auto revert to default</string>
+    <string name="auto_revert_from_memory_toast">Auto revert using memory function</string>
+    <!-- Shown after a revert that could not finish. Only the two targets that depend on
+      something outside this app get their own message; everything else is visible in the
+      services manager and fixable from there. -->
+    <string name="revert_failed_shizuku_toast">Failed to restart Shizuku service</string>
+    <string name="revert_failed_overlay_toast">Failed to revert Display over other apps permission using Shizuku, see notification</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">Failed to revert Shizuku service &amp; Display over other apps permissions</string>
+    <!-- Confirms the Tasker/MacroDroid "hide settings" trigger, which otherwise opens nothing. -->
+    <string name="settings_hidden_toast">Settings hidden</string>
 </resources>

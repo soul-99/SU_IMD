@@ -26,5 +26,13 @@
     "key": "accessibility_enabled",
     "valueOnLaunch": "0",
     "valueOnRevert": "1"
+  },
+  {
+    "settingType": "SECURE",
+    "label": "Hide Display over other apps",
+    "description": "needs Shizuku service",
+    "key": "op_system_alert_window",
+    "valueOnLaunch": "0",
+    "valueOnRevert": "1"
   }
 ]

@@ -33,9 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.android.geto.broadcastreceiver.AutoRevertRunner
 import com.android.geto.common.AppLocale
+import com.android.geto.common.ApplicationScope
+import com.android.geto.common.AutoRevertPending
 import com.android.geto.common.EXTRA_OPEN_REVERT_CONFIGURATION
 import com.android.geto.designsystem.component.LocalRevertConfigurationRequest
 import com.android.geto.designsystem.theme.GetoTheme
@@ -52,6 +57,8 @@ import com.android.geto.onboarding.rememberSetupState
 import com.android.geto.ui.local.LocalLauncherApps
 import com.android.geto.ui.local.LocalNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -73,6 +80,13 @@ class MainActivity : ComponentActivity() {
     // the one thing on it that needs a dependency.
     @Inject
     lateinit var shizukuWrapper: ShizukuWrapper
+
+    @Inject
+    lateinit var autoRevertRunner: AutoRevertRunner
+
+    @Inject
+    @ApplicationScope
+    lateinit var appScope: CoroutineScope
 
     private val viewModel: MainActivityViewModel by viewModels()
 
@@ -134,6 +148,25 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         consumeRevertConfigurationRequest(intent)
+
+        // ON_STOP, not ON_PAUSE: a dialog, the notification shade and the recents overlay all
+        // pause this activity without the user having gone anywhere, and any of them would
+        // otherwise count as leaving the app and arm a revert the moment they came back.
+        //
+        // The revert runs on the application scope, because it writes secure settings and may
+        // wait on Shizuku - work that must not be cancelled by this activity being recreated
+        // for a rotation part way through.
+        lifecycle.addObserver(
+            LifecycleEventObserver { _, event ->
+                when (event) {
+                    Lifecycle.Event.ON_STOP -> AutoRevertPending.markWentAway()
+
+                    Lifecycle.Event.ON_START -> appScope.launch { autoRevertRunner() }
+
+                    else -> Unit
+                }
+            },
+        )
 
         setContent {
             CompositionLocalProvider(

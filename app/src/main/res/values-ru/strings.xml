@@ -15,7 +15,13 @@
     <string name="settings">Настройки</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Открывайте банковские и другие защищённые приложения, не отключая каждый раз вручную параметры разработчика, отладку по USB или службы специальных возможностей. Выберите приложение, укажите, что менять на время его работы, и после выхода всё вернётся на место.</string>
+    <string name="setup_purpose">Открывайте банковские и другие защищённые приложения, не включая и не выключая каждый раз вручную эти настройки:
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. Поверх других приложений (нужна работающая служба Shizuku)
+5. Служба Shizuku
+6. и многое другое (это нужно настроить вручную через Memory function приложения, подсказка: в этом поможет Settings observer)</string>
     <string name="setup_step">Шаг %1$d</string>
     <string name="setup_granted">Предоставлено</string>
     <string name="setup_not_granted">Не предоставлено</string>
@@ -41,7 +47,7 @@
     <string name="setup_shizuku_not_running">Служба Shizuku не найдена. Запустите Shizuku и повторите попытку.</string>
     <string name="setup_shizuku_denied">Shizuku отказал. Разрешите доступ этому приложению в Shizuku и повторите попытку. Если вы выбрали «Запретить и больше не спрашивать», сначала удалите приложение из списка в Shizuku.</string>
     <string name="setup_shizuku_failed">Shizuku не смог выполнить команду. Воспользуйтесь командой ADB.</string>
-    <string name="setup_shizuku_once">Примечание: Shizuku нужен только для этой единственной выдачи разрешения. Разрешение сохраняется после перезагрузок, поэтому потом Shizuku можно остановить или удалить, если только вам не нужна дополнительная функция «Перезапуск службы Shizuku» в настройках, которая использует его позже ещё раз.</string>
+    <string name="setup_shizuku_once">Примечание: Shizuku нужен только для этой единственной выдачи разрешения. Разрешение сохраняется после перезагрузок, поэтому потом Shizuku можно остановить или удалить - если только вы не собираетесь также скрывать разрешение «Поверх других приложений», для которого служба Shizuku нужна каждый раз.</string>
     <string name="setup_shizuku_once_extra">Если вы включали отладку и параметры разработчика ради настройки Shizuku, их тоже можно выключить: после успешной настройки приложению не нужно ни то, ни другое.</string>
     <string name="setup_secure_settings_adb">С компьютером: включите отладку по USB → подключите телефон к компьютеру с терминалом ADB shell → выполните команду выше.</string>
     <string name="setup_secure_settings_shizuku">Без компьютера (рекомендуется):\n1. Установите и настройте приложение Shizuku, запустите службу Shizuku\n2. Нажмите кнопку «Использовать Shizuku» выше\n3. Нажмите «Разрешить», когда появится запрос.</string>
@@ -61,4 +67,12 @@
     <string name="setup_blocked">Оба шага обязательны. Без них приложение не сможет ни изменить, ни восстановить ни одной настройки.</string>
     <string name="setup_copied">Скопировано</string>
     <string name="setup_open_settings_failed">Не удалось открыть настройки на этом устройстве</string>
+    <string name="setup_name_display_over_other_apps">Поверх других приложений</string>
+    <string name="setup_how_title">Как это работает</string>
+    <string name="setup_how_off">IMD выключает эти настройки</string>
+    <string name="setup_how_off_note">Политика безопасности приложений не нарушается</string>
+    <string name="setup_how_use">Вы пользуетесь своим приложением</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">IMD включает эти настройки обратно</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

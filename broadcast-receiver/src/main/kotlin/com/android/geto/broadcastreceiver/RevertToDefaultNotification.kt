@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.ACTION_REVERT_TO_DEFAULT
+import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.NOTIFICATION_EXTRA_NOTIFICATION_ID
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.REVERT_TO_DEFAULT_NOTIFICATION_ID
 import com.android.geto.framework.notificationmanager.R
 
@@ -57,11 +58,15 @@ fun buildRevertToDefaultNotification(
     contentTitle: String,
     contentText: String,
 ): Notification {
-    val revertIntent = Intent(context, RevertToDefaultBroadcastReceiver::class.java).apply {
+    // Through the trampoline, like the per-app notification: it cancels this one immediately
+    // and collapses the shade, then hands the revert to the receiver that still runs it. The
+    // notification id is carried so the trampoline knows which to cancel.
+    val revertIntent = Intent(context, RevertTrampolineActivity::class.java).apply {
         action = ACTION_REVERT_TO_DEFAULT
+        putExtra(NOTIFICATION_EXTRA_NOTIFICATION_ID, REVERT_TO_DEFAULT_NOTIFICATION_ID)
     }
 
-    val revertPendingIntent = PendingIntent.getBroadcast(
+    val revertPendingIntent = PendingIntent.getActivity(
         context,
         REVERT_TO_DEFAULT_NOTIFICATION_ID,
         revertIntent,

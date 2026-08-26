@@ -25,11 +25,13 @@ import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.AppShortcut
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
@@ -51,6 +53,8 @@ object GetoIcons {
     val Android = Icons.Default.Android
     val Back = Icons.AutoMirrored.Filled.ArrowBack
     val Refresh = Icons.Default.Refresh
+    val Copy = Icons.Default.ContentCopy
+    val Share = Icons.Default.Share
     val Shortcut = Icons.Default.AppShortcut
     val SettingsSuggest = Icons.Default.SettingsSuggest
     val Add = Icons.Default.Add

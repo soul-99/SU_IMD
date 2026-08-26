@@ -18,6 +18,7 @@
  */
 package com.android.geto.feature.apps.dialog
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -68,6 +69,35 @@ import com.android.geto.designsystem.R as designR
 private const val SHIZUKU_ATTEMPTS_BEFORE_HELP = 2
 
 /**
+ * Which rows this dialog draws.
+ *
+ * Every target, minus overlay access when the master switch in Advanced is off - the same
+ * rule the three rows in Settings follow, so the feature is either present everywhere or
+ * nowhere rather than hidden in one place and live in another.
+ *
+ * Removing it costs the red row that a failed restore used to turn on, so the two ways back
+ * are worth naming here because this function is what takes the third one away:
+ *
+ *  1. The revert failure notification. It is ongoing and `setAutoCancel(false)`, so the tap
+ *     that opens this dialog does not clear it: Shizuku can be started from the row below,
+ *     or from its arrow out to the Shizuku app, and the notification is still in the shade
+ *     afterwards with **Try again** on it. That retry restores from the persisted debt and
+ *     does not go through this dialog at all.
+ *  2. **Revert to default**, at the bottom of this dialog. A debt taken while the switch was
+ *     on is still owed after it is switched off, so the revert still hands overlay access
+ *     back - see UserData.effectiveRevertDefaults. This is the way back if the notification
+ *     has been swiped away, which the user can do from Android 14 even on an ongoing one.
+ */
+private fun rows(manageOverlay: Boolean): List<ManualRevertTarget> =
+    if (manageOverlay) {
+        ManualRevertTarget.entries
+    } else {
+        ManualRevertTarget.entries.filter {
+            it != ManualRevertTarget.DisplayOverOtherApps
+        }
+    }
+
+/**
  * Manage the settings this app switches off, from one place.
  *
  * It began as a rescue hatch — once developer options are off there is no system screen
@@ -87,6 +117,14 @@ internal fun AndroidSettingsManagerDialog(
     busy: Boolean,
     shizukuStarting: Boolean,
     shizukuStartFailed: Boolean,
+    overlayRestoreFailed: Boolean,
+    overlayWriteInFlight: Boolean,
+    /**
+     * The master switch in Advanced settings. With it off the overlay row is not drawn,
+     * matching the three rows it already removes from Settings; the revert failure
+     * notification carries the restore instead - see [rows].
+     */
+    manageOverlay: Boolean = true,
     /** Null while the stored answer is still being read; see the ViewModel. */
     infoShown: Boolean? = true,
     onInfoShown: () -> Unit = {},
@@ -167,15 +205,37 @@ internal fun AndroidSettingsManagerDialog(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            ManualRevertTarget.entries.forEach { target ->
+            rows(manageOverlay = manageOverlay).forEach { target ->
                 val isShizuku = target == ManualRevertTarget.Shizuku
+
+                val isOverlay = target == ManualRevertTarget.DisplayOverOtherApps
+
+                // Starting a Shizuku fork switches the debugging transport on by itself, so
+                // while an overlay write is running these rows are about to move without the user
+                // touching them. Locked rather than left live, because a press in that window
+                // races the write that puts them back.
+                val disturbedByOverlayWrite = overlayWriteInFlight &&
+                    (isShizuku || target.usesDebuggingTransport)
 
                 TargetRow(
                     target = target,
-                    // Only ever true for the Shizuku row: it is the one target the app can
-                    // ask for but not make happen, so it is the one that has to report back.
-                    starting = isShizuku && shizukuStarting,
-                    failed = isShizuku && shizukuStartFailed && !shizukuStarting,
+                    // Shizuku is the one target the app can ask for but not make happen, so
+                    // it reports back. Overlay is the one whose restore can fail long after
+                    // anybody was looking, so it does too.
+                    starting = (isShizuku && shizukuStarting) ||
+                        (isOverlay && overlayWriteInFlight),
+                    failed = (isShizuku && shizukuStartFailed && !shizukuStarting) ||
+                        (isOverlay && overlayRestoreFailed && !overlayWriteInFlight),
+                    failureMessage = if (isOverlay) {
+                        R.string.settings_manager_overlay_restore_failed
+                    } else {
+                        R.string.settings_manager_shizuku_failed
+                    },
+                    failureOpen = if (isOverlay) {
+                        R.string.settings_manager_overlay_restore_failed_open
+                    } else {
+                        R.string.settings_manager_shizuku_failed_open
+                    },
                     // Absent means the first poll has not landed yet. Off is the safer of
                     // the two to show for a beat: it invites a press that helps, where a
                     // wrong "on" invites the user to walk away from a device still locked
@@ -186,7 +246,8 @@ internal fun AndroidSettingsManagerDialog(
                     // Locked while an attempt is in flight. The switch already reads on and
                     // the outcome is a few seconds away; letting it be pressed again would
                     // queue a second attempt against a service that is still deciding.
-                    usable = !busy &&
+                    usable = !busy && !disturbedByOverlayWrite &&
+                        (!isOverlay || !overlayWriteInFlight) &&
                         (!isShizuku || (states.shizukuAvailable && !shizukuStarting)),
                     onClickWhenUnusable = when {
                         isShizuku -> {
@@ -282,6 +343,8 @@ private fun TargetRow(
     usable: Boolean,
     starting: Boolean = false,
     failed: Boolean = false,
+    @StringRes failureMessage: Int = R.string.settings_manager_shizuku_failed,
+    @StringRes failureOpen: Int = R.string.settings_manager_shizuku_failed_open,
     onClickWhenUnusable: (() -> Unit)?,
     onSetEnabled: (Boolean) -> Unit,
     onOpen: () -> Unit,
@@ -296,7 +359,15 @@ private fun TargetRow(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // Weighted, so it is measured after the spinner and the icon rather than
+                // before them. Unweighted, a long title - "Display over other apps" is the
+                // longest here - eats the whole row and leaves the icon a few pixels to
+                // draw 18.dp into, which Modifier.size honours by shrinking it. That is why
+                // the overlay row's red icon came out smaller than the Shizuku row's when
+                // both asked for exactly the same size. fill = false so a short title still
+                // sits beside its icon instead of being pushed away from it.
                 Text(
+                    modifier = Modifier.weight(1f, fill = false),
                     text = target.getTitle(),
                     style = MaterialTheme.typography.bodyLarge,
                 )
@@ -320,21 +391,29 @@ private fun TargetRow(
                             .size(18.dp)
                             .clickable { showFailureHelp = true },
                         imageVector = GetoIcons.Info,
-                        contentDescription = stringResource(
-                            R.string.settings_manager_shizuku_failed_open,
-                        ),
+                        contentDescription = stringResource(failureOpen),
                         tint = MaterialTheme.colorScheme.error,
                     )
                 }
             }
 
-            // Only this row's switch is scoped to a chosen subset rather than the whole
-            // system feature, and that difference is worth saying out loud — otherwise an
-            // "off" here reads as "no accessibility service is running", which is not what
-            // it means.
-            if (target == ManualRevertTarget.AccessibilityServices) {
+            // These two rows are scoped to a chosen subset rather than the whole system
+            // feature, and that difference is worth saying out loud - otherwise an "off"
+            // here reads as "no accessibility service is running" or "no app can draw over
+            // others", which is not what either of them means.
+            val scopeNote = when (target) {
+                ManualRevertTarget.AccessibilityServices ->
+                    R.string.settings_manager_accessibility_note
+
+                ManualRevertTarget.DisplayOverOtherApps ->
+                    R.string.settings_manager_overlay_note
+
+                else -> null
+            }
+
+            if (scopeNote != null) {
                 Text(
-                    text = stringResource(R.string.settings_manager_accessibility_all_note),
+                    text = stringResource(scopeNote),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -391,14 +470,18 @@ private fun TargetRow(
     }
 
     if (showFailureHelp) {
-        ShizukuFailureDialog(onDismissRequest = { showFailureHelp = false })
+        RowFailureDialog(
+            message = failureMessage,
+            onDismissRequest = { showFailureHelp = false },
+        )
     }
 }
 
-/** What the red switch means, and the two places worth looking. */
+/** What a red switch means. One dialog, because both red switches mean "read this line". */
 @Composable
-private fun ShizukuFailureDialog(
+private fun RowFailureDialog(
     modifier: Modifier = Modifier,
+    @StringRes message: Int,
     onDismissRequest: () -> Unit,
 ) {
     DialogContainer(
@@ -411,7 +494,7 @@ private fun ShizukuFailureDialog(
                 .padding(20.dp),
         ) {
             Text(
-                text = stringResource(R.string.settings_manager_shizuku_failed),
+                text = stringResource(message),
                 style = MaterialTheme.typography.bodyMedium,
             )
 
@@ -483,6 +566,17 @@ private fun ShizukuHelpDialog(
         }
     }
 }
+
+/**
+ * The rows a Shizuku start moves on its own.
+ *
+ * A fork brings the debugging transport up with it using its own WRITE_SECURE_SETTINGS, so
+ * these three change without the app writing them and without the user pressing anything.
+ */
+private val ManualRevertTarget.usesDebuggingTransport: Boolean
+    get() = this == ManualRevertTarget.DeveloperSettings ||
+        this == ManualRevertTarget.UsbDebugging ||
+        this == ManualRevertTarget.WirelessDebugging
 
 /** The three rows that have a system screen or an app behind them. */
 private val ManualRevertTarget.opensSomewhere: Boolean

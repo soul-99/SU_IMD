@@ -22,6 +22,7 @@ import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers
 import com.android.geto.domain.framework.PackageManagerWrapper
 import com.android.geto.domain.framework.ShizukuWrapper
+import com.android.geto.domain.model.UserData
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.repository.UserDataRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,6 +42,14 @@ import javax.inject.Inject
 private const val CONFIRM_TIMEOUT_MILLIS = 10_000L
 
 private const val CONFIRM_POLL_MILLIS = 500L
+
+/**
+ * How many polls between one start broadcast and the next resend, so the ten seconds hold a
+ * handful of attempts rather than one. At 500 ms a poll, every fourth is about two seconds -
+ * often enough that a fork which dropped the first broadcast still gets one, rare enough not
+ * to hammer a fork that is simply slow to come up.
+ */
+private const val RESEND_EVERY_POLLS = 4
 
 /**
  * Asks Shizuku to start, then waits to find out whether it did.
@@ -79,35 +88,47 @@ class StartShizukuUseCase @Inject constructor(
         shizukuStartTracker.begin()
 
         try {
-            val sent = shizukuWrapper.startShizuku(
-                packageName = userData.shizukuPackageName,
-                action = userData.shizukuStartAction.ifBlank {
-                    userData.shizukuPackageName + ShizukuWrapper.ACTION_START_SUFFIX
-                },
-                authKey = userData.shizukuAuthKey,
-            )
-
-            // No receiver resolved the broadcast, which is the vanilla-Shizuku case. There
-            // is nothing to wait for.
-            if (!sent) return@withContext record(started = false)
-
-            record(started = awaitRunning())
+            record(started = startAndAwait(userData))
         } finally {
             shizukuStartTracker.end()
         }
     }
 
     /**
-     * Polls rather than waits a fixed time, so a fork that comes up in one second is not
-     * held behind a ten-second spinner.
+     * Sends the start broadcast, then polls for up to ten seconds, resending the broadcast
+     * every couple of seconds until Shizuku is running or the ten seconds are up.
+     *
+     * One send is not always enough: a fork whose app is closed can miss the first broadcast
+     * while its process is still starting, and the old single-shot start then waited out the
+     * full ten seconds for a service that would have come up on a second nudge. The window is
+     * still exactly ten seconds from here - the resends happen inside it, not after it - so a
+     * revert that cannot bring Shizuku up still gives up when it always did and raises its
+     * notification then.
+     *
+     * Returns as soon as Shizuku is seen running, so a fork that answers the first broadcast
+     * is not held for the resends it no longer needs.
      */
-    private suspend fun awaitRunning(): Boolean {
-        repeat((CONFIRM_TIMEOUT_MILLIS / CONFIRM_POLL_MILLIS).toInt()) {
+    private suspend fun startAndAwait(userData: UserData): Boolean {
+        val action = userData.shizukuStartAction.ifBlank {
+            userData.shizukuPackageName + ShizukuWrapper.ACTION_START_SUFFIX
+        }
+
+        val polls = (CONFIRM_TIMEOUT_MILLIS / CONFIRM_POLL_MILLIS).toInt()
+
+        repeat(polls) { poll ->
+            if (poll % RESEND_EVERY_POLLS == 0) {
+                shizukuWrapper.startShizuku(
+                    packageName = userData.shizukuPackageName,
+                    action = action,
+                    authKey = userData.shizukuAuthKey,
+                )
+            }
+
             delay(CONFIRM_POLL_MILLIS)
 
-            val running = runCatching { shizukuWrapper.isShizukuRunning() }.getOrDefault(false)
-
-            if (running) return true
+            if (runCatching { shizukuWrapper.isShizukuRunning() }.getOrDefault(false)) {
+                return true
+            }
         }
 
         return false

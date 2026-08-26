@@ -19,15 +19,12 @@
 package com.android.geto.feature.settings.dialog
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -41,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.feature.settings.R
 
@@ -56,9 +52,13 @@ import com.android.geto.feature.settings.R
 internal fun RevertDefaultsDialog(
     modifier: Modifier = Modifier,
     states: Map<ManualRevertTarget, Boolean>,
+    shizukuConfigured: Boolean,
+    manageOverlay: Boolean,
     onDismissRequest: () -> Unit,
     onUpdateRevertDefaults: (Map<ManualRevertTarget, Boolean>) -> Unit,
 ) {
+    // The full map, overlay entry included, even when that row is not drawn - the same
+    // reasoning as in SettingsToHideDialog: the draft is what gets saved.
     var draft by remember(states) { mutableStateOf(states) }
 
     // Each row sets only itself. Shizuku used to drag USB debugging with it and vice versa,
@@ -67,88 +67,82 @@ internal fun RevertDefaultsDialog(
         draft = draft + (target to enabled)
     }
 
-    DialogContainer(
+    SettingsPage(
         modifier = modifier,
+        title = stringResource(R.string.revert_defaults),
         onDismissRequest = onDismissRequest,
+        actions = {
+            TextButton(
+                onClick = {
+                    onUpdateRevertDefaults(draft)
+
+                    onDismissRequest()
+                },
+            ) {
+                Text(text = stringResource(R.string.save))
+            }
+        },
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(10.dp),
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                text = stringResource(R.string.revert_defaults),
-                style = MaterialTheme.typography.titleLarge,
-            )
+        // Says when this runs, which the title does not: "Revert to default" is the
+        // name of five different buttons, and someone arriving here from the settings
+        // list has just read "Settings to hide" one row above.
+        Text(
+            modifier = Modifier.padding(horizontal = 10.dp),
+            text = stringResource(R.string.revert_defaults_description),
+            style = MaterialTheme.typography.bodyMedium,
+        )
 
-            // Says when this runs, which the title does not: "Revert to default" is the
-            // name of five different buttons, and someone arriving here from the settings
-            // list has just read "Settings to hide" one row above.
-            Text(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                text = stringResource(R.string.revert_defaults_description),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+        Spacer(modifier = Modifier.height(4.dp))
 
-            Spacer(modifier = Modifier.height(4.dp))
+        RevertDefaultRow(
+            label = stringResource(R.string.revert_defaults_developer_settings),
+            checked = draft[ManualRevertTarget.DeveloperSettings] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.DeveloperSettings, it) },
+        )
 
-            RevertDefaultRow(
-                label = stringResource(R.string.revert_defaults_developer_settings),
-                checked = draft[ManualRevertTarget.DeveloperSettings] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.DeveloperSettings, it) },
-            )
+        RevertDefaultRow(
+            label = stringResource(R.string.revert_defaults_usb_debugging),
+            checked = draft[ManualRevertTarget.UsbDebugging] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.UsbDebugging, it) },
+        )
 
-            RevertDefaultRow(
-                label = stringResource(R.string.revert_defaults_usb_debugging),
-                checked = draft[ManualRevertTarget.UsbDebugging] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.UsbDebugging, it) },
-            )
+        RevertDefaultRow(
+            label = stringResource(R.string.revert_defaults_wireless_debugging),
+            checked = draft[ManualRevertTarget.WirelessDebugging] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.WirelessDebugging, it) },
+        )
 
-            RevertDefaultRow(
-                label = stringResource(R.string.revert_defaults_wireless_debugging),
-                checked = draft[ManualRevertTarget.WirelessDebugging] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.WirelessDebugging, it) },
-            )
+        RevertDefaultRow(
+            label = stringResource(R.string.revert_defaults_accessibility_services),
+            note = stringResource(R.string.revert_defaults_accessibility_note),
+            checked = draft[ManualRevertTarget.AccessibilityServices] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.AccessibilityServices, it) },
+        )
 
-            RevertDefaultRow(
-                label = stringResource(R.string.revert_defaults_accessibility_services),
-                note = stringResource(R.string.revert_defaults_accessibility_all_note),
-                checked = draft[ManualRevertTarget.AccessibilityServices] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.AccessibilityServices, it) },
-            )
+        RevertDefaultRow(
+            label = stringResource(R.string.revert_defaults_shizuku),
+            note = stringResource(R.string.revert_defaults_shizuku_note),
+            checked = draft[ManualRevertTarget.Shizuku] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.Shizuku, it) },
+        )
 
-            RevertDefaultRow(
-                label = stringResource(R.string.revert_defaults_shizuku),
-                note = stringResource(R.string.revert_defaults_shizuku_note),
-                checked = draft[ManualRevertTarget.Shizuku] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.Shizuku, it) },
-            )
-
+        // Shown only once overlay management has been switched on in Advanced. Hiding the
+        // row does not abandon anything already hidden: a revert still hands overlay access
+        // back to apps IMD took it from, whatever this switch says - see
+        // UserData.effectiveRevertDefaults.
+        if (manageOverlay) {
             RevertDefaultRow(
                 label = stringResource(R.string.revert_defaults_display_over_other_apps),
-                note = stringResource(R.string.revert_defaults_overlay_note),
-                checked = draft[ManualRevertTarget.DisplayOverOtherApps] == true,
+                note = if (shizukuConfigured) {
+                    stringResource(R.string.revert_defaults_overlay_note)
+                } else {
+                    stringResource(R.string.overlay_needs_shizuku_configured)
+                },
+                checked = draft[ManualRevertTarget.DisplayOverOtherApps] == true &&
+                    shizukuConfigured,
+                enabled = shizukuConfigured,
                 onCheckedChange = { toggle(ManualRevertTarget.DisplayOverOtherApps, it) },
             )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                TextButton(
-                    onClick = {
-                        onUpdateRevertDefaults(draft)
-
-                        onDismissRequest()
-                    },
-                ) {
-                    Text(text = stringResource(R.string.save))
-                }
-            }
         }
     }
 }
@@ -167,25 +161,40 @@ private fun RevertDefaultRow(
     label: String,
     note: String? = null,
     checked: Boolean,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
+    val contentColour = if (enabled) {
+        MaterialTheme.colorScheme.onSurface
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
+            .clickable(enabled = enabled) { onCheckedChange(!checked) }
             .padding(horizontal = 10.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = label, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = contentColour,
+            )
 
             if (note != null) {
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(text = note, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = note,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = contentColour,
+                )
             }
         }
 
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Switch(checked = checked, enabled = enabled, onCheckedChange = onCheckedChange)
     }
 }

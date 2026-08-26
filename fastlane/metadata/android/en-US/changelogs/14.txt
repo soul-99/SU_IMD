@@ -1,0 +1,7 @@
+v2.0
+
+* Hide "Display over other apps" for banking apps that refuse to run while an app can draw over them (needs Shizuku; contributed by RafayGhafoor).
+* Auto Revert on returning to IMD, off by default.
+* Tasker / MacroDroid integration (Experimental), secured with a per-install auth key and off by default.
+* The settings observer now keeps a log of what changed.
+* Reverts always restore everything they can and report anything they could not.

@@ -49,7 +49,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">सेटिंग्स छिपा/बंद कर दी गईं</string>
     <string name="settings_manager_configure_revert">तय करें कि “वापस लाएँ” क्या-क्या लौटाए</string>
-    <string name="settings_manager_accessibility_unmanaged">इस समय IMD ऐप किसी भी एक्सेसिबिलिटी सेवा को नियंत्रित नहीं कर रहा है</string>
     <string name="applied_settings_failure">सेटिंग्स लागू नहीं हो सकीं</string>
     <string name="applied_settings_invalid">इस ऐप की सेटिंग्स में अमान्य मान हैं</string>
     <string name="settings_manager_title">IMD सेवा प्रबंधक</string>
@@ -88,4 +87,14 @@
     <string name="settings_manager_shizuku_failed">पिछली कोशिश में Shizuku सेवा शुरू नहीं हो सकी; कृपया Shizuku ऐप की सेटिंग्स और IMD की Shizuku कॉन्फ़िगरेशन जाँचें</string>
     <string name="settings_manager_shizuku_failed_open">Shizuku सेवा क्यों शुरू नहीं हुई</string>
     <string name="understood">समझ गया</string>
+    <string name="overlay_failure_title">Shizuku की मदद से दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति नहीं बदली जा सकी</string>
+    <string name="overlay_failure_check">कृपया यह पक्का करें:</string>
+    <string name="overlay_failure_point_permission">IMD को Shizuku की अनुमति दी गई है</string>
+    <string name="overlay_failure_point_configuration">IMD ऐप्लिकेशन की सेटिंग में अपना Shizuku कॉन्फ़िगरेशन दोबारा जाँचें</string>
+    <string name="shizuku_starting_to_hide_overlay">दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति छिपाने के लिए Shizuku सेवा शुरू की जा रही है</string>
+    <string name="revert_display_over_other_apps">दूसरे ऐप्लिकेशन के ऊपर दिखाएं</string>
+    <string name="settings_manager_overlay_restore_failed">Shizuku की मदद से दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस नहीं दी जा सकी. कृपया Shizuku ऐप्लिकेशन से Shizuku सेवा मैन्युअल रूप से शुरू करें और दोबारा कोशिश करें</string>
+    <string name="settings_manager_overlay_restore_failed_open">दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति क्यों वापस नहीं दी गई</string>
+    <string name="shizuku_starting_to_restore_overlay">दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस देने के लिए Shizuku सेवा शुरू की जा रही है</string>
+    <string name="settings_manager_overlay_note">सिर्फ़ IMD ऐप्लिकेशन सेटिंग में चुने गए ऐप्लिकेशन ही मैनेज किए जाते हैं</string>
 </resources>

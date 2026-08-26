@@ -28,6 +28,7 @@ import com.android.geto.domain.repository.UserDataRepository
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
 import com.android.geto.domain.usecase.ApplySettingsToHideUseCase
 import com.android.geto.domain.usecase.GetLauncherAppsActivityInfosUseCase
+import com.android.geto.domain.usecase.ShizukuStartTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,12 +42,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AppsViewModel @Inject constructor(
+    shizukuStartTracker: ShizukuStartTracker,
     getLauncherAppsActivityInfosUseCase: GetLauncherAppsActivityInfosUseCase,
     private val applyAppSettingsUseCase: ApplyAppSettingsUseCase,
     private val applySettingsToHideUseCase: ApplySettingsToHideUseCase,
     private val packageManagerWrapper: PackageManagerWrapper,
     private val userDataRepository: UserDataRepository,
 ) : ViewModel() {
+    /**
+     * Whether a launch is currently waiting on Shizuku so it can hide overlay access.
+     *
+     * Read from the shared tracker rather than kept here, because the wait runs in an
+     * application-scoped, non-cancellable block: it outlives this ViewModel if the user
+     * switches tabs, and the spinner has to be right either way.
+     */
+    val overlayStart = shizukuStartTracker.overlayStart
     private var _textFlow = MutableStateFlow<String?>(null)
 
     private val _appLaunch = MutableStateFlow<FavouriteAppLaunch?>(null)

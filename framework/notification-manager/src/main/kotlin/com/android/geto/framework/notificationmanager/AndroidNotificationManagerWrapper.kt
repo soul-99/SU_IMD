@@ -48,8 +48,22 @@ interface AndroidNotificationManagerWrapper {
 
     companion object {
         const val NOTIFICATION_CHANNEL_ID = "geto_notification_channel_id"
+
+        /**
+         * A second channel, at IMPORTANCE_HIGH, for the one notification that has to
+         * interrupt.
+         *
+         * Importance is fixed when a channel is created and cannot be raised afterwards, so
+         * this could not simply be the existing channel turned up: every install since v1.0
+         * already has that one registered at IMPORTANCE_DEFAULT, and Android would ignore the
+         * change. A new id is the only way to get a heads-up banner on an existing install,
+         * and it also leaves the user able to silence this one without losing the ongoing
+         * Revert notification, which is the one they actually need.
+         */
+        const val ALERT_NOTIFICATION_CHANNEL_ID = "geto_alert_notification_channel_id"
         const val ACTION_REVERT_SETTINGS = "ACTION_REVERT_SETTINGS"
         const val ACTION_REVERT_TO_DEFAULT = "ACTION_REVERT_TO_DEFAULT"
+        const val ACTION_RETRY_OVERLAY_RESTORE = "ACTION_RETRY_OVERLAY_RESTORE"
         const val NOTIFICATION_EXTRA_COMPONENT_NAME = "component_name"
         const val NOTIFICATION_EXTRA_NOTIFICATION_ID = "notification_id"
 
@@ -65,5 +79,15 @@ interface AndroidNotificationManagerWrapper {
          * observer service's id 1.
          */
         const val REVERT_TO_DEFAULT_NOTIFICATION_ID = 1_000_001
+
+        /**
+         * The id the "could not give overlay access back" notification is posted under.
+         *
+         * Its own id rather than the revert one, because the two mean opposite things and
+         * can be on screen together: the revert notification offers to change the device,
+         * this one reports a change that did not finish. Reposting after a failed retry
+         * replaces it rather than stacking, which is the same reasoning as above.
+         */
+        const val OVERLAY_RESTORE_NOTIFICATION_ID = 1_000_002
     }
 }

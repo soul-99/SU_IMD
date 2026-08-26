@@ -96,6 +96,19 @@ private fun AppSettingTemplateItem(
                 style = MaterialTheme.typography.bodyLarge,
             )
 
+            // Directly under the label rather than below the key, because it is a condition
+            // on using the template at all - the two lines under it describe what the row
+            // writes, which is no use to someone who cannot use it yet.
+            appSettingTemplate.description?.let { description ->
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
             Spacer(modifier = Modifier.height(5.dp))
 
             Text(

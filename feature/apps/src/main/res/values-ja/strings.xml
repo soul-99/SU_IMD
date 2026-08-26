@@ -49,7 +49,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">設定を非表示 / 無効にしました</string>
     <string name="settings_manager_configure_revert">「元に戻す」で復元する内容を指定</string>
-    <string name="settings_manager_accessibility_unmanaged">現在、IMD アプリが管理しているユーザー補助サービスはありません</string>
     <string name="applied_settings_failure">設定を適用できませんでした</string>
     <string name="applied_settings_invalid">このアプリの設定に無効な値があります</string>
     <string name="settings_manager_title">IMD サービスマネージャー</string>
@@ -88,4 +87,14 @@
     <string name="settings_manager_shizuku_failed">前回の試行では Shizuku サービスを開始できませんでした。Shizuku アプリの設定と、IMD 側の Shizuku の構成を確認してください</string>
     <string name="settings_manager_shizuku_failed_open">Shizuku サービスが開始しなかった理由</string>
     <string name="understood">了解しました</string>
+    <string name="overlay_failure_title">Shizuku を使って他のアプリの上に重ねて表示の権限を変更できませんでした</string>
+    <string name="overlay_failure_check">次の点をご確認ください:</string>
+    <string name="overlay_failure_point_permission">IMD に Shizuku の権限が付与されていること</string>
+    <string name="overlay_failure_point_configuration">IMD アプリの設定で Shizuku の構成を確認し直してください</string>
+    <string name="shizuku_starting_to_hide_overlay">他のアプリの上に重ねて表示の権限を隠すために Shizuku サービスを開始しています</string>
+    <string name="revert_display_over_other_apps">他のアプリの上に重ねて表示</string>
+    <string name="settings_manager_overlay_restore_failed">Shizuku で他のアプリの上に重ねて表示の権限を復元できませんでした。Shizuku アプリから Shizuku サービスを手動で開始してから、もう一度お試しください</string>
+    <string name="settings_manager_overlay_restore_failed_open">他のアプリの上に重ねて表示の権限が復元されなかった理由</string>
+    <string name="shizuku_starting_to_restore_overlay">他のアプリの上に重ねて表示の権限を復元するために Shizuku サービスを開始しています</string>
+    <string name="settings_manager_overlay_note">IMD アプリの設定で選択したアプリのみが管理されます</string>
 </resources>

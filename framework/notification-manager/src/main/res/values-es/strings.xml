@@ -24,4 +24,8 @@
     -->
     <string name="revert_using_memory">Revertir usando la memoria</string>
     <string name="revert_to_default">Revertir a valores predeterminados</string>
+    <string name="overlay_restore_failed_title">Error al revertir</string>
+    <string name="overlay_restore_failed_text">No se ha podido restaurar el permiso Mostrar sobre otras aplicaciones con Shizuku. Activa el servicio Shizuku manualmente y pulsa el botón de abajo</string>
+    <string name="overlay_restore_retry">Reintentar</string>
+    <string name="alert_notification_channel">Errores al revertir</string>
 </resources>

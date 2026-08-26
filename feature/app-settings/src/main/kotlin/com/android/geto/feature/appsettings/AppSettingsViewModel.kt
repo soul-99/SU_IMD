@@ -34,6 +34,8 @@ import com.android.geto.domain.model.RequestPinShortcutResult
 import com.android.geto.domain.model.SecureSetting
 import com.android.geto.domain.model.SettingType
 import com.android.geto.domain.model.UpdatePinShortcutResult
+import com.android.geto.domain.model.appSettingsForOverlayState
+import com.android.geto.domain.model.templatesForOverlayState
 import com.android.geto.domain.repository.AppSettingsRepository
 import com.android.geto.domain.repository.UserDataRepository
 import com.android.geto.domain.usecase.AddAppSettingUseCase
@@ -48,6 +50,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -121,16 +125,34 @@ class AppSettingsViewModel @Inject constructor(
     private val _requestPinShortcutResult = MutableStateFlow<RequestPinShortcutResult?>(null)
     val requestPinShortcutResult = _requestPinShortcutResult.asStateFlow()
 
+    // The stored rows with the overlay marker filtered out while overlay management is off.
+    // The filter is on the way to the screen only - the Room rows are untouched, so a DOOA
+    // row a user added comes straight back when they switch the feature on again, in this app
+    // and every other it was added to. Showing it while off would promise a hide the memory
+    // function will not perform, since ApplyAppSettingsUseCase stops acting on the marker then.
     val appSettingsUiState =
-        appSettingsRepository.getAppSettingsFlowByComponentName(componentName = componentName)
-            .map(AppSettingsUiState::Success).stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = AppSettingsUiState.Loading,
-            )
+        combine(
+            appSettingsRepository.getAppSettingsFlowByComponentName(componentName = componentName),
+            userDataRepository.userData.map { it.manageOverlay }.distinctUntilChanged(),
+        ) { appSettings, manageOverlay ->
+            appSettings.appSettingsForOverlayState(manageOverlay = manageOverlay)
+        }.map(AppSettingsUiState::Success).stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = AppSettingsUiState.Loading,
+        )
 
     private val _appSettingTemplates = MutableStateFlow<List<AppSettingTemplate>>(emptyList())
-    val appSettingTemplates = _appSettingTemplates.onStart {
+
+    // The "Hide Display over other apps" template is dropped from the picker while overlay
+    // management is off, for the same reason and by the same marker as the rows above: it
+    // cannot be added to do nothing.
+    val appSettingTemplates = combine(
+        _appSettingTemplates,
+        userDataRepository.userData.map { it.manageOverlay }.distinctUntilChanged(),
+    ) { templates, manageOverlay ->
+        templates.templatesForOverlayState(manageOverlay = manageOverlay)
+    }.onStart {
         getAppSettingTemplates()
     }.stateIn(
         scope = viewModelScope,

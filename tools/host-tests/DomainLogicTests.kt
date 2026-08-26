@@ -27,6 +27,7 @@ import com.android.geto.domain.model.AppListOrder
 import com.android.geto.domain.model.AppListOrdering
 import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingKeys
+import com.android.geto.domain.model.AppSettingTemplate
 import com.android.geto.domain.model.FavouriteAppsOrdering
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.InstalledAppData
@@ -44,8 +45,15 @@ import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
 import com.android.geto.domain.model.Theme
+import com.android.geto.domain.model.TaskerIntegration
 import com.android.geto.domain.model.UserData
+import com.android.geto.domain.model.appSettingsForOverlayState
+import com.android.geto.domain.model.effectiveRevertDefaults
+import com.android.geto.domain.model.effectiveSettingsToHide
 import com.android.geto.domain.model.isShizukuConfigured
+import com.android.geto.domain.model.memoryHeldComponents
+import com.android.geto.domain.model.templatesForOverlayState
+import com.android.geto.domain.model.withoutOverlayWhenUnmanaged
 
 private var passed = 0
 private val failures = mutableListOf<String>()
@@ -227,6 +235,57 @@ private fun accessibilityReleaseTests() {
         currentlyEnabled = emptyList(),
     )
     checkEquals("release collapses duplicate records", listOf(SWIPE), f.enabledAfter)
+}
+
+/**
+ * releaseAll is what the manager's toggle and Revert to default use, and its whole reason to
+ * exist is the bug where a service held device-wide *and* by a later launch could not be put
+ * back. release() of one holder finds it "held by others" and restores nothing; releaseAll()
+ * clears every holder at once.
+ */
+private fun accessibilityReleaseAllTests() {
+    val deviceWide = AccessibilityServicePlan.DEVICE_WIDE_HOLD
+
+    // 13a. The exact shape the bug produced: the manager switched SWIPE off (device-wide),
+    // then a launch of app A claimed the same service. Two holders, one service, and it is
+    // currently off. A scoped release of just the device-wide holder would see A still
+    // holding it and leave it off; releaseAll brings it back.
+    val shadowed = mapOf(deviceWide to listOf(SWIPE), "a/b" to listOf(SWIPE))
+
+    val scoped = AccessibilityServicePlan.release(
+        released = shadowed[deviceWide].orEmpty(),
+        stillHeldByOthers = AccessibilityServicePlan.heldByOthers(shadowed, deviceWide),
+        currentlyEnabled = listOf(TALKBACK),
+    )
+    check("a scoped release cannot restore a shadowed service - the bug", SWIPE !in scoped.enabledAfter)
+
+    val all = AccessibilityServicePlan.releaseAll(
+        held = shadowed,
+        currentlyEnabled = listOf(TALKBACK),
+    )
+    check("releaseAll restores a service held by more than one holder", SWIPE in all.enabledAfter)
+
+    // 13b. Cumulative: services held from the manager and across two launches all come back
+    // together, deduplicated, and nothing the user turned on by hand is dropped.
+    val many = mapOf(
+        deviceWide to listOf(SWIPE),
+        "a/b" to listOf(TASKER),
+        "c/d" to listOf(SWIPE, TALKBACK),
+    )
+    val cumulative = AccessibilityServicePlan.releaseAll(
+        held = many,
+        currentlyEnabled = listOf(BIXBY),
+    )
+    check("releaseAll keeps a hand-enabled service", BIXBY in cumulative.enabledAfter)
+    check("releaseAll brings back every held service (SWIPE)", SWIPE in cumulative.enabledAfter)
+    check("releaseAll brings back every held service (TASKER)", TASKER in cumulative.enabledAfter)
+    check("releaseAll brings back every held service (TALKBACK)", TALKBACK in cumulative.enabledAfter)
+    checkEquals("releaseAll does not duplicate", cumulative.enabledAfter.size, cumulative.enabledAfter.distinct().size)
+
+    // 13c. Empty record is a no-op, so the manager toggle on a device with nothing held does
+    // not rewrite the setting.
+    val none = AccessibilityServicePlan.releaseAll(held = emptyMap(), currentlyEnabled = listOf(TALKBACK))
+    check("releaseAll of nothing is not a change", !none.listChanged)
 }
 
 private fun accessibilityRecordTests() {
@@ -905,6 +964,10 @@ private fun userData(
     packageName: String = "moe.shizuku.privileged.api",
     startAction: String = ShizukuForkDefaults.THEDJCHI_ACTION,
     authKey: String = "",
+    manageOverlay: Boolean = false,
+    heldOverlay: Map<String, List<String>> = emptyMap(),
+    hideStates: Map<ManualRevertTarget, Boolean> = SettingsToHide.Default,
+    revertStates: Map<ManualRevertTarget, Boolean> = RevertDefaults.Default,
 ) = UserData(
     theme = Theme.FOLLOW_SYSTEM,
     dynamicTheme = false,
@@ -921,11 +984,18 @@ private fun userData(
     shizukuStartAction = startAction,
     managedAccessibilityServices = emptyList(),
     heldAccessibilityServices = emptyMap(),
-    heldOverlayPackages = emptyMap(),
+    managedOverlayPackages = emptyList(),
+    heldOverlayPackages = heldOverlay,
+    heldOverlayIdentities = emptyMap(),
+    manageOverlay = manageOverlay,
+    taskerAuthKey = "",
+    taskerIntegrationEnabled = false,
+    overlayRestoreFailed = false,
+    autoRevertOnReturn = false,
     manualRevertTargets = emptySet(),
     notificationFunction = NotificationFunction.Default,
-    revertDefaults = RevertDefaults.Default,
-    settingsToHide = SettingsToHide.Default,
+    revertDefaults = revertStates,
+    settingsToHide = hideStates,
     notificationFunctionResetV16 = true,
     shizukuStartFailed = false,
     settingStateBefore = emptyMap(),
@@ -1202,8 +1272,8 @@ private fun revertDefaultsTests() {
         RevertDefaults.Default[ManualRevertTarget.Shizuku],
     )
     checkEquals(
-        "only accessibility and held overlay permissions are restored by default",
-        2,
+        "accessibility services is the only target restored by default",
+        1,
         RevertDefaults.Default.count { it.value },
     )
     checkEquals(
@@ -1216,9 +1286,12 @@ private fun revertDefaultsTests() {
         false,
         RevertDefaults.Default[ManualRevertTarget.WirelessDebugging],
     )
+    // Off, to match SettingsToHide.Default. Restoring is safe in isolation - only packages
+    // IMD itself disabled are ever put back - but the pair is opt-in together, and a
+    // restore switch that is on while nothing is ever hidden is a switch that does nothing.
     checkEquals(
-        "held overlay permissions are restored by default",
-        true,
+        "held overlay permissions are not restored by default",
+        false,
         RevertDefaults.Default[ManualRevertTarget.DisplayOverOtherApps],
     )
     check(
@@ -1428,9 +1501,235 @@ private fun settingsToHideTests() {
     )
 }
 
+/**
+ * The master switch for overlay management, and the one asymmetry in it: hiding is gated on
+ * it, restoring is not. Both halves are checked here because getting the second one wrong is
+ * silent - it does not fail a build or a launch, it just leaves an app without a permission
+ * IMD took from it and hides every screen that could give it back.
+ */
+private fun overlayManagementTests() {
+    val target = ManualRevertTarget.DisplayOverOtherApps
+
+    val hideOn = SettingsToHide.Default + (target to true)
+
+    val revertOn = RevertDefaults.Default + (target to true)
+
+    // 55. Managed: both configurations read exactly what was stored.
+    checkEquals(
+        "managed hiding reads the stored tick",
+        true,
+        userData(ShizukuForkMode.Thedjchi, manageOverlay = true, hideStates = hideOn)
+            .effectiveSettingsToHide[target],
+    )
+    checkEquals(
+        "managed reverting reads the stored tick",
+        true,
+        userData(ShizukuForkMode.Thedjchi, manageOverlay = true, revertStates = revertOn)
+            .effectiveRevertDefaults[target],
+    )
+
+    // 56. Unmanaged: hiding is off however it was left, so no launch can withdraw access.
+    checkEquals(
+        "unmanaged hiding reads off despite a stored tick",
+        false,
+        userData(ShizukuForkMode.Thedjchi, manageOverlay = false, hideStates = hideOn)
+            .effectiveSettingsToHide[target],
+    )
+
+    // 57. Unmanaged with nothing owed: the target is absent, so a revert neither hides nor
+    // restores it and does not report on it at all.
+    checkEquals(
+        "unmanaged reverting drops the target when nothing is owed",
+        false,
+        userData(ShizukuForkMode.Thedjchi, manageOverlay = false, revertStates = revertOn)
+            .effectiveRevertDefaults
+            .containsKey(target),
+    )
+
+    // 58. Unmanaged with a debt outstanding: restoring still happens. This is the case that
+    // matters - the user switched the feature off while apps were still held.
+    checkEquals(
+        "unmanaged reverting still restores an outstanding debt",
+        true,
+        userData(
+            ShizukuForkMode.Thedjchi,
+            manageOverlay = false,
+            heldOverlay = mapOf(AccessibilityServicePlan.DEVICE_WIDE_HOLD to listOf("a.b")),
+            revertStates = RevertDefaults.Default + (target to false),
+        ).effectiveRevertDefaults[target],
+    )
+
+    // 59. A debt is repaid even when the stored answer says "leave it hidden": restoring can
+    // only put back what IMD itself withdrew, so it can never grant anything new.
+    checkEquals(
+        "an outstanding debt outranks a stored hide once unmanaged",
+        true,
+        userData(
+            ShizukuForkMode.Thedjchi,
+            manageOverlay = false,
+            heldOverlay = mapOf("com.x/Y" to listOf("a.b")),
+            revertStates = RevertDefaults.Default + (target to false),
+        ).effectiveRevertDefaults[target],
+    )
+
+    // 60. What the dialogs draw and their summaries count. The entry is removed rather than
+    // forced false, because size is the denominator of the "x of y" line.
+    checkEquals(
+        "an unmanaged configuration loses the overlay row entirely",
+        SettingsToHide.Targets.size - 1,
+        hideOn.withoutOverlayWhenUnmanaged(manageOverlay = false).size,
+    )
+    checkEquals(
+        "a managed configuration keeps every row",
+        SettingsToHide.Targets.size,
+        hideOn.withoutOverlayWhenUnmanaged(manageOverlay = true).size,
+    )
+
+    // 61. The stored map is never mutated by any of this - switching the feature off and on
+    // again has to return the configuration as it was left rather than blank.
+    val stored = userData(ShizukuForkMode.Thedjchi, manageOverlay = false, hideStates = hideOn)
+
+    checkEquals(
+        "switching the feature off leaves the stored tick alone",
+        true,
+        stored.settingsToHide[target],
+    )
+}
+
+private fun appSetting(key: String) = AppSetting(
+    enabled = true,
+    settingType = SettingType.GLOBAL,
+    componentName = "com.example/Activity",
+    label = key,
+    key = key,
+    valueOnLaunch = "0",
+    valueOnRevert = "1",
+)
+
+private fun appSettingTemplate(key: String) = AppSettingTemplate(
+    settingType = SettingType.GLOBAL,
+    label = key,
+    key = key,
+    valueOnLaunch = "0",
+    valueOnRevert = "1",
+)
+
+/**
+ * The per-app config screen's view of the overlay marker. The same rule as the device-wide
+ * dialogs, one level down: while overlay management is off the "Hide Display over other apps"
+ * template and any row already carrying its marker leave the screen, and both come back when
+ * it is switched on - the filter is on the view, never on what is stored.
+ */
+private fun overlayMarkerVisibilityTests() {
+    val overlayKey = AppSettingKeys.SYSTEM_ALERT_WINDOW
+
+    val templates = listOf(
+        appSettingTemplate(key = AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED),
+        appSettingTemplate(key = AppSettingKeys.ACCESSIBILITY_ENABLED),
+        appSettingTemplate(key = overlayKey),
+    )
+
+    val rows = listOf(
+        appSetting(key = AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED),
+        appSetting(key = overlayKey),
+    )
+
+    // 62. Off: the marker is gone from both the picker and the added rows, and nothing else is.
+    checkEquals(
+        "the overlay template is hidden while unmanaged",
+        listOf(AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED, AppSettingKeys.ACCESSIBILITY_ENABLED),
+        templates.templatesForOverlayState(manageOverlay = false).map { it.key },
+    )
+    checkEquals(
+        "an added overlay row is hidden while unmanaged",
+        listOf(AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED),
+        rows.appSettingsForOverlayState(manageOverlay = false).map { it.key },
+    )
+
+    // 63. On: everything is shown, in the order it came - the filter adds and removes nothing
+    // else and does not reorder.
+    checkEquals(
+        "every template is shown while managed",
+        templates.map { it.key },
+        templates.templatesForOverlayState(manageOverlay = true).map { it.key },
+    )
+    checkEquals(
+        "every added row is shown while managed",
+        rows.map { it.key },
+        rows.appSettingsForOverlayState(manageOverlay = true).map { it.key },
+    )
+}
+
+/**
+ * The auth gate on the exported Tasker receiver, and the "which apps has memory got a hold on"
+ * sweep the memory trigger reverts. Both are the security-load-bearing halves of the feature,
+ * so both are pinned here where they can be reasoned about without a device.
+ */
+private fun taskerIntegrationTests() {
+    // 64. A blank stored key is "never set up", and nothing gets through it - not even a
+    // broadcast that helpfully sends a blank key of its own.
+    check(
+        "no stored key authorises nothing",
+        !TaskerIntegration.authorises(enabled = true, storedKey = "", providedKey = "anything"),
+    )
+    check(
+        "a blank provided key cannot match a blank stored key",
+        !TaskerIntegration.authorises(enabled = true, storedKey = "", providedKey = ""),
+    )
+
+    // 65. Once a key exists and the switch is on, only an exact match passes.
+    check(
+        "the matching key authorises when enabled",
+        TaskerIntegration.authorises(enabled = true, storedKey = "abc123", providedKey = "abc123"),
+    )
+    check(
+        "a wrong key is refused",
+        !TaskerIntegration.authorises(enabled = true, storedKey = "abc123", providedKey = "abc124"),
+    )
+    check(
+        "a missing key is refused",
+        !TaskerIntegration.authorises(enabled = true, storedKey = "abc123", providedKey = null),
+    )
+
+    // 65a. The master switch overrides even a correct key: off means off.
+    check(
+        "a correct key is refused while the integration is off",
+        !TaskerIntegration.authorises(enabled = false, storedKey = "abc123", providedKey = "abc123"),
+    )
+
+    // 66. "Revert using memory" sweeps every app memory is holding something for - a snapshot
+    // or a per-app accessibility hold - and never the device-wide holder, which belongs to
+    // Revert to default.
+    val components = memoryHeldComponents(
+        settingStateBefore = mapOf(
+            "a/b" to mapOf("k" to "0"),
+            "c/d" to emptyMap(),
+        ),
+        heldAccessibilityServices = mapOf(
+            AccessibilityServicePlan.DEVICE_WIDE_HOLD to listOf(TALKBACK),
+            "e/f" to listOf(SWIPE),
+            "a/b" to listOf(TASKER),
+        ),
+    )
+    checkEquals(
+        "memory sweep unions snapshots and per-app holds, minus the device-wide one",
+        setOf("a/b", "c/d", "e/f"),
+        components,
+    )
+    check("memory sweep excludes the device-wide holder", AccessibilityServicePlan.DEVICE_WIDE_HOLD !in components)
+
+    // 67. Nothing held means nothing to revert - the trigger is a no-op, not an error.
+    checkEquals(
+        "an empty memory record sweeps nothing",
+        emptySet<String>(),
+        memoryHeldComponents(settingStateBefore = emptyMap(), heldAccessibilityServices = emptyMap()),
+    )
+}
+
 fun main() {
     accessibilityHoldTests()
     accessibilityReleaseTests()
+    accessibilityReleaseAllTests()
     accessibilityRecordTests()
     accessibilityRoundTripTests()
     favouriteOrderingTests()
@@ -1447,6 +1746,9 @@ fun main() {
     accessibilityLiveStateTests()
     revertDefaultsTests()
     settingsToHideTests()
+    overlayManagementTests()
+    overlayMarkerVisibilityTests()
+    taskerIntegrationTests()
 
     println("passed: $passed")
 

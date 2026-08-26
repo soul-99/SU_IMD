@@ -38,4 +38,10 @@
 
     <string name="revert_to_default_toast">Standard wiederherstellen</string>
     <string name="revert_from_memory_toast">Aus dem Speicher wiederherstellen</string>
+    <string name="revert_failed_shizuku_toast">Shizuku-Dienst konnte nicht neu gestartet werden</string>
+    <string name="revert_failed_overlay_toast">Die Berechtigung Über anderen Apps einblenden konnte mit Shizuku nicht wiederhergestellt werden, siehe Benachrichtigung</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">Shizuku-Dienst und Über anderen Apps einblenden-Berechtigungen konnten nicht wiederhergestellt werden</string>
+    <string name="settings_hidden_toast">Einstellungen verborgen</string>
+    <string name="auto_revert_to_default_toast">Automatisch auf Standard zurückgesetzt</string>
+    <string name="auto_revert_from_memory_toast">Automatisch über die Memory function zurückgesetzt</string>
 </resources>

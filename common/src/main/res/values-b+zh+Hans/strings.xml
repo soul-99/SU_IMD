@@ -38,4 +38,10 @@
 
     <string name="revert_to_default_toast">还原为默认</string>
     <string name="revert_from_memory_toast">从记忆还原</string>
+    <string name="revert_failed_shizuku_toast">无法重新启动 Shizuku 服务</string>
+    <string name="revert_failed_overlay_toast">无法通过 Shizuku 恢复“显示在其他应用的上层”权限，请查看通知</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">无法恢复 Shizuku 服务和“显示在其他应用的上层”权限</string>
+    <string name="settings_hidden_toast">设置已隐藏</string>
+    <string name="auto_revert_to_default_toast">自动还原为默认设置</string>
+    <string name="auto_revert_from_memory_toast">使用 Memory function 自动还原</string>
 </resources>

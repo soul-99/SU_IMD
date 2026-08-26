@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import com.android.geto.common.ApplicationScope
 import com.android.geto.common.showRevertFromMemoryToast
+import com.android.geto.common.showRevertOverlayFailedToast
 import com.android.geto.domain.usecase.RevertAppSettingsUseCase
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.NOTIFICATION_EXTRA_COMPONENT_NAME
@@ -44,6 +45,9 @@ class RevertSettingsBroadcastReceiver @Inject constructor() : BroadcastReceiver(
     @Inject
     lateinit var notificationManagerWrapper: AndroidNotificationManagerWrapper
 
+    @Inject
+    lateinit var overlayRestoreRunner: OverlayRestoreRunner
+
     override fun onReceive(context: Context?, intent: Intent?) {
         val componentName = intent?.extras?.getString(NOTIFICATION_EXTRA_COMPONENT_NAME) ?: return
 
@@ -62,9 +66,20 @@ class RevertSettingsBroadcastReceiver @Inject constructor() : BroadcastReceiver(
 
         appScope.launch {
             try {
+                // Before the revert, not after. The revert can spend ten seconds starting
+                // Shizuku, and this notification has no business sitting in the shade for
+                // that whole time. The trampoline that opened this has usually cancelled it
+                // already; this covers the receiver being reached any other way.
+                notificationManagerWrapper.cancel(notificationId)
+
                 revertAppSettingsUseCase(componentName = componentName)
 
-                notificationManagerWrapper.cancel(notificationId)
+                // The overlay step is deliberately allowed to fail without failing the rest
+                // of the profile, so this is the only place its outcome is reported. Shizuku
+                // is not a target of a per-app revert, so only the one message applies.
+                if (overlayRestoreRunner.reportIfFailed()) {
+                    context?.showRevertOverlayFailedToast()
+                }
             } finally {
                 pendingResult.finish()
             }

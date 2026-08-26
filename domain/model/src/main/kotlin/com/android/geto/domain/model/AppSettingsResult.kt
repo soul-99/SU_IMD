@@ -20,6 +20,15 @@ package com.android.geto.domain.model
 enum class AppSettingsResult {
     Success,
     Failure,
+
+    /**
+     * Hiding "Display over other apps" needs a running Shizuku service, and it could not be
+     * reached. Kept apart from [Failure] because it is the one failure with a specific,
+     * actionable cause: every other failure is a settings write that did not take, whereas
+     * this one is answered by granting IMD permission in Shizuku or fixing the fork
+     * configuration, and the user cannot guess that from "could not apply settings".
+     */
+    OverlayFailure,
     NoPermission,
     InvalidValues,
     EmptyAppSettings,

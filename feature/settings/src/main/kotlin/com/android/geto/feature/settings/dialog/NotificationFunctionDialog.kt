@@ -18,7 +18,6 @@
  */
 package com.android.geto.feature.settings.dialog
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,10 +26,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -48,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.designsystem.component.emphasised
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.NotificationFunction
@@ -74,102 +70,82 @@ internal fun NotificationFunctionDialog(
 ) {
     var choice by remember(selected) { mutableStateOf(selected) }
 
-    DialogContainer(
+    SettingsPage(
         modifier = modifier,
+        title = stringResource(R.string.notification_function),
         onDismissRequest = onDismissRequest,
+        actions = {
+            TextButton(
+                onClick = {
+                    onUpdateNotificationFunction(choice)
+
+                    onDismissRequest()
+                },
+            ) {
+                Text(text = stringResource(R.string.save))
+            }
+        },
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                // The memory option now carries three caveats under its description, which
-                // on a short screen puts the Save button off the bottom of the dialog.
-                .verticalScroll(rememberScrollState())
-                .padding(10.dp),
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                text = stringResource(R.string.notification_function),
-                style = MaterialTheme.typography.titleLarge,
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Recommended first. A list that opens with the option being steered away from
+        // is a list that gets picked from the top by anyone not reading closely.
+        Column(modifier = Modifier.selectableGroup()) {
+            NotificationFunctionOption(
+                title = stringResource(R.string.notification_function_revert_option),
+                summary = stringResource(R.string.notification_function_revert_summary),
+                detail = emphasised(
+                    text = stringResource(R.string.notification_function_revert_detail),
+                    // The same resource the settings list uses for that row, so the
+                    // sentence cannot end up naming something the list does not.
+                    names = listOf(stringResource(R.string.revert_defaults_entry)),
+                ),
+                selected = choice == NotificationFunction.RevertToDefault,
+                onSelect = { choice = NotificationFunction.RevertToDefault },
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Recommended first. A list that opens with the option being steered away from
-            // is a list that gets picked from the top by anyone not reading closely.
-            Column(modifier = Modifier.selectableGroup()) {
-                NotificationFunctionOption(
-                    title = stringResource(R.string.notification_function_revert_option),
-                    summary = stringResource(R.string.notification_function_revert_summary),
-                    detail = emphasised(
-                        text = stringResource(R.string.notification_function_revert_detail),
-                        // The same resource the settings list uses for that row, so the
-                        // sentence cannot end up naming something the list does not.
-                        names = listOf(stringResource(R.string.revert_defaults_entry)),
-                    ),
-                    selected = choice == NotificationFunction.RevertToDefault,
-                    onSelect = { choice = NotificationFunction.RevertToDefault },
-                )
-
-                NotificationFunctionOption(
-                    title = stringResource(R.string.notification_function_memory_option),
-                    summary = stringResource(R.string.notification_function_memory_summary),
-                    detail = AnnotatedString(
-                        stringResource(R.string.notification_function_memory_detail),
-                    ),
-                    selected = choice == NotificationFunction.Memory,
-                    onSelect = { choice = NotificationFunction.Memory },
-                    extra = {
-                        // What this choice costs, then what it buys. Both are things the
-                        // option's own description cannot say, because they are about what
-                        // the *other* mode does for you and stops doing once you leave it.
-                        NoticeLine(
-                            text = emphasised(
-                                text = stringResource(R.string.notification_function_memory_warning_config),
-                                names = listOf(
-                                    stringResource(R.string.notif_name_all_apps),
-                                    stringResource(R.string.notif_name_favourites),
-                                ),
+            NotificationFunctionOption(
+                title = stringResource(R.string.notification_function_memory_option),
+                summary = stringResource(R.string.notification_function_memory_summary),
+                detail = AnnotatedString(
+                    stringResource(R.string.notification_function_memory_detail),
+                ),
+                selected = choice == NotificationFunction.Memory,
+                onSelect = { choice = NotificationFunction.Memory },
+                extra = {
+                    // What this choice costs, then what it buys. Both are things the
+                    // option's own description cannot say, because they are about what
+                    // the *other* mode does for you and stops doing once you leave it.
+                    NoticeLine(
+                        text = emphasised(
+                            text = stringResource(R.string.notification_function_memory_warning_config),
+                            names = listOf(
+                                stringResource(R.string.notif_name_all_apps),
+                                stringResource(R.string.notif_name_favourites),
                             ),
-                            colour = MaterialTheme.colorScheme.error,
-                        )
+                        ),
+                        colour = MaterialTheme.colorScheme.error,
+                    )
 
-                        NoticeLine(
-                            text = emphasised(
-                                text = stringResource(R.string.notification_function_memory_warning_revert),
-                                names = listOf(
-                                    stringResource(R.string.notif_name_revert_button),
-                                    stringResource(R.string.revert_defaults_entry),
-                                ),
+                    NoticeLine(
+                        text = emphasised(
+                            text = stringResource(R.string.notification_function_memory_warning_revert),
+                            names = listOf(
+                                stringResource(R.string.notif_name_revert_button),
+                                stringResource(R.string.revert_defaults_entry),
                             ),
-                            colour = MaterialTheme.colorScheme.error,
-                        )
+                        ),
+                        colour = MaterialTheme.colorScheme.error,
+                    )
 
-                        NoticeLine(
-                            text = AnnotatedString(
-                                stringResource(R.string.notification_function_memory_note),
-                            ),
-                            colour = MaterialTheme.colorScheme.primary,
-                        )
-                    },
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                TextButton(
-                    onClick = {
-                        onUpdateNotificationFunction(choice)
-
-                        onDismissRequest()
-                    },
-                ) {
-                    Text(text = stringResource(R.string.save))
-                }
-            }
+                    NoticeLine(
+                        text = AnnotatedString(
+                            stringResource(R.string.notification_function_memory_note),
+                        ),
+                        colour = MaterialTheme.colorScheme.primary,
+                    )
+                },
+            )
         }
     }
 }

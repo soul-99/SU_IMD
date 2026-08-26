@@ -67,6 +67,7 @@ def check(module: pathlib.Path, locale: str) -> list[str]:
 # is exactly the kind of thing a translator working string by string cannot see.
 EMPHASIS = [
     ("app", "setup_secure_settings_shizuku", ["setup_use_shizuku"]),
+    ("app", "setup_shizuku_once", ["setup_name_display_over_other_apps"]),
     ("feature/settings", "notification_function_revert_detail", ["revert_defaults_entry"]),
     ("feature/settings", "notification_function_memory_warning_config",
      ["notif_name_all_apps", "notif_name_favourites"]),
@@ -76,6 +77,9 @@ EMPHASIS = [
      ["settings_to_hide_name_shizuku_hide"]),
     ("feature/settings", "settings_to_hide_info_watchdog",
      ["settings_to_hide_name_shizuku_watchdog"]),
+    ("feature/settings", "manage_overlay_notice", ["section_app_functions"]),
+    ("feature/settings", "auto_revert_notice_scope", ["auto_revert_name_shortcuts"]),
+    ("feature/settings", "auto_revert_notice_early", ["auto_revert_name_early"]),
     ("feature/settings", "help_hide_title", ["help_name_mandatory"]),
     ("feature/settings", "help_revert_title", ["help_name_revert"]),
     ("feature/settings", "help_general_revert", ["help_name_revert_button"]),

@@ -25,4 +25,8 @@
     -->
     <string name="revert_using_memory">استعادة من الذاكرة</string>
     <string name="revert_to_default">استعادة الوضع الافتراضي</string>
+    <string name="overlay_restore_failed_title">فشل الاستعادة</string>
+    <string name="overlay_restore_failed_text">تعذّرت استعادة إذن العرض فوق التطبيقات الأخرى باستخدام Shizuku، يُرجى تشغيل خدمة Shizuku يدويًا ثم الضغط على الزر أدناه</string>
+    <string name="overlay_restore_retry">إعادة المحاولة</string>
+    <string name="alert_notification_channel">حالات فشل الاستعادة</string>
 </resources>

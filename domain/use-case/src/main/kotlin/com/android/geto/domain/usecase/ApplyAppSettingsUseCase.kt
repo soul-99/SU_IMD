@@ -26,6 +26,7 @@ import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.AppSettingsResult
+import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.SettingSnapshot
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.repository.AppSettingsRepository
@@ -41,6 +42,9 @@ class ApplyAppSettingsUseCase @Inject constructor(
     private val secureSettingsWrapper: SecureSettingsWrapper,
     private val accessibilityServicesWrapper: AccessibilityServicesWrapper,
     private val userDataRepository: UserDataRepository,
+    private val setManualTargetUseCase: SetManualTargetUseCase,
+    private val getManualTargetStatesUseCase: GetManualTargetStatesUseCase,
+    private val shizukuStartTracker: ShizukuStartTracker,
     @param:Dispatcher(GetoDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
 ) {
     suspend operator fun invoke(componentName: String): AppSettingsResult = withContext(defaultDispatcher) {
@@ -64,10 +68,45 @@ class ApplyAppSettingsUseCase @Inject constructor(
         val managesAccessibility = userData.managedAccessibilityServices.isNotEmpty() &&
             AppSettingKeys.hidesAccessibilityServices(enabledAppSettings)
 
-        val settingsToWrite = if (managesAccessibility) {
-            enabledAppSettings.filterNot { it.key == AppSettingKeys.ACCESSIBILITY_ENABLED }
-        } else {
-            enabledAppSettings
+        // Whether this profile withdraws overlay access. Unlike accessibility_enabled there
+        // is no real settings row behind the marker, so it comes out of the write loop
+        // whether or not the overlay work then happens.
+        //
+        // Gated on the master switch in Advanced as well as on the marker: a profile
+        // written while overlay management was on must stop hiding when it is switched off,
+        // or the one place the feature could still fire would be the one place it cannot be
+        // seen. Reverting such a profile is not gated - see RevertAppSettingsUseCase.
+        val managesOverlay = userData.manageOverlay &&
+            AppSettingKeys.hidesOverlayAccess(enabledAppSettings)
+
+        val settingsToWrite = enabledAppSettings
+            .filterNot { managesAccessibility && it.key == AppSettingKeys.ACCESSIBILITY_ENABLED }
+            .filterNot { it.key == AppSettingKeys.SYSTEM_ALERT_WINDOW }
+
+        // Before the settings writes, for the same reason the device-wide path does it
+        // first: overlay AppOps need Shizuku, and Shizuku needs the debugging transport this
+        // profile is probably about to switch off.
+        if (managesOverlay) {
+            if (!getManualTargetStatesUseCase().isEnabled(ManualRevertTarget.Shizuku)) {
+                shizukuStartTracker.beginOverlay(OverlayStart.Hide)
+
+                val started = try {
+                    setManualTargetUseCase(ManualRevertTarget.Shizuku, enabled = true)
+                } finally {
+                    shizukuStartTracker.endOverlay(OverlayStart.Hide)
+                }
+
+                if (!started) return@withContext AppSettingsResult.OverlayFailure
+            }
+
+            val hidden = withContext(NonCancellable) {
+                setManualTargetUseCase(
+                    target = ManualRevertTarget.DisplayOverOtherApps,
+                    enabled = false,
+                )
+            }
+
+            if (!hidden) return@withContext AppSettingsResult.OverlayFailure
         }
 
         try {

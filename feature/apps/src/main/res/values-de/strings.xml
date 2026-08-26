@@ -49,7 +49,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">Einstellungen ausgeblendet/deaktiviert</string>
     <string name="settings_manager_configure_revert">Festlegen, was beim Wiederherstellen eingeblendet wird</string>
-    <string name="settings_manager_accessibility_unmanaged">Derzeit werden von der IMD-App keine Bedienungshilfen-Dienste verwaltet</string>
     <string name="applied_settings_failure">Einstellungen konnten nicht angewendet werden</string>
     <string name="applied_settings_invalid">Diese App hat Einstellungen mit ungültigen Werten</string>
     <string name="settings_manager_title">IMD-Dienstmanager</string>
@@ -88,4 +87,14 @@
     <string name="settings_manager_shizuku_failed">Der Shizuku-Dienst konnte beim letzten Versuch nicht gestartet werden. Prüfe bitte die Einstellungen der Shizuku-App und die Shizuku-Konfiguration in IMD</string>
     <string name="settings_manager_shizuku_failed_open">Warum der Shizuku-Dienst nicht gestartet wurde</string>
     <string name="understood">Verstanden</string>
+    <string name="overlay_failure_title">Die Berechtigung Über anderen Apps einblenden konnte mit Shizuku nicht geändert werden</string>
+    <string name="overlay_failure_check">Bitte stellen Sie sicher:</string>
+    <string name="overlay_failure_point_permission">IMD wurde die Shizuku-Berechtigung erteilt</string>
+    <string name="overlay_failure_point_configuration">Prüfen Sie Ihre Shizuku-Konfiguration in den Einstellungen der IMD-App erneut</string>
+    <string name="shizuku_starting_to_hide_overlay">Shizuku-Dienst wird gestartet, um die Berechtigung Über anderen Apps einblenden auszublenden</string>
+    <string name="revert_display_over_other_apps">Über anderen Apps einblenden</string>
+    <string name="settings_manager_overlay_restore_failed">Die Berechtigung Über anderen Apps einblenden konnte mit Shizuku nicht wiederhergestellt werden. Bitte starten Sie den Shizuku-Dienst manuell in der Shizuku-App und versuchen Sie es erneut</string>
+    <string name="settings_manager_overlay_restore_failed_open">Warum Über anderen Apps einblenden nicht wiederhergestellt wurde</string>
+    <string name="shizuku_starting_to_restore_overlay">Shizuku-Dienst wird gestartet, um die Berechtigung Über anderen Apps einblenden wiederherzustellen</string>
+    <string name="settings_manager_overlay_note">es werden nur die in den IMD-Einstellungen ausgewählten Apps verwaltet</string>
 </resources>

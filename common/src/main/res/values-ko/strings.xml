@@ -35,4 +35,10 @@
 
     <string name="revert_to_default_toast">기본값으로 되돌리기</string>
     <string name="revert_from_memory_toast">메모리로 되돌리기</string>
+    <string name="revert_failed_shizuku_toast">Shizuku 서비스를 다시 시작하지 못했습니다</string>
+    <string name="revert_failed_overlay_toast">Shizuku로 다른 앱 위에 표시 권한을 복원하지 못했습니다. 알림을 확인하세요</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">Shizuku 서비스와 다른 앱 위에 표시 권한을 복원하지 못했습니다</string>
+    <string name="settings_hidden_toast">설정이 숨겨졌습니다</string>
+    <string name="auto_revert_to_default_toast">기본값으로 자동 되돌림</string>
+    <string name="auto_revert_from_memory_toast">Memory function으로 자동 되돌림</string>
 </resources>

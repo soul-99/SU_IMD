@@ -18,4 +18,8 @@
 <resources>
     <string name="revert_using_memory">Rétablir depuis la mémoire</string>
     <string name="revert_to_default">Rétablir par défaut</string>
+    <string name="overlay_restore_failed_title">Échec du rétablissement</string>
+    <string name="overlay_restore_failed_text">Impossible de restaurer l\'autorisation Superposition à d\'autres applis via Shizuku. Activez le service Shizuku manuellement, puis appuyez sur le bouton ci-dessous</string>
+    <string name="overlay_restore_retry">Réessayer</string>
+    <string name="alert_notification_channel">Échecs de rétablissement</string>
 </resources>

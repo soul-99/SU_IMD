@@ -35,4 +35,10 @@
 
     <string name="revert_to_default_toast">डिफ़ॉल्ट पर वापस लाएँ</string>
     <string name="revert_from_memory_toast">मेमोरी से वापस लाएँ</string>
+    <string name="revert_failed_shizuku_toast">Shizuku सेवा फिर से शुरू नहीं की जा सकी</string>
+    <string name="revert_failed_overlay_toast">Shizuku की मदद से दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस नहीं दी जा सकी, सूचना देखें</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">Shizuku सेवा और दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमतियाँ वापस नहीं की जा सकीं</string>
+    <string name="settings_hidden_toast">सेटिंग्स छिपाई गईं</string>
+    <string name="auto_revert_to_default_toast">अपने आप डिफ़ॉल्ट पर रिवर्ट</string>
+    <string name="auto_revert_from_memory_toast">मेमोरी फ़ंक्शन से अपने आप रिवर्ट</string>
 </resources>

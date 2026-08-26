@@ -55,6 +55,8 @@ import com.android.geto.domain.model.LauncherAppsActivityInfoData
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
+import com.android.geto.feature.apps.dialog.OverlayFailureDialog
+import com.android.geto.feature.apps.dialog.ShizukuStartingDialog
 import com.android.geto.feature.apps.dialog.SortLauncherAppsActivityInfoDialog
 import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
 import kotlinx.coroutines.FlowPreview
@@ -80,17 +82,32 @@ internal fun AppsRoute(
 
     var notConfigured by rememberSaveable { mutableStateOf(false) }
 
+    var overlayFailure by rememberSaveable { mutableStateOf(false) }
+
+    // Survives the launch that raised it: the wait runs in a NonCancellable scope
+    // that outlives this composition, and the spinner has to still be there when it
+    // returns.
+    val overlayStart by viewModel.overlayStart
+        .collectAsStateWithLifecycle(initialValue = null)
+
     var shortcutFor by remember { mutableStateOf<LauncherAppsActivityInfo?>(null) }
 
     ApplyThenLaunchEffect(
         appLaunch = appLaunch,
         snackbarHostState = snackbarHostState,
         onNotConfigured = { notConfigured = true },
+        onOverlayFailure = { overlayFailure = true },
         onConsumed = viewModel::consumeAppLaunch,
     )
 
     if (notConfigured) {
         NotConfiguredDialog(onDismissRequest = { notConfigured = false })
+    }
+
+    overlayStart?.let { ShizukuStartingDialog(reason = it) }
+
+    if (overlayFailure) {
+        OverlayFailureDialog(onDismissRequest = { overlayFailure = false })
     }
 
     shortcutFor?.let { info ->

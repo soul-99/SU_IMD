@@ -31,6 +31,7 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.android.geto.framework.notificationmanager.R as notificationR
 
 @HiltAndroidApp
 class GetoApplication : Application() {
@@ -82,6 +83,16 @@ class GetoApplication : Application() {
                 channelId = AndroidNotificationManagerWrapper.NOTIFICATION_CHANNEL_ID,
                 name = getString(R.string.app_name),
                 importance = NotificationManager.IMPORTANCE_DEFAULT,
+            )
+
+            // Separate and louder, for failures that leave the device changed in a way the
+            // user cannot see. Registering it here rather than on first use means the channel
+            // exists in system settings before anything has gone wrong, so it can be tuned
+            // down in advance by anyone who would rather it did not interrupt.
+            notificationManagerWrapper.createNotificationChannel(
+                channelId = AndroidNotificationManagerWrapper.ALERT_NOTIFICATION_CHANNEL_ID,
+                name = getString(notificationR.string.alert_notification_channel),
+                importance = NotificationManager.IMPORTANCE_HIGH,
             )
         }
     }

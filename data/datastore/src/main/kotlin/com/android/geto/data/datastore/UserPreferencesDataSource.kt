@@ -51,6 +51,7 @@ import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.model.UserData
 import kotlinx.coroutines.flow.map
+import java.security.SecureRandom
 import javax.inject.Inject
 
 class UserPreferencesDataSource @Inject constructor(private val userPreferences: DataStore<UserPreferences>) {
@@ -90,7 +91,16 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
             heldAccessibilityServices = it.heldAccessibilityServicesMap.mapValues { entry ->
                 AccessibilityServicePlan.decode(entry.value)
             },
-            heldOverlayPackages = it.heldOverlayPackagesMap.toMap(),
+            managedOverlayPackages = it.managedOverlayPackagesList.toList(),
+            heldOverlayPackages = it.heldOverlayPackagesByHolderMap.mapValues { entry ->
+                AccessibilityServicePlan.decode(entry.value)
+            },
+            heldOverlayIdentities = it.heldOverlayIdentitiesMap.toMap(),
+            manageOverlay = it.manageOverlay,
+            taskerAuthKey = it.taskerAuthKey,
+            taskerIntegrationEnabled = it.taskerIntegrationEnabled,
+            overlayRestoreFailed = it.overlayRestoreFailed,
+            autoRevertOnReturn = it.autoRevertOnReturn,
             manualRevertTargets = ManualRevertTarget.decode(it.manualRevertTargetsList),
             notificationFunction = it.notificationFunction.asNotificationFunction(),
             revertDefaults = RevertDefaults.decode(it.revertDefaultsList),
@@ -260,11 +270,108 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
         }
     }
 
-    suspend fun updateHeldOverlayPackages(packages: Map<String, String>) {
+    suspend fun updateAutoRevertOnReturn(enabled: Boolean) {
         userPreferences.updateData {
             it.copy {
-                heldOverlayPackages.clear()
-                heldOverlayPackages.putAll(packages)
+                autoRevertOnReturn = enabled
+            }
+        }
+    }
+
+    suspend fun updateManageOverlay(enabled: Boolean) {
+        userPreferences.updateData {
+            it.copy {
+                manageOverlay = enabled
+            }
+        }
+    }
+
+    /**
+     * Writes a key only if there is not one already, and returns whichever key now stands.
+     *
+     * Generate-if-absent rather than generate-on-open so the value is stable: the integration
+     * screen can be opened any number of times and the macros set up against the first key go
+     * on working. Done inside updateData so two screens opening at once cannot race two keys
+     * into existence.
+     */
+    suspend fun ensureTaskerAuthKey(): String {
+        var key = ""
+
+        userPreferences.updateData {
+            it.copy {
+                if (taskerAuthKey.isBlank()) taskerAuthKey = newTaskerAuthKey()
+
+                key = taskerAuthKey
+            }
+        }
+
+        return key
+    }
+
+    /**
+     * Turns the integration on or off, and makes sure a key exists when turning it on, so a
+     * user who flips the switch without opening the screen still has something for a broadcast
+     * to match against.
+     */
+    suspend fun updateTaskerIntegrationEnabled(enabled: Boolean) {
+        userPreferences.updateData {
+            it.copy {
+                taskerIntegrationEnabled = enabled
+
+                if (enabled && taskerAuthKey.isBlank()) taskerAuthKey = newTaskerAuthKey()
+            }
+        }
+    }
+
+    /** Replaces the key with a fresh one, which is what retires every macro built on the old. */
+    suspend fun refreshTaskerAuthKey(): String {
+        val key = newTaskerAuthKey()
+
+        userPreferences.updateData {
+            it.copy {
+                taskerAuthKey = key
+            }
+        }
+
+        return key
+    }
+
+    suspend fun updateOverlayRestoreFailed(failed: Boolean) {
+        userPreferences.updateData {
+            it.copy {
+                overlayRestoreFailed = failed
+            }
+        }
+    }
+
+    suspend fun updateManagedOverlayPackages(packages: List<String>) {
+        userPreferences.updateData {
+            it.copy {
+                managedOverlayPackages.clear()
+                managedOverlayPackages.addAll(packages.distinct())
+            }
+        }
+    }
+
+    /**
+     * The debt and the identities it was taken with, written together.
+     *
+     * One write rather than two, because a restore reads both and a process death between
+     * them would leave a package recorded as held with no identity to check it against.
+     */
+    suspend fun updateHeldOverlayPackages(
+        held: Map<String, List<String>>,
+        identities: Map<String, String>,
+    ) {
+        userPreferences.updateData {
+            it.copy {
+                heldOverlayPackagesByHolder.clear()
+                heldOverlayPackagesByHolder.putAll(
+                    held.mapValues { entry -> AccessibilityServicePlan.encode(entry.value) },
+                )
+
+                heldOverlayIdentities.clear()
+                heldOverlayIdentities.putAll(identities)
             }
         }
     }
@@ -354,4 +461,20 @@ class UserPreferencesDataSource @Inject constructor(private val userPreferences:
             }
         }
     }
+}
+
+/**
+ * A fresh Tasker auth key: 128 bits of SecureRandom as lower-case hex.
+ *
+ * SecureRandom rather than UUID.randomUUID() or Random, because this is the only thing
+ * standing between the exported receiver and any app that sends its broadcast, so it must not
+ * be guessable. Hex rather than Base64 so it survives being copied into a text field and
+ * typed back without a stray + or / being mangled.
+ */
+private fun newTaskerAuthKey(): String {
+    val bytes = ByteArray(16)
+
+    SecureRandom().nextBytes(bytes)
+
+    return bytes.joinToString("") { "%02x".format(it) }
 }

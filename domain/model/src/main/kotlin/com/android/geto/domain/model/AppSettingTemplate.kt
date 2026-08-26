@@ -20,6 +20,13 @@ package com.android.geto.domain.model
 data class AppSettingTemplate(
     val settingType: SettingType,
     val label: String,
+    /**
+     * The small print under the label, for a template whose label cannot say everything.
+     *
+     * Null for every template that is a plain settings write, which is most of them. Present
+     * where using the template depends on something outside the app being set up first.
+     */
+    val description: String? = null,
     val key: String,
     val valueOnLaunch: String,
     val valueOnRevert: String,

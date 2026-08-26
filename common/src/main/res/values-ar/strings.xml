@@ -39,4 +39,10 @@
 
     <string name="revert_to_default_toast">استعادة الوضع الافتراضي</string>
     <string name="revert_from_memory_toast">استعادة من الذاكرة</string>
+    <string name="revert_failed_shizuku_toast">تعذّرت إعادة تشغيل خدمة Shizuku</string>
+    <string name="revert_failed_overlay_toast">تعذّرت استعادة إذن العرض فوق التطبيقات الأخرى باستخدام Shizuku، راجع الإشعار</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">تعذّرت استعادة خدمة Shizuku وأذونات العرض فوق التطبيقات الأخرى</string>
+    <string name="settings_hidden_toast">تم إخفاء الإعدادات</string>
+    <string name="auto_revert_to_default_toast">استعادة تلقائية إلى الإعداد الافتراضي</string>
+    <string name="auto_revert_from_memory_toast">استعادة تلقائية باستخدام Memory function</string>
 </resources>

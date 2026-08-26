@@ -19,7 +19,13 @@
     <string name="settings">设置</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">打开银行类和其他受限应用时，不必每次都手动关闭开发者选项、USB 调试或无障碍服务。选择一个应用，指定它运行时应更改哪些设置，本应用会在用完之后把一切恢复原样。</string>
+    <string name="setup_purpose">打开银行等受限应用，无需每次手动开关这些设置：
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. 显示在其他应用的上层（需要 Shizuku 服务正在运行）
+5. Shizuku 服务
+6. 以及更多（需要你用应用的 Memory function 手动配置，提示：可以借助 Settings observer）</string>
     <string name="setup_step">第 %1$d 步</string>
     <string name="setup_granted">已授予</string>
     <string name="setup_not_granted">未授予</string>
@@ -45,7 +51,7 @@
     <string name="setup_shizuku_not_running">未找到 Shizuku 服务。请先启动 Shizuku，然后重试。</string>
     <string name="setup_shizuku_denied">Shizuku 拒绝了请求。请在 Shizuku 中允许本应用后重试。如果您之前选择了「拒绝并不再询问」，请先在 Shizuku 的应用列表中清除该记录。</string>
     <string name="setup_shizuku_failed">Shizuku 无法执行该命令。请改用 ADB 命令。</string>
-    <string name="setup_shizuku_once">免责声明：只有这一次授权才需要 Shizuku。该权限在重启后依然有效，因此之后您可以停止或卸载 Shizuku，除非您还想使用「设置」中可选的「重启 Shizuku 服务」功能，那项功能之后会再次用到它。</string>
+    <string name="setup_shizuku_once">免责声明：Shizuku 只在这一次授权时需要。该权限重启后依然有效，因此之后你可以停止或卸载 Shizuku - 除非你还想隐藏“显示在其他应用的上层”权限，那会每次都用到 Shizuku 服务。</string>
     <string name="setup_shizuku_once_extra">如果您为了配置 Shizuku 而开启了调试和开发者选项，现在也可以把它们关闭；设置成功后，本应用两者都不需要。</string>
     <string name="setup_secure_settings_adb">使用电脑：启用 USB 调试 → 把手机连接到运行 ADB shell 终端的电脑 → 运行上面的命令。</string>
     <string name="setup_secure_settings_shizuku">无需电脑（推荐）：\n1. 安装并配置 Shizuku 应用，启动 Shizuku 服务\n2. 点击上面的「使用 Shizuku」按钮\n3. 出现提示时点击「允许」。</string>
@@ -65,4 +71,12 @@
     <string name="setup_blocked">这两个步骤都是必需的。没有它们，本应用无法更改或还原任何一项设置。</string>
     <string name="setup_copied">已复制</string>
     <string name="setup_open_settings_failed">无法在此设备上打开设置</string>
+    <string name="setup_name_display_over_other_apps">显示在其他应用的上层</string>
+    <string name="setup_how_title">工作原理</string>
+    <string name="setup_how_off">IMD 关闭这些设置</string>
+    <string name="setup_how_off_note">不会破坏任何应用的安全策略</string>
+    <string name="setup_how_use">你使用自己的应用</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">IMD 再把这些设置重新打开</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

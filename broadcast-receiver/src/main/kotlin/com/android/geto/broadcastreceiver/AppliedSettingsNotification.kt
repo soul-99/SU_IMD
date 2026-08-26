@@ -52,13 +52,16 @@ fun buildAppliedSettingsNotification(
     contentTitle: String,
     contentText: String,
 ): Notification {
-    val revertIntent = Intent(context, RevertSettingsBroadcastReceiver::class.java).apply {
+    // Opens the trampoline rather than firing the broadcast directly. It cancels this
+    // notification at once and collapses the shade - which a broadcast action cannot - then
+    // hands the same action and extras to the receiver that still does the revert.
+    val revertIntent = Intent(context, RevertTrampolineActivity::class.java).apply {
         action = ACTION_REVERT_SETTINGS
         putExtra(NOTIFICATION_EXTRA_COMPONENT_NAME, componentName)
         putExtra(NOTIFICATION_EXTRA_NOTIFICATION_ID, notificationId)
     }
 
-    val revertPendingIntent = PendingIntent.getBroadcast(
+    val revertPendingIntent = PendingIntent.getActivity(
         context,
         notificationId,
         revertIntent,

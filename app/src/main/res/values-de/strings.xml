@@ -15,7 +15,13 @@
     <string name="settings">Einstellungen</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Öffne Banking-Apps und andere abgeschottete Apps, ohne jedes Mal von Hand die Entwickleroptionen, das USB-Debugging oder deine Bedienungshilfen-Dienste auszuschalten. Wähle eine App, lege fest, was sich während ihrer Laufzeit ändern soll, und diese App stellt danach alles wieder her.</string>
+    <string name="setup_purpose">Öffnen Sie Banking-Apps und andere eingeschränkte Apps, ohne diese Einstellungen jedes Mal von Hand ein- und auszuschalten:
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. Über anderen Apps einblenden (erfordert einen laufenden Shizuku-Dienst)
+5. Shizuku-Dienst
+6. und viele weitere (die müssen Sie mit der Memory function der App selbst einrichten, Tipp: der Settings observer hilft dabei)</string>
     <string name="setup_step">Schritt %1$d</string>
     <string name="setup_granted">Erteilt</string>
     <string name="setup_not_granted">Nicht erteilt</string>
@@ -41,7 +47,7 @@
     <string name="setup_shizuku_not_running">Kein Shizuku-Dienst gefunden. Starte Shizuku und versuche es erneut.</string>
     <string name="setup_shizuku_denied">Shizuku hat abgelehnt. Erlaube diese App in Shizuku und versuche es erneut. Wenn du „Ablehnen und nicht mehr fragen“ gewählt hast, entferne sie zuerst aus Shizukus App-Liste.</string>
     <string name="setup_shizuku_failed">Shizuku konnte den Befehl nicht ausführen. Nutze stattdessen den ADB-Befehl.</string>
-    <string name="setup_shizuku_once">Hinweis: Shizuku wird nur für diese eine Berechtigung benötigt. Die Berechtigung bleibt nach Neustarts erhalten, du kannst Shizuku danach also beenden oder deinstallieren. Eine Ausnahme: Du möchtest die optionale Funktion „Shizuku-Dienst neu starten“ in den Einstellungen nutzen, die Shizuku später erneut verwendet.</string>
+    <string name="setup_shizuku_once">Hinweis: Shizuku wird nur für diese eine Erteilung benötigt. Die Berechtigung bleibt über Neustarts hinweg erhalten, Sie können Shizuku danach also beenden oder deinstallieren - es sei denn, Sie möchten auch die Berechtigung Über anderen Apps einblenden ausblenden, wofür jedes Mal der Shizuku-Dienst gebraucht wird.</string>
     <string name="setup_shizuku_once_extra">Wenn du Debugging und Entwickleroptionen nur für die Einrichtung von Shizuku aktiviert hast, kannst du beides wieder ausschalten. Nach erfolgreicher Einrichtung braucht diese App keines von beiden.</string>
     <string name="setup_secure_settings_adb">Mit PC: USB-Debugging aktivieren → Telefon mit einem PC verbinden, auf dem ein ADB-Shell-Terminal läuft → den obigen Befehl ausführen.</string>
     <string name="setup_secure_settings_shizuku">Ohne PC (empfohlen):\n1. Shizuku-App installieren und einrichten, Shizuku-Dienst starten\n2. Oben auf die Schaltfläche „Shizuku verwenden“ tippen\n3. Bei der Abfrage auf „Zulassen“ tippen.</string>
@@ -61,4 +67,12 @@
     <string name="setup_blocked">Beide Schritte sind erforderlich. Ohne sie kann die App keine einzige Einstellung ändern oder wiederherstellen.</string>
     <string name="setup_copied">Kopiert</string>
     <string name="setup_open_settings_failed">Einstellungen konnten auf diesem Gerät nicht geöffnet werden</string>
+    <string name="setup_name_display_over_other_apps">Über anderen Apps einblenden</string>
+    <string name="setup_how_title">So funktioniert es</string>
+    <string name="setup_how_off">IMD schaltet diese Einstellungen aus</string>
+    <string name="setup_how_off_note">Keine Sicherheitsrichtlinie einer App wird gebrochen</string>
+    <string name="setup_how_use">Sie nutzen Ihre App</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">IMD schaltet diese Einstellungen wieder ein</string>
+    <string name="setup_how_number">%1$d.</string>
 </resources>

@@ -19,4 +19,8 @@
     <!-- Brazilian Portuguese. Machine translation, reviewed for consistency of terminology. -->
     <string name="revert_using_memory">Reverter usando a memória</string>
     <string name="revert_to_default">Reverter para o padrão</string>
+    <string name="overlay_restore_failed_title">Falha na reversão</string>
+    <string name="overlay_restore_failed_text">Não foi possível restaurar a permissão Sobreposição a outros apps usando o Shizuku. Ative o serviço Shizuku manualmente e toque no botão abaixo</string>
+    <string name="overlay_restore_retry">Tentar novamente</string>
+    <string name="alert_notification_channel">Falhas na reversão</string>
 </resources>

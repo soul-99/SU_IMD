@@ -26,6 +26,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,11 +35,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +56,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -65,6 +69,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -76,6 +81,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -90,6 +96,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.android.geto.common.AppLocale
 import com.android.geto.common.ProjectLinks
+import com.android.geto.common.SettingsChangeLog
 import com.android.geto.common.openObtainium
 import com.android.geto.common.openProjectUri
 import com.android.geto.designsystem.component.DialogContainer
@@ -100,16 +107,25 @@ import com.android.geto.domain.model.AccessibilityServiceData
 import com.android.geto.domain.model.InstalledAppData
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.OverlayPackageData
 import com.android.geto.domain.model.ShizukuForkDefaults
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.model.isShizukuConfigured
+import com.android.geto.domain.model.withoutOverlayWhenUnmanaged
 import com.android.geto.feature.settings.dialog.AccessibilityServicesDialog
+import com.android.geto.feature.settings.dialog.AutoRevertNoticeDialog
 import com.android.geto.feature.settings.dialog.LanguageDialog
+import com.android.geto.feature.settings.dialog.ManageOverlayNoticeDialog
 import com.android.geto.feature.settings.dialog.NotificationFunctionDialog
+import com.android.geto.feature.settings.dialog.OverlayPackagesDialog
+import com.android.geto.feature.settings.dialog.OverlayUnreadableDialog
 import com.android.geto.feature.settings.dialog.RevertDefaultsDialog
+import com.android.geto.feature.settings.dialog.SettingsChangeLogDialog
 import com.android.geto.feature.settings.dialog.SettingsToHideDialog
+import com.android.geto.feature.settings.dialog.SupportDialog
+import com.android.geto.feature.settings.dialog.TaskerIntegrationPage
 import com.android.geto.feature.settings.dialog.ThemeDialog
 import com.android.geto.feature.settings.help.SetupHelpDialog
 import com.android.geto.service.SettingsObserverService
@@ -123,10 +139,15 @@ import com.android.geto.common.R as commonR
 /** How long the Shizuku text fields wait after the last keystroke before persisting. */
 private val COMMIT_DEBOUNCE = 500.milliseconds
 
+/** The dark red the author asked for on the Support button; white text keeps AA contrast on it. */
+private val SUPPORT_BUTTON_COLOUR = Color(0xFFB71C1C)
+
 private const val AUTHOR_LINK_TAG = "author"
-private const val AUTHOR_EMAIL = "utkarshrajput1999@gmail.com"
+private const val AUTHOR_EMAIL = "utkarshrajput@hotmail.com"
 private const val AUTHOR_GITHUB_URL = "https://github.com/soul-99"
+private const val CONTRIBUTOR_GITHUB_URL = "https://github.com/RafayGhafoor"
 private const val GETO_REPOSITORY_URL = "https://github.com/JackEblan/Geto"
+private const val GETO_AUTHOR_GITHUB_URL = "https://github.com/JackEblan"
 private const val LICENCE_URL = "https://www.gnu.org/licenses/gpl-3.0"
 private const val SHIZUKU_THEDJCHI_URL = "https://github.com/thedjchi/Shizuku/releases"
 private const val SHIZUKU_SHEVERY_URL = "https://github.com/HmnDev-Tech/shevery/releases"
@@ -142,6 +163,8 @@ internal fun SettingsRoute(
 
     val accessibilityServices by viewModel.accessibilityServices.collectAsStateWithLifecycle()
 
+    val overlayPackages by viewModel.overlayPackages.collectAsStateWithLifecycle()
+
     val installedApps by viewModel.installedApps.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -153,19 +176,27 @@ internal fun SettingsRoute(
         settingsUiState = settingsUiState,
         isServiceRunning = isServiceRunning,
         accessibilityServices = accessibilityServices,
+        overlayPackages = overlayPackages,
         installedApps = installedApps,
         onUpdateTheme = viewModel::updateTheme,
         onUpdateDynamicTheme = viewModel::updateDynamicTheme,
         onUpdateRestartShizuku = viewModel::updateRestartShizuku,
+        onUpdateManageOverlay = viewModel::updateManageOverlay,
+        onEnsureTaskerAuthKey = viewModel::ensureTaskerAuthKey,
+        onRefreshTaskerAuthKey = viewModel::refreshTaskerAuthKey,
+        onUpdateTaskerIntegrationEnabled = viewModel::updateTaskerIntegrationEnabled,
+        onUpdateAutoRevertOnReturn = viewModel::updateAutoRevertOnReturn,
         onUpdateShizukuForkMode = viewModel::updateShizukuForkMode,
         onUpdateShizukuAuthKey = viewModel::updateShizukuAuthKey,
         onUpdateShizukuPackageName = viewModel::updateShizukuPackageName,
         onUpdateShizukuStartAction = viewModel::updateShizukuStartAction,
         onUpdateManagedAccessibilityServices = viewModel::updateManagedAccessibilityServices,
+        onUpdateManagedOverlayPackages = viewModel::updateManagedOverlayPackages,
         onUpdateNotificationFunction = viewModel::updateNotificationFunction,
         onUpdateRevertDefaults = viewModel::updateRevertDefaults,
         onUpdateSettingsToHide = viewModel::updateSettingsToHide,
         onRefreshAccessibilityServices = viewModel::refreshAccessibilityServices,
+        onRefreshOverlayPackages = viewModel::refreshOverlayPackages,
         onRefreshInstalledApps = viewModel::refreshInstalledApps,
     )
 }
@@ -177,19 +208,27 @@ internal fun SettingsScreen(
     settingsUiState: SettingsUiState,
     isServiceRunning: Boolean,
     accessibilityServices: List<AccessibilityServiceData>,
+    overlayPackages: List<OverlayPackageData>?,
     installedApps: List<InstalledAppData>,
     onUpdateTheme: (Theme) -> Unit,
     onUpdateDynamicTheme: (Boolean) -> Unit,
     onUpdateRestartShizuku: (Boolean) -> Unit,
+    onUpdateManageOverlay: (Boolean) -> Unit,
+    onEnsureTaskerAuthKey: () -> Unit,
+    onRefreshTaskerAuthKey: () -> Unit,
+    onUpdateTaskerIntegrationEnabled: (Boolean) -> Unit,
+    onUpdateAutoRevertOnReturn: (Boolean) -> Unit,
     onUpdateShizukuForkMode: (ShizukuForkMode) -> Unit,
     onUpdateShizukuAuthKey: (String) -> Unit,
     onUpdateShizukuPackageName: (String) -> Unit,
     onUpdateShizukuStartAction: (String) -> Unit,
     onUpdateManagedAccessibilityServices: (List<String>) -> Unit,
+    onUpdateManagedOverlayPackages: (List<String>) -> Unit,
     onUpdateNotificationFunction: (NotificationFunction) -> Unit,
     onUpdateRevertDefaults: (Map<ManualRevertTarget, Boolean>) -> Unit,
     onUpdateSettingsToHide: (Map<ManualRevertTarget, Boolean>) -> Unit,
     onRefreshAccessibilityServices: () -> Unit,
+    onRefreshOverlayPackages: () -> Unit,
     onRefreshInstalledApps: () -> Unit,
 ) {
     // The scroll modifier lives on the content column rather than here: a Box that scrolls
@@ -206,19 +245,27 @@ internal fun SettingsScreen(
                     userData = settingsUiState.userData,
                     isServiceRunning = isServiceRunning,
                     accessibilityServices = accessibilityServices,
+                    overlayPackages = overlayPackages,
                     installedApps = installedApps,
                     onUpdateDynamicTheme = onUpdateDynamicTheme,
                     onUpdateTheme = onUpdateTheme,
                     onUpdateRestartShizuku = onUpdateRestartShizuku,
-                        onUpdateShizukuForkMode = onUpdateShizukuForkMode,
+                    onUpdateManageOverlay = onUpdateManageOverlay,
+                    onEnsureTaskerAuthKey = onEnsureTaskerAuthKey,
+                    onRefreshTaskerAuthKey = onRefreshTaskerAuthKey,
+                    onUpdateTaskerIntegrationEnabled = onUpdateTaskerIntegrationEnabled,
+                    onUpdateAutoRevertOnReturn = onUpdateAutoRevertOnReturn,
+                    onUpdateShizukuForkMode = onUpdateShizukuForkMode,
                     onUpdateShizukuAuthKey = onUpdateShizukuAuthKey,
                     onUpdateShizukuPackageName = onUpdateShizukuPackageName,
                     onUpdateShizukuStartAction = onUpdateShizukuStartAction,
                     onUpdateManagedAccessibilityServices = onUpdateManagedAccessibilityServices,
+                    onUpdateManagedOverlayPackages = onUpdateManagedOverlayPackages,
                     onUpdateNotificationFunction = onUpdateNotificationFunction,
                     onUpdateRevertDefaults = onUpdateRevertDefaults,
                     onUpdateSettingsToHide = onUpdateSettingsToHide,
                     onRefreshAccessibilityServices = onRefreshAccessibilityServices,
+                    onRefreshOverlayPackages = onRefreshOverlayPackages,
                     onRefreshInstalledApps = onRefreshInstalledApps,
                 )
             }
@@ -232,19 +279,27 @@ private fun Success(
     userData: UserData,
     isServiceRunning: Boolean,
     accessibilityServices: List<AccessibilityServiceData>,
+    overlayPackages: List<OverlayPackageData>?,
     installedApps: List<InstalledAppData>,
     onUpdateDynamicTheme: (Boolean) -> Unit,
     onUpdateTheme: (Theme) -> Unit,
     onUpdateRestartShizuku: (Boolean) -> Unit,
+    onUpdateManageOverlay: (Boolean) -> Unit,
+    onEnsureTaskerAuthKey: () -> Unit,
+    onRefreshTaskerAuthKey: () -> Unit,
+    onUpdateTaskerIntegrationEnabled: (Boolean) -> Unit,
+    onUpdateAutoRevertOnReturn: (Boolean) -> Unit,
     onUpdateShizukuForkMode: (ShizukuForkMode) -> Unit,
     onUpdateShizukuAuthKey: (String) -> Unit,
     onUpdateShizukuPackageName: (String) -> Unit,
     onUpdateShizukuStartAction: (String) -> Unit,
     onUpdateManagedAccessibilityServices: (List<String>) -> Unit,
+    onUpdateManagedOverlayPackages: (List<String>) -> Unit,
     onUpdateNotificationFunction: (NotificationFunction) -> Unit,
     onUpdateRevertDefaults: (Map<ManualRevertTarget, Boolean>) -> Unit,
     onUpdateSettingsToHide: (Map<ManualRevertTarget, Boolean>) -> Unit,
     onRefreshAccessibilityServices: () -> Unit,
+    onRefreshOverlayPackages: () -> Unit,
     onRefreshInstalledApps: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -259,6 +314,8 @@ private fun Success(
     var languageTag by remember { mutableStateOf(AppLocale.stored(context)) }
 
     var showAccessibilityServicesDialog by remember { mutableStateOf(false) }
+
+    var showOverlayPackagesDialog by remember { mutableStateOf(false) }
 
     var showNotificationFunctionDialog by remember { mutableStateOf(false) }
 
@@ -275,6 +332,28 @@ private fun Success(
     }
 
     var showSettingsToHideDialog by remember { mutableStateOf(false) }
+
+    var showSettingsLog by remember { mutableStateOf(false) }
+
+    var showAutoRevertNotice by remember { mutableStateOf(false) }
+
+    var showManageOverlayNotice by remember { mutableStateOf(false) }
+
+    var showTaskerIntegration by remember { mutableStateOf(false) }
+
+    // What the two configuration dialogs show and count. The overlay row is absent from
+    // both until overlay management is switched on in Advanced, and the "x of y" summaries
+    // have to agree with them - a summary reading "3 of 5" beside a dialog listing four
+    // rows is the sort of mismatch that reads as a lost setting.
+    val hideStates = userData.settingsToHide.withoutOverlayWhenUnmanaged(userData.manageOverlay)
+
+    val revertStates = userData.revertDefaults
+        .withoutOverlayWhenUnmanaged(userData.manageOverlay)
+
+    // Read straight from the shared log rather than through the ViewModel: the writer is a
+    // foreground service in another module with no repository of its own, and this is the
+    // same arrangement SettingsObservationGate already uses for the running flag.
+    val settingsLog by SettingsChangeLog.entries.collectAsStateWithLifecycle()
 
     var selectedTheme by remember { mutableIntStateOf(Theme.entries.indexOf(userData.theme)) }
 
@@ -332,8 +411,8 @@ private fun Success(
                 title = stringResource(R.string.settings_to_hide),
                 subtitle = stringResource(
                     R.string.settings_to_hide_summary,
-                    userData.settingsToHide.count { it.value },
-                    userData.settingsToHide.size,
+                    hideStates.count { it.value },
+                    hideStates.size,
                 ),
                 onClick = { showSettingsToHideDialog = true },
             )
@@ -345,8 +424,8 @@ private fun Success(
                 title = stringResource(R.string.revert_defaults_entry),
                 subtitle = stringResource(
                     R.string.revert_defaults_summary,
-                    userData.revertDefaults.count { it.value },
-                    userData.revertDefaults.size,
+                    revertStates.count { it.value },
+                    revertStates.size,
                 ),
                 onClick = { showRevertDefaultsDialog = true },
             )
@@ -367,6 +446,28 @@ private fun Success(
                     showAccessibilityServicesDialog = true
                 },
             )
+
+            // The same row for overlay access, and it opens the same way. The difference is
+            // that this list can only be read through a running Shizuku, so the refresh has
+            // to land before anything can be shown - see the dialog below.
+            //
+            // Present only once overlay management has been switched on in Advanced, along
+            // with the overlay rows inside the two dialogs above. All three are what that
+            // switch's notice asks the user to come here and fill in.
+            if (userData.manageOverlay) {
+                SettingsColumn(
+                    title = stringResource(R.string.overlay_packages),
+                    subtitle = overlayPackagesSubtitle(
+                        overlayPackages = overlayPackages,
+                        managed = userData.managedOverlayPackages,
+                    ),
+                    onClick = {
+                        onRefreshOverlayPackages()
+
+                        showOverlayPackagesDialog = true
+                    },
+                )
+            }
         }
 
         CollapsibleSection(
@@ -390,6 +491,45 @@ private fun Success(
             expanded = expanded == SettingsSection.Advanced,
             onToggle = { toggleSection(SettingsSection.Advanced) },
         ) {
+            // First in Advanced, because it is the one switch here that adds and removes
+            // settings elsewhere in this screen: three overlay rows under Default IMD
+            // settings appear and disappear with it. Off by default, since overlay access
+            // is the only thing IMD touches that cannot be written at all without a working
+            // Shizuku service - on a device without one those three rows can only fail.
+            SwitchSetting(
+                title = stringResource(R.string.manage_overlay),
+                subtitle = stringResource(R.string.manage_overlay_subtitle),
+                checked = userData.manageOverlay,
+                onCheckedChange = { wanted ->
+                    onUpdateManageOverlay(wanted)
+
+                    // After the switch moves rather than instead of it, and on every
+                    // switch-on rather than once: there is nothing to agree to here, only
+                    // three rows that have just appeared and do nothing until they are
+                    // filled in.
+                    if (wanted) showManageOverlayNotice = true
+                },
+            )
+
+            // The only setting in the app that changes what happens without anybody
+            // pressing anything - which is why switching it on has to be read and agreed
+            // to rather than just tapped.
+            SwitchSetting(
+                title = stringResource(R.string.auto_revert),
+                subtitle = stringResource(R.string.auto_revert_subtitle),
+                checked = userData.autoRevertOnReturn,
+                onCheckedChange = { wanted ->
+                    // Switching off needs no explanation and takes effect immediately.
+                    // Switching on goes through the notice, and the switch only moves if the
+                    // user says yes to it.
+                    if (wanted) {
+                        showAutoRevertNotice = true
+                    } else {
+                        onUpdateAutoRevertOnReturn(false)
+                    }
+                },
+            )
+
             // Advanced because the recommended answer is the default and nobody has to
             // come here: choosing the memory function means taking on a profile per app,
             // which is the opposite of what Default IMD settings above is for.
@@ -404,26 +544,65 @@ private fun Success(
                 onUpdateRestartShizuku = onUpdateRestartShizuku,
             )
 
+            // Above the observer, because it is the one thing here another app might drive and
+            // so the one most worth finding. Experimental in the title, not as a subtitle, so
+            // the word travels with it wherever the row is read.
+            //
+            // A split row, not a plain one: the text opens the values screen, the switch on the
+            // right turns the whole integration on or off, and a rule between them says they are
+            // two controls rather than one. Off by default - nothing external works until it is
+            // deliberately turned on.
+            SplitToggleSetting(
+                title = stringResource(R.string.tasker_integration),
+                subtitle = stringResource(R.string.tasker_integration_subtitle),
+                checked = userData.taskerIntegrationEnabled,
+                onClick = { showTaskerIntegration = true },
+                onCheckedChange = onUpdateTaskerIntegrationEnabled,
+            )
+
             // A foreground service that watches every settings change. Useful for working
             // out what an app is actually reading, and of no interest to anyone who is not
             // doing that — which is what makes it advanced rather than an app function.
-            SettingsColumn(
+            SwitchSetting(
                 title = stringResource(R.string.settings_observer_service),
                 subtitle = if (isServiceRunning) {
                     stringResource(R.string.stop_service)
                 } else {
                     stringResource(R.string.start_service)
                 },
-                onClick = {
+                checked = isServiceRunning,
+                onCheckedChange = { wanted ->
                     val intent = Intent(context, SettingsObserverService::class.java)
 
-                    if (isServiceRunning) {
-                        context.stopService(intent)
-                    } else {
+                    if (wanted) {
                         ContextCompat.startForegroundService(context, intent)
+                    } else {
+                        context.stopService(intent)
                     }
                 },
             )
+
+            // Directly under the row they belong to, and on one line, because neither is a
+            // setting: they read and empty the record the service above keeps. Text buttons
+            // rather than another SettingsColumn for the same reason - a row that looks like
+            // its neighbours would read as a third thing to switch on.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.Start,
+            ) {
+                TextButton(onClick = { showSettingsLog = true }) {
+                    Text(text = stringResource(R.string.settings_log_view))
+                }
+
+                TextButton(
+                    enabled = settingsLog.isNotEmpty(),
+                    onClick = SettingsChangeLog::clear,
+                ) {
+                    Text(text = stringResource(R.string.settings_log_clear))
+                }
+            }
         }
 
         // Not collapsible, unlike the five above. There is nothing to configure in it, and
@@ -475,6 +654,24 @@ private fun Success(
         )
     }
 
+    if (showOverlayPackagesDialog) {
+        // Null is "could not read", not "nothing to show". The picker opens on a list and the
+        // notice opens on a null, because a picker that opened empty on a device where IMD
+        // simply cannot see would tell the user they have nothing to choose from.
+        val packages = overlayPackages
+
+        if (packages == null) {
+            OverlayUnreadableDialog(onDismissRequest = { showOverlayPackagesDialog = false })
+        } else {
+            OverlayPackagesDialog(
+                overlayPackages = packages,
+                selectedPackages = userData.managedOverlayPackages,
+                onDismissRequest = { showOverlayPackagesDialog = false },
+                onUpdateManagedOverlayPackages = onUpdateManagedOverlayPackages,
+            )
+        }
+    }
+
     if (showAccessibilityServicesDialog) {
         AccessibilityServicesDialog(
             accessibilityServices = accessibilityServices,
@@ -492,9 +689,49 @@ private fun Success(
         )
     }
 
+    if (showAutoRevertNotice) {
+        AutoRevertNoticeDialog(
+            onConfirm = {
+                onUpdateAutoRevertOnReturn(true)
+
+                showAutoRevertNotice = false
+            },
+            onDismissRequest = { showAutoRevertNotice = false },
+        )
+    }
+
+    if (showSettingsLog) {
+        SettingsChangeLogDialog(
+            entries = settingsLog,
+            onClear = SettingsChangeLog::clear,
+            onDismissRequest = { showSettingsLog = false },
+        )
+    }
+
+    if (showManageOverlayNotice) {
+        ManageOverlayNoticeDialog(
+            onDismissRequest = { showManageOverlayNotice = false },
+        )
+    }
+
+    if (showTaskerIntegration) {
+        TaskerIntegrationPage(
+            authKey = userData.taskerAuthKey,
+            notificationFunction = userData.notificationFunction,
+            onEnsureAuthKey = onEnsureTaskerAuthKey,
+            onRefreshAuthKey = onRefreshTaskerAuthKey,
+            onDismissRequest = { showTaskerIntegration = false },
+        )
+    }
+
+    // Both dialogs are handed the stored map rather than the trimmed one above. They decide
+    // for themselves which rows to draw; what they must not do is save back a map with the
+    // overlay entry missing, which would clear a choice made while the feature was on.
     if (showRevertDefaultsDialog) {
         RevertDefaultsDialog(
             states = userData.revertDefaults,
+            shizukuConfigured = userData.isShizukuConfigured,
+            manageOverlay = userData.manageOverlay,
             onDismissRequest = { showRevertDefaultsDialog = false },
             onUpdateRevertDefaults = onUpdateRevertDefaults,
         )
@@ -503,6 +740,8 @@ private fun Success(
     if (showSettingsToHideDialog) {
         SettingsToHideDialog(
             states = userData.settingsToHide,
+            shizukuConfigured = userData.isShizukuConfigured,
+            manageOverlay = userData.manageOverlay,
             onDismissRequest = { showSettingsToHideDialog = false },
             onUpdateSettingsToHide = onUpdateSettingsToHide,
         )
@@ -1031,6 +1270,8 @@ private fun AboutSection(modifier: Modifier = Modifier) {
 
     var showHelp by rememberSaveable { mutableStateOf(false) }
 
+    var showSupport by rememberSaveable { mutableStateOf(false) }
+
     // Every composable read is hoisted out of the builder lambdas: resources and theme
     // colours are resolved once per recomposition rather than once per span.
     val linkStyles = linkStyles()
@@ -1061,12 +1302,43 @@ private fun AboutSection(modifier: Modifier = Modifier) {
         }
     }
 
-    val fork = remember(forkOf, getoApp, linkStyles) {
+    val contributionsLabel = stringResource(R.string.about_contributions)
+
+    val contributorName = stringResource(R.string.about_contributor_name)
+
+    val contributorScope = stringResource(R.string.about_contributor_scope)
+
+    // Just the contributor now, sitting under the "Contributions;" heading rather than after
+    // an inline label. Separators appended here, not typed into the strings: aapt strips
+    // leading and trailing whitespace from an unquoted string resource.
+    val contributorLine = remember(contributorName, contributorScope, linkStyles) {
+        buildAnnotatedString {
+            withLink(LinkAnnotation.Url(url = CONTRIBUTOR_GITHUB_URL, styles = linkStyles)) {
+                append(contributorName)
+            }
+            append(" ")
+            append(contributorScope)
+        }
+    }
+
+    val forkAuthor = stringResource(R.string.about_fork_author)
+
+    val forkBy = stringResource(R.string.about_fork_by)
+
+    // "Fork of Geto by JackEblan (Blanc)" - two links in one line: Geto to its repository,
+    // and the original author's name to his GitHub profile.
+    val fork = remember(forkOf, getoApp, forkBy, forkAuthor, linkStyles) {
         buildAnnotatedString {
             append(forkOf)
             append(" ")
             withLink(LinkAnnotation.Url(url = GETO_REPOSITORY_URL, styles = linkStyles)) {
                 append(getoApp)
+            }
+            append(" ")
+            append(forkBy)
+            append(" ")
+            withLink(LinkAnnotation.Url(url = GETO_AUTHOR_GITHUB_URL, styles = linkStyles)) {
+                append(forkAuthor)
             }
         }
     }
@@ -1124,15 +1396,57 @@ private fun AboutSection(modifier: Modifier = Modifier) {
         // what licence. The gap is what separates the two, since neither has a heading.
         Spacer(modifier = Modifier.height(40.dp))
 
-        Text(text = author, style = MaterialTheme.typography.bodyMedium)
+        // Directly above the author line, because it is that line's ask made loud: the person
+        // who reads "created by soul_99" is exactly the one this is addressed to. A fixed red
+        // rather than a theme colour, at the author's request, with white text so it stays
+        // legible in both light and dark; the heart-hands emoji in the label carries the
+        // intent, so there is no separate icon to double it.
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp),
+            onClick = { showSupport = true },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = SUPPORT_BUTTON_COLOUR,
+                contentColor = Color.White,
+            ),
+        ) {
+            Text(
+                text = stringResource(R.string.support_button),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // A little bigger than the lines under it, so the name a reader is looking for when
+        // they open About is the first thing they land on.
+        Text(text = author, style = MaterialTheme.typography.bodyLarge)
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // "Contributions" is a heading now, with the contributor named on the line below it -
+        // the semicolon is appended here so translations do not each have to remember it.
+        AboutHeading(text = "$contributionsLabel;")
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Text(text = contributorLine, style = MaterialTheme.typography.bodyMedium)
+
+        Spacer(modifier = Modifier.height(14.dp))
 
         Text(text = fork, style = MaterialTheme.typography.bodyMedium)
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        Text(text = licence, style = MaterialTheme.typography.bodyMedium)
+        // The one heading with its content on the same line, because a licence name is a value
+        // more than a paragraph: "License:" then the name, which carries the link.
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AboutHeading(text = stringResource(R.string.about_license_heading))
+
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Text(text = licence, style = MaterialTheme.typography.bodyMedium)
+        }
     }
 
     if (showAuthorDialog) {
@@ -1141,6 +1455,10 @@ private fun AboutSection(modifier: Modifier = Modifier) {
 
     if (showHelp) {
         SetupHelpDialog(onDismissRequest = { showHelp = false })
+    }
+
+    if (showSupport) {
+        SupportDialog(onDismissRequest = { showSupport = false })
     }
 }
 
@@ -1311,6 +1629,21 @@ private fun AuthorDialog(
     }
 }
 
+/** A small heading inside About - "Contributions;" and "License:" - one step below a title. */
+@Composable
+private fun AboutHeading(
+    modifier: Modifier = Modifier,
+    text: String,
+) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+    )
+}
+
 @Composable
 private fun linkStyles(): TextLinkStyles {
     val colour = MaterialTheme.colorScheme.primary
@@ -1424,6 +1757,53 @@ private fun SwitchSetting(
     }
 }
 
+/**
+ * A row split into two controls: the title and subtitle open something on tap, and a switch on
+ * the right toggles a state, with a vertical rule between them so the two do not read as one.
+ *
+ * The Android pattern for a row that both opens a detail screen and has its own on/off - the
+ * old Wi-Fi and Bluetooth rows worked this way. The divider is the whole point: without it a
+ * tap near the switch is a coin toss between opening the screen and flipping the switch.
+ */
+@Composable
+private fun SplitToggleSetting(
+    modifier: Modifier = Modifier,
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onClick: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+        ) {
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(text = subtitle, style = MaterialTheme.typography.bodySmall)
+        }
+
+        VerticalDivider(
+            modifier = Modifier.padding(vertical = 10.dp),
+            color = MaterialTheme.colorScheme.outlineVariant,
+        )
+
+        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Switch(checked = checked, onCheckedChange = onCheckedChange)
+        }
+    }
+}
+
 @Composable
 private fun DynamicThemeSetting(
     modifier: Modifier = Modifier,
@@ -1473,6 +1853,26 @@ private fun accessibilityServicesSubtitle(
         stringResource(R.string.accessibility_services_none_selected, enabledCount)
     } else {
         stringResource(R.string.accessibility_services_selected, managed.size, enabledCount)
+    }
+}
+
+/**
+ * The same subtitle for overlay access, counting what is currently allowed.
+ *
+ * A null list has not been read yet - the row is tapped to read it - so the count falls back
+ * to what IMD already knows it selected rather than showing a zero it has not verified.
+ */
+@Composable
+private fun overlayPackagesSubtitle(
+    overlayPackages: List<OverlayPackageData>?,
+    managed: List<String>,
+): String {
+    val allowedCount = overlayPackages?.count { it.allowed } ?: managed.size
+
+    return if (managed.isEmpty()) {
+        stringResource(R.string.overlay_packages_none_selected, allowedCount)
+    } else {
+        stringResource(R.string.overlay_packages_selected, managed.size, allowedCount)
     }
 }
 

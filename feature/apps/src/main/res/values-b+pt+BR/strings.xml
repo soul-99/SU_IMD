@@ -49,7 +49,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">Configurações ocultadas/desativadas</string>
     <string name="settings_manager_configure_revert">Defina o que o Reverter restaura</string>
-    <string name="settings_manager_accessibility_unmanaged">No momento, nenhum serviço de acessibilidade está sendo gerenciado pelo app IMD</string>
     <string name="applied_settings_failure">Não foi possível aplicar as configurações</string>
     <string name="applied_settings_invalid">Este app tem configurações com valores inválidos</string>
     <string name="settings_manager_title">Gerenciador de serviços do IMD</string>
@@ -88,4 +87,14 @@
     <string name="settings_manager_shizuku_failed">Não foi possível iniciar o serviço do Shizuku na última tentativa; verifique as configurações do app Shizuku e a configuração do Shizuku no IMD</string>
     <string name="settings_manager_shizuku_failed_open">Por que o serviço do Shizuku não iniciou</string>
     <string name="understood">Entendido</string>
+    <string name="overlay_failure_title">Não foi possível alterar a permissão Sobreposição a outros apps usando o Shizuku</string>
+    <string name="overlay_failure_check">Verifique se:</string>
+    <string name="overlay_failure_point_permission">A permissão do Shizuku foi concedida ao IMD</string>
+    <string name="overlay_failure_point_configuration">Revise sua configuração do Shizuku nas configurações do app IMD</string>
+    <string name="shizuku_starting_to_hide_overlay">Iniciando o serviço Shizuku para ocultar a permissão Sobreposição a outros apps</string>
+    <string name="revert_display_over_other_apps">Sobreposição a outros apps</string>
+    <string name="settings_manager_overlay_restore_failed">Falha ao restaurar a permissão Sobreposição a outros apps usando o Shizuku. Inicie o serviço Shizuku manualmente pelo app Shizuku e tente novamente</string>
+    <string name="settings_manager_overlay_restore_failed_open">Por que Sobreposição a outros apps não foi restaurada</string>
+    <string name="shizuku_starting_to_restore_overlay">Iniciando o serviço Shizuku para restaurar a permissão Sobreposição a outros apps</string>
+    <string name="settings_manager_overlay_note">somente os apps selecionados nas configurações do app IMD são gerenciados</string>
 </resources>

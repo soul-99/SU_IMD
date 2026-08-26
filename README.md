@@ -6,12 +6,41 @@
   <img src="docs/screenshots/poster.png" width="100%" alt="Poster: what IMD does, with screenshots of the Favourites tab, creating a shortcut, the IMD services manager, the settings screen and the Quick Settings tiles">
 </p>
 
-Open banking and other locked-down apps without turning developer options, debugging, accessibility services or Shizuku service off-on by hand every single time.
+Open banking and other restricted apps without turning on/ off these settings manually everytime:
 
-Some apps refuse to run or quietly disable parts of themselves when they detect developer options, an ADB connection or an active accessibility service. The usual workaround is to go and switch those things off before opening the app and switch them back on afterwards, every time. IMD does that for you: pick an app, say which settings should change while it runs, and launch it from here. The settings are applied, the app opens, and an ongoing notification with a **Revert** action puts your device back the way it was.
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. Display over other apps (needs active Shizuku service)
+5. Shizuku service
+6. and many more (you need to manually configure them using Memory function of app, hint: use Settings observer to help yourself)
 
-**IMD SERVICES MANAGER** is the other half of that: one dialog showing the live state of developer settings, USB debugging, wireless debugging, your managed accessibility services and the Shizuku service, with a switch on each and a **Revert to default** button at the bottom. 
+#### How this works
+
+```mermaid
+flowchart TD
+    A["IMD turns these settings off<br/><i>no app's security policy is broken</i>"]
+    B["You use your app"]
+    C["IMD turns those settings on again"]
+    A --> B
+    B -- "Revert" --> C
+```
+
+Some apps refuse to run or quietly disable parts of themselves when they detect these settings or services. The usual workaround is to go and switch those things off before opening the app and switch them back on afterwards, every time.
+IMD does that for you: pick an app, say which settings should change while it runs, and launch it from here. The settings are applied, the app opens, and an ongoing notification with a **Revert** action puts your device back the way it was.
+
+#### IMD services manager
+
+<p>
+  <img src="docs/screenshots/services-manager.png" width="320" alt="The IMD services manager dialog over a homescreen, listing Developer settings, USB debugging, Wireless debugging, Accessibility services, Shizuku service and Display over other apps, each with a switch, and a Revert to default button at the bottom">
+</p>
+
+The other half of that: one dialog showing the live state of Developer settings, USB debugging, Wireless debugging, your managed Accessibility services, the Shizuku service and Display over other apps, with a switch on each and a **Revert to default** button at the bottom.
 It opens from a Quick Settings tile, a homescreen shortcut or the Favourites tab — without the app itself having to be open — which is what you reach for when a banking app has just refused to start and you do not want to go hunting through Android's settings to find out why.
+
+#### Tasker / MacroDroid integration (EXPERIMENTAL, secured with auth keys)
+
+Drive IMD from an automation app with an auth key that is random per install and refreshable: open the IMD services manager, Revert to default, Revert using memory, or hide your configured settings and services - all working even when IMD is not running. Set it up under Advanced settings, where every value has a copy button. Off by default, and every trigger is refused until you turn it on.
 
 It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the parts that did not survive real use - Shizuku dying with USB debugging disable, accessibility services that actually never stopped, and a quick re-enable settings button in app.
 
@@ -23,6 +52,7 @@ It is a fork of [Geto](https://github.com/JackEblan/Geto), rebuilt around the pa
 ## About Permissions
 
 * `WRITE_SECURE_SETTINGS` (one time grant via adb shell or Shizuku) (MANDATORY, needed to change settings state)
+* Shizuku service (optional) (needed to hide Display over other apps permissions - an appops permission)
 * Post notifications (optional)
 
 ## Security Concerns
@@ -53,6 +83,28 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 ## Functions
 
 ### Added in this fork
+
+#### v2.0
+
+**New**
+
+- **Hide "Display over other apps"** - for banking apps that refuse to run while another app can draw over them. Needs Shizuku, only the apps you pick are touched, and Revert gives the permission back. _(contribution by [RafayGhafoor](https://github.com/RafayGhafoor))_
+- **Auto Revert on returning** (off by default) - puts your settings back automatically when you return to IMD after launching an app from it.
+- **Tasker / MacroDroid integration** (Experimental) - drive IMD from an automation app (open the services manager, Revert to default, Revert using memory, or hide your settings) with a per-install auth key. Off by default, and works even when IMD is not running.
+- **Settings observer log** - the observer now records which settings an app changed, with View log / Clear log in Settings.
+- **Manage 'Display over other apps'** switch in Advanced - hides every overlay control on a device that has no Shizuku.
+- **Support the project 🫶 (for free)** button in About - a short note and free ways to help.
+
+**Improved**
+
+- A revert always restores everything it can, and a notification reports anything it could not.
+- If "Display over other apps" cannot be hidden on launch, nothing else is changed - the app simply does not open.
+- Only the apps and services you selected are ever touched.
+- Fixed Shizuku start/stop when the fork's app is closed but its service runs, and re-enabling accessibility services from the manager.
+- The notification's **Revert** button now clears it and closes the shade the instant it is pressed; the Shizuku spinner also shows for shortcut launches.
+- The IMD services manager shortcut can be created by any launcher again.
+
+_Under the hood: revert/hide ordering around Shizuku corrected and device state re-read after each start, the start-Shizuku signal resent across its 10-second wait, per-app overlay controls hidden while the feature is off, the About screen re-laid-out, and translations plus the initialisation screen updated._
 
 #### v1.6.8
 
@@ -134,15 +186,32 @@ or, with no PC, tap **Use Shizuku** on the first-run screen and it runs that com
 - Launch app from inside IMD or shortcut with its profile applied, and an ongoing notification carrying the **Revert** action.
 - A settings-observer foreground service.
 
-## Source
+## Support the project 🫶 (for free)
+
+I created this app in my busy schedule of full-time medical residency.
+
+Initially it was born out of my personal needs, but after positive community feedback, I decided to share it with the FOSS community.
+
+**You can do these for free, if you want to support my work and keep this project alive**
+
+I want it to be taken over by a more capable developer in future, as my profession does not allow me to maintain it all year round.
+
+1. Spread the word if you can - it helps the community, and I don't need any credit or mention. [Share the repo »](https://github.com/soul-99/SU_IMD)
+2. ⭐ Star the [GitHub repo](https://github.com/soul-99/SU_IMD) to increase its visibility.
+3. [Report bugs](https://github.com/soul-99/SU_IMD/issues) in the main repo.
+4. Join discussions.
+5. Contribute to the code or docs, if you are a developer.
+
+## Development & Contributions
+
+- **Created by:** [soul_99](https://github.com/soul-99/) (Dr. Utkarsh Rajput)
+- **Contributions:** [RafayGhafoor](https://github.com/RafayGhafoor) (Muhammad Rafay Awan)
+- **Original Project:** [Geto](https://github.com/JackEblan/Geto) by [JackEblan](https://github.com/JackEblan)
+- **License:** (SU) IMD is licensed under the GNU General Public License v3.0, same as the original. See the [license](https://github.com/JackEblan/Geto/blob/master/LICENSE) for more information.
+
+View [SUIMD.md](https://github.com/soul-99/SU_IMD/blob/main/SUIMD.md), which documents how to use the app, and what was changed and why with each version - including the bugs found in the original and the reasoning behind each fix.
 
 This app is a fork of **[Geto](https://github.com/JackEblan/Geto)** by **Jack Eblan**, licensed GPL-3.0. All of the original design and the great majority of the code are his; the additions above are the difference. Full credit for the app this is built on goes to him.
-
-- **Original project:** https://github.com/JackEblan/Geto
-- **This fork:** by soul_99 (Dr. Utkarsh Rajput)
-- **Licence:** [GNU General Public License v3.0](LICENSE) — the same licence as the original, as required.
-
-`SUIMD.md` documents what was changed and why, including the bugs found in the original and the reasoning behind each fix.
 
 ## The future of this fork
 

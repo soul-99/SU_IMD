@@ -427,6 +427,14 @@ private fun AppSettingsLaunchedEffects(
                 onResetApplyAppSettingsResult()
             }
 
+            // Per-app profiles do not touch overlay access, so this cannot arise here; the
+            // generic failure text is still the honest thing to show if it ever does.
+            AppSettingsResult.OverlayFailure -> {
+                snackbarHostState.showSnackbar(message = applyFailure)
+
+                onResetApplyAppSettingsResult()
+            }
+
             AppSettingsResult.NoPermission -> {
                 onShowWriteSecureSettingsDialog()
 
@@ -476,6 +484,12 @@ private fun AppSettingsLaunchedEffects(
             }
 
             AppSettingsResult.Failure -> {
+                snackbarHostState.showSnackbar(message = revertFailure)
+
+                onResetRevertAppSettingsResult()
+            }
+
+            AppSettingsResult.OverlayFailure -> {
                 snackbarHostState.showSnackbar(message = revertFailure)
 
                 onResetRevertAppSettingsResult()

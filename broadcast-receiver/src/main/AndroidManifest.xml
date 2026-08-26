@@ -18,6 +18,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
+        <!--
+          The Revert button's target. Translucent and with no history so it draws nothing and
+          leaves no trace in recents; its whole job is to collapse the shade, which launching
+          an activity does and a broadcast cannot. Not exported - it is only ever reached
+          through this app's own PendingIntent.
+        -->
+        <activity
+            android:name="com.android.geto.broadcastreceiver.RevertTrampolineActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <receiver
             android:name="com.android.geto.broadcastreceiver.RevertSettingsBroadcastReceiver"
             android:exported="false">
@@ -31,6 +45,30 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="ACTION_REVERT_TO_DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.android.geto.broadcastreceiver.OverlayRestoreRetryBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ACTION_RETRY_OVERLAY_RESTORE" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          The Tasker / MacroDroid door. Exported, unlike every receiver above, because it is
+          meant to be reached from another app - that is the feature. The auth key checked
+          inside is what an unexported flag would otherwise be doing. The action strings match
+          TaskerIntegration in domain/model verbatim; change them in both places or neither.
+        -->
+        <receiver
+            android:name="com.android.geto.broadcastreceiver.TaskerIntegrationBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.soul_99.suIMD.tasker.REVERT_TO_DEFAULT" />
+                <action android:name="com.soul_99.suIMD.tasker.REVERT_USING_MEMORY" />
+                <action android:name="com.soul_99.suIMD.tasker.HIDE_SETTINGS" />
             </intent-filter>
         </receiver>
     </application>

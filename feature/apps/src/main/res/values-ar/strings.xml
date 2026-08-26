@@ -50,7 +50,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">تم إخفاء الإعدادات / تعطيلها</string>
     <string name="settings_manager_configure_revert">تحديد ما الذي يستعيده زر الاستعادة</string>
-    <string name="settings_manager_accessibility_unmanaged">لا يدير تطبيق IMD حاليًا أي خدمة من خدمات إمكانية الوصول</string>
     <string name="applied_settings_failure">تعذّر تطبيق الإعدادات</string>
     <string name="applied_settings_invalid">يحتوي هذا التطبيق على إعدادات بقيم غير صالحة</string>
     <string name="settings_manager_title">مدير خدمات IMD</string>
@@ -89,4 +88,14 @@
     <string name="settings_manager_shizuku_failed">تعذّر بدء خدمة Shizuku في المحاولة الأخيرة، يُرجى مراجعة إعدادات تطبيق Shizuku وتهيئة Shizuku داخل IMD</string>
     <string name="settings_manager_shizuku_failed_open">لماذا لم تبدأ خدمة Shizuku</string>
     <string name="understood">فهمت</string>
+    <string name="overlay_failure_title">تعذّر تعديل إذن العرض فوق التطبيقات الأخرى باستخدام Shizuku</string>
+    <string name="overlay_failure_check">يُرجى التأكد من:</string>
+    <string name="overlay_failure_point_permission">أن إذن Shizuku ممنوح لتطبيق IMD</string>
+    <string name="overlay_failure_point_configuration">أعد التحقق من إعداد Shizuku في إعدادات تطبيق IMD</string>
+    <string name="shizuku_starting_to_hide_overlay">جارٍ تشغيل خدمة Shizuku لإخفاء إذن العرض فوق التطبيقات الأخرى</string>
+    <string name="revert_display_over_other_apps">العرض فوق التطبيقات الأخرى</string>
+    <string name="settings_manager_overlay_restore_failed">تعذّرت استعادة إذن العرض فوق التطبيقات الأخرى باستخدام Shizuku. يُرجى تشغيل خدمة Shizuku يدويًا من تطبيق Shizuku ثم المحاولة مرة أخرى</string>
+    <string name="settings_manager_overlay_restore_failed_open">لماذا لم تتم استعادة إذن العرض فوق التطبيقات الأخرى</string>
+    <string name="shizuku_starting_to_restore_overlay">جارٍ تشغيل خدمة Shizuku لاستعادة إذن العرض فوق التطبيقات الأخرى</string>
+    <string name="settings_manager_overlay_note">تُدار التطبيقات المحددة في إعدادات تطبيق IMD فقط</string>
 </resources>

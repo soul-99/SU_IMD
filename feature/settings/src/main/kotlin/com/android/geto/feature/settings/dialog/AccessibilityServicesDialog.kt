@@ -81,7 +81,14 @@ internal fun AccessibilityServicesDialog(
                 style = MaterialTheme.typography.bodySmall,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SystemSettingsButton(
+                text = stringResource(R.string.accessibility_system_settings),
+                intent = accessibilitySettingsIntent(),
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             if (accessibilityServices.isEmpty()) {
                 Text(

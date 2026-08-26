@@ -29,6 +29,17 @@ data class RevertToDefaultResult(
     val changed: Set<ManualRevertTarget> = emptySet(),
     val failed: Set<ManualRevertTarget> = emptySet(),
     val unchanged: Set<ManualRevertTarget> = emptySet(),
+    /**
+     * Whether this run tried to give overlay access back and could not.
+     *
+     * Carried here rather than left to the caller to read back out of stored preferences,
+     * because the caller lives in the broadcast-receiver module and reaching for the
+     * repository from there would drag the whole data layer across a module boundary for one
+     * boolean. It is also narrower than `DisplayOverOtherApps in failed`, which is equally
+     * true of a failed *hide* - and a failed hide needs no notification, because nothing was
+     * taken away that has to be given back.
+     */
+    val overlayRestoreFailed: Boolean = false,
 ) {
     val isSuccess: Boolean get() = failed.isEmpty()
 

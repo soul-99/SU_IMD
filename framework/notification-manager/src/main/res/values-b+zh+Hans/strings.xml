@@ -25,4 +25,8 @@
     -->
     <string name="revert_using_memory">使用记忆还原</string>
     <string name="revert_to_default">还原为默认</string>
+    <string name="overlay_restore_failed_title">还原失败</string>
+    <string name="overlay_restore_failed_text">无法通过 Shizuku 恢复“显示在其他应用的上层”权限，请手动开启 Shizuku 服务，然后点击下方按钮</string>
+    <string name="overlay_restore_retry">重试</string>
+    <string name="alert_notification_channel">还原失败</string>
 </resources>

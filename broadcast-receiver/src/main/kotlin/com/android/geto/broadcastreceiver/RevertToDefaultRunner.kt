@@ -21,7 +21,12 @@ package com.android.geto.broadcastreceiver
 import android.content.Context
 import android.content.Intent
 import com.android.geto.common.SettingsObservationGate
+import com.android.geto.common.showAutoRevertToDefaultToast
+import com.android.geto.common.showRevertOverlayFailedToast
+import com.android.geto.common.showRevertShizukuAndOverlayFailedToast
+import com.android.geto.common.showRevertShizukuFailedToast
 import com.android.geto.common.showRevertToDefaultToast
+import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.RevertToDefaultResult
 import com.android.geto.domain.usecase.RevertToDefaultUseCase
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
@@ -43,12 +48,21 @@ class RevertToDefaultRunner @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val revertToDefaultUseCase: RevertToDefaultUseCase,
     private val notificationManagerWrapper: AndroidNotificationManagerWrapper,
+    private val overlayRestoreRunner: OverlayRestoreRunner,
 ) {
-    suspend operator fun invoke(): RevertToDefaultResult {
+    /**
+     * [auto] only changes what the toast says. The work is identical, and the six manual
+     * entry points and the automatic one must not be able to drift apart in what they do.
+     */
+    suspend operator fun invoke(auto: Boolean = false): RevertToDefaultResult {
         // Said before the work rather than after it. Reverting takes a couple of seconds —
         // longer when Shizuku has to wait for adbd — and silence for that long from a tile
         // press reads as nothing having happened.
-        context.showRevertToDefaultToast()
+        if (auto) {
+            context.showAutoRevertToDefaultToast()
+        } else {
+            context.showRevertToDefaultToast()
+        }
 
         // Every per-app Revert button now describes a device that no longer exists, and
         // pressing one would write remembered values back over the defaults just applied.
@@ -59,7 +73,25 @@ class RevertToDefaultRunner @Inject constructor(
         return try {
             notificationManagerWrapper.cancelAll()
 
-            revertToDefaultUseCase()
+            revertToDefaultUseCase().also { result ->
+                // After cancelAll, so the report is not swept away by the same run that
+                // produced it.
+                if (result.overlayRestoreFailed) overlayRestoreRunner.report()
+
+                // Only these two are worth a toast: they are the pair that depends on
+                // something outside this app, so a user cannot simply put them right from
+                // the services manager the way they can a settings write.
+                val shizukuFailed = ManualRevertTarget.Shizuku in result.failed
+
+                when {
+                    shizukuFailed && result.overlayRestoreFailed ->
+                        context.showRevertShizukuAndOverlayFailedToast()
+
+                    shizukuFailed -> context.showRevertShizukuFailedToast()
+
+                    result.overlayRestoreFailed -> context.showRevertOverlayFailedToast()
+                }
+            }
         } finally {
             SettingsObservationGate.resume()
 

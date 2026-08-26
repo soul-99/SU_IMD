@@ -20,11 +20,15 @@ package com.android.geto.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
+
+/** Which way an overlay start is heading, so the wait can say so. */
+enum class OverlayStart { Hide, Restore }
 
 /**
  * Whether a Shizuku start attempt is in flight right now.
@@ -41,10 +45,50 @@ import javax.inject.Singleton
 class ShizukuStartTracker @Inject constructor() {
     private val attempts = MutableStateFlow(0)
 
+    private val overlayHideAttempts = MutableStateFlow(0)
+
+    private val overlayRestoreAttempts = MutableStateFlow(0)
+
     val starting: Flow<Boolean> = attempts.map { it > 0 }.distinctUntilChanged()
+
+    /**
+     * Narrower than [starting]: only the starts made on the way to changing overlay AppOps,
+     * and which way they are going.
+     *
+     * A launch has nowhere to report a ten second wait except over the app it is about to
+     * open, so it needs to know that *this* start is the one holding it up - a restart
+     * triggered from Settings is the same ten seconds and must not put a dialog over an
+     * unrelated screen. The direction matters too: the same wait precedes hiding overlay
+     * access and giving it back, and a spinner saying "to hide" during a revert is simply
+     * wrong.
+     *
+     * Hiding wins when both are somehow in flight, because a hide is what holds up a launch
+     * the user is waiting on.
+     */
+    val overlayStart: Flow<OverlayStart?> =
+        combine(overlayHideAttempts, overlayRestoreAttempts) { hiding, restoring ->
+            when {
+                hiding > 0 -> OverlayStart.Hide
+                restoring > 0 -> OverlayStart.Restore
+                else -> null
+            }
+        }.distinctUntilChanged()
 
     fun begin() {
         attempts.update { it + 1 }
+    }
+
+    fun beginOverlay(reason: OverlayStart) {
+        counterFor(reason).update { it + 1 }
+    }
+
+    fun endOverlay(reason: OverlayStart) {
+        counterFor(reason).update { (it - 1).coerceAtLeast(0) }
+    }
+
+    private fun counterFor(reason: OverlayStart) = when (reason) {
+        OverlayStart.Hide -> overlayHideAttempts
+        OverlayStart.Restore -> overlayRestoreAttempts
     }
 
     fun end() {

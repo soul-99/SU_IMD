@@ -172,7 +172,81 @@ message UserPreferences {
   // Packages whose display-over-other-apps AppOp IMD changed from allow to ignore, mapped
   // to "<firstInstallTime>:<uid>". Revert drops an entry if that identity changed, so an
   // app installed later under the same package name is never granted the old app's access.
-  map<string, string> heldOverlayPackages = 32;
+  // Superseded by heldOverlayPackagesByHolder below, which is keyed the same way the
+  // accessibility debt is. Left declared so the field number is never reused.
+  map<string, string> heldOverlayPackages = 32 [deprecated = true];
+
+  /*
+   * Whether the last attempt to give overlay access back failed.
+   *
+   * Separate from heldOverlayPackages being non-empty, which only means a restore is still
+   * owed: that is the normal state between hiding and reverting. This is set when a revert
+   * actually tried and could not reach Shizuku, and it is what turns the manager row red and
+   * keeps the retry notification justified. Cleared the moment a restore succeeds.
+   */
+  bool overlayRestoreFailed = 33;
+
+  /*
+   * Whether returning to IMD after launching an app from inside it reverts automatically.
+   *
+   * Off by default and gated behind a confirmation, because it is the one setting here that
+   * can undo the thing the user just asked for: coming back to IMD too early puts the
+   * settings back while the launched app is still open.
+   */
+  bool autoRevertOnReturn = 34;
+
+  // Which apps' "Display over other apps" permission IMD is allowed to touch, chosen by the
+  // user. Empty means none, and nothing is ever hidden - the same shape as
+  // managedAccessibilityServices, and for the same reason: taking every app that happens to
+  // hold the permission would switch off things the user never chose.
+  repeated string managedOverlayPackages = 35;
+
+  // The debt, keyed by whoever incurred it - an app's component name for a per-app profile,
+  // or the device-wide marker - with the package list encoded the same way the accessibility
+  // holds are. A package stays withdrawn until every holder has released it.
+  map<string, string> heldOverlayPackagesByHolder = 36;
+
+  // What each held package's installation looked like when its permission was taken away.
+  // Checked before giving it back, so an app uninstalled or replaced since does not inherit
+  // access it never had.
+  map<string, string> heldOverlayIdentities = 37;
+
+  /*
+   * Whether IMD manages "Display over other apps" at all.
+   *
+   * Off by default, and the master switch for the whole feature: with it off the overlay
+   * rows disappear from both configuration dialogs and from Default IMD settings, and
+   * nothing IMD does will ever withdraw overlay access. It exists because this is the one
+   * setting here that cannot work without a correctly configured Shizuku service, so on a
+   * device without one every overlay row is a control that can only fail.
+   *
+   * Restoring is deliberately not gated on it. A debt taken while the switch was on is
+   * still repaid after it is switched off, or turning the feature off would strand apps
+   * without a permission IMD took from them.
+   */
+  bool manageOverlay = 38;
+
+  /*
+   * The shared secret for the Tasker / MacroDroid intents.
+   *
+   * Empty until the user opens the integration screen, which is what generates it - so an
+   * empty value means the integration was never set up, and every external trigger is
+   * refused. Random per install and refreshable, the same shape Shizuku's own auth key has,
+   * because the exported receiver that runs reverts and hiding from another app has nothing
+   * else standing between it and any app on the device that cares to send the broadcast.
+   */
+  string taskerAuthKey = 39;
+
+  /*
+   * Whether the Tasker / MacroDroid intents are allowed to act at all.
+   *
+   * Off by default and separate from the key existing: the key documents how to call the
+   * integration, this switch is whether a call does anything. Both must be true - an
+   * unauthorised broadcast is refused whenever this is off, whatever key it carries - so the
+   * exported receiver has an explicit master switch the user can flip without having to rotate
+   * the key to shut it off.
+   */
+  bool taskerIntegrationEnabled = 40;
 
   // 9 was favouriteAppsTapAction. What a tap and a long press do is now decided by the
   // notification function rather than chosen, so there is nothing left for it to store.

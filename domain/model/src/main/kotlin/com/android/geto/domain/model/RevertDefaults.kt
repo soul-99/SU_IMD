@@ -68,9 +68,12 @@ object RevertDefaults {
         ManualRevertTarget.WirelessDebugging to false,
         ManualRevertTarget.AccessibilityServices to true,
         ManualRevertTarget.Shizuku to false,
-        // Only packages IMD previously disabled are restored, so this does not grant
-        // overlay access to anything new.
-        ManualRevertTarget.DisplayOverOtherApps to true,
+        // Off to match SettingsToHide.Default. Restoring only ever puts back what IMD
+        // itself switched off, so leaving it on would be safe in isolation — but hiding is
+        // opt-in, and a restore configured on by default while nothing is ever hidden is a
+        // switch that does nothing and still has to be explained. The pair is turned on
+        // together, by someone who has decided they want overlay hiding.
+        ManualRevertTarget.DisplayOverOtherApps to false,
     )
 
     fun encode(states: Map<ManualRevertTarget, Boolean>): List<String> =

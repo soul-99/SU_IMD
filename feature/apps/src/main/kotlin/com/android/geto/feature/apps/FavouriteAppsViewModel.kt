@@ -30,6 +30,7 @@ import com.android.geto.domain.repository.UserDataRepository
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
 import com.android.geto.domain.usecase.ApplySettingsToHideUseCase
 import com.android.geto.domain.usecase.GetFavouriteAppsUseCase
+import com.android.geto.domain.usecase.ShizukuStartTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,6 +52,7 @@ private const val TARGET_POLL_MILLIS = 500L
 
 @HiltViewModel
 class FavouriteAppsViewModel @Inject constructor(
+    shizukuStartTracker: ShizukuStartTracker,
     getFavouriteAppsUseCase: GetFavouriteAppsUseCase,
     private val applyAppSettingsUseCase: ApplyAppSettingsUseCase,
     private val applySettingsToHideUseCase: ApplySettingsToHideUseCase,
@@ -59,6 +61,14 @@ class FavouriteAppsViewModel @Inject constructor(
     private val revertToDefaultRunner: RevertToDefaultRunner,
     @param:ApplicationScope private val appScope: CoroutineScope,
 ) : ViewModel() {
+    /**
+     * Whether a launch is currently waiting on Shizuku so it can hide overlay access.
+     *
+     * Read from the shared tracker rather than kept here, because the wait runs in an
+     * application-scoped, non-cancellable block: it outlives this ViewModel if the user
+     * switches tabs, and the spinner has to be right either way.
+     */
+    val overlayStart = shizukuStartTracker.overlayStart
     private val _textFlow = MutableStateFlow<String?>(null)
 
     private val _appLaunch = MutableStateFlow<FavouriteAppLaunch?>(null)

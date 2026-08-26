@@ -50,7 +50,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">Paramètres masqués/désactivés</string>
     <string name="settings_manager_configure_revert">Configurer ce que Rétablir restaure</string>
-    <string name="settings_manager_accessibility_unmanaged">Aucun service d\'accessibilité n\'est actuellement géré par l\'application IMD</string>
     <string name="applied_settings_failure">Impossible d\'appliquer les paramètres</string>
     <string name="applied_settings_invalid">Cette application a des paramètres aux valeurs non valides</string>
     <string name="settings_manager_title">Gestionnaire de services IMD</string>
@@ -89,4 +88,14 @@
     <string name="settings_manager_shizuku_failed">Le service Shizuku n\'a pas pu démarrer lors de la dernière tentative ; veuillez vérifier les paramètres de l\'application Shizuku et la configuration Shizuku d\'IMD</string>
     <string name="settings_manager_shizuku_failed_open">Pourquoi le service Shizuku n\'a pas démarré</string>
     <string name="understood">Compris</string>
+    <string name="overlay_failure_title">Impossible de modifier l\'autorisation Superposition à d\'autres applis via Shizuku</string>
+    <string name="overlay_failure_check">Veuillez vérifier que :</string>
+    <string name="overlay_failure_point_permission">L\'autorisation Shizuku est accordée à IMD</string>
+    <string name="overlay_failure_point_configuration">Revérifiez votre configuration Shizuku dans les paramètres de l\'application IMD</string>
+    <string name="shizuku_starting_to_hide_overlay">Démarrage du service Shizuku pour masquer l\'autorisation Superposition à d\'autres applis</string>
+    <string name="revert_display_over_other_apps">Superposition à d\'autres applis</string>
+    <string name="settings_manager_overlay_restore_failed">Impossible de restaurer l\'autorisation Superposition à d\'autres applis via Shizuku. Démarrez le service Shizuku manuellement depuis l\'application Shizuku, puis réessayez</string>
+    <string name="settings_manager_overlay_restore_failed_open">Pourquoi Superposition à d\'autres applis n\'a pas été restaurée</string>
+    <string name="shizuku_starting_to_restore_overlay">Démarrage du service Shizuku pour restaurer l\'autorisation Superposition à d\'autres applis</string>
+    <string name="settings_manager_overlay_note">seules les applis sélectionnées dans les paramètres d\'IMD sont gérées</string>
 </resources>

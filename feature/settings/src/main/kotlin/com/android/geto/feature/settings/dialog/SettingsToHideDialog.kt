@@ -19,7 +19,6 @@
 package com.android.geto.feature.settings.dialog
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,8 +27,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +43,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.designsystem.component.emphasised
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.ManualRevertTarget
@@ -67,127 +63,131 @@ import com.android.geto.feature.settings.R
 internal fun SettingsToHideDialog(
     modifier: Modifier = Modifier,
     states: Map<ManualRevertTarget, Boolean>,
+    shizukuConfigured: Boolean,
+    manageOverlay: Boolean,
     onDismissRequest: () -> Unit,
     onUpdateSettingsToHide: (Map<ManualRevertTarget, Boolean>) -> Unit,
 ) {
+    // The full map, overlay entry included, even when that row is not drawn. The draft is
+    // what gets saved, so dropping the entry while the feature is switched off would quietly
+    // clear a choice made while it was on and hand it back unticked later.
     var draft by remember(states) { mutableStateOf(states) }
 
     val toggle = { target: ManualRevertTarget, enabled: Boolean ->
         draft = draft + (target to enabled)
     }
 
-    DialogContainer(
+    SettingsPage(
         modifier = modifier,
+        title = stringResource(R.string.settings_to_hide_title),
         onDismissRequest = onDismissRequest,
+        actions = {
+            TextButton(
+                onClick = {
+                    onUpdateSettingsToHide(draft)
+
+                    onDismissRequest()
+                },
+            ) {
+                Text(text = stringResource(R.string.save))
+            }
+        },
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(10.dp),
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                text = stringResource(R.string.settings_to_hide_title),
-                style = MaterialTheme.typography.titleLarge,
-            )
+        Text(
+            modifier = Modifier.padding(horizontal = 10.dp),
+            text = stringResource(R.string.settings_to_hide_description),
+            style = MaterialTheme.typography.bodyMedium,
+        )
 
-            Text(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                text = stringResource(R.string.settings_to_hide_description),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+        Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
+        SettingToHideRow(
+            label = stringResource(R.string.revert_defaults_developer_settings),
+            checked = draft[ManualRevertTarget.DeveloperSettings] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.DeveloperSettings, it) },
+        )
 
-            SettingToHideRow(
-                label = stringResource(R.string.revert_defaults_developer_settings),
-                checked = draft[ManualRevertTarget.DeveloperSettings] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.DeveloperSettings, it) },
-            )
+        SettingToHideRow(
+            label = stringResource(R.string.revert_defaults_usb_debugging),
+            note = stringResource(R.string.settings_to_hide_usb_note),
+            checked = draft[ManualRevertTarget.UsbDebugging] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.UsbDebugging, it) },
+        )
 
-            SettingToHideRow(
-                label = stringResource(R.string.revert_defaults_usb_debugging),
-                note = stringResource(R.string.settings_to_hide_usb_note),
-                checked = draft[ManualRevertTarget.UsbDebugging] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.UsbDebugging, it) },
-            )
+        SettingToHideRow(
+            label = stringResource(R.string.revert_defaults_wireless_debugging),
+            checked = draft[ManualRevertTarget.WirelessDebugging] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.WirelessDebugging, it) },
+        )
 
-            SettingToHideRow(
-                label = stringResource(R.string.revert_defaults_wireless_debugging),
-                checked = draft[ManualRevertTarget.WirelessDebugging] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.WirelessDebugging, it) },
-            )
+        SettingToHideRow(
+            // A different string from the revert dialog's, unlike the label. Hiding is about
+            // which services this app is allowed to touch; reverting is about which ones come
+            // back. They were one string while they said the same thing, and stopped being
+            // able to be the moment either side gained a detail the other did not have.
+            label = stringResource(R.string.revert_defaults_accessibility_services),
+            note = stringResource(R.string.settings_to_hide_accessibility_note),
+            checked = draft[ManualRevertTarget.AccessibilityServices] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.AccessibilityServices, it) },
+        )
 
-            SettingToHideRow(
-                // Deliberately the same string the revert dialog uses for this note: the
-                // caveat is about which services this app manages at all, so it is the
-                // same fact in both places and must not be able to drift.
-                label = stringResource(R.string.revert_defaults_accessibility_services),
-                note = stringResource(R.string.settings_to_hide_accessibility_note),
-                checked = draft[ManualRevertTarget.AccessibilityServices] == true,
-                onCheckedChange = { toggle(ManualRevertTarget.AccessibilityServices, it) },
-            )
-
+        // Only once overlay management has been switched on in Advanced. Off is the
+        // default, and on a device with no working Shizuku it is the only honest state -
+        // a row that can only ever fail is worse than no row, and greying it out here
+        // would say "configure Shizuku" to someone who has decided not to use the feature
+        // at all.
+        if (manageOverlay) {
             SettingToHideRow(
                 label = stringResource(R.string.revert_defaults_display_over_other_apps),
-                note = stringResource(R.string.settings_to_hide_overlay_note),
-                checked = draft[ManualRevertTarget.DisplayOverOtherApps] == true,
+                note = if (shizukuConfigured) {
+                    stringResource(R.string.settings_to_hide_overlay_note)
+                } else {
+                    stringResource(R.string.overlay_needs_shizuku_configured)
+                },
+                checked = draft[ManualRevertTarget.DisplayOverOtherApps] == true &&
+                    shizukuConfigured,
+                // Overlay AppOps can only be written through Shizuku. Letting this be
+                // ticked with no Shizuku configured buys the user a launch that fails ten
+                // seconds later for a reason the dialog already knew about.
+                enabled = shizukuConfigured,
                 onCheckedChange = { toggle(ManualRevertTarget.DisplayOverOtherApps, it) },
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // First, and in the error colour, because it is the one note here that means
-            // "you may be in the wrong place entirely". Everything else in this dialog is
-            // device-wide by design; someone who wanted per-app settings will otherwise
-            // tick these boxes and wonder why every app gets the same treatment.
-            InfoLine(
-                text = AnnotatedString(stringResource(R.string.settings_to_hide_info_per_app)),
-                color = MaterialTheme.colorScheme.error,
-            )
-
-            InfoLine(text = AnnotatedString(stringResource(R.string.settings_to_hide_info_all)))
-
-            // Third, and red, because it is the one line here that describes a way the
-            // hiding can be undone without anybody touching the device. Shizuku's watchdog
-            // restarts the service on its own, and starting the service turns ADB back on -
-            // so the settings this dialog just hid come back mid-session, which is exactly
-            // the state a locked-down app is looking for.
-            InfoLine(
-                text = emphasised(
-                    text = stringResource(R.string.settings_to_hide_info_watchdog),
-                    names = listOf(
-                        stringResource(R.string.settings_to_hide_name_shizuku_watchdog),
-                    ),
-                ),
-                color = MaterialTheme.colorScheme.error,
-            )
-
-            InfoLine(
-                text = emphasised(
-                    text = stringResource(R.string.settings_to_hide_info_shizuku),
-                    names = listOf(stringResource(R.string.settings_to_hide_name_shizuku_hide)),
-                ),
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                TextButton(
-                    onClick = {
-                        onUpdateSettingsToHide(draft)
-
-                        onDismissRequest()
-                    },
-                ) {
-                    Text(text = stringResource(R.string.save))
-                }
-            }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // First, and in the error colour, because it is the one note here that means
+        // "you may be in the wrong place entirely". Everything else in this dialog is
+        // device-wide by design; someone who wanted per-app settings will otherwise
+        // tick these boxes and wonder why every app gets the same treatment.
+        InfoLine(
+            text = AnnotatedString(stringResource(R.string.settings_to_hide_info_per_app)),
+            color = MaterialTheme.colorScheme.error,
+        )
+
+        InfoLine(text = AnnotatedString(stringResource(R.string.settings_to_hide_info_all)))
+
+        // Third, and red, because it is the one line here that describes a way the
+        // hiding can be undone without anybody touching the device. Shizuku's watchdog
+        // restarts the service on its own, and starting the service turns ADB back on -
+        // so the settings this dialog just hid come back mid-session, which is exactly
+        // the state a locked-down app is looking for.
+        InfoLine(
+            text = emphasised(
+                text = stringResource(R.string.settings_to_hide_info_watchdog),
+                names = listOf(
+                    stringResource(R.string.settings_to_hide_name_shizuku_watchdog),
+                ),
+            ),
+            color = MaterialTheme.colorScheme.error,
+        )
+
+        InfoLine(
+            text = emphasised(
+                text = stringResource(R.string.settings_to_hide_info_shizuku),
+                names = listOf(stringResource(R.string.settings_to_hide_name_shizuku_hide)),
+            ),
+        )
     }
 }
 
@@ -202,26 +202,43 @@ private fun SettingToHideRow(
     label: String,
     note: String? = null,
     checked: Boolean,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
+    // Greyed rather than hidden. A row that vanishes when Shizuku is unconfigured leaves
+    // the user with no way to find out the feature exists, let alone what to configure.
+    val contentColour = if (enabled) {
+        MaterialTheme.colorScheme.onSurface
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
+            .clickable(enabled = enabled) { onCheckedChange(!checked) }
             .padding(horizontal = 10.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = label, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = contentColour,
+            )
 
             if (note != null) {
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(text = note, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = note,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = contentColour,
+                )
             }
         }
 
-        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        Checkbox(checked = checked, enabled = enabled, onCheckedChange = onCheckedChange)
     }
 }
 

@@ -7,7 +7,22 @@
     <string name="settings">Settings</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Open banking and other locked-down apps without turning developer options, USB debugging or your accessibility services off by hand every single time. Pick an app, say what should change while it runs, and this puts everything back afterwards.</string>
+    <string name="setup_purpose">Open banking and other restricted apps without turning on/ off these settings manually everytime:
+1. Developer settings
+2. Debugging
+3. Accessibility services
+4. Display over other apps (needs active Shizuku service)
+5. Shizuku service
+6. and many more (you need to manually configure them using Memory function of app, hint: use Settings observer to help yourself)</string>
+    <!-- The three-step flow under the description. setup_how_number draws the numeral, so a
+      translation never has to carry it. -->
+    <string name="setup_how_title">How this works</string>
+    <string name="setup_how_number">%1$d.</string>
+    <string name="setup_how_off">IMD turns these settings off</string>
+    <string name="setup_how_off_note">No app\'s security policy is broken</string>
+    <string name="setup_how_use">You use your app</string>
+    <string name="setup_how_revert">Revert</string>
+    <string name="setup_how_on">IMD turns those settings on again</string>
     <string name="setup_step">Step %1$d</string>
     <string name="setup_granted">Granted</string>
     <string name="setup_not_granted">Not granted</string>
@@ -34,7 +49,8 @@
     <string name="setup_shizuku_not_running">No Shizuku service found. Start Shizuku, then try again.</string>
     <string name="setup_shizuku_denied">Shizuku refused. Allow this app in Shizuku and try again — if you picked “deny and don\'t ask again”, clear it from Shizuku\'s app list first.</string>
     <string name="setup_shizuku_failed">Shizuku could not run the command. Use the ADB command instead.</string>
-    <string name="setup_shizuku_once">Disclaimer: Shizuku is only needed for this one grant. The permission survives reboots, so afterwards you can stop or uninstall Shizuku — unless you also want the optional “Restart Shizuku service” feature in Settings, which uses it again later.</string>
+    <string name="setup_name_display_over_other_apps">Display over other apps</string>
+    <string name="setup_shizuku_once">Disclaimer: Shizuku is only needed for this one grant. The permission survives reboots, so afterwards you can stop or uninstall Shizuku - unless you want to hide Display over other apps permissions also, which uses Shizuku service every time.</string>
     <string name="setup_shizuku_once_extra">You can also disable debugging and developer settings if you enabled those to setup Shizuku, this app needs neither after successful setup.</string>
     <string name="setup_secure_settings_adb">With a PC: enable USB debugging → connect phone to a PC running ADB shell terminal → run the above command.</string>
     <string name="setup_secure_settings_shizuku">Without a PC (Recommended):\n1. Install and setup Shizuku app, start Shizuku service\n2. Click on the above Use Shizuku button\n3. Click on allow when prompt shows.</string>

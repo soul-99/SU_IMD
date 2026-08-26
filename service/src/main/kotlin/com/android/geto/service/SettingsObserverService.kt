@@ -33,6 +33,7 @@ import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.android.geto.common.AppLocale
+import com.android.geto.common.SettingsChangeLog
 import com.android.geto.common.SettingsObservationGate
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,31 +63,67 @@ class SettingsObserverService : Service() {
 
             if (SettingsObservationGate.isPaused) return
 
-            val category = when {
-                uri.toString().startsWith(Settings.System.CONTENT_URI.toString()) -> getString(
-                    commonR.string.system,
-                )
+            val table = when {
+                uri.toString().startsWith(Settings.System.CONTENT_URI.toString()) ->
+                    SettingsChangeLog.Table.System
 
-                uri.toString().startsWith(Settings.Secure.CONTENT_URI.toString()) -> getString(
-                    commonR.string.secure,
-                )
+                uri.toString().startsWith(Settings.Secure.CONTENT_URI.toString()) ->
+                    SettingsChangeLog.Table.Secure
 
-                uri.toString().startsWith(Settings.Global.CONTENT_URI.toString()) -> getString(
-                    commonR.string.global,
-                )
+                uri.toString().startsWith(Settings.Global.CONTENT_URI.toString()) ->
+                    SettingsChangeLog.Table.Global
 
-                else -> getString(R.string.unknown)
+                else -> SettingsChangeLog.Table.Unknown
+            }
+
+            val category = when (table) {
+                SettingsChangeLog.Table.System -> getString(commonR.string.system)
+                SettingsChangeLog.Table.Secure -> getString(commonR.string.secure)
+                SettingsChangeLog.Table.Global -> getString(commonR.string.global)
+                SettingsChangeLog.Table.Unknown -> getString(R.string.unknown)
+            }
+
+            val key = uri?.lastPathSegment
+
+            // Registered with notifyForDescendants, so the last path segment is the key that
+            // changed. Without one there is nothing to read and nothing worth logging.
+            if (key != null && table != SettingsChangeLog.Table.Unknown) {
+                SettingsChangeLog.record(
+                    table = table,
+                    key = key,
+                    value = readValue(table = table, key = key),
+                )
             }
 
             androidNotificationManagerWrapper.notify(
                 id = NOTIFICATION_ID,
                 notification = getNotification(
                     title = category,
-                    text = uri?.lastPathSegment ?: getString(R.string.unknown),
+                    text = key ?: getString(R.string.unknown),
                 ),
             )
         }
     }
+
+    /**
+     * The value the key now holds.
+     *
+     * Read here rather than left to the log, because by the time anyone opens the log the
+     * setting may have moved again - and a value read late is worse than none: it looks like
+     * a record of the change and is not.
+     *
+     * Settings reads are cached in-process by the framework, so this stays cheap on a
+     * callback that fires in bursts. A key with no value reads as null, which the log shows
+     * as unset rather than pretending it is an empty string.
+     */
+    private fun readValue(table: SettingsChangeLog.Table, key: String): String? = runCatching {
+        when (table) {
+            SettingsChangeLog.Table.System -> Settings.System.getString(contentResolver, key)
+            SettingsChangeLog.Table.Secure -> Settings.Secure.getString(contentResolver, key)
+            SettingsChangeLog.Table.Global -> Settings.Global.getString(contentResolver, key)
+            SettingsChangeLog.Table.Unknown -> null
+        }
+    }.getOrNull()
 
     private val stopIntent
         get() = Intent(

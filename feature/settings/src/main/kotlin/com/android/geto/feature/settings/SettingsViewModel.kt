@@ -20,15 +20,18 @@ package com.android.geto.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.geto.common.AutoRevertPending
 import com.android.geto.domain.model.AccessibilityServiceData
 import com.android.geto.domain.model.InstalledAppData
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.OverlayPackageData
 import com.android.geto.domain.model.ShizukuForkMode
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.repository.UserDataRepository
 import com.android.geto.domain.usecase.GetAccessibilityServicesUseCase
 import com.android.geto.domain.usecase.GetInstalledAppsUseCase
+import com.android.geto.domain.usecase.GetOverlayPackagesUseCase
 import com.android.geto.service.SettingsObserverService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +47,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val userDataRepository: UserDataRepository,
     private val getAccessibilityServicesUseCase: GetAccessibilityServicesUseCase,
+    private val getOverlayPackagesUseCase: GetOverlayPackagesUseCase,
     private val getInstalledAppsUseCase: GetInstalledAppsUseCase,
 ) : ViewModel() {
     val settingsUiState = userDataRepository.userData.map(SettingsUiState::Success).stateIn(
@@ -80,6 +84,52 @@ class SettingsViewModel @Inject constructor(
     fun updateRestartShizuku(restartShizuku: Boolean) {
         viewModelScope.launch {
             userDataRepository.updateRestartShizuku(restartShizuku = restartShizuku)
+        }
+    }
+
+    /** Generates the Tasker auth key if there is not one yet; a no-op once there is. */
+    fun ensureTaskerAuthKey() {
+        viewModelScope.launch {
+            userDataRepository.ensureTaskerAuthKey()
+        }
+    }
+
+    /** Rotates the Tasker auth key, retiring every macro built on the old one. */
+    fun refreshTaskerAuthKey() {
+        viewModelScope.launch {
+            userDataRepository.refreshTaskerAuthKey()
+        }
+    }
+
+    /** The master switch for the Tasker integration; enabling also generates a key if none. */
+    fun updateTaskerIntegrationEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            userDataRepository.updateTaskerIntegrationEnabled(enabled = enabled)
+        }
+    }
+
+    /**
+     * The master switch for overlay management.
+     *
+     * Nothing is undone here on the way off. A debt taken while it was on is still repaid
+     * by the next revert - see UserData.effectiveRevertDefaults - and the stored overlay
+     * ticks are left alone so switching the feature back on returns it as it was left.
+     */
+    fun updateManageOverlay(enabled: Boolean) {
+        viewModelScope.launch {
+            userDataRepository.updateManageOverlay(enabled = enabled)
+        }
+    }
+
+    /**
+     * Switching off also drops any marker already armed, so a launch made while it was on
+     * cannot revert after the user has turned it off.
+     */
+    fun updateAutoRevertOnReturn(enabled: Boolean) {
+        if (!enabled) AutoRevertPending.clear()
+
+        viewModelScope.launch {
+            userDataRepository.updateAutoRevertOnReturn(enabled = enabled)
         }
     }
 
@@ -136,6 +186,26 @@ class SettingsViewModel @Inject constructor(
      * installed-services list, and re-reading when the picker opens is both cheaper and
      * more accurate than a stale cached copy.
      */
+    /**
+     * Null until asked, and null again whenever the list could not be read - which is the
+     * whole reason this is nullable rather than an empty list. The screen opens the picker on
+     * a list and the "needs Shizuku" notice on a null.
+     */
+    private val _overlayPackages = MutableStateFlow<List<OverlayPackageData>?>(null)
+    val overlayPackages = _overlayPackages.asStateFlow()
+
+    fun updateManagedOverlayPackages(packages: List<String>) {
+        viewModelScope.launch {
+            userDataRepository.updateManagedOverlayPackages(packages = packages)
+        }
+    }
+
+    fun refreshOverlayPackages() {
+        viewModelScope.launch {
+            _overlayPackages.update { getOverlayPackagesUseCase() }
+        }
+    }
+
     fun refreshAccessibilityServices() {
         viewModelScope.launch {
             _accessibilityServices.update { getAccessibilityServicesUseCase() }

@@ -18,4 +18,8 @@
 <resources>
     <string name="revert_using_memory">मेमोरी से वापस लाएँ</string>
     <string name="revert_to_default">डिफ़ॉल्ट पर वापस लाएँ</string>
+    <string name="overlay_restore_failed_title">रिवर्ट विफल</string>
+    <string name="overlay_restore_failed_text">Shizuku की मदद से दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस नहीं दी जा सकी. कृपया Shizuku सेवा मैन्युअल रूप से चालू करें और नीचे दिए गए बटन पर क्लिक करें</string>
+    <string name="overlay_restore_retry">फिर कोशिश करें</string>
+    <string name="alert_notification_channel">रिवर्ट विफलताएँ</string>
 </resources>

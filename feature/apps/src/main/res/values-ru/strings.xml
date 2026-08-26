@@ -49,7 +49,6 @@
     <string name="applied_settings_title">IMD</string>
     <string name="applied_settings_success">Настройки скрыты/отключены</string>
     <string name="settings_manager_configure_revert">Настройте, что восстанавливает кнопка «Вернуть»</string>
-    <string name="settings_manager_accessibility_unmanaged">Сейчас приложение IMD не управляет ни одной службой специальных возможностей</string>
     <string name="applied_settings_failure">Не удалось применить настройки</string>
     <string name="applied_settings_invalid">У этого приложения есть настройки с недопустимыми значениями</string>
     <string name="settings_manager_title">Диспетчер служб IMD</string>
@@ -89,4 +88,14 @@
     <string name="settings_manager_shizuku_failed">При последней попытке не удалось запустить службу Shizuku. Проверьте настройки приложения Shizuku и конфигурацию Shizuku в IMD</string>
     <string name="settings_manager_shizuku_failed_open">Почему служба Shizuku не запустилась</string>
     <string name="understood">Понятно</string>
+    <string name="overlay_failure_title">Не удалось изменить разрешение «Поверх других приложений» с помощью Shizuku</string>
+    <string name="overlay_failure_check">Убедитесь, что:</string>
+    <string name="overlay_failure_point_permission">Приложению IMD выдано разрешение Shizuku</string>
+    <string name="overlay_failure_point_configuration">Проверьте настройку Shizuku в настройках приложения IMD</string>
+    <string name="shizuku_starting_to_hide_overlay">Запуск службы Shizuku, чтобы скрыть разрешение «Поверх других приложений»</string>
+    <string name="revert_display_over_other_apps">Поверх других приложений</string>
+    <string name="settings_manager_overlay_restore_failed">Не удалось восстановить разрешение «Поверх других приложений» с помощью Shizuku. Запустите службу Shizuku вручную в приложении Shizuku и повторите попытку</string>
+    <string name="settings_manager_overlay_restore_failed_open">Почему разрешение «Поверх других приложений» не восстановлено</string>
+    <string name="shizuku_starting_to_restore_overlay">Запуск службы Shizuku, чтобы восстановить разрешение «Поверх других приложений»</string>
+    <string name="settings_manager_overlay_note">управляются только приложения, выбранные в настройках IMD</string>
 </resources>

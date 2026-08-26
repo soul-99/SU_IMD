@@ -35,4 +35,10 @@
 
     <string name="revert_to_default_toast">Rétablir par défaut</string>
     <string name="revert_from_memory_toast">Rétablir depuis la mémoire</string>
+    <string name="revert_failed_shizuku_toast">Impossible de redémarrer le service Shizuku</string>
+    <string name="revert_failed_overlay_toast">Impossible de restaurer l\'autorisation Superposition à d\'autres applis via Shizuku, voir la notification</string>
+    <string name="revert_failed_shizuku_and_overlay_toast">Impossible de restaurer le service Shizuku et les autorisations Superposition à d\'autres applis</string>
+    <string name="settings_hidden_toast">Paramètres masqués</string>
+    <string name="auto_revert_to_default_toast">Rétablissement automatique par défaut</string>
+    <string name="auto_revert_from_memory_toast">Rétablissement automatique via la Memory function</string>
 </resources>
