@@ -1,1 +1,1 @@
-[SU] IMD - (A supercharged fork of Geto)
+IMD - It's My Device (supercharged fork of Geto)

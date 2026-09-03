@@ -23,15 +23,35 @@
       and they do different things: one restores what this app changed for this app, the
       other drives the whole device to the configured state.
     -->
-    <string name="revert_using_memory">Revert using memory</string>
+    <string name="revert_using_memory">Unhide settings using memory</string>
     <string name="revert_to_default">Revert to default</string>
     <!-- Posted when a revert could not give overlay access back, because Shizuku was out
       of reach. The button retries the restore only; it never tries to start Shizuku, which
       is the thing the user has just been asked to do by hand. -->
-    <string name="overlay_restore_failed_title">Revert Failure</string>
+    <string name="overlay_restore_failed_title">Unhide settings failure</string>
     <string name="overlay_restore_failed_text">Unable to restore Display over other apps permissions using Shizuku, please turn on Shizuku service manually and click the button below</string>
     <string name="overlay_restore_retry">Try again</string>
+    <!-- Posted when a fork ignored its stop intent and the Shizuku service had to be taken
+      down by cycling USB debugging instead. Two texts, because the overlay permission is only
+      worth naming when it was actually hidden in the same run. The button only dismisses. -->
+    <string name="shizuku_usb_fallback_title">Shizuku service stopped</string>
+    <string name="shizuku_usb_fallback_text">Shizuku service killed using USB debugging not stop intent, app might fail to restore Shizuku service upon Revert.</string>
+    <string name="shizuku_usb_fallback_text_overlay">Shizuku service killed using USB debugging not stop intent, app might fail to restore Shizuku service and Display over other apps upon Revert.</string>
+    <string name="notification_ok">OK</string>
     <!-- The name of the high-importance channel, as it appears in Android's notification
       settings for this app. -->
-    <string name="alert_notification_channel">Revert failures</string>
+    <string name="alert_notification_channel">IMD failures</string>
+    <string name="hidden_revert_default">Settings hidden, click to unhide settings.</string>
+    <string name="hidden_revert_memory">Settings hidden, click to unhide settings from memory.</string>
+    <string name="auto_hide_channel">Auto-hide settings (IMD+)</string>
+    <!-- The channel name the author chose, and the one-line body of the note itself. -->
+    <string name="developer_note_channel">IMD app update notice</string>
+    <string name="developer_note_notification">IMD: Important note from developer 🧑‍🔬</string>
+    <string name="auto_hide_hidden_revert">IMD+ hid your settings, click to unhide settings.</string>
+    <string name="auto_hide_hidden_revert_memory">IMD+ hid your settings, click to unhide settings from memory.</string>
+    <string name="auto_unhide_channel">Auto unhide settings service</string>
+    <string name="auto_unhide_running">Auto unhide service running</string>
+    <string name="auto_hide_shizuku_failed">IMD+ failed to hide settings as Shizuku service could not be started. Please check your settings.</string>
+    <string name="shizuku_revert_failed">Failed to start Shizuku service, please click here to start manually</string>
+    <string name="shevery_start_failed">Failed to start Shevery, please click here to start it manually.</string>
 </resources>

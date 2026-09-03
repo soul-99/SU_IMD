@@ -35,14 +35,33 @@
     <string name="global">Global</string>
 
     <string name="language_system">النظام / تلقائي</string>
-    <string name="language_ai_notice">أُنشئت اللغات غير الإنجليزية بترجمة آلية بمساعدة الذكاء الاصطناعي، لذا قد تحتوي على أخطاء. وإذا رغبت في تصحيحها، يُنصح بالإبلاغ عن أخطاء الترجمة إلى المطوّر عبر متتبّع المشكلات في GitHub.</string>
+    <string name="language_ai_notice">أُنشئت اللغات غير الإنجليزية بترجمة آلية، لذا قد تحتوي على أخطاء. وإذا رغبت في تصحيحها، يُنصح بالإبلاغ عن أخطاء الترجمة إلى المطوّر عبر متتبّع المشكلات في GitHub.</string>
 
     <string name="revert_to_default_toast">استعادة الوضع الافتراضي</string>
     <string name="revert_from_memory_toast">استعادة من الذاكرة</string>
-    <string name="revert_failed_shizuku_toast">تعذّرت إعادة تشغيل خدمة Shizuku</string>
-    <string name="revert_failed_overlay_toast">تعذّرت استعادة إذن العرض فوق التطبيقات الأخرى باستخدام Shizuku، راجع الإشعار</string>
-    <string name="revert_failed_shizuku_and_overlay_toast">تعذّرت استعادة خدمة Shizuku وأذونات العرض فوق التطبيقات الأخرى</string>
     <string name="settings_hidden_toast">تم إخفاء الإعدادات</string>
     <string name="auto_revert_to_default_toast">استعادة تلقائية إلى الإعداد الافتراضي</string>
     <string name="auto_revert_from_memory_toast">استعادة تلقائية باستخدام Memory function</string>
+    <string name="auto_hide_run_toast">يُخفي IMD+ إعداداتك…</string>
+    <string name="auto_hide_revert_toast">يستعيد IMD+ إعداداتك…</string>
+    <string name="toast_auto_hiding">‏IMD+: جارٍ إخفاء الإعدادات...</string>
+    <string name="toast_done_hidden">‏IMD: تم إخفاء الإعدادات</string>
+    <string name="toast_done_hidden_for">‏IMD: تم إخفاء الإعدادات لـ ‎%1$s</string>
+    <string name="toast_done_reverted_defaults">‏IMD: تمت إعادة الإعدادات إلى الوضع الافتراضي</string>
+    <string name="toast_done_restored_defaults">‏IMD: تمت استعادة الإعدادات إلى الوضع الافتراضي</string>
+    <string name="toast_done_restored_memory">‏IMD: تمت استعادة الإعدادات من الذاكرة</string>
+    <string name="toast_done_restored_memory_for">‏IMD: تمت استعادة الإعدادات من الذاكرة (‎%1$s)</string>
+    <string name="toast_nothing_to_restore">‏IMD: لا توجد إعدادات مخفية لاستعادتها</string>
+    <string name="toast_auto_done_hidden">‏IMD+: تم إخفاء الإعدادات</string>
+    <string name="toast_auto_done_hidden_for">‏IMD+: تم إخفاء الإعدادات لـ ‎%1$s</string>
+    <string name="permissions_lost">‏تم فقدان الأذونات الضرورية. يرجى فتح IMD وإعادة منح الأذونات أولاً.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="next">التالي</string>
+    <string name="back">رجوع</string>
+    <string name="prior_hide_ignore">تجاهل كل عمليات الاستعادة السابقة</string>
+    <string name="prior_hide_restore">استعادة الإعدادات أولاً</string>
+    <string name="prior_hide_restoring">يقوم IMD باستعادة إعداداتك…</string>
+    <string name="prior_hide_title">تم اكتشاف إعدادات مخفية سابقًا، هل تريد استعادتها أولاً؟</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="skip">تخطٍّ</string>
 </resources>

@@ -18,34 +18,25 @@
 package com.android.geto.activity.shortcut
 
 import com.android.geto.domain.model.AppSettingsResult
-import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.HidingFramework
 
 sealed interface ShortcutActivityUiState {
     data object Loading : ShortcutActivityUiState
 
+    /**
+     * ⚠ **It carried `applicationIcon` and `unhidingFramework` until r3**, both only so the
+     * shortcut route could post a per-app revert notification with the launched app's icon.
+     * Every launch posts the one generic notification now, so neither is read any more — and
+     * the icon was a bitmap fetched over binder on every shortcut press.
+     *
+     * ⚠ **The hand-written `equals`/`hashCode` went with the icon**, which is the only reason
+     * they existed: a `ByteArray` property gives a data class identity-based equality, so both
+     * had to be spelled out. What is left is a nullable enum, an enum and a `String?`, for
+     * which the generated implementations are exactly what those overrides wrote by hand.
+     */
     data class Success(
         val appSettingsResult: AppSettingsResult?,
-        val applicationIcon: ByteArray?,
-        val notificationFunction: NotificationFunction = NotificationFunction.Default,
-    ) : ShortcutActivityUiState {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as Success
-
-            if (appSettingsResult != other.appSettingsResult) return false
-            if (notificationFunction != other.notificationFunction) return false
-            if (!applicationIcon.contentEquals(other.applicationIcon)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = appSettingsResult?.hashCode() ?: 0
-            result = 31 * result + notificationFunction.hashCode()
-            result = 31 * result + (applicationIcon?.contentHashCode() ?: 0)
-            return result
-        }
-    }
+        val hidingFramework: HidingFramework = HidingFramework.Default,
+        val appName: String? = null,
+    ) : ShortcutActivityUiState
 }

@@ -23,6 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import com.android.geto.activity.hide.HideTileService
 import com.android.geto.activity.main.MainActivity
 import com.android.geto.activity.services.ServicesActivity
 import com.android.geto.common.AppLocale
@@ -31,16 +32,16 @@ import com.android.geto.common.AppLocale
  * Where a long press on either Quick Settings tile lands.
  *
  * Android allows an app exactly one long-press target, declared with the
- * QS_TILE_PREFERENCES intent filter, no matter how many tiles it publishes — so two tiles
+ * QS_TILE_PREFERENCES intent filter, no matter how many tiles it publishes — so three tiles
  * that want to open different things have to share one activity and sort themselves out
  * here. The system says which tile was pressed in [Intent.EXTRA_COMPONENT_NAME]; this reads
  * it, starts the right thing and gets out of the way.
  *
- * The two destinations are deliberately crossed over. Long-pressing *Revert to default*
- * opens the settings manager, because the question after a revert is "what state is
- * everything in now", and the manager is the screen that answers it. Long-pressing the
- * *manager* tile opens the app itself, which is the only route to the Favourites list the
- * manager cannot show.
+ * The destinations are deliberately crossed over. Long-pressing *Revert to default* or
+ * *Hide settings* opens the settings manager, because the question after either is
+ * "what state is everything in now", and the manager is the screen that answers it.
+ * Long-pressing the *manager* tile opens the app itself, which is the only route to the
+ * Favourites list the manager cannot show.
  */
 class TilePreferencesActivity : ComponentActivity() {
     // The chosen language, applied before anything reads a string. A no-op on Android 13
@@ -69,7 +70,12 @@ class TilePreferencesActivity : ComponentActivity() {
         intent?.getParcelableExtra(Intent.EXTRA_COMPONENT_NAME)
 
     private fun destinationFor(tile: ComponentName?): Intent {
-        if (tile?.className == RevertTileService::class.java.name) {
+        // Both of the tiles that change the device open the manager, because the question
+        // after either is "what state is everything in now" and that is the screen which
+        // answers it. The manager's own tile is the exception below.
+        if (tile?.className == RevertTileService::class.java.name ||
+            tile?.className == HideTileService::class.java.name
+        ) {
             return Intent(this, ServicesActivity::class.java)
         }
 

@@ -60,4 +60,13 @@
     <string name="action_app_setting">アプリ設定</string>
     <string name="action_create_shortcut">ショートカットを作成</string>
     <string name="action_setting_template">設定テンプレート</string>
+    <string name="auto_hide_conflict_snackbar">IMD+ が設定を非表示のまま保持しています。先に元に戻してから、このプロファイルを適用してください。</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">先に設定を構成してください</string>
+    <string name="dooa_thedjchi_only">「他のアプリの上に重ねて表示」の管理に対応しているのは Shizuku の Thedjchi フォークだけです</string>
+    <string name="help_path_accessibility">IMD 設定 → デフォルト IMD 設定 → 非表示にするユーザー補助サービス</string>
+    <string name="help_path_dooa">IMD 設定 → デフォルト IMD 設定 → IMD が管理する他のアプリの上に重ねて表示</string>
+    <string name="help_path_manage_shizuku">IMD 設定 → Shizuku の構成 → Shizuku を管理</string>
+    <string name="shortcut_lookup_failed">このアプリのショートカット情報を読み取れませんでした。</string>
+    <string name="understood">了解しました</string>
 </resources>

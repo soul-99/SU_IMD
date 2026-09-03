@@ -22,6 +22,8 @@ plugins {
     alias(libs.plugins.com.android.geto.application)
     alias(libs.plugins.com.android.geto.hilt)
     alias(libs.plugins.kotlin.serialization)
+    // Bare id: the version is declared once in the root build file. See the note there.
+    id("androidx.baselineprofile")
 }
 
 android {
@@ -58,8 +60,8 @@ android {
 
     defaultConfig {
         applicationId = "com.soul_99.suIMD"
-        versionCode = 14
-        versionName = "2.0"
+        versionCode = 17
+        versionName = "3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -76,6 +78,12 @@ android {
 
             isMinifyEnabled = true
             isShrinkResources = true
+
+            // ⚠ **Minification stays ON, and the profile survives it.** A baseline profile
+            // names classes and methods and R8 renames them, so the plugin rewrites the
+            // profile through the obfuscation map that this build already produces. Nothing
+            // to set here; the note is so a later round does not "fix" a profile that looks
+            // wrong by turning minification off, which would cost more than it saved.
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -121,10 +129,18 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+
+    // What installs the baseline profile on first run. Without it the profile ships inside
+    // the APK and is never applied on most devices.
+    implementation(libs.androidx.profileinstaller)
     implementation(libs.kotlinx.serialization.json)
 
     androidTestImplementation(libs.androidx.test.core.ktx)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+
+    // Where the generated profile comes from. ⚠ This does not run at build time — see
+    // baselineprofile/README.md for the one command that produces it.
+    baselineProfile(projects.baselineprofile)
 }

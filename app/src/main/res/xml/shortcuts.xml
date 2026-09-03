@@ -14,19 +14,12 @@
       Static rather than dynamic: it never changes, so there is nothing for the app to
       keep in sync, and a static shortcut is present from install without the app having
       to have been opened first.
-    -->
-    <shortcut
-        android:shortcutId="imd_services"
-        android:enabled="true"
-        android:icon="@mipmap/ic_services"
-        android:shortcutShortLabel="@string/services_shortcut_label"
-        android:shortcutLongLabel="@string/services_shortcut_label">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="com.soul_99.suIMD"
-            android:targetClass="com.android.geto.activity.services.ServicesActivity" />
-    </shortcut>
 
+      ⚠ The Settings manager shortcut that used to sit above this one is gone, at the
+      author's instruction: the SettingsManagerLauncher activity-alias in the manifest
+      already puts a Settings manager entry in the launcher on install, so a long-press
+      shortcut to the same ServicesActivity was a second door to the same room.
+    -->
     <shortcut
         android:shortcutId="imd_revert_to_default"
         android:enabled="true"

@@ -60,4 +60,13 @@
     <string name="action_app_setting">앱 설정</string>
     <string name="action_create_shortcut">바로가기 만들기</string>
     <string name="action_setting_template">설정 템플릿</string>
+    <string name="auto_hide_conflict_snackbar">IMD+가 설정을 숨긴 채로 유지하고 있습니다. 먼저 되돌린 뒤 이 프로필을 적용하세요.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">먼저 설정을 구성해 주세요</string>
+    <string name="dooa_thedjchi_only">\'다른 앱 위에 표시\' 관리는 Shizuku의 Thedjchi 포크에서만 지원됩니다</string>
+    <string name="help_path_accessibility">IMD 설정 → 기본 IMD 설정 → 숨길 접근성 서비스</string>
+    <string name="help_path_dooa">IMD 설정 → 기본 IMD 설정 → IMD가 관리하는 다른 앱 위에 표시</string>
+    <string name="help_path_manage_shizuku">IMD 설정 → Shizuku 구성 → Shizuku 관리</string>
+    <string name="shortcut_lookup_failed">이 앱의 바로가기 정보를 읽을 수 없습니다.</string>
+    <string name="understood">확인했습니다</string>
 </resources>

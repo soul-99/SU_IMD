@@ -34,7 +34,7 @@
     <string name="favourite_apps_options">お気に入りのオプション</string>
     <string name="no_favourite_apps">お気に入りはまだありません</string>
     <string name="no_matching_favourite_apps">その検索に一致するお気に入りはありません</string>
-    <string name="no_favourite_apps_subtitle">「すべてのアプリ」でアプリの横にある星、またはそのアプリの設定画面にある星をタップしてください。</string>
+    <string name="no_favourite_apps_subtitle">「すべてのアプリ」タブで星アイコンをタップして追加します</string>
     <string name="view">表示</string>
     <string name="custom">カスタム</string>
     <string name="alphabetical">名前順</string>
@@ -51,19 +51,22 @@
     <string name="settings_manager_configure_revert">「元に戻す」で復元する内容を指定</string>
     <string name="applied_settings_failure">設定を適用できませんでした</string>
     <string name="applied_settings_invalid">このアプリの設定に無効な値があります</string>
-    <string name="settings_manager_title">IMD サービスマネージャー</string>
+    <string name="settings_manager_title">設定マネージャー</string>
 
     <!-- settings_manager_title and the two _name_ strings below are matched as substrings
          inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_open_settings">IMD の設定を開く</string>
     <string name="settings_manager_info">このダイアログについて</string>
-    <string name="settings_manager_info_live">IMD サービスマネージャーは、設定とサービスの現在の状態を表示します。IMD や IMD で作成したアプリのショートカットからアプリを開いたときに、どの設定やサービスを非表示または再表示するかを決めるものではありません。</string>
+    <string name="settings_manager_info_live">IMD 設定マネージャーは設定のライブ状態を表示し、簡単に変更できます。</string>
     <string name="settings_manager_info_live_extra">IMD からアプリを起動したときに何を非表示にし、何を再表示するかを決めるには、IMD アプリ内でデフォルト IMD 設定を指定してください。</string>
     <string name="settings_manager_info_name_defaults">デフォルト IMD 設定</string>
     <string name="settings_manager_info_developer">IMD から開発者向けオプションをオフにしても、開発者向けオプションのフラグがオン・オフされるだけで、開発者向けオプション内で行った変更（アニメーションスケールの設定、仮の現在地アプリなど）はリセットされません。</string>
     <string name="settings_manager_info_developer_extra">開発者向けオプションをリセットするには、開発者向けオプションのページを開き、そこからオフにしてください。</string>
     <string name="settings_manager_info_name_reset">開発者向けオプションをリセット</string>
     <string name="revert_to_default">デフォルトに戻す</string>
+    <string name="unhide_settings">設定を再表示</string>
     <string name="not_configured_title">非表示にする設定がありません。このアプリで非表示にする設定を指定する必要があります。</string>
+    <string name="nothing_to_hide_message">まず IMD アプリの設定で、非表示にする設定を指定してください。</string>
     <string name="not_configured_message">IMD アプリでこのアプリを長押しすると、非表示にする設定を選べます。</string>
     <string name="got_it">わかりました</string>
     <string name="settings_manager_open">%1$s を開く</string>
@@ -77,7 +80,6 @@
     <string name="shizuku_help_point_setup">Shizuku アプリがインストールされ、ADB に登録されていること、そして IMD アプリの設定ページで正しく指定されていることを確認してください。</string>
     <string name="shizuku_help_point_permission">IMD アプリの Shizuku 権限は、特権的な Android 権限 WRITE_SECURE_SETTINGS を一度付与するためだけに使われます。Shizuku サービスの状態を調べたり、Shizuku サービスをオン・オフしたりするためには使われません。</string>
     <string name="shizuku_help_point_restart">正しく設定できたら、IMD アプリを再起動してもう一度お試しください。</string>
-    <string name="settings_manager_shizuku_wait">Shizuku のフォークによってはインテントでのサービス開始に時間がかかるため、10 秒ほどお待ちください</string>
     <string name="revert_developer_settings">開発者向けオプション</string>
     <string name="revert_usb_debugging">USB デバッグ</string>
     <string name="revert_wireless_debugging">ワイヤレス デバッグ</string>
@@ -97,4 +99,34 @@
     <string name="settings_manager_overlay_restore_failed_open">他のアプリの上に重ねて表示の権限が復元されなかった理由</string>
     <string name="shizuku_starting_to_restore_overlay">他のアプリの上に重ねて表示の権限を復元するために Shizuku サービスを開始しています</string>
     <string name="settings_manager_overlay_note">IMD アプリの設定で選択したアプリのみが管理されます</string>
+    <string name="shizuku_unmanageable">ここから Shizuku サービスを管理することはできません。IMD の設定で Shizuku を正しく構成してください</string>
+    <string name="shevery_toggle_title">Shevery サービス</string>
+    <string name="shevery_toggle_point_status">IMD 設定マネージャーはサービスの現在の状態を表示するだけです。</string>
+    <string name="shevery_toggle_point_intents">Shevery では切り替えできません（インテント非対応）</string>
+    <string name="accessibility_none_managed">IMD で管理する User補助サービスが設定されていません。まず IMD アプリの設定で管理したいサービスを構成してください。</string>
+    <string name="shizuku_stopping_via_intent">停止インテントで Shizuku の停止を試みています</string>
+    <string name="shevery_toggle_point_open">サービスを管理するには Shevery アプリを直接開いてください</string>
+    <string name="overlay_none_managed">「他のアプリの上に重ねて表示」を非表示にするアプリが設定されていません。\nIMD アプリの設定から追加してください。</string>
+    <string name="auto_hide_conflict_title">IMD+ が設定を非表示のまま保持しています</string>
+    <string name="auto_hide_conflict_body">IMD+ はすでに端末全体の一覧を非表示にしており、このアプリのプロファイルはそこに含まれないものを求めています。その上にさらに隠すと、どちらの復元でも戻せない設定が残ります。</string>
+    <string name="auto_hide_conflict_fix">まず IMD+ を元に戻してください — その通知か「設定を非表示」タイルから — そのうえでこのアプリを開き直してください。</string>
+    <string name="shizuku_starting">Shizuku サービスを開始しています</string>
+    <string name="settings_manager_busy_hiding">IMD が設定を非表示にしています。お待ちください...</string>
+    <string name="settings_manager_busy_unhiding">IMD が設定を再表示しています。お待ちください...</string>
+    <string name="settings_manager_info_name_live">ライブ状態</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">先に設定を構成してください</string>
+    <string name="dooa_thedjchi_only">「他のアプリの上に重ねて表示」の管理に対応しているのは Shizuku の Thedjchi フォークだけです</string>
+    <string name="help_path_accessibility">IMD 設定 → デフォルト IMD 設定 → 非表示にするユーザー補助サービス</string>
+    <string name="help_path_dooa">IMD 設定 → デフォルト IMD 設定 → IMD が管理する他のアプリの上に重ねて表示</string>
+    <string name="help_path_manage_shizuku">IMD 設定 → Shizuku の構成 → Shizuku を管理</string>
+    <string name="hide_settings">設定を非表示</string>
+    <string name="revert_shevery">Shevery サービス</string>
+    <string name="settings_manager_all_off">すべてオフ</string>
+    <string name="settings_manager_all_on">すべてオン</string>
+    <string name="settings_manager_only_selected">選択したものだけ</string>
+    <string name="settings_manager_pending">IMD は現在設定を非表示にしています。設定を再表示する前にここで加えた変更は、設定の復元後に取り消されます</string>
+    <string name="shevery_service_first">先に Shevery サービスをオンにしてください。</string>
+    <string name="shevery_wait_countdown">Shevery サービスの起動を待っています...(%1$d)</string>
+    <string name="shizuku_wait_countdown">Shizuku サービスの起動を待っています...(%1$d)</string>
 </resources>

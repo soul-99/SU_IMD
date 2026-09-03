@@ -41,4 +41,24 @@ interface AccessibilityServicesWrapper {
      * if the write was refused.
      */
     suspend fun setEnabledAccessibilityServices(components: List<String>): Boolean
+
+    /**
+     * The flattened component name of IMD's own accessibility service — the IMD+ detector.
+     *
+     * Built here rather than written down in the domain because half of it is this app's
+     * package name, which only the framework layer can see. It changes with the build flavour
+     * and with any future rename, and a hardcoded copy would go quietly wrong on both.
+     */
+    fun autoHideServiceComponent(): String
+
+    /**
+     * Whether the system has the IMD+ detector **bound and running** right now.
+     *
+     * Deliberately not "is it in the enabled list": from Android 13 a sideloaded app's service
+     * can sit in that list and never be bound, because the restricted-settings AppOp has not
+     * been allowed. Trusting the list there produces the worst possible report — IMD+ says it
+     * is watching, and nothing is. This asks the accessibility manager which services it
+     * actually has running.
+     */
+    suspend fun isAutoHideServiceRunning(): Boolean
 }

@@ -16,10 +16,27 @@
   ~
   -->
 <resources>
-    <string name="revert_using_memory">메모리로 되돌리기</string>
+    <string name="revert_using_memory">메모리를 사용해 설정 다시 표시</string>
     <string name="revert_to_default">기본값으로 되돌리기</string>
-    <string name="overlay_restore_failed_title">되돌리기 실패</string>
+    <string name="overlay_restore_failed_title">설정 다시 표시 실패</string>
     <string name="overlay_restore_failed_text">Shizuku로 다른 앱 위에 표시 권한을 복원하지 못했습니다. Shizuku 서비스를 직접 켠 후 아래 버튼을 눌러 주세요</string>
     <string name="overlay_restore_retry">다시 시도</string>
-    <string name="alert_notification_channel">되돌리기 실패</string>
+    <string name="alert_notification_channel">IMD 실패</string>
+    <string name="shizuku_usb_fallback_title">Shizuku 서비스가 중지됨</string>
+    <string name="shizuku_usb_fallback_text">Shizuku 서비스가 중지 인텐트가 아니라 USB 디버깅으로 종료되었습니다. 되돌릴 때 앱이 Shizuku 서비스를 복원하지 못할 수 있습니다.</string>
+    <string name="shizuku_usb_fallback_text_overlay">Shizuku 서비스가 중지 인텐트가 아니라 USB 디버깅으로 종료되었습니다. 되돌릴 때 앱이 Shizuku 서비스와 \'다른 앱 위에 표시\'를 복원하지 못할 수 있습니다.</string>
+    <string name="notification_ok">확인</string>
+    <string name="hidden_revert_default">설정이 숨겨졌습니다. 다시 표시하려면 탭하세요.</string>
+    <string name="hidden_revert_memory">설정이 숨겨졌습니다. 메모리에서 다시 표시하려면 탭하세요.</string>
+    <string name="auto_hide_channel">설정 자동 숨기기 (IMD+)</string>
+    <string name="auto_hide_hidden_revert">IMD+가 설정을 숨겼습니다. 다시 표시하려면 탭하세요.</string>
+    <string name="auto_hide_hidden_revert_memory">IMD+가 설정을 숨겼습니다. 메모리에서 다시 표시하려면 탭하세요.</string>
+    <string name="auto_unhide_channel">자동 표시 설정 서비스</string>
+    <string name="auto_unhide_running">자동 표시 서비스 실행 중</string>
+    <string name="auto_hide_shizuku_failed">Shizuku 서비스를 시작할 수 없어 IMD+가 설정을 숨기지 못했습니다. 설정을 확인해 주세요.</string>
+    <string name="shizuku_revert_failed">Shizuku 서비스를 시작하지 못했습니다. 여기를 눌러 수동으로 시작해 주세요</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="developer_note_channel">IMD 앱 업데이트 알림</string>
+    <string name="developer_note_notification">IMD: 개발자의 중요한 안내 🧑‍🔬</string>
+    <string name="shevery_start_failed">Shevery를 시작하지 못했습니다. 수동으로 시작하려면 여기를 누르세요.</string>
 </resources>

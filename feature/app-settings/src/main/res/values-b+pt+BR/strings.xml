@@ -60,4 +60,13 @@
     <string name="action_app_setting">Configuração do app</string>
     <string name="action_create_shortcut">Criar atalho</string>
     <string name="action_setting_template">Modelo de configurações</string>
+    <string name="auto_hide_conflict_snackbar">O IMD+ está mantendo as suas configurações ocultas. Reverta-o primeiro e depois aplique este perfil.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">Configure primeiro as configurações</string>
+    <string name="dooa_thedjchi_only">gerenciar \"Sobreposição a outros apps\" só é compatível com o fork Thedjchi do Shizuku</string>
+    <string name="help_path_accessibility">Configurações do IMD → Configurações padrão do IMD → Serviços de acessibilidade a ocultar</string>
+    <string name="help_path_dooa">Configurações do IMD → Configurações padrão do IMD → Sobreposição a outros apps gerenciada pelo IMD</string>
+    <string name="help_path_manage_shizuku">Configurações do IMD → Configuração do Shizuku → Gerenciar o Shizuku</string>
+    <string name="shortcut_lookup_failed">Não foi possível ler os detalhes do atalho deste app.</string>
+    <string name="understood">Entendi</string>
 </resources>

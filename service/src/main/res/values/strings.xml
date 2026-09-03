@@ -20,4 +20,6 @@
     <string name="waiting_for_changes">Waiting for changes…</string>
     <string name="unknown">Unknown</string>
     <string name="stop">Stop</string>
+    <string name="auto_hide_service_label">IMD+ (autohide settings)</string>
+    <string name="auto_hide_service_description">Lets IMD notice when one of your chosen apps is opened, so it can hide your settings before that app looks at them. IMD only reads which app came to the front — never anything on your screen.</string>
 </resources>

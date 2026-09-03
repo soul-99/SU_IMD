@@ -1,0 +1,16 @@
+flowchart TD
+    A["An app is launched <b>from inside IMD</b>,<br/>and something is actually applied"] --> B["Arm the watch"]
+    B --> C["IMD goes away - marked when it stops, so<br/>a dialog or the notification shade<br/>does not count"]
+    C --> D["IMD comes back to the foreground"]
+    D --> E{"Is <b>Auto revert on<br/>returning</b> on?"}
+    E -- No --> F["<b>Clear the armed marker</b> and stop. The<br/>launch is discarded, not<br/>merely skipped"]
+    E -- Yes --> G{"<b>Unhiding framework</b>?"}
+    G -- Memory --> H["Revert only the launched app's profile<br/>(logic 4), cancel its notification, and<br/>clear the revert offer if<br/>nothing is left"]
+    G -- "Default IMD settings" --> I["Revert to default (logic 2)"]
+    H -- "Overlay could not<br/>be restored" --> J["Report that instead<br/>of the toast"]
+
+    class F stop
+    class J stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

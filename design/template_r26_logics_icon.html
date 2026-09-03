@@ -1,0 +1,204 @@
+<title>r26 Logics Icon</title>
+<style>
+  :root { --ink:#16180f; --page:#f4f5ec; --muted:#5c6152; --rule:#d3d7c6; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --ink:#e6e8dc; --page:#14160f; --muted:#9aa08d; --rule:#2e3327; }
+  }
+  :root[data-theme="dark"] { --ink:#e6e8dc; --page:#14160f; --muted:#9aa08d; --rule:#2e3327; }
+
+  body {
+    background:var(--page); color:var(--ink); margin:0; padding:26px 18px 70px;
+    font:15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width:960px; margin:0 auto; }
+  h1 { font-size:21px; margin:0 0 4px; letter-spacing:-0.01em; }
+  .sub { color:var(--muted); margin:0 0 8px; font-size:13.5px; max-width:70ch; }
+  h2 {
+    font-size:12px; text-transform:uppercase; letter-spacing:.09em; color:var(--muted);
+    margin:34px 0 6px; font-weight:600; border-top:1px solid var(--rule); padding-top:14px;
+  }
+  p.note { color:var(--muted); font-size:13.5px; margin:0 0 18px; max-width:70ch; }
+  .flag { border-left:3px solid #d08a2c; padding:10px 0 10px 14px; margin:0 0 22px; font-size:13.5px; max-width:70ch; }
+  .flag b { color:var(--ink); }
+  code { font-size:.9em; opacity:.85; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:16px; }
+  .panel { border-radius:14px; padding:18px; border:1px solid var(--rule); }
+  .panel h3 { font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 14px; opacity:.6; font-weight:600; }
+
+  /* the About card, both themes, so the icon is judged where it lives */
+  .card {
+    border-radius:12px; padding:12px; border:1px solid;
+    display:flex; gap:10px; align-items:flex-start;
+  }
+  .card.lightcard { background:#ffffff; border-color:#c5c8ba; color:#1a1c16; }
+  .card.darkcard  { background:#14160e; border-color:#44483d; color:#e2e3d8; }
+  .card .words { flex:1; }
+  .card .link { color:#4e7819; text-decoration:underline; font-size:15px; line-height:1.3; }
+  .card.darkcard .link { color:#b3e675; }
+  .card .shell {
+    margin-top:10px; background:#f2f1e9; border-radius:8px; padding:8px 10px;
+    font:12px/1.5 "DejaVu Sans Mono", ui-monospace, monospace; color:#e0a800; white-space:nowrap;
+    overflow:hidden;
+  }
+  .card .shell b { color:#4c662b; font-weight:400; }
+  .card .art { flex:none; width:64px; height:64px; }
+
+  .swatchrow { display:flex; gap:22px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+  .swatchrow figure { margin:0; text-align:center; }
+  .swatchrow figcaption { font-size:11px; color:var(--muted); margin-top:6px; letter-spacing:.04em; }
+  .big { width:120px; height:120px; }
+  .mid { width:64px;  height:64px; }
+  .sml { width:32px;  height:32px; }
+</style>
+
+<main>
+  <h1>r26 — the Logics card icon</h1>
+  <p class="sub">An original drawing in the style of the icon you pasted into the screenshot. Nothing is built yet — this is the template and one decision.</p>
+
+  <div class="flag">
+    <b>Why I have not simply used the Flaticon file.</b> Flaticon's free licence requires visible attribution wherever the icon appears and does not permit redistributing the asset itself — and IMD ships under GPL-3.0, which requires that everything in the source be redistributable on GPL terms. Dropping that PNG into the repo puts the two licences in direct conflict, and it is your name on the project, so it is not a call I will make quietly. What is below is drawn from scratch: same idea — a bulb wired into logic — same flat multi-colour treatment, none of their geometry. If you would rather have <em>their</em> exact icon, buy the Flaticon licence that allows redistribution and send me the file and I will drop it in; that is a real option, just a paid one.
+  </div>
+
+  <h2>The drawing</h2>
+  <p class="note">A dashed circuit boundary standing for the logic IMD applies, three nodes on it in the app's own greens and teals, a bulb at the centre for the idea, a gear for the mechanism, and the two outcomes IMD actually produces — a green tick for hidden, a red cross for restored. Drawn as an Android <code>VectorDrawable</code>, so it is a few hundred bytes and stays crisp at any density.</p>
+
+  <div class="swatchrow">
+    <figure>
+      <svg class="big" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-label="Logic icon, large">
+        <circle cx="48" cy="46" r="33" fill="none" stroke="#8f9285" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 7"/>
+        <g fill="#2a746f"><path d="M48 6l6.9 4v8L48 22l-6.9-4v-8z"/></g>
+        <g fill="#7fc8c2"><path d="M15 30l6.1 3.5v7L15 44l-6.1-3.5v-7z"/><path d="M81 30l6.1 3.5v7L81 44l-6.1-3.5v-7z"/></g>
+        <g fill="#4e7819"><path d="M26 70l5.2 3v6l-5.2 3-5.2-3v-6z"/></g>
+        <path d="M48 24c-8.6 0-15.5 6.9-15.5 15.4 0 5.6 2.9 9.4 5.4 12.4 1.6 1.9 2.6 3.2 2.9 4.7h14.4c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#ffcf4d"/>
+        <path d="M48 24c-1 0-2 .1-2.9.3 7.2 1.4 12.6 7.6 12.6 15.1 0 5.6-2.9 9.4-5.4 12.4-1.6 1.9-2.6 3.2-2.9 4.7h5.3c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#e0a800"/>
+        <rect x="40" y="60" width="16" height="4.5" rx="2.2" fill="#9aa08d"/>
+        <rect x="41.5" y="66.5" width="13" height="4.5" rx="2.2" fill="#9aa08d"/>
+        <path d="M44 73.5h8c0 2.6-1.8 4.5-4 4.5s-4-1.9-4-4.5z" fill="#75796c"/>
+        <path d="M42 41.5l4-8 4 5.5 4-8" fill="none" stroke="#7a5b00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <g transform="translate(70 62)">
+          <path d="M9.7 0h-3.4l-.6 2.6a7 7 0 00-1.7 1L1.6 2.4-.1 5.3l2 1.8a7 7 0 000 2L-.1 10.9l1.7 2.9 2.4-1.2a7 7 0 001.7 1l.6 2.6h3.4l.6-2.6a7 7 0 001.7-1l2.4 1.2 1.7-2.9-2-1.8a7 7 0 000-2l2-1.8-1.7-2.9-2.4 1.2a7 7 0 00-1.7-1z" fill="#9aa08d"/>
+          <circle cx="8" cy="8.1" r="3.1" fill="#f4f5ec"/>
+        </g>
+        <circle cx="76" cy="16" r="11" fill="#3ec46d"/>
+        <path d="M71 16.2l3.4 3.4 6-6.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="19" cy="63" r="10" fill="#e5484d"/>
+        <path d="M15.6 59.6l6.8 6.8M22.4 59.6l-6.8 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      <figcaption>120 px — detail check</figcaption>
+    </figure>
+
+    <figure>
+      <svg class="mid" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-label="Logic icon, card size">
+        <circle cx="48" cy="46" r="33" fill="none" stroke="#8f9285" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 7"/>
+        <g fill="#2a746f"><path d="M48 6l6.9 4v8L48 22l-6.9-4v-8z"/></g>
+        <g fill="#7fc8c2"><path d="M15 30l6.1 3.5v7L15 44l-6.1-3.5v-7z"/><path d="M81 30l6.1 3.5v7L81 44l-6.1-3.5v-7z"/></g>
+        <g fill="#4e7819"><path d="M26 70l5.2 3v6l-5.2 3-5.2-3v-6z"/></g>
+        <path d="M48 24c-8.6 0-15.5 6.9-15.5 15.4 0 5.6 2.9 9.4 5.4 12.4 1.6 1.9 2.6 3.2 2.9 4.7h14.4c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#ffcf4d"/>
+        <path d="M48 24c-1 0-2 .1-2.9.3 7.2 1.4 12.6 7.6 12.6 15.1 0 5.6-2.9 9.4-5.4 12.4-1.6 1.9-2.6 3.2-2.9 4.7h5.3c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#e0a800"/>
+        <rect x="40" y="60" width="16" height="4.5" rx="2.2" fill="#9aa08d"/>
+        <rect x="41.5" y="66.5" width="13" height="4.5" rx="2.2" fill="#9aa08d"/>
+        <path d="M44 73.5h8c0 2.6-1.8 4.5-4 4.5s-4-1.9-4-4.5z" fill="#75796c"/>
+        <path d="M42 41.5l4-8 4 5.5 4-8" fill="none" stroke="#7a5b00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <g transform="translate(70 62)">
+          <path d="M9.7 0h-3.4l-.6 2.6a7 7 0 00-1.7 1L1.6 2.4-.1 5.3l2 1.8a7 7 0 000 2L-.1 10.9l1.7 2.9 2.4-1.2a7 7 0 001.7 1l.6 2.6h3.4l.6-2.6a7 7 0 001.7-1l2.4 1.2 1.7-2.9-2-1.8a7 7 0 000-2l2-1.8-1.7-2.9-2.4 1.2a7 7 0 00-1.7-1z" fill="#9aa08d"/>
+          <circle cx="8" cy="8.1" r="3.1" fill="#f4f5ec"/>
+        </g>
+        <circle cx="76" cy="16" r="11" fill="#3ec46d"/>
+        <path d="M71 16.2l3.4 3.4 6-6.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="19" cy="63" r="10" fill="#e5484d"/>
+        <path d="M15.6 59.6l6.8 6.8M22.4 59.6l-6.8 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      <figcaption>64 px — actual size in the card</figcaption>
+    </figure>
+
+    <figure>
+      <svg class="sml" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-label="Logic icon, small">
+        <circle cx="48" cy="46" r="33" fill="none" stroke="#8f9285" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 7"/>
+        <g fill="#2a746f"><path d="M48 6l6.9 4v8L48 22l-6.9-4v-8z"/></g>
+        <g fill="#7fc8c2"><path d="M15 30l6.1 3.5v7L15 44l-6.1-3.5v-7z"/><path d="M81 30l6.1 3.5v7L81 44l-6.1-3.5v-7z"/></g>
+        <g fill="#4e7819"><path d="M26 70l5.2 3v6l-5.2 3-5.2-3v-6z"/></g>
+        <path d="M48 24c-8.6 0-15.5 6.9-15.5 15.4 0 5.6 2.9 9.4 5.4 12.4 1.6 1.9 2.6 3.2 2.9 4.7h14.4c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#ffcf4d"/>
+        <rect x="40" y="60" width="16" height="4.5" rx="2.2" fill="#9aa08d"/>
+        <rect x="41.5" y="66.5" width="13" height="4.5" rx="2.2" fill="#9aa08d"/>
+        <path d="M44 73.5h8c0 2.6-1.8 4.5-4 4.5s-4-1.9-4-4.5z" fill="#75796c"/>
+        <g transform="translate(70 62)">
+          <path d="M9.7 0h-3.4l-.6 2.6a7 7 0 00-1.7 1L1.6 2.4-.1 5.3l2 1.8a7 7 0 000 2L-.1 10.9l1.7 2.9 2.4-1.2a7 7 0 001.7 1l.6 2.6h3.4l.6-2.6a7 7 0 001.7-1l2.4 1.2 1.7-2.9-2-1.8a7 7 0 000-2l2-1.8-1.7-2.9-2.4 1.2a7 7 0 00-1.7-1z" fill="#9aa08d"/>
+          <circle cx="8" cy="8.1" r="3.1" fill="#f4f5ec"/>
+        </g>
+        <circle cx="76" cy="16" r="11" fill="#3ec46d"/>
+        <path d="M71 16.2l3.4 3.4 6-6.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="19" cy="63" r="10" fill="#e5484d"/>
+        <path d="M15.6 59.6l6.8 6.8M22.4 59.6l-6.8 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      <figcaption>32 px — legibility floor</figcaption>
+    </figure>
+  </div>
+
+  <h2>In the card, both themes</h2>
+  <p class="note">Top-right, aligned to the first line of the link, exactly where you put it in the screenshot. The shell panel is r25's sepia in both — that change is already in the r25 zip.</p>
+  <div class="grid">
+    <div class="panel">
+      <h3>Light</h3>
+      <div class="card lightcard">
+        <div class="words">
+          <div class="link">IMD app Logics<br>(How this app works)</div>
+          <div class="shell"><b>$ </b>su_imd --why<br><b>su_imd: </b>developer lost his sanity<br><b>su_imd: </b>creating &amp; perfecting these.</div>
+        </div>
+        <svg class="art" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="48" cy="46" r="33" fill="none" stroke="#8f9285" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 7"/>
+          <g fill="#2a746f"><path d="M48 6l6.9 4v8L48 22l-6.9-4v-8z"/></g>
+          <g fill="#7fc8c2"><path d="M15 30l6.1 3.5v7L15 44l-6.1-3.5v-7z"/><path d="M81 30l6.1 3.5v7L81 44l-6.1-3.5v-7z"/></g>
+          <g fill="#4e7819"><path d="M26 70l5.2 3v6l-5.2 3-5.2-3v-6z"/></g>
+          <path d="M48 24c-8.6 0-15.5 6.9-15.5 15.4 0 5.6 2.9 9.4 5.4 12.4 1.6 1.9 2.6 3.2 2.9 4.7h14.4c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#ffcf4d"/>
+          <path d="M48 24c-1 0-2 .1-2.9.3 7.2 1.4 12.6 7.6 12.6 15.1 0 5.6-2.9 9.4-5.4 12.4-1.6 1.9-2.6 3.2-2.9 4.7h5.3c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#e0a800"/>
+          <rect x="40" y="60" width="16" height="4.5" rx="2.2" fill="#9aa08d"/>
+          <rect x="41.5" y="66.5" width="13" height="4.5" rx="2.2" fill="#9aa08d"/>
+          <path d="M44 73.5h8c0 2.6-1.8 4.5-4 4.5s-4-1.9-4-4.5z" fill="#75796c"/>
+          <path d="M42 41.5l4-8 4 5.5 4-8" fill="none" stroke="#7a5b00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <g transform="translate(70 62)">
+            <path d="M9.7 0h-3.4l-.6 2.6a7 7 0 00-1.7 1L1.6 2.4-.1 5.3l2 1.8a7 7 0 000 2L-.1 10.9l1.7 2.9 2.4-1.2a7 7 0 001.7 1l.6 2.6h3.4l.6-2.6a7 7 0 001.7-1l2.4 1.2 1.7-2.9-2-1.8a7 7 0 000-2l2-1.8-1.7-2.9-2.4 1.2a7 7 0 00-1.7-1z" fill="#9aa08d"/>
+            <circle cx="8" cy="8.1" r="3.1" fill="#ffffff"/>
+          </g>
+          <circle cx="76" cy="16" r="11" fill="#3ec46d"/>
+          <path d="M71 16.2l3.4 3.4 6-6.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="19" cy="63" r="10" fill="#e5484d"/>
+          <path d="M15.6 59.6l6.8 6.8M22.4 59.6l-6.8 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Dark</h3>
+      <div class="card darkcard">
+        <div class="words">
+          <div class="link">IMD app Logics<br>(How this app works)</div>
+          <div class="shell"><b>$ </b>su_imd --why<br><b>su_imd: </b>developer lost his sanity<br><b>su_imd: </b>creating &amp; perfecting these.</div>
+        </div>
+        <svg class="art" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="48" cy="46" r="33" fill="none" stroke="#8f9285" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 7"/>
+          <g fill="#92ded6"><path d="M48 6l6.9 4v8L48 22l-6.9-4v-8z"/></g>
+          <g fill="#2a746f"><path d="M15 30l6.1 3.5v7L15 44l-6.1-3.5v-7z"/><path d="M81 30l6.1 3.5v7L81 44l-6.1-3.5v-7z"/></g>
+          <g fill="#b3e675"><path d="M26 70l5.2 3v6l-5.2 3-5.2-3v-6z"/></g>
+          <path d="M48 24c-8.6 0-15.5 6.9-15.5 15.4 0 5.6 2.9 9.4 5.4 12.4 1.6 1.9 2.6 3.2 2.9 4.7h14.4c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#ffcf4d"/>
+          <path d="M48 24c-1 0-2 .1-2.9.3 7.2 1.4 12.6 7.6 12.6 15.1 0 5.6-2.9 9.4-5.4 12.4-1.6 1.9-2.6 3.2-2.9 4.7h5.3c.3-1.5 1.3-2.8 2.9-4.7 2.5-3 5.4-6.8 5.4-12.4C63.5 30.9 56.6 24 48 24z" fill="#e0a800"/>
+          <rect x="40" y="60" width="16" height="4.5" rx="2.2" fill="#c5c8ba"/>
+          <rect x="41.5" y="66.5" width="13" height="4.5" rx="2.2" fill="#c5c8ba"/>
+          <path d="M44 73.5h8c0 2.6-1.8 4.5-4 4.5s-4-1.9-4-4.5z" fill="#8f9285"/>
+          <path d="M42 41.5l4-8 4 5.5 4-8" fill="none" stroke="#7a5b00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <g transform="translate(70 62)">
+            <path d="M9.7 0h-3.4l-.6 2.6a7 7 0 00-1.7 1L1.6 2.4-.1 5.3l2 1.8a7 7 0 000 2L-.1 10.9l1.7 2.9 2.4-1.2a7 7 0 001.7 1l.6 2.6h3.4l.6-2.6a7 7 0 001.7-1l2.4 1.2 1.7-2.9-2-1.8a7 7 0 000-2l2-1.8-1.7-2.9-2.4 1.2a7 7 0 00-1.7-1z" fill="#c5c8ba"/>
+            <circle cx="8" cy="8.1" r="3.1" fill="#14160e"/>
+          </g>
+          <circle cx="76" cy="16" r="11" fill="#3ec46d"/>
+          <path d="M71 16.2l3.4 3.4 6-6.4" fill="none" stroke="#14160e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="19" cy="63" r="10" fill="#e5484d"/>
+          <path d="M15.6 59.6l6.8 6.8M22.4 59.6l-6.8 6.8" fill="none" stroke="#14160e" stroke-width="2.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <h2>The one decision</h2>
+  <p class="note">The nodes and the gear read differently in the two themes above — <b>light</b> uses the app's own dark greens and teals, <b>dark</b> uses the light ones, so the icon belongs to the page it is on. The alternative is one fixed drawing in both, like the shell block you just asked to pin. Both are drawn above; say which and I will build it as a single <code>VectorDrawable</code> (fixed) or as two (theme-aware). The bulb, tick and cross stay the same colours either way — those are meanings, not decoration.</p>
+</main>

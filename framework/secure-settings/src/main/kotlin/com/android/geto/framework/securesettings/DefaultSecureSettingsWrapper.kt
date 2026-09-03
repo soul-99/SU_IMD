@@ -21,6 +21,7 @@ import android.content.Context
 import android.provider.Settings
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
+import com.android.geto.domain.common.Diagnostics
 import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers.IO
 import com.android.geto.domain.framework.SecureSettingsWrapper
@@ -48,6 +49,12 @@ internal class DefaultSecureSettingsWrapper @Inject constructor(
         Settings.NameValueTable.VALUE,
     )
 
+    // A synchronous PackageManager check behind a suspend signature, which the interface needs
+    // because nothing else about this wrapper can be answered without leaving the caller's
+    // thread. Cheap enough to ask at the top of every hide.
+    override suspend fun hasWriteSecureSettingsPermission(): Boolean =
+        writeSecureSettingsMonitor.hasPermission()
+
     override suspend fun canWriteSecureSettings(
         settingType: SettingType,
         key: String,
@@ -58,7 +65,11 @@ internal class DefaultSecureSettingsWrapper @Inject constructor(
         // the use cases still map it to AppSettingsResult.NoPermission exactly as before —
         // this only adds the reaction, it does not swallow the failure.
         try {
-            when (settingType) {
+            // Bound to a name rather than left as the last expression, because it *is* the
+            // return value - putString reports whether the row was written, and this whole
+            // function is that Boolean. Logging after it without holding on to it made the
+            // try block evaluate to Unit, which is exactly how this failed to compile once.
+            val written = when (settingType) {
                 SYSTEM -> Settings.System.putString(
                     contentResolver,
                     key,
@@ -77,7 +88,24 @@ internal class DefaultSecureSettingsWrapper @Inject constructor(
                     value,
                 )
             }
+
+            // The most useful line the diagnostic log carries, and the reason it is here
+            // rather than in the use cases: they can say a hide failed, only this can say
+            // which key it failed on. It reports what putString actually returned, so a
+            // write that was refused outright and one that quietly did nothing read
+            // differently in the log.
+            Diagnostics.log(
+                tag = "write",
+                message = "$settingType.$key = $value -> " + if (written) "ok" else "not written",
+            )
+
+            written
         } catch (securityException: SecurityException) {
+            // Before the rethrow, so the line exists whatever the use case above decides to
+            // do with the exception - and so a run that ends in NoPermission names the key
+            // it died on rather than only the fact that it died.
+            Diagnostics.log(tag = "write", message = "$settingType.$key = $value -> refused")
+
             writeSecureSettingsMonitor.onWriteRefused()
 
             throw securityException

@@ -1,0 +1,30 @@
+flowchart TD
+    A["Its own launcher icon · a Quick Settings tile ·<br/>a homescreen shortcut · the Favourites tab ·<br/>an IMD intent - <b>all without IMD open</b>"] --> B["Read every row's <b>live</b> state, and<br/>re-read it twice a second"]
+    B --> C["Draw only the rows ticked in <b>Setting manager<br/>toggles</b>, in an order that<br/>depends on the fork"]
+
+    C --> D{"Row pressed"}
+    D -- "Developer settings ·<br/>USB · Wireless debugging" --> E["Write it directly. Locked while a<br/>fork start or an overlay write<br/>is in flight"]
+    D -- "Accessibility services" --> F["Act only on the selection -<br/><i>only selected ones</i>"]
+    D -- "Display over other apps" --> G["Start Shizuku if needed, write the<br/>AppOp, then put back the rows<br/>the start disturbed"]
+
+    D -- "Shizuku, on <b>Thedjchi</b>" --> H["Start or stop it. The spinner turns in<br/>the switch thumb, with an <b>8s</b><br/>countdown under the row"]
+    D -- "Shizuku, on <b>Shevery</b>" --> I["Renamed <b>Shevery service</b>. Turning it on<br/>raises the debugging transports and<br/>waits <b>40s</b> for ErrorProtect"]
+    I --> J["During the wait the row looks locked but<br/>stays pressable - <b>a press cancels</b>. USB<br/>and the row itself are held;<br/>wireless stays free"]
+    I -- "Turned off" --> K["Stops the service <b>and</b> both<br/>debugging transports"]
+
+    C -- "Shizuku not configured" --> L["The Shizuku row and the overlay row are<br/><b>removed from the card</b>, not greyed"]
+
+    E --> M["<b>All off</b> / <b>All on</b> pill, above the first<br/>switch. It moves only the rows it judged<br/>operable, in dependency order, and skips<br/>wireless unless the user restores it"]
+    F --> M
+    G --> M
+    H --> M
+    J --> M
+    M --> N["Rows that were off when a bulk button<br/>was pressed <b>tick</b> as they come on"]
+    N --> O["Footer: <b>Hide settings</b> or <b>Unhide settings</b>,<br/>whichever the device is - and <b>Revert to<br/>default</b>, which long-presses into<br/>its own configuration"]
+
+    class I fork
+    class J fork
+    class K fork
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

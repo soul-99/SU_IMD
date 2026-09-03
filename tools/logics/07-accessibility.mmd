@@ -1,0 +1,19 @@
+flowchart TD
+    A["A hide reaches the<br/>accessibility step"] --> B["Only the services selected in<br/><b>Accessibility services managed by IMD</b><br/>are ever touched"]
+    B --> C["Claim every selected service that is on<br/><b>or</b> already held by another profile - so<br/>that profile's revert cannot bring<br/>one back mid-hide"]
+    C --> G["Record the claim <b>before</b> switching anything off,<br/>and roll it back if the write fails.<br/>A device-wide hide records under one fixed key;<br/>a per-app one records against that app"]
+    G --> H["Switch the claimed services off"]
+
+    H --> I{"On the way back -<br/>which revert?"}
+    I -- "Revert to default, or the<br/>Settings manager's switch" --> J["<b>Release everything.</b> Every holder is<br/>flattened, deliberately: scoping this<br/>is what caused the reported bug"]
+    I -- "A per-app revert" --> K["Release only this app's claim, and<br/>leave a service another app<br/>still holds switched off"]
+
+    J --> L{"Switched from the<br/><b>Settings manager</b>?"}
+    L -- "Turned off" --> M["Also switch <b>IMD's own IMD+<br/>detector</b> off - always"]
+    L -- "Turned on" --> N["Also bring the detector back,<br/>unless something is still hidden"]
+    K --> O["The detector is left alone<br/>on this path"]
+
+    class M stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

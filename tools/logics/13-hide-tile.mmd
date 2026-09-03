@@ -1,0 +1,30 @@
+flowchart TD
+    A["The <b>Hide settings</b> Quick Settings<br/>tile is pressed"] --> B{"Already working?"}
+    B -- Yes --> Z["Ignored. The tile reads <i>Hiding<br/>settings…</i> and cannot be pressed"]
+    B -- No --> C["Run on the app's own scope - <b>the shade<br/>stays open</b>. Re-read which<br/>direction to go"]
+
+    C --> D{"Is anything<br/>hidden now?"}
+
+    D -- "No, so hide" --> E{"Outcome"}
+    E -- Hidden --> F["Toast, and the one ongoing <b>Settings<br/>hidden</b> notification. The shade<br/>collapses a second later"]
+    E -- "Nothing ticked" --> G["Collapse the shade, and say<br/>what to configure"]
+    E -- "The overlay write failed" --> H["<b>Leave the shade open</b> and post a<br/>high-priority notification into it.<br/>Tapping opens the <b>Settings manager</b>"]
+    E -- "The grant has gone" --> I["Collapse, and say so"]
+    E -- "IMD+ holds it, or a<br/>prior hide stands" --> J["Nothing, silently"]
+
+    D -- "Yes, so unhide" --> K{"Who is holding it?"}
+    K -- "<b>IMD+</b>" --> L["Hand the whole press to IMD+'s own<br/>revert - this is checked first"]
+    K -- "Per-app profiles" --> M["Cancel the notifications, then<br/>sweep every record (logic 4)"]
+    K -- "Device-wide" --> N["Revert, following the <b>unhiding<br/>framework</b> - so under Memory it restores<br/>what the hide measured"]
+    K -- "Nothing recorded" --> O["Fall back to <b>Revert to default</b> anyway,<br/>so a press is never a no-op"]
+
+    P["On <b>Shevery</b> the Shizuku row is dropped from<br/>Settings to hide - so a list whose only<br/>tick is Shizuku hides nothing"] -.-> E
+
+    class Z stop
+    class G stop
+    class H stop
+    class I stop
+    class P fork
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

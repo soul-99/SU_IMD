@@ -24,5 +24,29 @@
             android:name=".SettingsObserverService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <!--
+          The Auto-hide settings (IMD+) detector.
+
+          Exported, because an accessibility service has to be: the system binds it, and the
+          system is another process. BIND_ACCESSIBILITY_SERVICE is what makes that safe - only
+          a caller holding it may bind, and only the system holds it.
+
+          The label is what appears in Android's own accessibility list, so it says what the
+          service is for rather than repeating the app's name.
+        -->
+        <service
+            android:name=".AutoHideAccessibilityService"
+            android:exported="true"
+            android:label="@string/auto_hide_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/auto_hide_accessibility_config" />
+        </service>
     </application>
 </manifest>

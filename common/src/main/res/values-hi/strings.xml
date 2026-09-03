@@ -31,14 +31,33 @@
     <string name="global">Global</string>
 
     <string name="language_system">सिस्टम / स्वचालित</string>
-    <string name="language_ai_notice">अंग्रेज़ी के अलावा अन्य भाषाएँ AI-सहायित मशीनी अनुवाद से बनाई गई हैं, इसलिए उनमें त्रुटियाँ हो सकती हैं। यदि आप सुधार चाहते हैं तो अनुवाद की त्रुटियों की जानकारी GitHub इशू ट्रैकर पर डेवलपर को दें।</string>
+    <string name="language_ai_notice">अंग्रेज़ी के अलावा अन्य भाषाएँ मशीनी अनुवाद से बनाई गई हैं, इसलिए उनमें त्रुटियाँ हो सकती हैं। यदि आप सुधार चाहते हैं तो अनुवाद की त्रुटियों की जानकारी GitHub इशू ट्रैकर पर डेवलपर को दें।</string>
 
     <string name="revert_to_default_toast">डिफ़ॉल्ट पर वापस लाएँ</string>
     <string name="revert_from_memory_toast">मेमोरी से वापस लाएँ</string>
-    <string name="revert_failed_shizuku_toast">Shizuku सेवा फिर से शुरू नहीं की जा सकी</string>
-    <string name="revert_failed_overlay_toast">Shizuku की मदद से दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस नहीं दी जा सकी, सूचना देखें</string>
-    <string name="revert_failed_shizuku_and_overlay_toast">Shizuku सेवा और दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमतियाँ वापस नहीं की जा सकीं</string>
     <string name="settings_hidden_toast">सेटिंग्स छिपाई गईं</string>
     <string name="auto_revert_to_default_toast">अपने आप डिफ़ॉल्ट पर रिवर्ट</string>
     <string name="auto_revert_from_memory_toast">मेमोरी फ़ंक्शन से अपने आप रिवर्ट</string>
+    <string name="auto_hide_run_toast">IMD+ आपकी सेटिंग्स छिपा रहा है…</string>
+    <string name="auto_hide_revert_toast">IMD+ आपकी सेटिंग्स वापस ला रहा है…</string>
+    <string name="toast_auto_hiding">IMD+: सेटिंग छिपाई जा रही हैं...</string>
+    <string name="toast_done_hidden">IMD: सेटिंग छिपा दी गईं</string>
+    <string name="toast_done_hidden_for">IMD: %1$s के लिए सेटिंग छिपा दी गईं</string>
+    <string name="toast_done_reverted_defaults">IMD: सेटिंग डिफ़ॉल्ट पर वापस लाई गईं</string>
+    <string name="toast_done_restored_defaults">IMD: सेटिंग डिफ़ॉल्ट पर बहाल की गईं</string>
+    <string name="toast_done_restored_memory">IMD: सेटिंग मेमोरी से बहाल की गईं</string>
+    <string name="toast_done_restored_memory_for">IMD: सेटिंग मेमोरी से बहाल की गईं (%1$s)</string>
+    <string name="toast_nothing_to_restore">IMD: बहाल करने के लिए कोई छिपी सेटिंग नहीं</string>
+    <string name="toast_auto_done_hidden">IMD+: सेटिंग छिपा दी गईं</string>
+    <string name="toast_auto_done_hidden_for">IMD+: %1$s के लिए सेटिंग छिपा दी गईं</string>
+    <string name="permissions_lost">आवश्यक अनुमतियाँ खो गई हैं। कृपया पहले IMD खोलें और अनुमतियाँ फिर से दें।</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="next">आगे</string>
+    <string name="back">वापस</string>
+    <string name="prior_hide_ignore">पिछले सभी रिवर्ट अनदेखा करें</string>
+    <string name="prior_hide_restore">पहले सेटिंग्स बहाल करें</string>
+    <string name="prior_hide_restoring">IMD आपकी सेटिंग्स बहाल कर रहा है…</string>
+    <string name="prior_hide_title">पहले छिपाई गई सेटिंग्स मिलीं, क्या उन्हें पहले बहाल करें?</string>
+    <string name="retry">फिर कोशिश करें</string>
+    <string name="skip">छोड़ें</string>
 </resources>

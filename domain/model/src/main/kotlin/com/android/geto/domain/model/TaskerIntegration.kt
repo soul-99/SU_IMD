@@ -36,7 +36,28 @@ package com.android.geto.domain.model
 object TaskerIntegration {
     const val ACTION_REVERT_TO_DEFAULT = "com.soul_99.suIMD.tasker.REVERT_TO_DEFAULT"
     const val ACTION_REVERT_USING_MEMORY = "com.soul_99.suIMD.tasker.REVERT_USING_MEMORY"
+    /**
+     * The framework-following unhide: whatever is outstanding is settled the way the current
+     * Unhiding framework says, which under the memory function means every pending revert at
+     * once rather than the configured defaults.
+     *
+     * ⚠ **[ACTION_REVERT_USING_MEMORY] is kept and still does exactly what it always did.**
+     * It is the pair of this one in the picker, not in the manifest: the integration screen
+     * shows this action in its place, but an automation somebody wrote months ago still fires
+     * the old string and must not quietly start doing something broader.
+     */
+    const val ACTION_UNHIDE_SETTINGS = "com.soul_99.suIMD.tasker.UNHIDE_SETTINGS"
     const val ACTION_HIDE_SETTINGS = "com.soul_99.suIMD.tasker.HIDE_SETTINGS"
+
+    /**
+     * The author's "Hide/ unhide settings": one action that does whatever the tile's press does.
+     *
+     * ⚠ **A toggle, not a third way to hide.** It reads the stored hidden state at the moment it
+     * runs and goes the other way, which is what makes it usable from a single automation button -
+     * and it goes through the same `SettingsHiddenRunner.toggle()` the Quick Settings tile does, so
+     * the two can never disagree about what a press means.
+     */
+    const val ACTION_TOGGLE_SETTINGS = "com.soul_99.suIMD.tasker.TOGGLE_SETTINGS"
 
     /** The intent extra every broadcast above must carry, holding the auth key. */
     const val EXTRA_AUTH_KEY = "auth_key"

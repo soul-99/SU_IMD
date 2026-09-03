@@ -21,6 +21,10 @@ package com.android.geto.navigation
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.android.geto.feature.apps.navigation.FavouriteAppsRouteData
@@ -30,6 +34,8 @@ import com.android.geto.feature.apps.navigation.navigateToApps
 import com.android.geto.feature.apps.navigation.navigateToFavouriteApps
 import com.android.geto.feature.appsettings.navigation.appSettingsScreen
 import com.android.geto.feature.appsettings.navigation.navigateToAppSettings
+import com.android.geto.designsystem.component.getoFloatingActionInset
+import com.android.geto.feature.apps.AppsFloatingActions
 import com.android.geto.feature.home.navigation.HomeRouteData
 import com.android.geto.feature.home.navigation.homeScreen
 import com.android.geto.feature.settings.navigation.navigateToSettings
@@ -50,11 +56,30 @@ fun GetoNavHost(navController: NavHostController) {
             snackbarHostState = snackbarHostState,
             topLevelDestinations = TopLevelDestination.entries,
             startDestination = FavouriteAppsRouteData::class,
-            // The manager dialog asking for the revert configuration, from a tile or a
-            // shortcut with the app not running, or already open on another tab. Navigating
-            // rather than choosing a start destination is what makes the second and every
-            // later request work as well as the first.
-            onRevertConfigurationRequest = NavHostController::navigateToSettings,
+            // Anything outside the graph asking for the Settings tab: the manager dialog
+            // wanting the revert configuration, from a tile or a shortcut with the app not
+            // running or already open on another tab, and the re-launch that follows a change
+            // of hiding-unhiding mechanism. Navigating rather than choosing a start
+            // destination is what makes the second and every later request work as well as
+            // the first.
+            onSettingsTabRequest = NavHostController::navigateToSettings,
+            // ⚠ **Drawn by the home scaffold rather than inside a tab, at the author's r12
+            // instruction**: they belong to both app tabs and must not slide with a tab change.
+            // Which tabs get them is decided here because `:feature:home` cannot see the app's
+            // destinations - it hands back whichever one is showing and this answers.
+            floatingActions = { selected ->
+                if (selected == FAVOURITE_APPS || selected == ALL_APPS) {
+                    AppsFloatingActions(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            // Clear of the floating tab bar on a phone, which the author
+                            // found them overlapping; on a tablet the bar is down the left edge
+                            // and this is the plain bottom margin instead, which is where he
+                            // asked for them back in r12b.
+                            .padding(end = 16.dp, bottom = getoFloatingActionInset()),
+                    )
+                }
+            },
             onClickHomeDestination = { homeNavHostController, homeDestination ->
                 // HomeDestination is an interface, so this when is not checked for
                 // exhaustiveness. The else branch keeps a forgotten tab from crashing.

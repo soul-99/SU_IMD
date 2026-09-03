@@ -18,12 +18,14 @@
  */
 package com.android.geto.designsystem.component
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 
 /**
  * Bolds the named phrases wherever they appear in a sentence.
@@ -52,6 +54,96 @@ fun emphasised(text: String, names: List<String>): AnnotatedString = remember(te
                     start = start,
                     end = start + name.length,
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Underlines the named phrases wherever they appear in a sentence.
+ *
+ * The third of this file's three marks, and the one for a phrase inside a line that is already
+ * emphasised as a whole - underlining what the sentence is *about* when bolding it again would
+ * say nothing, because the line around it is bold too.
+ *
+ * Built exactly like [emphasised], and the reasons there are the reasons here: the translator
+ * gets a whole sentence rather than fragments, a translation that reorders it still gets its
+ * marks in the right places, and a phrase a translation phrases around is skipped rather than
+ * treated as an error.
+ */
+@Composable
+fun underlined(text: String, names: List<String>): AnnotatedString = remember(text, names) {
+    buildAnnotatedString {
+        append(text)
+
+        names.forEach { name ->
+            val start = text.indexOf(name)
+
+            if (start >= 0) {
+                addStyle(
+                    style = SpanStyle(textDecoration = TextDecoration.Underline),
+                    start = start,
+                    end = start + name.length,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The same, in the theme's own accent colour as well as bold.
+ *
+ * For a phrase that names something the reader has to go and find — a Quick Settings tile, a
+ * screen — where bold alone does not separate it enough from the rest of a paragraph. The
+ * colour is the app's primary, so the phrase reads as part of this app rather than as a link
+ * out of it, and it moves with the theme in both light and dark.
+ *
+ * [bold] is for phrases in the same sentence that want emphasis but not the colour — a button
+ * label beside a tile name, say. Both lists are optional and either may be empty.
+ *
+ * Kept beside [emphasised] and built the same way, for the same reasons: whole sentences for
+ * the translator, and a name that a translation phrases around is skipped rather than
+ * breaking the line.
+ */
+@Composable
+fun highlighted(
+    text: String,
+    names: List<String>,
+    bold: List<String> = emptyList(),
+): AnnotatedString {
+    val colour = MaterialTheme.colorScheme.primary
+
+    return remember(text, names, bold, colour) {
+        buildAnnotatedString {
+            append(text)
+
+            // Plain emphasis first, so a coloured name that happens to sit inside a bolded
+            // phrase still ends up coloured rather than being overwritten by it.
+            bold.forEach { name ->
+                val start = text.indexOf(name)
+
+                if (start >= 0) {
+                    addStyle(
+                        style = SpanStyle(fontWeight = FontWeight.Bold),
+                        start = start,
+                        end = start + name.length,
+                    )
+                }
+            }
+
+            names.forEach { name ->
+                val start = text.indexOf(name)
+
+                if (start >= 0) {
+                    addStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = colour,
+                        ),
+                        start = start,
+                        end = start + name.length,
+                    )
+                }
             }
         }
     }

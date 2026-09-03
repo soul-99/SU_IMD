@@ -34,7 +34,7 @@
     <string name="favourite_apps_options">Opções dos favoritos</string>
     <string name="no_favourite_apps">Nenhum favorito ainda</string>
     <string name="no_matching_favourite_apps">Nenhum favorito corresponde a essa busca</string>
-    <string name="no_favourite_apps_subtitle">Toque na estrela ao lado de um app em Todos os apps, ou na estrela da tela de configurações dele.</string>
+    <string name="no_favourite_apps_subtitle">Adicione apps tocando no ícone de estrela na aba Todos os apps</string>
     <string name="view">Visualização</string>
     <string name="custom">Personalizada</string>
     <string name="alphabetical">A–Z</string>
@@ -51,19 +51,22 @@
     <string name="settings_manager_configure_revert">Defina o que o Reverter restaura</string>
     <string name="applied_settings_failure">Não foi possível aplicar as configurações</string>
     <string name="applied_settings_invalid">Este app tem configurações com valores inválidos</string>
-    <string name="settings_manager_title">Gerenciador de serviços do IMD</string>
+    <string name="settings_manager_title">Gerenciador de configurações</string>
 
     <!-- settings_manager_title and the two _name_ strings below are matched as substrings
          inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_open_settings">Abrir as configurações do IMD</string>
     <string name="settings_manager_info">O que esta caixa de diálogo faz</string>
-    <string name="settings_manager_info_live">O Gerenciador de serviços do IMD mostra o estado ao vivo das configurações e dos serviços. Ele não decide quais configurações/serviços ocultar ou reexibir quando os apps são abertos pelo IMD ou por atalhos criados pelo IMD.</string>
+    <string name="settings_manager_info_live">O Gerenciador de configurações do IMD exibe o status ao vivo das configurações e permite alterá-las facilmente.</string>
     <string name="settings_manager_info_live_extra">Para definir o que ocultar e reexibir ao abrir apps pelo IMD, ajuste as configurações padrão do IMD dentro do app IMD.</string>
     <string name="settings_manager_info_name_defaults">configurações padrão do IMD</string>
     <string name="settings_manager_info_developer">Desativar as opções do desenvolvedor pelo IMD apenas liga e desliga a chave das opções do desenvolvedor; isso não desfaz as alterações feitas nelas (como escalas de animação, app de localização simulada… etc).</string>
     <string name="settings_manager_info_developer_extra">Para redefinir as opções do desenvolvedor, abra a página de opções do desenvolvedor e desative-a por lá.</string>
     <string name="settings_manager_info_name_reset">redefinir as opções do desenvolvedor</string>
     <string name="revert_to_default">Reverter para o padrão</string>
+    <string name="unhide_settings">Reexibir configurações</string>
     <string name="not_configured_title">Nenhuma configuração a ocultar; você precisa definir quais configurações ocultar para este app.</string>
+    <string name="nothing_to_hide_message">Você precisa primeiro definir quais configurações ocultar nas configurações do app IMD.</string>
     <string name="not_configured_message">No app IMD, toque e segure este app para escolher quais configurações ocultar.</string>
     <string name="got_it">Entendi</string>
     <string name="settings_manager_open">Abrir %1$s</string>
@@ -77,7 +80,6 @@
     <string name="shizuku_help_point_setup">Verifique se o app Shizuku está instalado, registrado no ADB e configurado corretamente na página de configurações do app IMD.</string>
     <string name="shizuku_help_point_permission">A permissão do Shizuku no app IMD é usada apenas para conceder uma única vez a permissão privilegiada do Android WRITE_SECURE_SETTINGS. Ela não é usada para detectar o estado do serviço do Shizuku nem para ligar e desligar esse serviço.</string>
     <string name="shizuku_help_point_restart">Depois de configurar tudo corretamente, reinicie o app IMD e tente de novo.</string>
-    <string name="settings_manager_shizuku_wait">Aguarde 10s, pois alguns forks do Shizuku demoram a iniciar o serviço por intents</string>
     <string name="revert_developer_settings">Opções do desenvolvedor</string>
     <string name="revert_usb_debugging">Depuração USB</string>
     <string name="revert_wireless_debugging">Depuração por Wi-Fi</string>
@@ -97,4 +99,34 @@
     <string name="settings_manager_overlay_restore_failed_open">Por que Sobreposição a outros apps não foi restaurada</string>
     <string name="shizuku_starting_to_restore_overlay">Iniciando o serviço Shizuku para restaurar a permissão Sobreposição a outros apps</string>
     <string name="settings_manager_overlay_note">somente os apps selecionados nas configurações do app IMD são gerenciados</string>
+    <string name="shizuku_unmanageable">Não é possível gerenciar o serviço do Shizuku por aqui; configure o Shizuku corretamente nas configurações do IMD</string>
+    <string name="shevery_toggle_title">Serviço do Shevery</string>
+    <string name="shevery_toggle_point_status">O gerenciador de serviços do IMD apenas mostra o status ao vivo do serviço.</string>
+    <string name="shevery_toggle_point_intents">Não é possível alternar no Shevery (intents não suportadas)</string>
+    <string name="accessibility_none_managed">Nenhum serviço de acessibilidade está definido para ser gerenciado pelo IMD; configure primeiro os que deseja gerenciar nas configurações do app IMD.</string>
+    <string name="shizuku_stopping_via_intent">Tentando parar o Shizuku usando a intent de parada</string>
+    <string name="shevery_toggle_point_open">Abra o app Shevery diretamente para gerenciar o serviço</string>
+    <string name="overlay_none_managed">Nenhum app está configurado para ter “Sobreposição a outros apps” ocultada.\nAdicione-os nas configurações do IMD.</string>
+    <string name="auto_hide_conflict_title">O IMD+ está mantendo as suas configurações ocultas</string>
+    <string name="auto_hide_conflict_body">O IMD+ já ocultou a lista de todo o aparelho, e o perfil deste app pede algo que ela não cobre. Ocultar mais por cima disso deixaria configurações que nenhuma das duas reversões devolve.</string>
+    <string name="auto_hide_conflict_fix">Reverta o IMD+ primeiro — pela notificação dele ou pelo bloco Ocultar configurações — e depois abra este app de novo.</string>
+    <string name="shizuku_starting">Iniciando o serviço Shizuku</string>
+    <string name="settings_manager_busy_hiding">IMD ocultando configurações, aguarde...</string>
+    <string name="settings_manager_busy_unhiding">IMD reexibindo configurações, aguarde...</string>
+    <string name="settings_manager_info_name_live">status ao vivo</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">Configure primeiro as configurações</string>
+    <string name="dooa_thedjchi_only">gerenciar \"Sobreposição a outros apps\" só é compatível com o fork Thedjchi do Shizuku</string>
+    <string name="help_path_accessibility">Configurações do IMD → Configurações padrão do IMD → Serviços de acessibilidade a ocultar</string>
+    <string name="help_path_dooa">Configurações do IMD → Configurações padrão do IMD → Sobreposição a outros apps gerenciada pelo IMD</string>
+    <string name="help_path_manage_shizuku">Configurações do IMD → Configuração do Shizuku → Gerenciar o Shizuku</string>
+    <string name="hide_settings">Ocultar configurações</string>
+    <string name="revert_shevery">Serviço do Shevery</string>
+    <string name="settings_manager_all_off">Desligar tudo</string>
+    <string name="settings_manager_all_on">Ligar tudo</string>
+    <string name="settings_manager_only_selected">Somente os selecionados</string>
+    <string name="settings_manager_pending">O IMD está ocultando configurações no momento; qualquer alteração feita aqui antes de você reexibi-las será desfeita após a restauração</string>
+    <string name="shevery_service_first">Ligue primeiro o serviço do Shevery.</string>
+    <string name="shevery_wait_countdown">Aguardando o serviço do Shevery iniciar...(%1$d)</string>
+    <string name="shizuku_wait_countdown">Aguardando o serviço do Shizuku iniciar...(%1$d)</string>
 </resources>

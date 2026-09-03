@@ -41,9 +41,41 @@ internal class DefaultShizukuWrapper @Inject constructor(
         ShizukuPermission.isRunning()
     }
 
+    override suspend fun hasShizukuPermission(): Boolean = withContext(ioDispatcher) {
+        ShizukuPermission.isRunning() && ShizukuPermission.hasPermission()
+    }
+
+    override suspend fun requestShizukuPermission(): Boolean = withContext(ioDispatcher) {
+        ShizukuPermission.requestPermission()
+    }
+
+    override suspend fun forceStop(packageName: String): Boolean = withContext(ioDispatcher) {
+        ShizukuPermission.forceStop(packageName = packageName)
+    }
+
+    override suspend fun allowRestrictedSettings(packageName: String): Boolean =
+        withContext(ioDispatcher) {
+            ShizukuPermission.allowRestrictedSettings(packageName = packageName)
+        }
+
+    override suspend fun allowBatteryUnrestricted(packageName: String): Boolean =
+        withContext(ioDispatcher) {
+            ShizukuPermission.allowBatteryUnrestricted(packageName = packageName)
+        }
+
     override suspend fun grantWriteSecureSettings(packageName: String): ShizukuGrant =
         withContext(ioDispatcher) {
             ShizukuPermission.grantWriteSecureSettings(packageName = packageName)
+        }
+
+    override suspend fun grantDumpPermission(packageName: String): ShizukuGrant =
+        withContext(ioDispatcher) {
+            ShizukuPermission.grantDumpPermission(packageName = packageName)
+        }
+
+    override suspend fun allowUsageAccess(packageName: String): Boolean =
+        withContext(ioDispatcher) {
+            ShizukuPermission.allowUsageAccess(packageName = packageName)
         }
 
     override suspend fun getAllowedOverlayPackages(): Set<String>? = withContext(ioDispatcher) {

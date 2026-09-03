@@ -33,18 +33,23 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <receiver
-            android:name="com.android.geto.broadcastreceiver.RevertSettingsBroadcastReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="ACTION_REVERT_SETTINGS" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
             android:name="com.android.geto.broadcastreceiver.RevertToDefaultBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="ACTION_REVERT_TO_DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          The Auto-hide settings (IMD+) notification's revert. Separate from the one above
+          because it does one thing more: it force-stops the watched apps before the settings
+          are put back, so none of them sees them come back while it is running.
+        -->
+        <receiver
+            android:name="com.android.geto.broadcastreceiver.AutoHideRevertBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ACTION_AUTO_HIDE_REVERT" />
             </intent-filter>
         </receiver>
 
@@ -53,6 +58,47 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="ACTION_RETRY_OVERLAY_RESTORE" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          Android switches an app's own accessibility service off when the app is replaced, so
+          IMD+ would stop working after every update of IMD until somebody noticed. Not
+          exported: MY_PACKAGE_REPLACED is delivered to this app alone and only the system
+          sends it. A manifest receiver for it is exempt from the background-launch
+          restrictions, which is why this is declared here rather than registered at runtime -
+          there is nothing running to register it at the moment it fires.
+        -->
+        <receiver
+            android:name="com.android.geto.broadcastreceiver.PackageReplacedBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          The OK button on a warning notification. Clears the notification it names and
+          changes nothing else, which is why it needs no Hilt entry point of its own.
+        -->
+        <receiver
+            android:name="com.android.geto.broadcastreceiver.NotificationDismissBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ACTION_DISMISS_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          Puts a revert notification back after a swipe. Not exported: it is reached only
+          through this app's own delete intent, which Android fires when a person removes
+          the notification and never when the app cancels it.
+        -->
+        <receiver
+            android:name="com.android.geto.broadcastreceiver.NotificationRepostBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ACTION_REPOST_REVERT_NOTIFICATION" />
             </intent-filter>
         </receiver>
 
@@ -68,7 +114,9 @@
             <intent-filter>
                 <action android:name="com.soul_99.suIMD.tasker.REVERT_TO_DEFAULT" />
                 <action android:name="com.soul_99.suIMD.tasker.REVERT_USING_MEMORY" />
+                <action android:name="com.soul_99.suIMD.tasker.UNHIDE_SETTINGS" />
                 <action android:name="com.soul_99.suIMD.tasker.HIDE_SETTINGS" />
+                <action android:name="com.soul_99.suIMD.tasker.TOGGLE_SETTINGS" />
             </intent-filter>
         </receiver>
     </application>

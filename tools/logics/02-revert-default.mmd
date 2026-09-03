@@ -1,0 +1,24 @@
+flowchart TD
+    A["<b>Revert to default</b>, the named function:<br/>its Quick Settings tile · a homescreen shortcut ·<br/>the Settings manager's button · an IMD intent"] --> B["Clear any IMD+ hold, sweep every per-app<br/>memory record, and drop the auto-unhide<br/>and auto-revert watches"]
+    B --> C["<b>Restore the extras first</b> - settings a<br/>profile changed that the six targets<br/>cannot reach"]
+    C --> D["Read <b>Settings to unhide on Revert</b>"]
+
+    D --> E{"Does overlay access<br/>need a write?"}
+    E -- "No, or the fork<br/>is <b>Shevery</b>" --> H
+    E -- "Yes, to give it back" --> F["Start Shizuku if needed (logic 8),<br/>then write the AppOp"]
+    E -- "Yes, to withdraw it -<br/>the configuration says off" --> F
+    F --> G{"Did the write land?"}
+    G -- No --> G1["Record the debt and post<br/><b>Unhide settings failure</b>,<br/>with a <i>Try again</i> button"]
+    G -- Yes --> H
+
+    H["Write the ordinary targets in order"] --> I{"Shizuku available -<br/>configured <b>and</b> installed?"}
+    I -- "No, or this fork<br/>has no intents" --> L
+    I -- Yes --> J["Start or stop it to match what<br/>the configuration asks. A start<br/>that fails is not retried here"]
+    J --> K["If it was started, re-settle wireless<br/>debugging - a fork takes it<br/>down on its way up"]
+    K --> L["Clear the hidden mark"]
+    L --> M["Release the held accessibility services,<br/>and bring <b>IMD's own IMD+ detector</b><br/>back last"]
+
+    class G1 stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

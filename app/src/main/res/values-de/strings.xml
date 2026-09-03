@@ -15,13 +15,6 @@
     <string name="settings">Einstellungen</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Öffnen Sie Banking-Apps und andere eingeschränkte Apps, ohne diese Einstellungen jedes Mal von Hand ein- und auszuschalten:
-1. Developer settings
-2. Debugging
-3. Accessibility services
-4. Über anderen Apps einblenden (erfordert einen laufenden Shizuku-Dienst)
-5. Shizuku-Dienst
-6. und viele weitere (die müssen Sie mit der Memory function der App selbst einrichten, Tipp: der Settings observer hilft dabei)</string>
     <string name="setup_step">Schritt %1$d</string>
     <string name="setup_granted">Erteilt</string>
     <string name="setup_not_granted">Nicht erteilt</string>
@@ -30,10 +23,10 @@
     <string name="setup_copy_command">Befehl kopieren</string>
     <string name="setup_check_again">Erneut prüfen</string>
     <string name="setup_use_shizuku">Shizuku verwenden</string>
-    <string name="services_shortcut_label">Dienstmanager</string>
+    <string name="services_shortcut_label">Einstellungsmanager</string>
     <string name="revert_shortcut_label">Standard wiederherstellen</string>
     <string name="shortcut_not_configured_title">Für diese App ist nichts konfiguriert</string>
-    <string name="shortcut_not_configured_message">Du musst zuerst festlegen, welche Einstellungen für diese App ausgeblendet werden sollen: IMD → Alle Apps → auf den App-Namen tippen → Einstellungsvorlage → auswählen, welche Einstellungen ausgeblendet werden sollen.</string>
+    <string name="shortcut_not_configured_message">Du musst zuerst festlegen, welche Einstellungen für diese App ausgeblendet werden sollen: IMD → Alle Apps → lange auf den App-Namen tippen → Einstellungsvorlage → auswählen, welche Einstellungen ausgeblendet werden sollen.</string>
     <string name="shortcut_not_configured_dismiss">Verstanden</string>
     <string name="obtainium_title">Diese App aktuell halten</string>
     <string name="obtainium_body">Da diese App vollständig offline arbeitet, nutze bitte Obtainium, um nach Updates zu suchen und sie direkt aus den GitHub-Releases zu installieren.</string>
@@ -69,10 +62,43 @@
     <string name="setup_open_settings_failed">Einstellungen konnten auf diesem Gerät nicht geöffnet werden</string>
     <string name="setup_name_display_over_other_apps">Über anderen Apps einblenden</string>
     <string name="setup_how_title">So funktioniert es</string>
-    <string name="setup_how_off">IMD schaltet diese Einstellungen aus</string>
+    <string name="setup_how_off">IMD schaltet die Einstellungen aus</string>
     <string name="setup_how_off_note">Keine Sicherheitsrichtlinie einer App wird gebrochen</string>
     <string name="setup_how_use">Sie nutzen Ihre App</string>
     <string name="setup_how_revert">Revert</string>
-    <string name="setup_how_on">IMD schaltet diese Einstellungen wieder ein</string>
+    <string name="setup_how_on">IMD schaltet die Einstellungen wieder ein</string>
     <string name="setup_how_number">%1$d.</string>
+    <string name="hide_tile_label">Einstellungen ausblenden</string>
+    <string name="hide_tile_visible">Einstellungen sichtbar</string>
+    <string name="hide_tile_hidden">Einstellungen ausgeblendet</string>
+    <string name="hide_tile_working">Einstellungen werden ausgeblendet…</string>
+    <string name="hide_tile_unhiding">Einstellungen werden wieder eingeblendet…</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="hide_unhide_shortcut_label">Einstellungen aus-/einblenden</string>
+    <string name="setup_done_1">1. Starte deine problematischen Apps jetzt einfach, indem du sie in IMD antippst.</string>
+    <string name="setup_done_2">2. Für den schnellen Zugriff:</string>
+    <string name="setup_done_2_1">1. Halte App-Symbole gedrückt, um Startbildschirm-Verknüpfungen zu erstellen</string>
+    <string name="setup_done_2_2">2. Füge Apps zum Favoriten-Tab hinzu</string>
+    <string name="setup_done_2_3">3. Füge die Schnelleinstellung „Einstellungen ausblenden“ hinzu</string>
+    <string name="setup_done_2_3_tip">(Tipp: Langes Drücken der Kachel öffnet den Einstellungsmanager)</string>
+    <string name="setup_done_3">3. Verwende den eigenen Einstellungsmanager von IMD:</string>
+    <string name="setup_done_3_1">1. Verwende das Symbol des Einstellungsmanagers in deiner App-Übersicht</string>
+    <string name="setup_done_3_2">2. Füge die Schnelleinstellung „Einstellungsmanager“ hinzu</string>
+    <string name="setup_done_4">4. Die Einrichtung ist jetzt abgeschlossen, aber es wird empfohlen, dir Folgendes anzusehen:</string>
+    <string name="setup_done_4_1">1. Automatisch einblenden (EMPFOHLEN)</string>
+    <string name="setup_done_4_2">2. Einstellungen automatisch ausblenden (IMD+, benötigt Hintergrunddienst)</string>
+    <string name="setup_done_4_3">3. Alle weiteren Einstellungen für tiefergehende Anpassungen</string>
+    <string name="setup_done_4_4">4. IMD intents (Integration mit Tasker / Macrodroid... usw.)</string>
+    <string name="setup_done_add_tile">Kachel hinzufügen</string>
+    <string name="setup_done_go">Los geht\'s</string>
+    <string name="setup_done_title">Die Einrichtung ist fast abgeschlossen</string>
+    <string name="setup_step_accessibility">Bedienungshilfen zum Ausblenden / Verwalten auswählen</string>
+    <string name="setup_step_auto_unhide">Dienst für automatisches Einblenden einrichten</string>
+    <string name="setup_step_customise_ui">Oberfläche anpassen</string>
+    <string name="setup_step_manager_rows">Schalter des Einstellungsmanagers</string>
+    <string name="setup_step_overlay">„Über anderen Apps anzeigen“ zum Ausblenden / Verwalten auswählen</string>
+    <string name="setup_step_settings_to_hide">Einstellungen zum Aus-/Einblenden auswählen</string>
+    <string name="shizuku_setup_fill_first">Bitte fülle zuerst alle Felder aus</string>
+    <string name="shizuku_setup_manage">Shizuku-Konfiguration verwalten</string>
+    <string name="shizuku_setup_skip">Überspringen</string>
 </resources>

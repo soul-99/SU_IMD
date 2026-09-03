@@ -1,0 +1,40 @@
+flowchart TD
+    A["User taps an app in IMD, its homescreen<br/>shortcut, the <b>Hide settings</b> tile,<br/>or an IMD intent"] --> B{"<b>Hiding framework</b>"}
+    B -- "Default IMD settings<br/>(the default)" --> C["Read the device-wide<br/><b>Settings to hide</b>"]
+    B -- "Per app configuration" --> M["That app's own profile<br/>(logic 3)"]
+
+    C --> N{"Anything left to do?"}
+    N -- "Nothing ticked" --> Y1["<b>Stop.</b> Say what to configure.<br/>The app is not opened"]
+    N -- "IMD+ already holds<br/>the device" --> Y2["Open the app.<br/>Nothing to do"]
+    N -- "A previous hide was<br/>never undone" --> Y3["<b>Stop.</b> Offer to restore<br/>that first"]
+    N -- "WRITE_SECURE_SETTINGS<br/>has gone" --> Y4["<b>Stop.</b> Say the grant<br/>was lost"]
+    N -- Yes --> V{"<b>Unhiding framework</b><br/>is Memory?"}
+
+    V -- Yes --> W["Measure what every ticked target holds<br/><b>now</b> and record it, before<br/>anything moves"]
+    V -- No --> D
+    W --> D{"Hide <b>Display over<br/>other apps</b>?"}
+
+    D -- "Not ticked, already withdrawn,<br/>or the fork is <b>Shevery</b>" --> H
+    D -- Yes --> E{"Shizuku running?"}
+    E -- No --> F["Start Shizuku (logic 8)"]
+    E -- Yes --> G["Withdraw overlay access<br/>from the selected apps"]
+    F --> G
+    F -- "Would not start" --> X1["<b>Stop.</b> Nothing was touched"]
+    G -- "The write was refused" --> X2["<b>Stop.</b> The Shizuku start is<br/><b>not</b> rolled back"]
+
+    G --> H["Write the remaining targets in<br/><b>HideOrder</b> - the reverse of the<br/>order a revert puts them back"]
+    H --> I["Stop Shizuku last (logic 5), told<br/>which transports to leave up"]
+    I --> J{"A write refused, and<br/>the grant gone?"}
+    J -- Yes --> K["<b>Undo everything this run did</b>, in<br/>reverse, then report the loss"]
+    J -- No --> L["Mark the device hidden - even if<br/>only some of it moved"]
+    L --> P["Open the app, and post the one ongoing<br/>notification: <i>Settings hidden,<br/>click to unhide settings</i>"]
+
+    class Y1 stop
+    class Y3 stop
+    class Y4 stop
+    class X1 stop
+    class X2 stop
+    class K stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

@@ -19,13 +19,6 @@
     <string name="settings">设置</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">打开银行等受限应用，无需每次手动开关这些设置：
-1. Developer settings
-2. Debugging
-3. Accessibility services
-4. 显示在其他应用的上层（需要 Shizuku 服务正在运行）
-5. Shizuku 服务
-6. 以及更多（需要你用应用的 Memory function 手动配置，提示：可以借助 Settings observer）</string>
     <string name="setup_step">第 %1$d 步</string>
     <string name="setup_granted">已授予</string>
     <string name="setup_not_granted">未授予</string>
@@ -34,10 +27,10 @@
     <string name="setup_copy_command">复制命令</string>
     <string name="setup_check_again">重新检查</string>
     <string name="setup_use_shizuku">使用 Shizuku</string>
-    <string name="services_shortcut_label">服务管理器</string>
+    <string name="services_shortcut_label">设置管理器</string>
     <string name="revert_shortcut_label">还原为默认</string>
     <string name="shortcut_not_configured_title">尚未为该应用配置任何内容</string>
-    <string name="shortcut_not_configured_message">您需要先为该应用配置要隐藏哪些设置：IMD → 所有应用 → 点击应用名称 → 设置模板 → 选择要隐藏的设置。</string>
+    <string name="shortcut_not_configured_message">您需要先为该应用配置要隐藏哪些设置：IMD → 所有应用 → 长按应用名称 → 设置模板 → 选择要隐藏的设置。</string>
     <string name="shortcut_not_configured_dismiss">知道了</string>
     <string name="obtainium_title">让本应用保持最新</string>
     <string name="obtainium_body">由于本应用完全离线运行，请使用 Obtainium 检查更新，并直接从 GitHub 发布页安装。</string>
@@ -73,10 +66,43 @@
     <string name="setup_open_settings_failed">无法在此设备上打开设置</string>
     <string name="setup_name_display_over_other_apps">显示在其他应用的上层</string>
     <string name="setup_how_title">工作原理</string>
-    <string name="setup_how_off">IMD 关闭这些设置</string>
+    <string name="setup_how_off">IMD 关闭设置</string>
     <string name="setup_how_off_note">不会破坏任何应用的安全策略</string>
     <string name="setup_how_use">你使用自己的应用</string>
     <string name="setup_how_revert">Revert</string>
-    <string name="setup_how_on">IMD 再把这些设置重新打开</string>
+    <string name="setup_how_on">IMD 再把设置重新打开</string>
     <string name="setup_how_number">%1$d.</string>
+    <string name="hide_tile_label">隐藏设置</string>
+    <string name="hide_tile_visible">设置可见</string>
+    <string name="hide_tile_hidden">设置已隐藏</string>
+    <string name="hide_tile_working">正在隐藏设置…</string>
+    <string name="hide_tile_unhiding">正在恢复设置…</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="hide_unhide_shortcut_label">隐藏/取消隐藏设置</string>
+    <string name="setup_done_1">1. 现在只需在 IMD 中点击那些有问题的应用即可启动它们。</string>
+    <string name="setup_done_2">2. 快速访问方式：</string>
+    <string name="setup_done_2_1">1. 长按应用图标以创建主屏幕快捷方式</string>
+    <string name="setup_done_2_2">2. 把应用加入收藏标签页</string>
+    <string name="setup_done_2_3">3. 添加“隐藏设置”快捷设置磁贴</string>
+    <string name="setup_done_2_3_tip">（提示：长按磁贴会打开设置管理器）</string>
+    <string name="setup_done_3">3. 使用 IMD 自带的设置管理器：</string>
+    <string name="setup_done_3_1">1. 使用应用抽屉中的设置管理器图标</string>
+    <string name="setup_done_3_2">2. 添加“设置管理器”快捷设置磁贴</string>
+    <string name="setup_done_4">4. 设置现已完成，但仍建议你了解一下：</string>
+    <string name="setup_done_4_1">1. 自动取消隐藏设置（推荐）</string>
+    <string name="setup_done_4_2">2. 自动隐藏设置（IMD+，需要后台服务）</string>
+    <string name="setup_done_4_3">3. 其余所有设置，可作更深入的个性化</string>
+    <string name="setup_done_4_4">4. IMD intents（与 Tasker / Macrodroid... 等集成）</string>
+    <string name="setup_done_add_tile">添加磁贴</string>
+    <string name="setup_done_go">开始吧</string>
+    <string name="setup_done_title">设置即将完成</string>
+    <string name="setup_step_accessibility">选择要隐藏 / 管理的无障碍服务</string>
+    <string name="setup_step_auto_unhide">设置自动取消隐藏设置服务</string>
+    <string name="setup_step_customise_ui">自定义界面</string>
+    <string name="setup_step_manager_rows">设置管理器开关</string>
+    <string name="setup_step_overlay">选择要隐藏 / 管理的“显示在其他应用上层”</string>
+    <string name="setup_step_settings_to_hide">选择要隐藏 / 取消隐藏的设置</string>
+    <string name="shizuku_setup_fill_first">请先填写所有字段</string>
+    <string name="shizuku_setup_manage">管理 Shizuku 配置</string>
+    <string name="shizuku_setup_skip">跳过</string>
 </resources>

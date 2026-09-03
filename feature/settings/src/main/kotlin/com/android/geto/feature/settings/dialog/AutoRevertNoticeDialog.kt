@@ -81,8 +81,6 @@ internal fun AutoRevertNoticeDialog(
 
         SubPoint(text = stringResource(R.string.auto_revert_notice_trigger_example))
 
-        SubPoint(text = stringResource(R.string.auto_revert_notice_trigger_both))
-
         NumberedPoint(
             number = 3,
             text = emphasised(

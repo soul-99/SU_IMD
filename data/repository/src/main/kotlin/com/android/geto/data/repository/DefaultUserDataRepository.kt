@@ -20,6 +20,8 @@ package com.android.geto.data.repository
 
 import com.android.geto.data.datastore.UserPreferencesDataSource
 import com.android.geto.domain.model.FavouriteAppsView
+import com.android.geto.domain.model.HidingFramework
+import com.android.geto.domain.model.IconStyle
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.ShizukuForkMode
@@ -27,6 +29,7 @@ import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
 import com.android.geto.domain.model.Theme
+import com.android.geto.domain.model.UnhidingFramework
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.Flow
@@ -74,6 +77,10 @@ class DefaultUserDataRepository @Inject constructor(
         userPreferencesDataSource.updateSortFavouriteApps(sortFavouriteApps = sortFavouriteApps)
     }
 
+    override suspend fun updateIconStyle(iconStyle: IconStyle) {
+        userPreferencesDataSource.updateIconStyle(iconStyle = iconStyle)
+    }
+
     override suspend fun updateFavouriteAppsView(favouriteAppsView: FavouriteAppsView) {
         userPreferencesDataSource.updateFavouriteAppsView(favouriteAppsView = favouriteAppsView)
     }
@@ -112,6 +119,34 @@ class DefaultUserDataRepository @Inject constructor(
 
     override suspend fun updateAutoRevertOnReturn(enabled: Boolean) {
         userPreferencesDataSource.updateAutoRevertOnReturn(enabled = enabled)
+    }
+
+    override suspend fun updateRestoreWirelessDebugging(enabled: Boolean) {
+        userPreferencesDataSource.updateRestoreWirelessDebugging(enabled = enabled)
+    }
+
+    override suspend fun updateManageShizuku(enabled: Boolean) {
+        userPreferencesDataSource.updateManageShizuku(enabled = enabled)
+    }
+
+    override suspend fun updateManageShizukuMigratedV3(done: Boolean) {
+        userPreferencesDataSource.updateManageShizukuMigratedV3(done = done)
+    }
+
+    override suspend fun updateAutoUnhideResetV3(done: Boolean) {
+        userPreferencesDataSource.updateAutoUnhideResetV3(done = done)
+    }
+
+    override suspend fun updateUpgradedToV3(upgraded: Boolean) {
+        userPreferencesDataSource.updateUpgradedToV3(upgraded = upgraded)
+    }
+
+    override suspend fun updateFavouriteAppsViewSet(set: Boolean) {
+        userPreferencesDataSource.updateFavouriteAppsViewSet(set = set)
+    }
+
+    override suspend fun updateSortFavouriteAppsSet(set: Boolean) {
+        userPreferencesDataSource.updateSortFavouriteAppsSet(set = set)
     }
 
     override suspend fun updateManageOverlay(enabled: Boolean) {
@@ -162,12 +197,123 @@ class DefaultUserDataRepository @Inject constructor(
         userPreferencesDataSource.updateNotificationFunction(notificationFunction = notificationFunction)
     }
 
+    override suspend fun updateHidingFramework(hidingFramework: HidingFramework) {
+        userPreferencesDataSource.updateHidingFramework(hidingFramework = hidingFramework)
+    }
+
+    override suspend fun updateUnhidingFramework(unhidingFramework: UnhidingFramework) {
+        userPreferencesDataSource.updateUnhidingFramework(unhidingFramework = unhidingFramework)
+    }
+
+    override suspend fun updateFrameworksMigratedV3(done: Boolean) {
+        userPreferencesDataSource.updateFrameworksMigratedV3(done = done)
+    }
+
+    override suspend fun updateManagerRows(states: Map<ManualRevertTarget, Boolean>) {
+        userPreferencesDataSource.updateManagerRows(states = states)
+    }
+
+    override suspend fun updateProgressiveBlur(enabled: Boolean) {
+        userPreferencesDataSource.updateProgressiveBlur(enabled = enabled)
+    }
+
+    override suspend fun updateBlurSettings(radiusDp: Int, tintPercent: Int, fadeDp: Int) {
+        userPreferencesDataSource.updateBlurSettings(
+            radiusDp = radiusDp,
+            tintPercent = tintPercent,
+            fadeDp = fadeDp,
+        )
+    }
+
+    override suspend fun updateOledBackground(enabled: Boolean) {
+        userPreferencesDataSource.updateOledBackground(enabled = enabled)
+    }
+
+    override suspend fun updateDrawerShortcuts(manager: Boolean, hideUnhide: Boolean) {
+        userPreferencesDataSource.updateDrawerShortcuts(manager = manager, hideUnhide = hideUnhide)
+    }
+
+    override suspend fun updateAutoHideDetectorManagedV3(done: Boolean) {
+        userPreferencesDataSource.updateAutoHideDetectorManagedV3(done = done)
+    }
+
     override suspend fun updateRevertDefaults(states: Map<ManualRevertTarget, Boolean>) {
         userPreferencesDataSource.updateRevertDefaults(states = states)
     }
 
     override suspend fun updateSettingsToHide(states: Map<ManualRevertTarget, Boolean>) {
         userPreferencesDataSource.updateSettingsToHide(states = states)
+    }
+
+    override suspend fun updateSettingsToHideDefaultsV21(done: Boolean) {
+        userPreferencesDataSource.updateSettingsToHideDefaultsV21(done = done)
+    }
+
+    override suspend fun updateSettingsHiddenDeviceWide(hidden: Boolean) {
+        userPreferencesDataSource.updateSettingsHiddenDeviceWide(hidden = hidden)
+    }
+
+    override suspend fun updateAutoHideEnabled(enabled: Boolean) {
+        userPreferencesDataSource.updateAutoHideEnabled(enabled = enabled)
+    }
+
+    override suspend fun updateAutoHidePackages(packages: List<String>) {
+        userPreferencesDataSource.updateAutoHidePackages(packages = packages)
+    }
+
+    override suspend fun updateAutoHideNoKillOnLaunch(noKill: Boolean) {
+        userPreferencesDataSource.updateAutoHideNoKillOnLaunch(noKill = noKill)
+    }
+
+    override suspend fun updateAutoHideEnabledBeforeHide(enabled: Boolean) {
+        userPreferencesDataSource.updateAutoHideEnabledBeforeHide(enabled = enabled)
+    }
+
+    override suspend fun updateAutoHideRunning(running: Boolean) {
+        userPreferencesDataSource.updateAutoHideRunning(running = running)
+    }
+
+    override suspend fun updateAutoUnhideEnabled(enabled: Boolean) {
+        userPreferencesDataSource.updateAutoUnhideEnabled(enabled = enabled)
+    }
+
+    override suspend fun updateAutoUnhideTriggers(
+        onSwipe: Boolean,
+        onScreenLock: Boolean,
+        onIdle: Boolean,
+    ) {
+        userPreferencesDataSource.updateAutoUnhideTriggers(
+            onSwipe = onSwipe,
+            onScreenLock = onScreenLock,
+            onIdle = onIdle,
+        )
+    }
+
+    override suspend fun updateAutoUnhideScreenLockMinutes(minutes: Int) {
+        userPreferencesDataSource.updateAutoUnhideScreenLockMinutes(minutes = minutes)
+    }
+
+    override suspend fun updateAutoUnhideIdleMinutes(minutes: Int) {
+        userPreferencesDataSource.updateAutoUnhideIdleMinutes(minutes = minutes)
+    }
+
+    override suspend fun updateSettingsNoticeRevision(revision: Int) {
+        userPreferencesDataSource.updateSettingsNoticeRevision(revision = revision)
+    }
+
+    override suspend fun markAutoHideEverEnabled() {
+        userPreferencesDataSource.markAutoHideEverEnabled()
+    }
+
+    override suspend fun updateDiagnosticsEnabled(enabled: Boolean) {
+        userPreferencesDataSource.updateDiagnosticsEnabled(enabled = enabled)
+    }
+
+    override suspend fun updateAutoUnhideUsedFor(onAppLaunch: Boolean, onTile: Boolean) {
+        userPreferencesDataSource.updateAutoUnhideUsedFor(
+            onAppLaunch = onAppLaunch,
+            onTile = onTile,
+        )
     }
 
     override suspend fun updateRevertDefaultsResetV166(done: Boolean) {

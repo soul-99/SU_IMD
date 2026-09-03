@@ -23,6 +23,16 @@ interface PackageManagerWrapper {
     suspend fun getActivityIcon(componentName: String): ByteArray?
 
     /**
+     * The launcher label of one activity, for a sentence that names the app.
+     *
+     * Null when the component is gone — uninstalled between the launch and the toast — and
+     * the caller then says the sentence that names no app rather than one with a blank in
+     * it. The label, not the package name: "Settings hidden for com.example.bank" is not
+     * what somebody reads a toast for.
+     */
+    suspend fun getActivityLabel(componentName: String): String?
+
+    /**
      * Every installed application, with its label and a small icon, sorted by label.
      *
      * Deliberately not limited to packages with a launcher entry: a Shizuku install
@@ -59,8 +69,37 @@ interface PackageManagerWrapper {
      */
     suspend fun getLastInstallTimes(): Map<String, Long>
 
+    /**
+     * Small icons for the named packages only; missing or undecodable packages are omitted.
+     *
+     * ⚠ **The counterpart of [getAppLabels], and it exists for the same reason.**
+     * [getInstalledApps] would answer this too, by enumerating every package on the device and
+     * rasterising an icon for each — seconds of work and megabytes of bitmaps to put pictures on
+     * a dozen rows. The pickers that need this know exactly which packages they are asking about.
+     */
+    suspend fun getAppIcons(packageNames: Set<String>): Map<String, ByteArray>
+
     /** Installation identities for the requested packages; missing packages are omitted. */
     suspend fun getPackageIdentities(packageNames: Set<String>): Map<String, String>
 
+    /**
+     * Display labels for the named packages only; missing packages are omitted.
+     *
+     * The cheap way to put a human name on a handful of package names. [getInstalledApps]
+     * answers the same question, but it enumerates every package on the device and rasterises
+     * an icon for each — seconds of work to label a dozen rows that show no icons at all.
+     */
+    suspend fun getAppLabels(packageNames: Set<String>): Map<String, String>
+
     fun isSystem(flags: Int): Boolean
+
+    /**
+     * IMD's own package name.
+     *
+     * IMD+ has to name itself to the shell: the restricted-settings AppOp and the battery
+     * exemption are both granted per package, and the package is the one this code is running
+     * in. Read from the framework rather than written down anywhere, so a build flavour or a
+     * rename cannot leave a stale copy behind that silently grants nothing.
+     */
+    fun ownPackageName(): String
 }

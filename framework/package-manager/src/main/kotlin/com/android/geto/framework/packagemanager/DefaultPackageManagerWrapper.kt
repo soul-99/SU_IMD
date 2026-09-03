@@ -56,6 +56,17 @@ internal class DefaultPackageManagerWrapper @Inject constructor(
         }
     }
 
+    override suspend fun getActivityLabel(componentName: String): String? =
+        withContext(ioDispatcher) {
+            try {
+                ComponentName.unflattenFromString(componentName)?.let {
+                    packageManager.getActivityInfo(it, 0).loadLabel(packageManager).toString()
+                }
+            } catch (_: PackageManager.NameNotFoundException) {
+                null
+            }
+        }
+
     override suspend fun getInstalledApps(): List<InstalledAppData> = withContext(ioDispatcher) {
         val applications = try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -161,6 +172,42 @@ internal class DefaultPackageManagerWrapper @Inject constructor(
         packages.associate { it.packageName to it.lastUpdateTime }
     }
 
+    override suspend fun getAppLabels(packageNames: Set<String>): Map<String, String> = withContext(ioDispatcher) {
+        packageNames.mapNotNull { packageName ->
+            val label = runCatching {
+                val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    packageManager.getApplicationInfo(
+                        packageName,
+                        PackageManager.ApplicationInfoFlags.of(0),
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    packageManager.getApplicationInfo(packageName, 0)
+                }
+
+                packageManager.getApplicationLabel(applicationInfo).toString()
+            }.getOrNull() ?: return@mapNotNull null
+
+            packageName to label
+        }.toMap()
+    }
+
+    override suspend fun getAppIcons(packageNames: Set<String>): Map<String, ByteArray> =
+        withContext(ioDispatcher) {
+            packageNames.mapNotNull { packageName ->
+                val icon = runCatching {
+                    androidDrawableWrapper.toByteArray(
+                        drawable = packageManager.getApplicationIcon(packageName),
+                        // The same 96px the app picker uses. These rows are the same size, and
+                        // the 192px default is four times the pixels for no visible gain.
+                        size = PICKER_ICON_SIZE,
+                    )
+                }.getOrNull() ?: return@mapNotNull null
+
+                packageName to icon
+            }.toMap()
+        }
+
     override suspend fun getPackageIdentities(packageNames: Set<String>): Map<String, String> =
         withContext(ioDispatcher) {
             packageNames.mapNotNull { packageName ->
@@ -183,4 +230,6 @@ internal class DefaultPackageManagerWrapper @Inject constructor(
         }
 
     override fun isSystem(flags: Int): Boolean = (flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0
+
+    override fun ownPackageName(): String = context.packageName
 }

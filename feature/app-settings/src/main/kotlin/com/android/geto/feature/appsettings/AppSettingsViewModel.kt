@@ -26,19 +26,23 @@ import com.android.geto.domain.framework.PackageManagerWrapper
 import com.android.geto.domain.framework.ShortcutManagerCompatWrapper
 import com.android.geto.domain.model.AddAppSettingResult
 import com.android.geto.domain.model.AppSetting
+import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.AppSettingTemplate
 import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.domain.model.GetPinShortcutResult
-import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.OverlayBlockReason
 import com.android.geto.domain.model.RequestPinShortcutResult
 import com.android.geto.domain.model.SecureSetting
 import com.android.geto.domain.model.SettingType
 import com.android.geto.domain.model.UpdatePinShortcutResult
-import com.android.geto.domain.model.appSettingsForOverlayState
-import com.android.geto.domain.model.templatesForOverlayState
+import com.android.geto.domain.model.appSettingBlocked
+import com.android.geto.domain.model.overlayBlockReasons
 import com.android.geto.domain.repository.AppSettingsRepository
 import com.android.geto.domain.repository.UserDataRepository
 import com.android.geto.domain.usecase.AddAppSettingUseCase
+import com.android.geto.broadcastreceiver.SettingsHiddenRunner
+import com.android.geto.common.ApplicationScope
+import com.android.geto.common.PriorHideRestore
 import com.android.geto.domain.usecase.ApplyAppSettingsUseCase
 import com.android.geto.domain.usecase.GetPinShortcutUseCase
 import com.android.geto.domain.usecase.GetSecureSettingsByNameUseCase
@@ -47,10 +51,10 @@ import com.android.geto.domain.usecase.RevertAppSettingsUseCase
 import com.android.geto.domain.usecase.UpdatePinShortcutUseCase
 import com.android.geto.feature.appsettings.navigation.AppSettingsRouteData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -65,6 +69,8 @@ class AppSettingsViewModel @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository,
     private val packageManagerWrapper: PackageManagerWrapper,
     private val applyAppSettingsUseCase: ApplyAppSettingsUseCase,
+    private val settingsHiddenRunner: SettingsHiddenRunner,
+    @param:ApplicationScope private val appScope: CoroutineScope,
     private val revertAppSettingsUseCase: RevertAppSettingsUseCase,
     private val requestPinShortcutUseCase: RequestPinShortcutUseCase,
     private val addAppSettingUseCase: AddAppSettingUseCase,
@@ -81,20 +87,6 @@ class AppSettingsViewModel @Inject constructor(
 
     private var _secureSettings = MutableStateFlow<List<SecureSetting>>(emptyList())
     val secureSettings = _secureSettings.asStateFlow()
-
-    /**
-     * Which notification this screen's launch button should post.
-     *
-     * Read here rather than in the composable because the repository is a suspending flow
-     * and this screen already owns every other read of it.
-     */
-    val notificationFunction = userDataRepository.userData
-        .map { it.notificationFunction }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = NotificationFunction.Default,
-        )
 
     val isFavourite = userDataRepository.userData.map {
         componentName in it.favouriteComponentNames
@@ -125,18 +117,22 @@ class AppSettingsViewModel @Inject constructor(
     private val _requestPinShortcutResult = MutableStateFlow<RequestPinShortcutResult?>(null)
     val requestPinShortcutResult = _requestPinShortcutResult.asStateFlow()
 
-    // The stored rows with the overlay marker filtered out while overlay management is off.
-    // The filter is on the way to the screen only - the Room rows are untouched, so a DOOA
-    // row a user added comes straight back when they switch the feature on again, in this app
-    // and every other it was added to. Showing it while off would promise a hide the memory
-    // function will not perform, since ApplyAppSettingsUseCase stops acting on the marker then.
+    // The stored rows, minus anything IMD cannot act on right now - Display over other apps
+    // without a Thedjchi Shizuku to write the AppOp through, the Shizuku service with 'Manage
+    // Shizuku' off, the accessibility flag with nothing in the picker.
+    //
+    // The filter is on the way to the screen only: the Room rows are untouched, so a row comes
+    // straight back when the thing it needs is configured again, in this app and every other
+    // it was added to.
+    //
+    // ⚠ **Shown and greyed, not removed — every row, on every fork, since r4n.** There used
+    // to be one exception: the Shizuku marker on a fork with no intents left the screen through
+    // `appSettingHidden`. The author reversed that — *"greyed, unchecked (memory-preserving)
+    // Shizuku service checkboxes on Shevery ... just like for DOOA"* — so nothing is filtered
+    // here at all now, and `appSettingBlocked` greys whatever cannot run.
     val appSettingsUiState =
-        combine(
-            appSettingsRepository.getAppSettingsFlowByComponentName(componentName = componentName),
-            userDataRepository.userData.map { it.manageOverlay }.distinctUntilChanged(),
-        ) { appSettings, manageOverlay ->
-            appSettings.appSettingsForOverlayState(manageOverlay = manageOverlay)
-        }.map(AppSettingsUiState::Success).stateIn(
+        appSettingsRepository.getAppSettingsFlowByComponentName(componentName = componentName)
+            .map(AppSettingsUiState::Success).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = AppSettingsUiState.Loading,
@@ -144,15 +140,9 @@ class AppSettingsViewModel @Inject constructor(
 
     private val _appSettingTemplates = MutableStateFlow<List<AppSettingTemplate>>(emptyList())
 
-    // The "Hide Display over other apps" template is dropped from the picker while overlay
-    // management is off, for the same reason and by the same marker as the rows above: it
-    // cannot be added to do nothing.
-    val appSettingTemplates = combine(
-        _appSettingTemplates,
-        userDataRepository.userData.map { it.manageOverlay }.distinctUntilChanged(),
-    ) { templates, manageOverlay ->
-        templates.templatesForOverlayState(manageOverlay = manageOverlay)
-    }.onStart {
+    // The same rule as the rows above: offered and greyed, so a press can say what to go and
+    // configure. Nothing leaves the list any more — r4n took the one exception out.
+    val appSettingTemplates = _appSettingTemplates.onStart {
         getAppSettingTemplates()
     }.stateIn(
         scope = viewModelScope,
@@ -165,6 +155,31 @@ class AppSettingsViewModel @Inject constructor(
 
     private val _updatePinShortcutResult = MutableStateFlow<UpdatePinShortcutResult?>(null)
     val updatePinShortcutResult = _updatePinShortcutResult.asStateFlow()
+
+    /**
+     * The popup's two answers, both of which end in this screen's launch running again.
+     *
+     * ⚠ **Restore only goes on if the device came out clear**, and ⚠ **Ignore is permanent** —
+     * see `SettingsHiddenRunner.discardPendingReverts`. On the application scope because a
+     * restore can wait on Shizuku for seconds and this screen may well be left in that time.
+     */
+    fun restoreThenApply() {
+        appScope.launch {
+            // See AppsViewModel.restoreThenLaunch: the flag is what puts a spinner on the
+            // screen for the seconds this call can take.
+            val cleared = PriorHideRestore.track { settingsHiddenRunner.flushPendingReverts() }
+
+            if (cleared) applyAppSettings()
+        }
+    }
+
+    fun discardThenApply() {
+        appScope.launch {
+            settingsHiddenRunner.discardPendingReverts()
+
+            applyAppSettings()
+        }
+    }
 
     fun applyAppSettings() {
         viewModelScope.launch {
@@ -201,8 +216,36 @@ class AppSettingsViewModel @Inject constructor(
     fun revertAppSettings() {
         viewModelScope.launch {
             _revertAppSettingsResult.update { revertAppSettingsUseCase(componentName = componentName) }
+
+            // The notification offering to undo this hide is now describing a device that has
+            // been put back. Nothing on this route took it down - it is one fixed id shared by
+            // every hide since r3, and the per-app ids the revert paths cancelled have not
+            // been posted under since. Conditional inside: another app may still be hidden.
+            settingsHiddenRunner.clearRevertOfferIfSettled()
         }
     }
+
+    /**
+     * Which of the drawn keys IMD cannot act on right now, and why the overlay one cannot.
+     *
+     * ⚠ **The reasons rather than the sentences**, for the reason `:domain:model` returns them
+     * at all: paths are resources and cannot live in the domain, and Display over other apps
+     * has three ways to be unusable that are fixed in three different places. The screen maps
+     * them to this module's own copy of the wording.
+     *
+     * ⚠ **Asked of the three keys that mean something beyond "write this".** Everything else
+     * in a profile is a Settings row IMD writes directly and can always write.
+     */
+    val blockedAppSettings = userDataRepository.userData.map { userData ->
+        BlockedAppSettings(
+            keys = GATED_KEYS.filter { appSettingBlocked(userData = userData, key = it) }.toSet(),
+            overlayReasons = overlayBlockReasons(userData = userData),
+        )
+    }.distinctUntilChanged().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = BlockedAppSettings(),
+    )
 
     fun requestPinShortcut(
         icon: ByteArray?,
@@ -300,3 +343,31 @@ class AppSettingsViewModel @Inject constructor(
         }
     }
 }
+
+/**
+ * The per-app keys that can be greyed, and why.
+ *
+ * A value rather than three flags so the screen asks one question per row. `overlayReasons` is
+ * empty when Display over other apps is usable **and** on Shevery, where it is unsupported
+ * rather than unconfigured - the empty list is what picks the author's fork sentence over his
+ * configure-first one, exactly as it does in the two configuration dialogs and the settings
+ * manager.
+ *
+ * ⚠ **Public, and it has to be.** [AppSettingsViewModel.blockedAppSettings] is a public property
+ * on a public class, and Kotlin refuses a public declaration whose type argument is `internal` -
+ * a caller outside the module would see the property and not the type it returns. That is a
+ * compile error in Android Studio and invisible here, because the sandbox only really
+ * compiles the five pure-JVM domain modules. `tools/check_exposed_internal.py` now asks the
+ * question instead.
+ */
+data class BlockedAppSettings(
+    val keys: Set<String> = emptySet(),
+    val overlayReasons: List<OverlayBlockReason> = emptyList(),
+)
+
+/** The three keys that mean more to IMD than "write this value". */
+private val GATED_KEYS = listOf(
+    AppSettingKeys.SYSTEM_ALERT_WINDOW,
+    AppSettingKeys.SHIZUKU_SERVICE,
+    AppSettingKeys.ACCESSIBILITY_ENABLED,
+)

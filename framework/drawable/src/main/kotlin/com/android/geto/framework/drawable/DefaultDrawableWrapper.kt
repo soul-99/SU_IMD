@@ -20,6 +20,7 @@ package com.android.geto.framework.drawable
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.toBitmap
+import com.android.geto.domain.common.IconStyleState
 import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers
 import kotlinx.coroutines.CoroutineDispatcher
@@ -31,8 +32,8 @@ internal class DefaultDrawableWrapper @Inject constructor(
     @param:Dispatcher(GetoDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
 ) : AndroidDrawableWrapper {
     /**
-     * Deliberately renders the icon exactly as the system handed it over, with no mask and
-     * no plate.
+     * Renders an icon the system has already shaped exactly as it handed it over, and shapes
+     * one it has not.
      *
      * An earlier version drew adaptive layers unmasked and clipped everything — adaptive
      * and legacy alike — to one squircle, so that every row in the app matched. It looked
@@ -43,10 +44,12 @@ internal class DefaultDrawableWrapper @Inject constructor(
      * OEM launcher applies, which on many devices is a mask of its own — so the result was
      * a second mask over the first.
      *
-     * Matching a launcher exactly means reproducing per-OEM behaviour that is not
-     * queryable. Passing the system's own bitmap through is the only version that is right
-     * everywhere. This is also what [ShortcutIconFactory] falls back to for legacy icons,
-     * so masking here quietly made pinned shortcuts wrong too.
+     * ⚠ **Both of those are about icons that already arrive shaped, and neither is true of one
+     * that does not.** A drawable that is not an `AdaptiveIconDrawable` on API 26+ has no 108-unit
+     * canvas and has had no OEM treatment applied — it is a finished 48dp picture, which is why
+     * the author saw legacy icons drawn raw beside shaped ones. [LegacyIconShaping] shapes only
+     * those, and asks the platform for the mask rather than choosing a squircle, so the reverted
+     * version's third problem — being right only on some devices — does not come back either.
      */
     override suspend fun toByteArray(drawable: Drawable, size: Int): ByteArray = withContext(defaultDispatcher) {
         val stream = ByteArrayOutputStream()
@@ -56,10 +59,19 @@ internal class DefaultDrawableWrapper @Inject constructor(
         // then scaled up to a 50dp slot, which on a high-density screen is four times the
         // pixels it has — the icon read as small and soft next to its neighbours. Rendering
         // every icon at one size costs nothing extra for the ones that were already large.
-        //
+        val rendered = drawable.toBitmap(width = size, height = size)
+
+        // ⚠ **The user's Icon style, read from memory** — see IconStyleState for why it is
+        // held rather than injected. False is "System icons": the drawable is handed over
+        // exactly as the system gave it, which is what this app did before v3.
+        val shaped = if (IconStyleState.shapeLegacyIcons && LegacyIconShaping.isLegacy(drawable)) {
+            LegacyIconShaping.maskedInApp(source = rendered, size = size)
+        } else {
+            rendered
+        }
+
         // The quality argument is ignored for PNG, which is lossless.
-        drawable.toBitmap(width = size, height = size)
-            .compress(Bitmap.CompressFormat.PNG, 100, stream)
+        shaped.compress(Bitmap.CompressFormat.PNG, 100, stream)
 
         stream.toByteArray()
     }

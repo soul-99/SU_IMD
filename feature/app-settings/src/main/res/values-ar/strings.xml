@@ -65,4 +65,13 @@
     <string name="action_app_setting">إعداد التطبيق</string>
     <string name="action_create_shortcut">إنشاء اختصار</string>
     <string name="action_setting_template">قالب الإعدادات</string>
+    <string name="auto_hide_conflict_snackbar">‏يحتفظ IMD+ بإعداداتك مخفية. استعِده أولًا ثم طبّق هذا الملف.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">يرجى ضبط الإعدادات أولاً</string>
+    <string name="dooa_thedjchi_only">إدارة \"العرض فوق التطبيقات الأخرى\" مدعومة فقط في نسخة Thedjchi من Shizuku</string>
+    <string name="help_path_accessibility">إعدادات IMD ← إعدادات IMD الافتراضية ← خدمات إمكانية الوصول المراد إخفاؤها</string>
+    <string name="help_path_dooa">إعدادات IMD ← إعدادات IMD الافتراضية ← العرض فوق التطبيقات الأخرى الذي يديره IMD</string>
+    <string name="help_path_manage_shizuku">إعدادات IMD ← إعدادات Shizuku ← إدارة Shizuku</string>
+    <string name="shortcut_lookup_failed">تعذّرت قراءة تفاصيل اختصار هذا التطبيق.</string>
+    <string name="understood">فهمت</string>
 </resources>

@@ -16,6 +16,7 @@
   ~
   -->
 <resources>
+    <string name="shortcut_lookup_failed">Could not read this app\'s shortcut details.</string>
     <string name="app_settings_disabled">Please enable atleast one setting</string>
     <string name="empty_app_settings_list">No settings found</string>
     <string name="geto_settings">IMD</string>
@@ -62,4 +63,15 @@
     <string name="action_app_setting">App setting</string>
     <string name="action_create_shortcut">Create shortcut</string>
     <string name="action_setting_template">Setting template</string>
+    <string name="auto_hide_conflict_snackbar">IMD+ is holding your settings. Revert it first, then apply this profile.</string>
+    <!-- ⚠ Duplicated from feature/settings and feature/apps, which this module cannot see.
+      check5_dupes treats identical strings across modules as intentional; string/understood is
+      already shared exactly this way. The wording is the author's and must stay identical in
+      all three, or the same refusal would be worded three ways. -->
+    <string name="understood">Understood</string>
+    <string name="configure_first">Please configure the settings first</string>
+    <string name="dooa_thedjchi_only">managing Display over other apps is only supported for Thedjchi fork of Shizuku</string>
+    <string name="help_path_accessibility">IMD Settings \u2192 Default IMD settings \u2192 Accessibility services managed by IMD</string>
+    <string name="help_path_dooa">IMD Settings \u2192 Default IMD settings \u2192 Display over other apps managed by IMD</string>
+    <string name="help_path_manage_shizuku">IMD Settings \u2192 Shizuku configuration \u2192 Manage Shizuku</string>
 </resources>

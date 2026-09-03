@@ -35,7 +35,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -54,6 +53,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,15 +67,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.geto.designsystem.component.GetoCheckbox
 import com.android.geto.broadcastreceiver.postAppliedSettingsNotification
-import com.android.geto.common.showRevertFromMemoryToast
+import com.android.geto.designsystem.component.ConfigureFirstDialog
+import com.android.geto.designsystem.component.PriorHideDialog
+import com.android.geto.common.showRestoredToast
 import com.android.geto.designsystem.icon.GetoIcons
 import com.android.geto.domain.model.AddAppSettingResult
 import com.android.geto.domain.model.AppSetting
+import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.AppSettingTemplate
 import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.domain.model.GetPinShortcutResult
-import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.OverlayBlockReason
 import com.android.geto.domain.model.RequestPinShortcutResult
 import com.android.geto.domain.model.SecureSetting
 import com.android.geto.domain.model.SettingType
@@ -106,8 +110,6 @@ internal fun AppSettingsRoute(
 
     val revertAppSettingsResult by viewModel.revertAppSettingsResult.collectAsStateWithLifecycle()
 
-    val notificationFunction by viewModel.notificationFunction.collectAsStateWithLifecycle()
-
     val addAppSettingResult by viewModel.addAppSettingsResult.collectAsStateWithLifecycle()
 
     val activityIcon by viewModel.activityIcon.collectAsStateWithLifecycle()
@@ -115,6 +117,8 @@ internal fun AppSettingsRoute(
     val requestPinShortcutResult by viewModel.requestPinShortcutResult.collectAsStateWithLifecycle()
 
     val appSettingTemplates by viewModel.appSettingTemplates.collectAsStateWithLifecycle()
+
+    val blockedAppSettings by viewModel.blockedAppSettings.collectAsStateWithLifecycle()
 
     val getPinShortcutResult by viewModel.getPinShortcutResult.collectAsStateWithLifecycle()
 
@@ -133,18 +137,23 @@ internal fun AppSettingsRoute(
         addAppSettingResult = addAppSettingResult,
         applyAppSettingsResult = applyAppSettingsResult,
         revertAppSettingsResult = revertAppSettingsResult,
-        notificationFunction = notificationFunction,
         requestPinShortcutResult = requestPinShortcutResult,
         appSettingTemplates = appSettingTemplates,
+        blockedAppSettings = blockedAppSettings,
         updatePinShortcutResult = updatePinShortcutResult,
         isFavourite = isFavourite,
         onUpdateFavourite = viewModel::updateFavourite,
         onApplyAppSettings = viewModel::applyAppSettings,
+        onRestoreThenApply = viewModel::restoreThenApply,
+        onDiscardThenApply = viewModel::discardThenApply,
         onRevertAppSettings = {
             // Said on the press rather than on the result. This is the memory revert, and
             // the only thing distinguishing it from "Revert to default" from the user's
             // side is which button was pressed — so the answer has to arrive with the press.
-            context.showRevertFromMemoryToast()
+            context.showRestoredToast(
+                fromMemory = true,
+                appName = appSettingsRouteData.activityLabel,
+            )
 
             viewModel.revertAppSettings()
         },
@@ -177,14 +186,21 @@ internal fun AppSettingsScreen(
     addAppSettingResult: AddAppSettingResult?,
     applyAppSettingsResult: AppSettingsResult?,
     revertAppSettingsResult: AppSettingsResult?,
-    notificationFunction: NotificationFunction,
     requestPinShortcutResult: RequestPinShortcutResult?,
     appSettingTemplates: List<AppSettingTemplate>,
+    /** Which drawn keys are greyed, and why the Display over other apps one is. */
+    blockedAppSettings: BlockedAppSettings,
     getPinShortcutResult: GetPinShortcutResult?,
     updatePinShortcutResult: UpdatePinShortcutResult?,
     isFavourite: Boolean,
     onUpdateFavourite: (Boolean) -> Unit,
     onApplyAppSettings: () -> Unit,
+    /**
+     * The force-close popup's two answers, both of which end in this screen's launch running
+     * again. See `SettingsHiddenRunner.discardPendingReverts` — the second one is permanent.
+     */
+    onRestoreThenApply: () -> Unit,
+    onDiscardThenApply: () -> Unit,
     onRevertAppSettings: () -> Unit,
     onCheckAppSetting: (appSetting: AppSetting) -> Unit,
     onDeleteAppSetting: (appSetting: AppSetting) -> Unit,
@@ -209,11 +225,50 @@ internal fun AppSettingsScreen(
     ) -> Unit,
     onResetUpdatePinShortcutResult: () -> Unit,
 ) {
-    var showAppSettingDialog by remember { mutableStateOf(false) }
+    var showAppSettingDialog by rememberSaveable { mutableStateOf(false) }
 
-    var showTemplateDialog by remember { mutableStateOf(false) }
+    var showTemplateDialog by rememberSaveable { mutableStateOf(false) }
 
-    var showWriteSecureSettingsDialog by remember { mutableStateOf(false) }
+    // Null while nothing is refusing; a list of location trees otherwise, empty for the one
+    // case with nothing to point at - Shevery, where Display over other apps is unsupported
+    // rather than unconfigured. The empty list is what picks the fork sentence over the
+    // configure-first one. Same convention as the two configuration dialogs.
+    var blockedPaths by remember { mutableStateOf<List<String>?>(null) }
+
+    val accessibilityPath = stringResource(R.string.help_path_accessibility)
+
+    val dooaPath = stringResource(R.string.help_path_dooa)
+
+    val manageShizukuPath = stringResource(R.string.help_path_manage_shizuku)
+
+    // ⚠ **The decision is not repeated here, only the wording.** `overlayBlockReasons` in
+    // `:domain:model` is the single answer to why the overlay row will not move; this module
+    // cannot see the other two modules' resources, so what is duplicated is five strings
+    // rather than a rule.
+    val pathsFor = { key: String ->
+        when (key) {
+            AppSettingKeys.SYSTEM_ALERT_WINDOW -> blockedAppSettings.overlayReasons.mapNotNull {
+                when (it) {
+                    OverlayBlockReason.ForkUnsupported -> null
+
+                    OverlayBlockReason.ManageShizukuOff -> manageShizukuPath
+
+                    OverlayBlockReason.NothingSelected -> dooaPath
+                }
+            }
+
+            AppSettingKeys.SHIZUKU_SERVICE -> listOf(manageShizukuPath)
+
+            else -> listOf(accessibilityPath)
+        }
+    }
+
+    var showWriteSecureSettingsDialog by rememberSaveable { mutableStateOf(false) }
+
+    // Settings are down from a run of IMD that is no longer alive. Saved like its neighbours:
+    // losing it to a rotation would leave a launch that simply did nothing, with the only
+    // explanation gone.
+    var showPriorHideDialog by rememberSaveable { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -224,7 +279,6 @@ internal fun AppSettingsScreen(
         addAppSettingResult = addAppSettingResult,
         applyAppSettingsResult = applyAppSettingsResult,
         revertAppSettingsResult = revertAppSettingsResult,
-        notificationFunction = notificationFunction,
         requestPinShortcutResult = requestPinShortcutResult,
         getPinShortcutResult = getPinShortcutResult,
         updatePinShortcutResult = updatePinShortcutResult,
@@ -234,6 +288,9 @@ internal fun AppSettingsScreen(
         onResetAddAppSettingResult = onResetAddAppSettingResult,
         onShowWriteSecureSettingsDialog = {
             showWriteSecureSettingsDialog = true
+        },
+        onShowPriorHideDialog = {
+            showPriorHideDialog = true
         },
         onResetGetPinShortcutResult = onResetGetPinShortcutResult,
         onResetUpdatePinShortcutResult = onResetUpdatePinShortcutResult,
@@ -281,6 +338,8 @@ internal fun AppSettingsScreen(
                     if (appSettingsUiState.appSettings.isNotEmpty()) {
                         Success(
                             appSettingsUiState = appSettingsUiState,
+                            blockedKeys = blockedAppSettings.keys,
+                            onBlockedClick = { blockedPaths = pathsFor(it) },
                             onCheckAppSetting = onCheckAppSetting,
                             onDeleteAppSettingsItem = onDeleteAppSetting,
                         )
@@ -307,10 +366,25 @@ internal fun AppSettingsScreen(
         )
     }
 
+    blockedPaths?.let { paths ->
+        ConfigureFirstDialog(
+            message = if (paths.isEmpty()) {
+                stringResource(R.string.dooa_thedjchi_only)
+            } else {
+                stringResource(R.string.configure_first)
+            },
+            paths = paths,
+            dismissLabel = stringResource(R.string.understood),
+            onDismissRequest = { blockedPaths = null },
+        )
+    }
+
     if (showTemplateDialog) {
         TemplateDialog(
             appSettingTemplates = appSettingTemplates,
             componentName = appSettingsRouteData.componentName,
+            blockedKeys = blockedAppSettings.keys,
+            onBlockedClick = { blockedPaths = pathsFor(it) },
             onAddAppSetting = onAddAppSetting,
             onDismissRequest = {
                 showTemplateDialog = false
@@ -322,6 +396,26 @@ internal fun AppSettingsScreen(
         WriteSecureSettingsDialog(
             onDismissRequest = {
                 showWriteSecureSettingsDialog = false
+            },
+        )
+    }
+
+    // Dismissed before either call, so the Shizuku spinner a restore may need is not hidden
+    // behind a dialog that has already been answered.
+    if (showPriorHideDialog) {
+        PriorHideDialog(
+            title = stringResource(commonR.string.prior_hide_title),
+            restoreLabel = stringResource(commonR.string.prior_hide_restore),
+            ignoreLabel = stringResource(commonR.string.prior_hide_ignore),
+            onRestore = {
+                showPriorHideDialog = false
+
+                onRestoreThenApply()
+            },
+            onIgnore = {
+                showPriorHideDialog = false
+
+                onDiscardThenApply()
             },
         )
     }
@@ -358,7 +452,6 @@ private fun AppSettingsLaunchedEffects(
     addAppSettingResult: AddAppSettingResult?,
     applyAppSettingsResult: AppSettingsResult?,
     revertAppSettingsResult: AppSettingsResult?,
-    notificationFunction: NotificationFunction,
     requestPinShortcutResult: RequestPinShortcutResult?,
     getPinShortcutResult: GetPinShortcutResult?,
     updatePinShortcutResult: UpdatePinShortcutResult?,
@@ -367,6 +460,7 @@ private fun AppSettingsLaunchedEffects(
     onResetRequestPinShortcutResult: () -> Unit,
     onResetAddAppSettingResult: () -> Unit,
     onShowWriteSecureSettingsDialog: () -> Unit,
+    onShowPriorHideDialog: () -> Unit,
     onResetGetPinShortcutResult: () -> Unit,
     onResetUpdatePinShortcutResult: () -> Unit,
 ) {
@@ -379,10 +473,6 @@ private fun AppSettingsLaunchedEffects(
     val appSettingsDisabled = stringResource(id = R.string.app_settings_disabled)
 
     val emptyAppSettingsList = stringResource(id = R.string.empty_app_settings_list)
-
-    val getoSettings = stringResource(id = R.string.geto_settings)
-
-    val applySuccess = stringResource(id = R.string.apply_success)
 
     val applyFailure = stringResource(id = R.string.apply_failure)
 
@@ -406,6 +496,8 @@ private fun AppSettingsLaunchedEffects(
     val appSettingAddSuccess = stringResource(R.string.app_setting_added_successfully)
 
     val appSettingAddFailed = stringResource(R.string.app_setting_already_exists)
+
+    val autoHideConflict = stringResource(R.string.auto_hide_conflict_snackbar)
 
     LaunchedEffect(key1 = applyAppSettingsResult) {
         when (applyAppSettingsResult) {
@@ -441,15 +533,18 @@ private fun AppSettingsLaunchedEffects(
                 onResetApplyAppSettingsResult()
             }
 
+            // Nothing was written and the app is not opening. The dialog below is the only
+            // surface this screen has for it, and both of its answers come back here.
+            AppSettingsResult.HiddenFromPreviousUse -> {
+                onShowPriorHideDialog()
+
+                onResetApplyAppSettingsResult()
+            }
+
             AppSettingsResult.Success -> {
                 postAppliedSettingsNotification(
                     context = context,
                     notificationManager = androidNotificationManagerWrapper,
-                    notificationFunction = notificationFunction,
-                    componentName = appSettingsRouteData.componentName,
-                    icon = activityIcon,
-                    contentTitle = getoSettings,
-                    contentText = applySuccess,
                 )
 
                 androidLauncherAppsWrapper.startMainActivity(componentName = appSettingsRouteData.componentName)
@@ -459,6 +554,24 @@ private fun AppSettingsLaunchedEffects(
 
             AppSettingsResult.InvalidValues -> {
                 snackbarHostState.showSnackbar(message = invalidValues)
+
+                onResetApplyAppSettingsResult()
+            }
+
+            // Only the device-wide configuration can be empty, and this screen never applies
+            // it - it applies the profile for one app. Reset and say nothing rather than show
+            // a message about a screen this one has nothing to do with.
+            AppSettingsResult.NothingToHide -> onResetApplyAppSettingsResult()
+
+            // Applied from this screen rather than from a launch, so there is no app to open
+            // and nothing to say: the settings this profile asks for are already off.
+            AppSettingsResult.AlreadyHidden -> onResetApplyAppSettingsResult()
+
+            // Auto-hide settings (IMD+) is holding the device down with a different list, and
+            // this profile cannot be applied on top of it without leaving settings that
+            // neither revert puts back.
+            AppSettingsResult.AutoHideConflict -> {
+                snackbarHostState.showSnackbar(message = autoHideConflict)
 
                 onResetApplyAppSettingsResult()
             }
@@ -476,6 +589,11 @@ private fun AppSettingsLaunchedEffects(
                 // tap of revert produces no emission and the button looks dead.
                 onResetRevertAppSettingsResult()
             }
+
+            // A revert cannot produce it — the gate is on the hide — but the `when` is
+            // exhaustive over the same enum and silence here would be a compile error rather
+            // than a decision.
+            AppSettingsResult.HiddenFromPreviousUse -> onResetRevertAppSettingsResult()
 
             AppSettingsResult.EmptyAppSettings -> {
                 snackbarHostState.showSnackbar(message = emptyAppSettingsList)
@@ -512,6 +630,14 @@ private fun AppSettingsLaunchedEffects(
 
                 onResetRevertAppSettingsResult()
             }
+
+            // Reverting a per-app profile never reads the device-wide configuration, so this
+            // cannot arise here either. Nor can the two IMD+ outcomes: both are decided on the
+            // way in, by the apply, and a revert is asked for after that decision was made.
+            AppSettingsResult.NothingToHide,
+            AppSettingsResult.AlreadyHidden,
+            AppSettingsResult.AutoHideConflict,
+            -> onResetRevertAppSettingsResult()
 
             null -> Unit
         }
@@ -785,6 +911,8 @@ private fun Empty(
 private fun Success(
     modifier: Modifier = Modifier,
     appSettingsUiState: AppSettingsUiState.Success,
+    blockedKeys: Set<String>,
+    onBlockedClick: (String) -> Unit,
     onCheckAppSetting: (AppSetting) -> Unit,
     onDeleteAppSettingsItem: (AppSetting) -> Unit,
 ) {
@@ -792,6 +920,8 @@ private fun Success(
         items(items = appSettingsUiState.appSettings, key = { it.id }) { appSettings ->
             AppSettingItem(
                 appSetting = appSettings,
+                enabled = appSettings.key !in blockedKeys,
+                onBlockedClick = { onBlockedClick(appSettings.key) },
                 onCheckedChange = { check ->
                     onCheckAppSetting(
                         appSettings.copy(enabled = check),
@@ -809,31 +939,61 @@ private fun Success(
 private fun LazyItemScope.AppSettingItem(
     modifier: Modifier = Modifier,
     appSetting: AppSetting,
+    enabled: Boolean,
+    onBlockedClick: () -> Unit,
     onCheckedChange: (Boolean) -> Unit,
     onDeleteClick: () -> Unit,
 ) {
+    val contentColour = if (enabled) {
+        MaterialTheme.colorScheme.onSurface
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_CONTENT_ALPHA)
+    }
+
     ListItem(
-        modifier = modifier.animateItem(),
+        modifier = modifier
+            .animateItem()
+            .then(if (enabled) Modifier else Modifier.clickable(onClick = onBlockedClick)),
         headlineContent = {
             Text(
                 text = appSetting.label,
+                color = contentColour,
             )
         },
         overlineContent = {
             Text(
                 text = appSetting.key,
+                color = contentColour,
             )
         },
         supportingContent = {
             Text(
                 text = appSetting.settingType.getSettingTypeTitle(),
+                color = contentColour,
             )
         },
         leadingContent = {
-            Checkbox(
-                checked = appSetting.enabled,
-                onCheckedChange = onCheckedChange,
-            )
+            // ⚠ **Unticked while blocked, and only in the drawing.** The stored row is not
+            // touched - `onCheckedChange` cannot be reached from here - so the tick comes
+            // straight back when the thing this row needs is configured again. The author:
+            // "shown unchecked and unclickable with the checkbox position remembered".
+            //
+            // ⚠ **Wrapped in a Box, not merely disabled.** A disabled Checkbox swallows the
+            // press inside its own bounds, so the ListItem's clickable above would never see
+            // a tap on the one control the user is aiming at.
+            Box(
+                modifier = if (enabled) {
+                    Modifier
+                } else {
+                    Modifier.clickable(onClick = onBlockedClick)
+                },
+            ) {
+                GetoCheckbox(
+                    checked = enabled && appSetting.enabled,
+                    enabled = enabled,
+                    onCheckedChange = onCheckedChange,
+                )
+            }
         },
         trailingContent = {
             IconButton(onClick = onDeleteClick) {
@@ -845,6 +1005,9 @@ private fun LazyItemScope.AppSettingItem(
         },
     )
 }
+
+/** Material's disabled content alpha, restated where a row draws its own colours. */
+private const val DISABLED_CONTENT_ALPHA = 0.38f
 
 @Composable
 internal fun SettingType.getSettingTypeTitle() = when (this) {

@@ -21,6 +21,7 @@ package com.android.geto.common
 import android.app.LocaleManager
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Build
 import android.os.LocaleList
 import java.util.Locale
@@ -139,6 +140,31 @@ object AppLocale {
         return base.createConfigurationContext(config)
     }
 
+    /**
+     * A context whose resources resolve in [tag]'s language, for *previewing* a language before
+     * it is chosen. [SYSTEM] resolves to the device's own default locale.
+     *
+     * Unlike [wrap] this touches nothing global - it neither reads nor writes the stored choice
+     * and never calls `Locale.setDefault` - so the first-run picker can build one on every tap
+     * to redraw itself in whatever language was tapped, without committing that language. The
+     * Continue button is still what commits it, through [set].
+     */
+    fun previewContext(base: Context, tag: String): Context {
+        val locale = if (tag == SYSTEM) {
+            val system = Resources.getSystem().configuration.locales
+            if (system.isEmpty) Locale.getDefault() else system[0]
+        } else {
+            Locale.forLanguageTag(tag)
+        }
+
+        val config = Configuration(base.resources.configuration)
+
+        config.setLocale(locale)
+        config.setLocales(LocaleList(locale))
+
+        return base.createConfigurationContext(config)
+    }
+
     /** Has the first-run picker been shown yet? */
     fun prompted(context: Context): Boolean = prefs(context).getBoolean(KEY_PROMPTED, false)
 
@@ -157,6 +183,19 @@ object AppLocale {
         LocaleList.setDefault(LocaleList(locale))
     }
 
+    /**
+     * The context it was handed, deliberately - **never `applicationContext`**.
+     *
+     * [wrap] runs inside `Application.attachBaseContext`, and at that moment the Application
+     * does not exist yet: `LoadedApk.mApplication` is assigned only after `attachBaseContext`
+     * returns, so `getApplicationContext()` answers null and calling anything on it throws.
+     * That crash killed the process before a single line of the app ran, on every device
+     * below Android 13 - which is every device the [wrap] short-circuit above does not cover.
+     *
+     * Nothing is lost by using the base context. It is a full context with the right data
+     * directory, and SharedPreferences are cached per file per process, so this is the same
+     * one-key file whichever context asks for it.
+     */
     private fun prefs(context: Context) =
-        context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 }

@@ -27,8 +27,15 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** Which way an overlay start is heading, so the wait can say so. */
-enum class OverlayStart { Hide, Restore }
+/**
+ * Why Shizuku is being waited on, so the spinner can say so.
+ *
+ * [StartShizuku] is the plain case and the one that was missing: a revert that puts the Shizuku
+ * service back without touching overlay access spends the same wait as any other start, and
+ * used to spend it either in silence or - worse - under a spinner naming "Display over other
+ * apps", which that revert is not touching at all.
+ */
+enum class OverlayStart { Hide, Restore, StopShizuku, StartShizuku }
 
 /**
  * Whether a Shizuku start attempt is in flight right now.
@@ -49,6 +56,15 @@ class ShizukuStartTracker @Inject constructor() {
 
     private val overlayRestoreAttempts = MutableStateFlow(0)
 
+    // Stopping has its own wait, and its own spinner: by the time it runs the overlay work
+    // is done, so nothing else is on screen to explain the pause.
+    private val shizukuStopAttempts = MutableStateFlow(0)
+
+    // The plain start: Shizuku being brought up for its own sake rather than as a step on the
+    // way to writing overlay AppOps. Counted separately so the spinner can say the plain
+    // thing instead of naming a setting this run is not touching.
+    private val shizukuStartAttempts = MutableStateFlow(0)
+
     val starting: Flow<Boolean> = attempts.map { it > 0 }.distinctUntilChanged()
 
     /**
@@ -66,10 +82,22 @@ class ShizukuStartTracker @Inject constructor() {
      * the user is waiting on.
      */
     val overlayStart: Flow<OverlayStart?> =
-        combine(overlayHideAttempts, overlayRestoreAttempts) { hiding, restoring ->
+        combine(
+            overlayHideAttempts,
+            overlayRestoreAttempts,
+            shizukuStopAttempts,
+            shizukuStartAttempts,
+        ) { hiding, restoring, stopping, starting ->
             when {
                 hiding > 0 -> OverlayStart.Hide
                 restoring > 0 -> OverlayStart.Restore
+                // Last of the overlay reasons, because it happens after the overlay work in
+                // the same launch: while both are somehow in flight the overlay wait is the
+                // one that came first and the one the spinner is already describing.
+                stopping > 0 -> OverlayStart.StopShizuku
+                // Lowest priority of all, and deliberately: it names no setting, so any of
+                // the three above is a more useful thing to be told.
+                starting > 0 -> OverlayStart.StartShizuku
                 else -> null
             }
         }.distinctUntilChanged()
@@ -89,6 +117,8 @@ class ShizukuStartTracker @Inject constructor() {
     private fun counterFor(reason: OverlayStart) = when (reason) {
         OverlayStart.Hide -> overlayHideAttempts
         OverlayStart.Restore -> overlayRestoreAttempts
+        OverlayStart.StopShizuku -> shizukuStopAttempts
+        OverlayStart.StartShizuku -> shizukuStartAttempts
     }
 
     fun end() {

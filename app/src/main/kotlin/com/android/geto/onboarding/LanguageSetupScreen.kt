@@ -18,6 +18,7 @@
  */
 package com.android.geto.onboarding
 
+import android.view.View
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,11 +43,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
@@ -71,67 +73,84 @@ fun LanguageSetupScreen(
     initialTag: String,
     onContinue: (String) -> Unit,
 ) {
-    var draft by remember { mutableStateOf(initialTag) }
+    var draft by rememberSaveable { mutableStateOf(initialTag) }
 
-    Surface(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(horizontal = 24.dp),
-        ) {
-            Text(
-                modifier = Modifier.padding(top = 32.dp),
-                text = stringResource(R.string.language_setup_title),
-                style = MaterialTheme.typography.headlineMedium,
-            )
+    val baseContext = LocalContext.current
 
-            Text(
-                modifier = Modifier.padding(top = 12.dp),
-                text = stringResource(R.string.language_setup_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+    // Resolve this screen's own strings against the tapped language, so the page redraws itself
+    // in whatever the reader is previewing the moment they tap it - the title, the notes and the
+    // Continue button, all in that language - without committing the choice, which the Continue
+    // button still does through onContinue. The endonyms in the list stay in their own script.
+    val preview = remember(draft) { AppLocale.previewContext(baseContext, draft) }
 
-            Text(
-                modifier = Modifier.padding(top = 16.dp),
-                text = stringResource(commonR.string.language_ai_notice),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+    val pageDirection = if (
+        preview.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+    ) {
+        LayoutDirection.Rtl
+    } else {
+        LayoutDirection.Ltr
+    }
 
+    CompositionLocalProvider(LocalLayoutDirection provides pageDirection) {
+        Surface(modifier = modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-                    .verticalScroll(rememberScrollState())
-                    .selectableGroup(),
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
+                    .padding(horizontal = 24.dp),
             ) {
-                LanguageChoice(
-                    label = stringResource(commonR.string.language_system),
-                    selected = draft == AppLocale.SYSTEM,
-                    onClick = { draft = AppLocale.SYSTEM },
+                Text(
+                    modifier = Modifier.padding(top = 32.dp),
+                    text = preview.getString(R.string.language_setup_title),
+                    style = MaterialTheme.typography.headlineMedium,
                 )
 
-                AppLocale.LANGUAGES.forEach { (tag, endonym) ->
-                    LanguageChoice(
-                        label = endonym,
-                        selected = draft == tag,
-                        rtl = tag == "ar",
-                        onClick = { draft = tag },
-                    )
-                }
-            }
+                Text(
+                    modifier = Modifier.padding(top = 12.dp),
+                    text = preview.getString(R.string.language_setup_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Button(onClick = { onContinue(draft) }) {
-                    Text(text = stringResource(R.string.language_setup_continue))
+                Text(
+                    modifier = Modifier.padding(top = 16.dp),
+                    text = preview.getString(commonR.string.language_ai_notice),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .verticalScroll(rememberScrollState())
+                        .selectableGroup(),
+                ) {
+                    LanguageChoice(
+                        label = preview.getString(commonR.string.language_system),
+                        selected = draft == AppLocale.SYSTEM,
+                        onClick = { draft = AppLocale.SYSTEM },
+                    )
+
+                    AppLocale.LANGUAGES.forEach { (tag, endonym) ->
+                        LanguageChoice(
+                            label = endonym,
+                            selected = draft == tag,
+                            onClick = { draft = tag },
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Button(onClick = { onContinue(draft) }) {
+                        Text(text = preview.getString(R.string.language_setup_continue))
+                    }
                 }
             }
         }
@@ -139,23 +158,27 @@ fun LanguageSetupScreen(
 }
 
 /**
- * One language, written in its own script and laid out in its own direction.
+ * One language, written in its own script and always laid out left to right.
  *
- * The direction is per row rather than per screen: the page around it is still in whatever
- * language the app is currently using, and flipping the whole screen for one Arabic entry
- * in the list would move the scrollbar and the button under the reader's thumb.
+ * ⚠ **Script direction and row direction are not the same question**, and this row used to
+ * answer the first with the second. Arabic text renders right to left from its own characters
+ * whatever the row does; [LayoutDirection] only decides which end of the row the radio button
+ * sits at. So the Arabic entry gained nothing from a right-to-left row and lost the thing a
+ * picker needs, which is one column of radio buttons the eye can run down - the author's
+ * *"show all languages from left and the toggle too"*.
+ *
+ * Pinned rather than left to follow the page, so previewing Arabic does not flip the list under
+ * the reader while they are still choosing from it. The page around it still follows the
+ * preview, which is what makes the preview worth having.
  */
 @Composable
 private fun LanguageChoice(
     modifier: Modifier = Modifier,
     label: String,
     selected: Boolean,
-    rtl: Boolean = false,
     onClick: () -> Unit,
 ) {
-    CompositionLocalProvider(
-        LocalLayoutDirection provides if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr,
-    ) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
             modifier = modifier
                 .fillMaxWidth()

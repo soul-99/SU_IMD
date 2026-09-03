@@ -15,13 +15,6 @@
     <string name="settings">Ajustes</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Abre aplicaciones bancarias y otras aplicaciones restringidas sin activar/desactivar estos ajustes a mano cada vez:
-1. Developer settings
-2. Debugging
-3. Accessibility services
-4. Mostrar sobre otras aplicaciones (requiere el servicio Shizuku activo)
-5. Servicio Shizuku
-6. y muchos más (tienes que configurarlos a mano con la Memory function de la aplicación, consejo: usa el Settings observer para ayudarte)</string>
     <string name="setup_step">Paso %1$d</string>
     <string name="setup_granted">Concedido</string>
     <string name="setup_not_granted">No concedido</string>
@@ -30,10 +23,10 @@
     <string name="setup_copy_command">Copiar comando</string>
     <string name="setup_check_again">Comprobar de nuevo</string>
     <string name="setup_use_shizuku">Usar Shizuku</string>
-    <string name="services_shortcut_label">Administrador de servicios</string>
+    <string name="services_shortcut_label">Gestor de ajustes</string>
     <string name="revert_shortcut_label">Revertir a valores predeterminados</string>
     <string name="shortcut_not_configured_title">No hay nada configurado para esta app</string>
-    <string name="shortcut_not_configured_message">Primero tienes que configurar qué ajustes ocultar para esta app en IMD → Todas las apps → toca el nombre de la app → Plantilla de ajustes → selecciona qué ajustes ocultar.</string>
+    <string name="shortcut_not_configured_message">Primero tienes que configurar qué ajustes ocultar para esta app en IMD → Todas las apps → mantén pulsado el nombre de la app → Plantilla de ajustes → selecciona qué ajustes ocultar.</string>
     <string name="shortcut_not_configured_dismiss">Entendido</string>
     <string name="obtainium_title">Mantener esta app actualizada</string>
     <string name="obtainium_body">Como esta app funciona completamente sin conexión, usa Obtainium para buscar actualizaciones e instalarlas directamente desde las versiones publicadas en GitHub.</string>
@@ -69,10 +62,43 @@
     <string name="setup_open_settings_failed">No se pudieron abrir los ajustes en este dispositivo</string>
     <string name="setup_name_display_over_other_apps">Mostrar sobre otras aplicaciones</string>
     <string name="setup_how_title">Cómo funciona</string>
-    <string name="setup_how_off">IMD desactiva estos ajustes</string>
+    <string name="setup_how_off">IMD desactiva los ajustes</string>
     <string name="setup_how_off_note">No se rompe la política de seguridad de ninguna aplicación</string>
     <string name="setup_how_use">Usas tu aplicación</string>
     <string name="setup_how_revert">Revert</string>
-    <string name="setup_how_on">IMD vuelve a activar esos ajustes</string>
+    <string name="setup_how_on">IMD vuelve a activar los ajustes</string>
     <string name="setup_how_number">%1$d.</string>
+    <string name="hide_tile_label">Ocultar ajustes</string>
+    <string name="hide_tile_visible">Ajustes visibles</string>
+    <string name="hide_tile_hidden">Ajustes ocultos</string>
+    <string name="hide_tile_working">Ocultando ajustes…</string>
+    <string name="hide_tile_unhiding">Restaurando ajustes…</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="hide_unhide_shortcut_label">Ocultar/mostrar ajustes</string>
+    <string name="setup_done_1">1. Ahora simplemente abre tus aplicaciones problemáticas tocándolas en IMD.</string>
+    <string name="setup_done_2">2. Para un acceso rápido:</string>
+    <string name="setup_done_2_1">1. Mantén pulsados los iconos de las aplicaciones para crear accesos directos en la pantalla de inicio</string>
+    <string name="setup_done_2_2">2. Añade aplicaciones a la pestaña de favoritos</string>
+    <string name="setup_done_2_3">3. Añade el ajuste rápido «Ocultar ajustes»</string>
+    <string name="setup_done_2_3_tip">(consejo: mantener pulsado el mosaico abre el gestor de ajustes)</string>
+    <string name="setup_done_3">3. Usa el propio gestor de ajustes de IMD:</string>
+    <string name="setup_done_3_1">1. Usa el icono del gestor de ajustes en tu cajón de aplicaciones</string>
+    <string name="setup_done_3_2">2. Añade el ajuste rápido «Gestor de ajustes»</string>
+    <string name="setup_done_4">4. La configuración ya está completa, pero te recomendamos que veas:</string>
+    <string name="setup_done_4_1">1. Mostrar automáticamente (RECOMENDADO)</string>
+    <string name="setup_done_4_2">2. Ocultar ajustes automáticamente (IMD+, necesita un servicio en segundo plano)</string>
+    <string name="setup_done_4_3">3. Todos los demás ajustes, para una personalización más profunda</string>
+    <string name="setup_done_4_4">4. IMD intents (integración con Tasker / Macrodroid... etc.)</string>
+    <string name="setup_done_add_tile">Añadir mosaico</string>
+    <string name="setup_done_go">Vamos allá</string>
+    <string name="setup_done_title">La configuración ya casi está completa</string>
+    <string name="setup_step_accessibility">Selecciona los servicios de accesibilidad que ocultar / gestionar</string>
+    <string name="setup_step_auto_unhide">Configura el servicio de mostrar automáticamente</string>
+    <string name="setup_step_customise_ui">Personalizar la interfaz</string>
+    <string name="setup_step_manager_rows">Interruptores del gestor de ajustes</string>
+    <string name="setup_step_overlay">Selecciona qué «Mostrar sobre otras aplicaciones» ocultar / gestionar</string>
+    <string name="setup_step_settings_to_hide">Selecciona los ajustes que ocultar / mostrar</string>
+    <string name="shizuku_setup_fill_first">Rellena primero todos los campos</string>
+    <string name="shizuku_setup_manage">Gestionar la configuración de Shizuku</string>
+    <string name="shizuku_setup_skip">Omitir</string>
 </resources>

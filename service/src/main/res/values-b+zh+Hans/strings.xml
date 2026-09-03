@@ -22,4 +22,6 @@
     <string name="waiting_for_changes">正在等待更改…</string>
     <string name="unknown">未知</string>
     <string name="stop">停止</string>
+    <string name="auto_hide_service_label">IMD+（自动隐藏设置）</string>
+    <string name="auto_hide_service_description">让 IMD 知道你选定的应用何时被打开，以便在该应用查看之前隐藏你的设置。IMD 只读取哪个应用来到前台，绝不读取屏幕上的任何内容。</string>
 </resources>

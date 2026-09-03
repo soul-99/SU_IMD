@@ -29,6 +29,7 @@ import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.ManualTargetStates
 import com.android.geto.domain.model.SettingType
 import com.android.geto.domain.model.isShizukuConfigured
+import com.android.geto.domain.model.overlayManageableInManager
 import com.android.geto.domain.repository.UserDataRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
@@ -64,14 +65,41 @@ class GetManualTargetStatesUseCase @Inject constructor(
         // reliably invalidate it — pingBinder can go on answering "alive" for a service
         // that is gone. Checking the package first is the only reading that survives an
         // uninstall, which is exactly the case the switch was getting wrong.
-        val shizukuAvailable = userData.isShizukuConfigured &&
-            runCatching {
-                packageManagerWrapper.isInstalled(packageName = userData.shizukuPackageName)
-            }.getOrDefault(false)
+        // Falls back to the stock package name when nothing is configured, so an installed
+        // Shizuku can still be recognised by someone who has not filled in IMD's own Shizuku
+        // section yet. That is the only reading the check has to survive; the point of it is
+        // the uninstall case above, not identifying which fork is present.
+        val shizukuInstalled = runCatching {
+            packageManagerWrapper.isInstalled(
+                packageName = userData.shizukuPackageName
+                    .ifBlank { ShizukuWrapper.DEFAULT_SHIZUKU_PACKAGE_NAME },
+            )
+        }.getOrDefault(false)
+
+        // Whether the service is up, which is a fact about the device and true or false
+        // regardless of what IMD has been told about Shizuku. The manager shows this on the
+        // switch so a running service never reads as stopped - it just cannot be operated
+        // from there without a configuration to send start and stop intents through.
+        val shizukuRunning = shizukuInstalled &&
+            runCatching { shizukuWrapper.isShizukuRunning() }.getOrDefault(false)
+
+        // Whether IMD can *operate* that service: starting and stopping go out as the fork's
+        // own broadcasts, and there is no action to send without a configuration. Kept apart
+        // from the reading above so "running" and "manageable" cannot be confused - the row is
+        // shown live either way, and only usability turns on this.
+        val shizukuAvailable = userData.isShizukuConfigured && shizukuInstalled
 
         val enabled = ManualRevertTarget.entries.associateWith { target ->
             when (target) {
                 ManualRevertTarget.AccessibilityServices -> {
+                    // Nothing selected means nothing for this row to stand for. Reading "on"
+                    // there was describing the device - no managed service is off, because
+                    // there are none - when the row's whole subject is what IMD is holding
+                    // down. Off, and the dialog refuses to move it and says why.
+                    if (userData.managedAccessibilityServices.isEmpty()) {
+                        return@associateWith false
+                    }
+
                     if (
                         AccessibilityServicePlan.DEVICE_WIDE_HOLD in
                         userData.heldAccessibilityServices
@@ -90,10 +118,7 @@ class GetManualTargetStatesUseCase @Inject constructor(
                     }.getOrDefault(false)
                 }
 
-                ManualRevertTarget.Shizuku -> {
-                    shizukuAvailable &&
-                        runCatching { shizukuWrapper.isShizukuRunning() }.getOrDefault(false)
-                }
+                ManualRevertTarget.Shizuku -> shizukuRunning
 
                 ManualRevertTarget.DisplayOverOtherApps -> {
                     // This app's own record comes first, and it is the only reading that is
@@ -107,10 +132,14 @@ class GetManualTargetStatesUseCase @Inject constructor(
 
                     // The row stands for the chosen set, exactly as the accessibility row
                     // does, so it only reads "on" when every selected app still holds the
-                    // permission. Nothing selected means nothing to report on.
+                    // permission.
                     val selected = userData.managedOverlayPackages
 
-                    if (selected.isEmpty()) return@associateWith true
+                    // Nothing selected means nothing for this row to stand for - the same
+                    // answer the accessibility row gives above, and for the same reason. It
+                    // used to read "on", which described the device rather than anything IMD
+                    // was doing, on a switch that could not do anything about it either way.
+                    if (selected.isEmpty()) return@associateWith false
 
                     // A failed query falls back to "on" rather than "off": it only fails when
                     // Shizuku is out of reach, and Shizuku being out of reach says nothing
@@ -133,6 +162,20 @@ class GetManualTargetStatesUseCase @Inject constructor(
             }
         }
 
-        ManualTargetStates(enabled = enabled, shizukuAvailable = shizukuAvailable)
+        ManualTargetStates(
+            enabled = enabled,
+            shizukuAvailable = shizukuAvailable,
+            shizukuSupportsIntents = userData.shizukuForkMode.supportsIntents,
+            accessibilityManaged = userData.managedAccessibilityServices.isNotEmpty(),
+            // ⚠ **The manager's rule, not the hiding one, and this field has no other
+            // reader.** `overlayManageable` is Thedjchi-only because a *launch* must be able to
+            // bring the shell up on demand; here the user has just started the service by hand,
+            // so a running Shevery can write the AppOp after all. See the author's two new
+            // points in the Shevery pop-up, which are exactly this distinction.
+            overlayManaged = overlayManageableInManager(
+                userData = userData,
+                shizukuRunning = shizukuRunning,
+            ),
+        )
     }
 }

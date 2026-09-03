@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~   Copyright 2026 soul_99 (suIMD)
+  ~
+  ~   Licensed under the GNU General Public License v3.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       https://www.gnu.org/licenses/gpl-3.0
+  ~
+  -->
+<!--
+  What Auto-hide settings (IMD+) asks the system for, and deliberately nothing more.
+
+  Only windowStateChanged, which is what fires when an app comes to the front — that single
+  event is the whole feature. No content events, no text, and no
+  canRetrieveWindowContent: IMD+ needs the package name of whatever is in front, never a word
+  of what is on screen, and an accessibility service that can read screen content is a very
+  different thing to install than one that cannot.
+
+  packageNames is left unset because the watched list is the user's and changes at runtime;
+  filtering here would freeze it into the APK. The service checks the package itself and
+  returns immediately for anything it does not care about.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagDefault"
+    android:description="@string/auto_hide_service_description"
+    android:notificationTimeout="100" />

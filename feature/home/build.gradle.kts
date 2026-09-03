@@ -24,7 +24,3 @@ plugins {
 android {
     namespace = "com.android.geto.feature.home"
 }
-
-dependencies {
-    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
-}

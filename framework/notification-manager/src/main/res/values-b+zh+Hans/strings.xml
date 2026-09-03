@@ -23,10 +23,27 @@
       The two notification actions stay distinguishable: 使用记忆还原 restores only what this
       app changed for this app, 还原为默认 drives the whole device to the configured state.
     -->
-    <string name="revert_using_memory">使用记忆还原</string>
+    <string name="revert_using_memory">使用记忆取消隐藏设置</string>
     <string name="revert_to_default">还原为默认</string>
-    <string name="overlay_restore_failed_title">还原失败</string>
+    <string name="overlay_restore_failed_title">取消隐藏设置失败</string>
     <string name="overlay_restore_failed_text">无法通过 Shizuku 恢复“显示在其他应用的上层”权限，请手动开启 Shizuku 服务，然后点击下方按钮</string>
     <string name="overlay_restore_retry">重试</string>
-    <string name="alert_notification_channel">还原失败</string>
+    <string name="alert_notification_channel">IMD 故障</string>
+    <string name="shizuku_usb_fallback_title">Shizuku 服务已停止</string>
+    <string name="shizuku_usb_fallback_text">Shizuku 服务是通过 USB 调试而非停止 intent 结束的，恢复时应用可能无法重新启动 Shizuku 服务。</string>
+    <string name="shizuku_usb_fallback_text_overlay">Shizuku 服务是通过 USB 调试而非停止 intent 结束的，恢复时应用可能无法重新启动 Shizuku 服务和「显示在其他应用上层」权限。</string>
+    <string name="notification_ok">确定</string>
+    <string name="hidden_revert_default">设置已隐藏，点击以取消隐藏设置。</string>
+    <string name="hidden_revert_memory">设置已隐藏，点击以从记忆中取消隐藏设置。</string>
+    <string name="auto_hide_channel">自动隐藏设置（IMD+）</string>
+    <string name="auto_hide_hidden_revert">IMD+ 已隐藏你的设置，点击以取消隐藏设置。</string>
+    <string name="auto_hide_hidden_revert_memory">IMD+ 已隐藏你的设置，点击以从记忆中取消隐藏设置。</string>
+    <string name="auto_unhide_channel">自动取消隐藏设置服务</string>
+    <string name="auto_unhide_running">自动取消隐藏服务运行中</string>
+    <string name="auto_hide_shizuku_failed">IMD+ 无法隐藏设置，因为 Shizuku 服务无法启动。请检查你的设置。</string>
+    <string name="shizuku_revert_failed">无法启动 Shizuku 服务，请点击此处手动启动</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="developer_note_channel">IMD 应用更新提示</string>
+    <string name="developer_note_notification">IMD：来自开发者的重要说明 🧑‍🔬</string>
+    <string name="shevery_start_failed">启动 Shevery 失败，请点击这里手动启动。</string>
 </resources>

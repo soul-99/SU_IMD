@@ -37,14 +37,22 @@ import javax.inject.Inject
  * hand does - a selected radio button over three empty fields would look configured while
  * doing nothing.
  *
- * No marker flag is needed to make this run once. [ShizukuForkMode.Unset] is the state of an
- * install where nobody has chosen, nothing in the UI can return to it, and this only ever
- * writes when it finds that state - so a user's own choice is never overwritten, and neither
- * is a deliberate decision to leave it alone once something has been picked.
+ * **A blank start action is the one honest sign that nothing here has been configured.** The
+ * fork mode cannot say it any more, since an unset one now reads as the recommended family;
+ * and neither can the package name, which the preferences layer fills in with stock Shizuku's
+ * when nothing is stored. The start action is the only one of the three that stays empty until
+ * something actually writes it - which is why it, alone, is what this asks about.
  *
- * Silence is a valid outcome. With neither app installed the mode stays Unset and the fields
- * stay empty, which is honest: a guess at that point would just be a package name the user
- * has to notice is wrong.
+ * That matters more than it looks. [isShizukuConfigured] wants a start action, so an install
+ * where this never ran reports itself as unconfigured however full the fields look - which is
+ * the "you need to configure Shizuku first" a fresh install used to meet with every field
+ * apparently filled in.
+ *
+ * No marker flag is needed to make this run once: it only ever writes when it finds that
+ * state, so a user's own answer is never overwritten. With neither app installed the package
+ * is left alone - a guess at that point would just be a name the user has to notice is wrong -
+ * but the start action for the current family is still written, because a field the app shows
+ * has to be a field the app has actually stored.
  */
 class DetectShizukuForkUseCase @Inject constructor(
     private val userDataRepository: UserDataRepository,
@@ -54,28 +62,43 @@ class DetectShizukuForkUseCase @Inject constructor(
     suspend operator fun invoke() = withContext(defaultDispatcher) {
         val userData = userDataRepository.userData.first()
 
-        if (userData.shizukuForkMode != ShizukuForkMode.Unset) return@withContext
+        // Somebody has been here. See the note above for why this one field is the question.
+        if (userData.shizukuStartAction.isNotBlank()) return@withContext
 
         val apps = packageManagerWrapper.getInstalledApps()
 
-        val mode = when {
+        val detected = when {
             apps.any { it.label.equals(ShizukuForkDefaults.SHIZUKU_LABEL, ignoreCase = true) } ->
                 ShizukuForkMode.Thedjchi
 
             apps.any { it.label.equals(ShizukuForkDefaults.SHEVERY_LABEL, ignoreCase = true) } ->
                 ShizukuForkMode.Other
 
-            else -> return@withContext
+            else -> null
+        }
+
+        // Nothing found: keep whichever family the install already reads as, and fill in only
+        // the action. Safe to write the detected one when there is one, because getting here
+        // at all means no start action is stored - and choosing a family in Settings always
+        // writes one, so no deliberate choice can be sitting behind this.
+        val mode = detected ?: userData.shizukuForkMode
+
+        if (detected != null) {
+            userDataRepository.updateShizukuForkMode(shizukuForkMode = mode)
         }
 
         val packageName = ShizukuForkDefaults.packageFor(mode = mode, apps = apps)
 
+        if (packageName.isNotBlank()) {
+            userDataRepository.updateShizukuPackageName(shizukuPackageName = packageName)
+        }
+
         val label = apps.firstOrNull { it.packageName == packageName }?.label.orEmpty()
 
-        userDataRepository.updateShizukuForkMode(shizukuForkMode = mode)
-        userDataRepository.updateShizukuPackageName(shizukuPackageName = packageName)
-        userDataRepository.updateShizukuStartAction(
-            shizukuStartAction = ShizukuForkDefaults.actionFor(mode = mode, selectedLabel = label),
-        )
+        val startAction = ShizukuForkDefaults.actionFor(mode = mode, selectedLabel = label)
+
+        if (startAction.isNotBlank()) {
+            userDataRepository.updateShizukuStartAction(shizukuStartAction = startAction)
+        }
     }
 }

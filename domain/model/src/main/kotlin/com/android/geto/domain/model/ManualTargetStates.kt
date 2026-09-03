@@ -30,6 +30,33 @@ package com.android.geto.domain.model
 data class ManualTargetStates(
     val enabled: Map<ManualRevertTarget, Boolean> = emptyMap(),
     val shizukuAvailable: Boolean = false,
+    /**
+     * Whether the chosen fork can be started and stopped by intent at all.
+     *
+     * False for Shevery, whose service follows the debugging transport instead. Separate from
+     * [shizukuAvailable] because the two are different refusals: "IMD has not been told how to
+     * reach Shizuku" is something the user can fix in settings, while "this fork has no
+     * intents" is a permanent property of what they installed, and the row says so differently.
+     */
+    val shizukuSupportsIntents: Boolean = true,
+    /**
+     * Whether any accessibility service is selected for IMD to manage.
+     *
+     * With nothing selected the row has nothing to report on and nothing to switch: IMD is
+     * holding no service down, so it reads off and refuses to be moved rather than sitting on
+     * an "on" that describes the device instead of anything this app is doing.
+     */
+    val accessibilityManaged: Boolean = false,
+    /**
+     * Whether any app is selected for IMD to withdraw "Display over other apps" from.
+     *
+     * The same distinction as [accessibilityManaged], and it matters for the same reason: with
+     * nothing selected the row is not describing something IMD is doing, it is describing the
+     * device - and a switch that reports the device while pretending to control it is the one
+     * shape of control this app has already been bitten by. Nothing selected reads off and
+     * refuses to move, and says which screen to go to.
+     */
+    val overlayManaged: Boolean = false,
 ) {
     fun isEnabled(target: ManualRevertTarget): Boolean = enabled[target] == true
 }

@@ -34,7 +34,7 @@
     <string name="favourite_apps_options">Favoriten-Optionen</string>
     <string name="no_favourite_apps">Noch keine Favoriten</string>
     <string name="no_matching_favourite_apps">Keine Favoriten passen zu dieser Suche</string>
-    <string name="no_favourite_apps_subtitle">Tippe im Tab „Alle Apps“ auf den Stern neben einer App oder auf den Stern auf ihrem Einstellungsbildschirm.</string>
+    <string name="no_favourite_apps_subtitle">Apps hinzufügen: Tippe im Tab „Alle Apps“ auf das Sternsymbol</string>
     <string name="view">Ansicht</string>
     <string name="custom">Eigene Reihenfolge</string>
     <string name="alphabetical">A–Z</string>
@@ -51,19 +51,22 @@
     <string name="settings_manager_configure_revert">Festlegen, was beim Wiederherstellen eingeblendet wird</string>
     <string name="applied_settings_failure">Einstellungen konnten nicht angewendet werden</string>
     <string name="applied_settings_invalid">Diese App hat Einstellungen mit ungültigen Werten</string>
-    <string name="settings_manager_title">IMD-Dienstmanager</string>
+    <string name="settings_manager_title">Einstellungsmanager</string>
 
     <!-- settings_manager_title and the two _name_ strings below are matched as substrings
          inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_open_settings">IMD-Einstellungen öffnen</string>
     <string name="settings_manager_info">Was dieser Dialog macht</string>
-    <string name="settings_manager_info_live">Der IMD-Dienstmanager zeigt den aktuellen Status der Einstellungen und Dienste an. Er legt nicht fest, welche Einstellungen/Dienste aus- oder eingeblendet werden, wenn Apps über IMD oder über App-Verknüpfungen geöffnet werden, die IMD angelegt hat.</string>
+    <string name="settings_manager_info_live">Der IMD-Einstellungsmanager zeigt den Live-Status der Einstellungen an und ändert sie mühelos.</string>
     <string name="settings_manager_info_live_extra">Um festzulegen, was beim Starten von Apps über IMD aus- und eingeblendet wird, konfiguriere bitte die Standard-IMD-Einstellungen in der IMD-App.</string>
     <string name="settings_manager_info_name_defaults">Standard-IMD-Einstellungen</string>
     <string name="settings_manager_info_developer">Das Ausschalten der Entwickleroptionen über IMD schaltet nur den Schalter für die Entwickleroptionen um. Änderungen, die in den Entwickleroptionen vorgenommen wurden (etwa Animationsskalierung, App für simulierte Standorte … usw.), werden dadurch nicht zurückgesetzt.</string>
     <string name="settings_manager_info_developer_extra">Zum Zurücksetzen der Entwickleroptionen öffne die Seite der Entwickleroptionen und schalte sie dort aus.</string>
     <string name="settings_manager_info_name_reset">Zurücksetzen der Entwickleroptionen</string>
     <string name="revert_to_default">Standard wiederherstellen</string>
+    <string name="unhide_settings">Einstellungen einblenden</string>
     <string name="not_configured_title">Es gibt keine Einstellungen zum Ausblenden. Du musst für diese App festlegen, welche Einstellungen ausgeblendet werden sollen.</string>
+    <string name="nothing_to_hide_message">Du musst zuerst in den IMD-App-Einstellungen festlegen, welche Einstellungen ausgeblendet werden sollen.</string>
     <string name="not_configured_message">Halte diese App in der IMD-App gedrückt, um festzulegen, welche Einstellungen ausgeblendet werden sollen.</string>
     <string name="got_it">Verstanden</string>
     <string name="settings_manager_open">%1$s öffnen</string>
@@ -77,7 +80,6 @@
     <string name="shizuku_help_point_setup">Stelle bitte sicher, dass die Shizuku-App installiert, in ADB registriert und auf der Einstellungsseite der IMD-App korrekt konfiguriert ist.</string>
     <string name="shizuku_help_point_permission">Die Shizuku-Berechtigung der IMD-App dient nur dazu, die privilegierte Android-Berechtigung WRITE_SECURE_SETTINGS einmalig zu erteilen. Sie wird weder genutzt, um den Status des Shizuku-Dienstes zu erkennen, noch um den Shizuku-Dienst ein- oder auszuschalten.</string>
     <string name="shizuku_help_point_restart">Starte die IMD-App nach der Einrichtung bitte neu und versuche es erneut.</string>
-    <string name="settings_manager_shizuku_wait">Bitte warte 10 Sekunden, da manche Shizuku-Forks den Dienst über Intents nur langsam starten</string>
     <string name="revert_developer_settings">Entwickleroptionen</string>
     <string name="revert_usb_debugging">USB-Debugging</string>
     <string name="revert_wireless_debugging">Drahtloses Debugging</string>
@@ -97,4 +99,34 @@
     <string name="settings_manager_overlay_restore_failed_open">Warum Über anderen Apps einblenden nicht wiederhergestellt wurde</string>
     <string name="shizuku_starting_to_restore_overlay">Shizuku-Dienst wird gestartet, um die Berechtigung Über anderen Apps einblenden wiederherzustellen</string>
     <string name="settings_manager_overlay_note">es werden nur die in den IMD-Einstellungen ausgewählten Apps verwaltet</string>
+    <string name="shizuku_unmanageable">Der Shizuku-Dienst kann von hier aus nicht verwaltet werden. Bitte konfiguriere Shizuku korrekt in den IMD-Einstellungen</string>
+    <string name="shevery_toggle_title">Shevery-Dienst</string>
+    <string name="shevery_toggle_point_status">Der IMD-Einstellungsmanager zeigt nur den Live-Status des Dienstes an.</string>
+    <string name="shevery_toggle_point_intents">Umschalten ist bei Shevery nicht möglich (Intents werden nicht unterstützt)</string>
+    <string name="accessibility_none_managed">Es sind keine Bedienungshilfen zur Verwaltung durch IMD ausgewählt. Lege die gewünschten zuerst in den IMD-App-Einstellungen fest.</string>
+    <string name="shizuku_stopping_via_intent">Versuche, Shizuku über den Stopp-Intent zu beenden</string>
+    <string name="shevery_toggle_point_open">Öffne die Shevery-App direkt, um den Dienst zu verwalten</string>
+    <string name="overlay_none_managed">Es sind keine Apps für das Ausblenden von „Über anderen Apps einblenden“ eingerichtet.\nBitte füge sie in den IMD-App-Einstellungen hinzu.</string>
+    <string name="auto_hide_conflict_title">IMD+ hält deine Einstellungen ausgeblendet</string>
+    <string name="auto_hide_conflict_body">IMD+ hat die geräteweite Liste bereits ausgeblendet, und das Profil dieser App verlangt etwas, das sie nicht abdeckt. Noch mehr darüber auszublenden hinterließe Einstellungen, die keines der beiden Zurücksetzen wiederherstellt.</string>
+    <string name="auto_hide_conflict_fix">Setze zuerst IMD+ zurück — über seine Benachrichtigung oder die Kachel „Einstellungen ausblenden“ — und öffne diese App dann erneut.</string>
+    <string name="shizuku_starting">Shizuku-Dienst wird gestartet</string>
+    <string name="settings_manager_busy_hiding">IMD blendet Einstellungen aus, bitte warten...</string>
+    <string name="settings_manager_busy_unhiding">IMD blendet Einstellungen wieder ein, bitte warten...</string>
+    <string name="settings_manager_info_name_live">Live-Status</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">Bitte konfiguriere zuerst die Einstellungen</string>
+    <string name="dooa_thedjchi_only">die Verwaltung von „Über anderen Apps anzeigen“ wird nur vom Thedjchi-Fork von Shizuku unterstützt</string>
+    <string name="help_path_accessibility">IMD-Einstellungen → Standard-IMD-Einstellungen → Auszublendende Bedienungshilfen-Dienste</string>
+    <string name="help_path_dooa">IMD-Einstellungen → Standard-IMD-Einstellungen → Von IMD verwaltetes „Über anderen Apps anzeigen“</string>
+    <string name="help_path_manage_shizuku">IMD-Einstellungen → Shizuku-Konfiguration → Shizuku verwalten</string>
+    <string name="hide_settings">Einstellungen ausblenden</string>
+    <string name="revert_shevery">Shevery-Dienst</string>
+    <string name="settings_manager_all_off">Alle aus</string>
+    <string name="settings_manager_all_on">Alle an</string>
+    <string name="settings_manager_only_selected">Nur die ausgewählten</string>
+    <string name="settings_manager_pending">IMD blendet gerade Einstellungen aus; alle Änderungen, die du hier vornimmst, bevor du die Einstellungen wieder einblendest, werden nach der Wiederherstellung rückgängig gemacht</string>
+    <string name="shevery_service_first">Bitte schalte zuerst den Shevery-Dienst ein.</string>
+    <string name="shevery_wait_countdown">Warte auf den Start des Shevery-Dienstes...(%1$d)</string>
+    <string name="shizuku_wait_countdown">Warte auf den Start des Shizuku-Dienstes...(%1$d)</string>
 </resources>

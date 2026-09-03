@@ -17,10 +17,14 @@
  */
 package com.android.geto.feature.settings.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.android.geto.designsystem.component.blockTouchesWhileAnimating
 import com.android.geto.feature.settings.SettingsRoute
 
 fun NavController.navigateToSettings() {
@@ -35,6 +39,10 @@ fun NavController.navigateToSettings() {
 
 fun NavGraphBuilder.settingsScreen() {
     composable<SettingsRouteData> {
-        SettingsRoute()
+        // Full size around a full-size destination, so this changes no layout - it only gives
+        // the transition somewhere to hang its touch blocker. See blockTouchesWhileAnimating.
+        Box(modifier = Modifier.fillMaxSize().blockTouchesWhileAnimating(this)) {
+            SettingsRoute()
+        }
     }
 }

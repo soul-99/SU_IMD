@@ -33,4 +33,26 @@ data class OverlayPackageData(
     val packageName: String,
     val label: String,
     val allowed: Boolean,
-)
+    /** The app's icon, or null when it has none, could not be decoded, or the app is gone. */
+    val icon: ByteArray? = null,
+) {
+    // ByteArray compares by identity — see AccessibilityServiceData for the whole of why this
+    // is written out. `allowed` stays in; only the bytes are left out.
+    override fun equals(other: Any?): Boolean = this === other ||
+        (
+            other is OverlayPackageData &&
+                packageName == other.packageName &&
+                label == other.label &&
+                allowed == other.allowed
+            )
+
+    override fun hashCode(): Int {
+        var result = packageName.hashCode()
+
+        result = 31 * result + label.hashCode()
+
+        result = 31 * result + allowed.hashCode()
+
+        return result
+    }
+}

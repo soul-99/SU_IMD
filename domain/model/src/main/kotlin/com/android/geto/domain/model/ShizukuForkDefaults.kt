@@ -40,6 +40,18 @@ object ShizukuForkDefaults {
     const val SHEVERY_ACTION = "moe.shizuku.manager.action.START_SERVER"
 
     /**
+     * The stock package names, used only as a second guess when no label matches.
+     *
+     * A label is the better first guess — see the note above — but it is also the thing a
+     * translated or re-branded build changes, and a user who has one of these installed under
+     * an unexpected name is exactly the user least able to type the right package in by hand.
+     * So: label first, then this, then nothing.
+     */
+    const val SHIZUKU_PACKAGE = "moe.shizuku.privileged.api"
+
+    const val SHEVERY_PACKAGE = "com.hamondev.shevery"
+
+    /**
      * The package to preselect, or blank when nothing plausible is installed.
      *
      * [ShizukuForkMode.Other] prefers Shevery and falls back to Shizuku, because that mode
@@ -49,11 +61,20 @@ object ShizukuForkDefaults {
      * wrong package that makes the toggle look ready.
      */
     fun packageFor(mode: ShizukuForkMode, apps: List<InstalledAppData>): String = when (mode) {
-        ShizukuForkMode.Unset -> ""
-        ShizukuForkMode.Thedjchi -> apps.findByLabel(SHIZUKU_LABEL)
-        ShizukuForkMode.Other -> apps.findByLabel(SHEVERY_LABEL).ifBlank {
-            apps.findByLabel(SHIZUKU_LABEL)
-        }
+        // Unset still answers, because the picker now starts on a family rather than on
+        // nothing: a fresh install should arrive with the field already filled if the app
+        // is there to find.
+        ShizukuForkMode.Unset, ShizukuForkMode.Thedjchi ->
+            apps.findByLabel(SHIZUKU_LABEL).ifBlank { apps.findByPackage(SHIZUKU_PACKAGE) }
+
+        // Shevery first and by both routes, then the Shizuku pair as a last resort: this
+        // family covers "Shevery and anything else speaking a token-free start action", so a
+        // differently-named Shizuku build is the next best guess when Shevery is not here.
+        ShizukuForkMode.Other ->
+            apps.findByLabel(SHEVERY_LABEL)
+                .ifBlank { apps.findByPackage(SHEVERY_PACKAGE) }
+                .ifBlank { apps.findByLabel(SHIZUKU_LABEL) }
+                .ifBlank { apps.findByPackage(SHIZUKU_PACKAGE) }
     }
 
     /**
@@ -113,6 +134,8 @@ object ShizukuForkDefaults {
     private const val STOP = "STOP"
 
     private fun List<InstalledAppData>.findByLabel(label: String): String = firstOrNull { it.label.matches(label) }?.packageName.orEmpty()
+
+    private fun List<InstalledAppData>.findByPackage(packageName: String): String = firstOrNull { it.packageName == packageName }?.packageName.orEmpty()
 
     private fun String?.matches(label: String): Boolean = this?.trim().equals(label, ignoreCase = true)
 }

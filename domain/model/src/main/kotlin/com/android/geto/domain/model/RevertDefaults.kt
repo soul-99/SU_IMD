@@ -41,38 +41,41 @@ object RevertDefaults {
     private const val OFF = "0"
 
     /**
-     * What the dialog starts out with when it has never been saved.
+     * Nothing, on a fresh install - the mirror of [SettingsToHide.Default].
      *
-     * Accessibility services only, as of v1.6.6, and the reasoning is about safety rather
-     * than convenience. Every other target here is a debugging surface: developer settings,
-     * USB debugging, wireless debugging, and the Shizuku service that rides on one of them.
-     * Switching those back on automatically means a Revert can leave a device more open
-     * than the person pressing the button realised, on a schedule they did not choose -
-     * including a Revert fired from a tile with nothing on screen to report what happened.
+     * The two configurations are one decision made twice: what this app switches off on the
+     * way in, and what it switches back on on the way out. An install that hides nothing has
+     * nothing to put back, so a restore ticked in advance would be a switch that does nothing
+     * and still has to be explained - and the moment it did do something, it would be this
+     * app switching a debugging surface *on* for somebody who never asked.
      *
-     * Accessibility services are the exception because the app switched them off itself,
-     * they are not a debugging surface, and leaving them off silently breaks a screen
-     * reader. Restoring what this app turned off is the whole promise of the button.
-     *
-     * Earlier versions also defaulted USB debugging and Shizuku to on. v1.6.6 resets any
-     * install carrying that forward - see MigrateRevertDefaultsUseCase - and tells the user
-     * it has done so, because a default quietly changing underneath somebody is worse than
-     * the original default.
+     * That asymmetry is the whole argument. Failing to restore something leaves the device
+     * more closed than its owner keeps it, which they can see and fix in one screen. Restoring
+     * something they keep off leaves it more open, on a schedule they did not choose, possibly
+     * from a tile with nothing on screen to say so.
      *
      * A default, not a policy. The dialog exists precisely so this can be overridden, and
-     * once saved the stored answer wins for every target including this one.
+     * once saved the stored answer wins for every target.
      */
-    val Default: Map<ManualRevertTarget, Boolean> = mapOf(
+    val Default: Map<ManualRevertTarget, Boolean> = ManualRevertTarget.entries.associateWith { false }
+
+    /**
+     * The v1.6.6 default: accessibility services alone.
+     *
+     * What an install that predates v2.1 has been behaving as, and the only thing
+     * MigrateRevertDefaultsUseCase ever writes. Accessibility services were the one target on,
+     * because the app switched them off itself, they are not a debugging surface, and leaving
+     * them off silently breaks a screen reader.
+     *
+     * Frozen here rather than tracking [Default], so a later change to what a fresh install
+     * starts with cannot quietly rewrite what an existing install was promised.
+     */
+    val NarrowedV166: Map<ManualRevertTarget, Boolean> = mapOf(
         ManualRevertTarget.DeveloperSettings to false,
         ManualRevertTarget.UsbDebugging to false,
         ManualRevertTarget.WirelessDebugging to false,
         ManualRevertTarget.AccessibilityServices to true,
         ManualRevertTarget.Shizuku to false,
-        // Off to match SettingsToHide.Default. Restoring only ever puts back what IMD
-        // itself switched off, so leaving it on would be safe in isolation — but hiding is
-        // opt-in, and a restore configured on by default while nothing is ever hidden is a
-        // switch that does nothing and still has to be explained. The pair is turned on
-        // together, by someone who has decided they want overlay hiding.
         ManualRevertTarget.DisplayOverOtherApps to false,
     )
 

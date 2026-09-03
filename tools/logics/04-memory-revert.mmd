@@ -1,0 +1,26 @@
+flowchart TD
+    A["Auto revert on returning · the auto-unhide<br/>watcher · IMD+'s own revert · the button on<br/>the app's configuration screen"] --> B{"Is there anything<br/>to work from?"}
+    B -- "No profile, or<br/>every row off" --> Z["Nothing to do"]
+    B -- Yes --> C{"Did <b>this app</b> withdraw<br/>overlay access?"}
+
+    C -- "No - another app holds it,<br/>or it was already withdrawn" --> E
+    C -- Yes --> D["Give overlay access back"]
+    D --> E["Write each setting back to what was recorded -<br/>or, where nothing was recorded, to the value<br/>the profile names for a revert.<br/><i>Wireless debugging is left down if switching it<br/>on is what this would do and</i> Restore wireless<br/>debugging <i>is off</i>"]
+
+    E --> F{"Did every write land?"}
+
+    F -- No --> Y["<b>Stop.</b> Keep the record<br/>so a retry can use it"]
+    F -- Yes --> G["<b>Drop the record</b> - before anything<br/>else, so a second revert cannot<br/>apply it twice"]
+    G --> H{"Does the profile restore<br/>accessibility services?"}
+    H -- Yes --> I["Release only the services<br/>this app is holding"]
+    H -- No --> J
+    I --> J["Restart Shizuku if this app stopped it -<br/>unconditionally since v3, after a<br/>1.5s wait for the daemon"]
+    J --> K{"Is anything still hidden -<br/>device-wide <b>or</b> by<br/>another profile?"}
+    K -- Yes --> L["Leave IMD's own detector off"]
+    K -- No --> M["Bring the detector back"]
+
+    class Z stop
+    class Y stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

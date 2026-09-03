@@ -18,11 +18,15 @@
  */
 package com.android.geto.feature.apps.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.android.geto.designsystem.component.blockTouchesWhileAnimating
 import com.android.geto.feature.apps.FavouriteAppsRoute
 
 fun NavController.navigateToFavouriteApps() {
@@ -43,9 +47,12 @@ fun NavGraphBuilder.favouriteAppsScreen(
     ) -> Unit,
 ) {
     composable<FavouriteAppsRouteData> {
-        FavouriteAppsRoute(
-            snackbarHostState = snackbarHostState,
-            onClickApp = onClickApp,
-        )
+        // See settingsScreen - a full-size wrapper for the touch blocker, no layout change.
+        Box(modifier = Modifier.fillMaxSize().blockTouchesWhileAnimating(this)) {
+            FavouriteAppsRoute(
+                snackbarHostState = snackbarHostState,
+                onClickApp = onClickApp,
+            )
+        }
     }
 }

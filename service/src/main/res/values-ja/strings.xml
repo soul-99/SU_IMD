@@ -21,4 +21,6 @@
     <string name="waiting_for_changes">変更を待機しています…</string>
     <string name="unknown">不明</string>
     <string name="stop">停止</string>
+    <string name="auto_hide_service_label">IMD+（設定を自動で非表示）</string>
+    <string name="auto_hide_service_description">選んだアプリが開かれたことを IMD が検知し、そのアプリが見る前に設定を非表示にできるようにします。IMD が読み取るのは前面に来たアプリだけで、画面の内容は一切読み取りません。</string>
 </resources>

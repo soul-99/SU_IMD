@@ -62,4 +62,13 @@
     <string name="action_app_setting">应用设置</string>
     <string name="action_create_shortcut">创建快捷方式</string>
     <string name="action_setting_template">设置模板</string>
+    <string name="auto_hide_conflict_snackbar">IMD+ 正在保持你的设置处于隐藏状态。请先还原，再应用此配置。</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">请先配置设置</string>
+    <string name="dooa_thedjchi_only">只有 Shizuku 的 Thedjchi 分支支持管理“显示在其他应用上层”</string>
+    <string name="help_path_accessibility">IMD 设置 → 默认 IMD 设置 → 要隐藏的无障碍服务</string>
+    <string name="help_path_dooa">IMD 设置 → 默认 IMD 设置 → 由 IMD 管理的显示在其他应用上层</string>
+    <string name="help_path_manage_shizuku">IMD 设置 → Shizuku 配置 → 管理 Shizuku</string>
+    <string name="shortcut_lookup_failed">无法读取此应用的快捷方式信息。</string>
+    <string name="understood">明白了</string>
 </resources>

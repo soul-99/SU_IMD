@@ -36,6 +36,7 @@ dependencyResolutionManagement {
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "SU_IMD"
 include(":app")
+include(":baselineprofile")
 include(":broadcast-receiver")
 include(":common")
 include(":data:datastore")

@@ -57,7 +57,16 @@ import com.android.geto.feature.apps.R
 @Composable
 fun ShizukuStartingDialog(
     modifier: Modifier = Modifier,
-    reason: OverlayStart,
+    /**
+     * What the wait is for, or null to say only that Shizuku is starting.
+     *
+     * ⚠ **No caller passes null any more.** IMD+ used to, on the argument that a run can wait
+     * on Shizuku twice and the user experiences one wait — but that predates StopShizuku and
+     * StartShizuku joining [OverlayStart], and a null during a stop names a start that is not
+     * happening. The branch is kept for a reasonless wait, not for a caller that has one and
+     * declines to say it.
+     */
+    reason: OverlayStart?,
 ) {
     Dialog(
         onDismissRequest = {},
@@ -83,11 +92,25 @@ fun ShizukuStartingDialog(
                 Text(
                     modifier = Modifier.weight(1f),
                     text = when (reason) {
+                        null -> stringResource(R.string.shizuku_starting)
+
                         OverlayStart.Hide ->
                             stringResource(R.string.shizuku_starting_to_hide_overlay)
 
                         OverlayStart.Restore ->
                             stringResource(R.string.shizuku_starting_to_restore_overlay)
+
+                        // Not an overlay wait at all: the launch is holding while the fork
+                        // is asked to stop. It reaches the same spinner because it is the
+                        // same kind of pause - seconds of nothing, mid-launch, with no other
+                        // screen up to explain it.
+                        OverlayStart.StopShizuku ->
+                            stringResource(R.string.shizuku_stopping_via_intent)
+
+                        // The same words the reasonless spinner shows, because it is the same
+                        // event: Shizuku is being started, and no setting is being named.
+                        OverlayStart.StartShizuku ->
+                            stringResource(R.string.shizuku_starting)
                     },
                     style = MaterialTheme.typography.bodyMedium,
                 )

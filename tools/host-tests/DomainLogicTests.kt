@@ -22,18 +22,48 @@
  * Run with tools/host-tests/run.sh — it fails the build on the first bad assertion.
  */
 
+import com.android.geto.domain.model.AccessibilityServiceData
 import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.AppListOrder
 import com.android.geto.domain.model.AppListOrdering
 import com.android.geto.domain.model.AppSetting
 import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.AppSettingTemplate
+import com.android.geto.domain.model.AutoHideRequirements
+import com.android.geto.domain.model.AutoUnhideRequirements
+import com.android.geto.domain.model.IconStyle
+import com.android.geto.domain.model.appSettingBlocked
+import com.android.geto.domain.model.autoHideFailureBackoffMillis
+import com.android.geto.domain.model.screenLockAfterTile
+import com.android.geto.domain.model.tileAfterScreenLock
+import com.android.geto.domain.model.autoHideSwitchOn
 import com.android.geto.domain.model.FavouriteAppsOrdering
+import com.android.geto.domain.model.HidingFramework
+import com.android.geto.domain.model.canHide
+import com.android.geto.domain.model.hideOwnsRevert
+import com.android.geto.domain.model.hidingFrameworkFor
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.InstalledAppData
 import com.android.geto.domain.model.LauncherAppsActivityInfo
 import com.android.geto.domain.model.ManualRevertResult
+import com.android.geto.domain.model.ManagerRows
 import com.android.geto.domain.model.ManualRevertTarget
+import com.android.geto.domain.model.manualTargetForKey
+import com.android.geto.domain.model.memoryHeldComponents
+import com.android.geto.domain.model.memoryHoldsSettings
+import com.android.geto.domain.model.settingsHidden
+import com.android.geto.domain.model.strandsSettings
+import com.android.geto.domain.model.deviceWideMemoryWanted
+import com.android.geto.domain.model.deviceWideRecordAfterRevert
+import com.android.geto.domain.model.deviceWideSnapshotId
+import com.android.geto.domain.model.manualChangeRecord
+import com.android.geto.domain.model.masterPillOnOrder
+import com.android.geto.domain.model.masterPillOrder
+import com.android.geto.domain.model.revertNamesApp
+import com.android.geto.domain.model.settingsOutsideRevertDefaults
+import com.android.geto.domain.model.SettingSnapshot.settingOf
+import com.android.geto.domain.model.UnhidingFramework
+import com.android.geto.domain.model.unhidingFrameworkFor
 import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.RevertDefaults
 import com.android.geto.domain.model.SettingSnapshot
@@ -47,13 +77,20 @@ import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
 import com.android.geto.domain.model.Theme
 import com.android.geto.domain.model.TaskerIntegration
 import com.android.geto.domain.model.UserData
-import com.android.geto.domain.model.appSettingsForOverlayState
+import com.android.geto.domain.model.accessibilityServicesForPicker
 import com.android.geto.domain.model.effectiveRevertDefaults
 import com.android.geto.domain.model.effectiveSettingsToHide
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.model.memoryHeldComponents
-import com.android.geto.domain.model.templatesForOverlayState
+import com.android.geto.domain.model.overlayAlreadyWithdrawn
+import com.android.geto.domain.model.memoryHoldsSettings
+import com.android.geto.domain.model.settingsHidden
+import com.android.geto.domain.model.OverlayBlockReason
+import com.android.geto.domain.model.manageShizukuEffective
+import com.android.geto.domain.model.overlayBlockReasons
+import com.android.geto.domain.model.overlayManageableInManager
 import com.android.geto.domain.model.withoutOverlayWhenUnmanaged
+import com.android.geto.domain.model.withoutShizukuWhenNoIntents
 
 private var passed = 0
 private val failures = mutableListOf<String>()
@@ -672,6 +709,73 @@ private fun appSettingKeyTests() {
         "an unrelated key does not restore services",
         !AppSettingKeys.restoresAccessibilityServices(listOf(setting("screen_brightness"))),
     )
+
+    // 31b. Stopping the Shizuku service is a marker row, like overlay access: only a launch
+    //      value of "0" counts as a stop, and reverting starts it again whatever the value.
+    check(
+        "shizuku_service=0 on launch stops the service",
+        AppSettingKeys.stopsShizukuService(
+            listOf(setting(AppSettingKeys.SHIZUKU_SERVICE, valueOnLaunch = "0")),
+        ),
+    )
+    check(
+        "shizuku_service=1 on launch does not stop the service",
+        !AppSettingKeys.stopsShizukuService(
+            listOf(setting(AppSettingKeys.SHIZUKU_SERVICE, valueOnLaunch = "1")),
+        ),
+    )
+    check(
+        "a disabled shizuku_service row does not stop the service",
+        !AppSettingKeys.stopsShizukuService(
+            listOf(setting(AppSettingKeys.SHIZUKU_SERVICE, enabled = false)),
+        ),
+    )
+    check(
+        "an unrelated key does not stop the service",
+        !AppSettingKeys.stopsShizukuService(listOf(setting("screen_brightness"))),
+    )
+    // 31c. The reserved id that records "this app stopped Shizuku" must be underivable from
+    //      any real row - including the profile's own shizuku_service marker, which is what
+    //      idOf() would otherwise turn into exactly this string.
+    check(
+        "the shizuku-stopped record id cannot be produced by any setting row",
+        SettingType.entries.none { type ->
+            SettingSnapshot.idOf(type, AppSettingKeys.SHIZUKU_SERVICE) ==
+                SettingSnapshot.SHIZUKU_STOPPED_ID
+        },
+    )
+    check(
+        "the shizuku-stopped record id survives a snapshot round trip",
+        SettingSnapshot.decode(
+            SettingSnapshot.encode(mapOf(SettingSnapshot.SHIZUKU_STOPPED_ID to "1")),
+        ).containsKey(SettingSnapshot.SHIZUKU_STOPPED_ID),
+    )
+
+    // 31d. The same three properties for the note that records "this app withdrew overlay
+    //      access", which is what stops a second app's revert handing the permission back
+    //      while the app that actually hid it is still open.
+    check(
+        "the overlay-hidden record id cannot be produced by any setting row",
+        SettingType.entries.none { type ->
+            SettingSnapshot.idOf(type, AppSettingKeys.SYSTEM_ALERT_WINDOW) ==
+                SettingSnapshot.OVERLAY_HIDDEN_ID
+        },
+    )
+    check(
+        "the two reserved record ids are distinct",
+        SettingSnapshot.OVERLAY_HIDDEN_ID != SettingSnapshot.SHIZUKU_STOPPED_ID,
+    )
+    check(
+        "the overlay-hidden record id survives a snapshot round trip",
+        SettingSnapshot.decode(
+            SettingSnapshot.encode(
+                mapOf(
+                    SettingSnapshot.SHIZUKU_STOPPED_ID to "1",
+                    SettingSnapshot.OVERLAY_HIDDEN_ID to "1",
+                ),
+            ),
+        ).keys == setOf(SettingSnapshot.SHIZUKU_STOPPED_ID, SettingSnapshot.OVERLAY_HIDDEN_ID),
+    )
 }
 
 private fun appListOrderingTests() {
@@ -968,6 +1072,25 @@ private fun userData(
     heldOverlay: Map<String, List<String>> = emptyMap(),
     hideStates: Map<ManualRevertTarget, Boolean> = SettingsToHide.Default,
     revertStates: Map<ManualRevertTarget, Boolean> = RevertDefaults.Default,
+    // Saved, so effectiveSettingsToHide reads hideStates rather than the pre-v2.1 fallback
+    // it applies to an install that never configured one. Tests that want that fallback say
+    // so explicitly.
+    hideConfigured: Boolean = true,
+    settingsToHideDefaultsV21: Boolean = true,
+    settingsHiddenDeviceWide: Boolean = false,
+    autoHideEnabled: Boolean = false,
+    settingStateBefore: Map<String, Map<String, String?>> = emptyMap(),
+    heldAccessibility: Map<String, List<String>> = emptyMap(),
+    hidingFramework: HidingFramework = HidingFramework.Default,
+    unhidingFramework: UnhidingFramework = UnhidingFramework.Default,
+    setupNoticeVersion: Int = 0,
+    restoreWirelessDebugging: Boolean = false,
+    manageShizuku: Boolean = true,
+    // ⚠ **Non-empty by default, since r4m.** `canHide` refuses AccessibilityServices with an
+    // empty selection, so a blank fixture would force that target off in every hide-map
+    // assertion in this file and quietly change what they test. The two that want an empty
+    // selection say so.
+    managedAccessibility: List<String> = listOf("com.example/.Service"),
 ) = UserData(
     theme = Theme.FOLLOW_SYSTEM,
     dynamicTheme = false,
@@ -982,9 +1105,12 @@ private fun userData(
     shizukuAuthKey = authKey,
     shizukuPackageName = packageName,
     shizukuStartAction = startAction,
-    managedAccessibilityServices = emptyList(),
-    heldAccessibilityServices = emptyMap(),
-    managedOverlayPackages = emptyList(),
+    managedAccessibilityServices = managedAccessibility,
+    heldAccessibilityServices = heldAccessibility,
+    // ⚠ Derived from the same flag since r3: `overlayManageable` replaced the stored
+    // manageOverlay switch and asks for a non-empty selection, so a test that wants overlay
+    // management on has to have something selected to manage.
+    managedOverlayPackages = if (manageOverlay) listOf("com.example.overlay") else emptyList(),
     heldOverlayPackages = heldOverlay,
     heldOverlayIdentities = emptyMap(),
     manageOverlay = manageOverlay,
@@ -994,17 +1120,62 @@ private fun userData(
     autoRevertOnReturn = false,
     manualRevertTargets = emptySet(),
     notificationFunction = NotificationFunction.Default,
+    hidingFramework = hidingFramework,
+    unhidingFramework = unhidingFramework,
     revertDefaults = revertStates,
     settingsToHide = hideStates,
+    restoreWirelessDebugging = restoreWirelessDebugging,
+    manageShizuku = manageShizuku,
+    manageShizukuMigratedV3 = true,
+    revertDefaultsConfigured = true,
+    settingsToHideConfigured = hideConfigured,
+    settingsToHideDefaultsV21 = settingsToHideDefaultsV21,
+    settingsHiddenDeviceWide = settingsHiddenDeviceWide,
+    autoHideEnabled = autoHideEnabled,
+    autoHidePackages = emptyList(),
+    autoHideNoKillOnLaunch = false,
+    autoHideEnabledBeforeHide = false,
+    autoHideRunning = false,
+    autoUnhideEnabled = false,
+    autoUnhideOnSwipe = false,
+    autoUnhideOnScreenLock = false,
+    iconStyle = IconStyle.SmartAdaptive,
+    autoUnhideOnIdle = false,
+    autoUnhideScreenLockMinutes = 5,
+    autoUnhideIdleMinutes = 15,
+    autoUnhideOnAppLaunch = true,
+    autoUnhideOnTile = true,
+    diagnosticsEnabled = false,
     notificationFunctionResetV16 = true,
+    frameworksMigratedV3 = true,
     shizukuStartFailed = false,
-    settingStateBefore = emptyMap(),
+    settingStateBefore = settingStateBefore,
     tipShown = false,
     obtainiumTipShown = false,
-    setupNoticeVersion = 0,
+    setupNoticeVersion = setupNoticeVersion,
     revertDefaultsResetV166 = false,
     revertDefaultsNoticePending = false,
     settingsManagerInfoShown = false,
+    autoHideEverEnabled = false,
+    settingsNoticeRevision = 0,
+    // r4n: the one-shot auto-unhide reset has already run for every fixture, so the
+    // triggers and conditions a test sets are the ones it gets.
+    autoUnhideResetV3 = true,
+    // r4o: fixtures are upgrades, so anything gated on "existed before v3" is reachable.
+    upgradedToV3 = true,
+    // r9: every row shown, which is what the manager drew before this preference existed. A test
+    // written against the old six-row card goes on seeing six rows.
+    managerRows = ManagerRows.Default,
+    progressiveBlur = true,
+    oledBackground = false,
+    blurRadiusDp = 14,
+    blurTintPercent = 50,
+    blurFadeDp = 72,
+    drawerShortcutManager = true,
+    drawerShortcutHideUnhide = false,
+    // r9: already migrated, for the same reason autoUnhideResetV3 above is - a fixture is a
+    // settled install rather than one mid-upgrade.
+    autoHideDetectorManagedV3 = true,
 )
 
 private fun shizukuForkDefaultsTests() {
@@ -1040,10 +1211,33 @@ private fun shizukuForkDefaultsTests() {
         ShizukuForkDefaults.packageFor(ShizukuForkMode.Thedjchi, listOf(UNRELATED)),
     )
 
+    // Unset answers like thedjchi now, because a fresh install starts on that family rather
+    // than on nothing: the package field should arrive already filled where the app is there
+    // to find, instead of empty until something is picked.
     checkEquals(
-        "unset picks nothing",
-        "",
+        "unset detects like thedjchi",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Thedjchi, forkInstalled),
         ShizukuForkDefaults.packageFor(ShizukuForkMode.Unset, forkInstalled),
+    )
+
+    // The package name is the second guess, after the label. It is what rescues a build
+    // installed under a name this app has never heard of.
+    val renamed = forkApp("Something Else", ShizukuForkDefaults.SHIZUKU_PACKAGE)
+    checkEquals(
+        "the stock package is found even when the label does not match",
+        ShizukuForkDefaults.SHIZUKU_PACKAGE,
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Thedjchi, listOf(UNRELATED, renamed)),
+    )
+    val shevery = forkApp("Something Else", ShizukuForkDefaults.SHEVERY_PACKAGE)
+    checkEquals(
+        "shevery's stock package is found by package name too",
+        ShizukuForkDefaults.SHEVERY_PACKAGE,
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Other, listOf(UNRELATED, shevery)),
+    )
+    checkEquals(
+        "still blank when neither the label nor the package is installed",
+        "",
+        ShizukuForkDefaults.packageFor(ShizukuForkMode.Other, listOf(UNRELATED)),
     )
 
     checkEquals(
@@ -1248,55 +1442,47 @@ private fun accessibilityLiveStateTests() {
  * rule it enforces between two of its rows.
  */
 private fun revertDefaultsTests() {
-    // 45. Never configured falls back to accessibility services and restoring overlay
-    // permissions IMD previously disabled. The latter cannot grant anything new because
-    // the implementation only replays its held package set.
+    // 45. Never configured falls back to nothing restored. Restoring something the user
+    // keeps off leaves the device more open than they keep it, on a schedule they did not
+    // choose - so, as of v2.1, an install nobody has configured restores nothing at all.
     checkEquals(
         "an empty configuration falls back to the default",
         RevertDefaults.Default,
         RevertDefaults.decode(emptyList()),
     )
     checkEquals(
-        "USB debugging is off by default",
-        false,
-        RevertDefaults.Default[ManualRevertTarget.UsbDebugging],
-    )
-    checkEquals(
-        "accessibility services is on by default",
-        true,
-        RevertDefaults.Default[ManualRevertTarget.AccessibilityServices],
-    )
-    checkEquals(
-        "Shizuku is off by default",
-        false,
-        RevertDefaults.Default[ManualRevertTarget.Shizuku],
-    )
-    checkEquals(
-        "accessibility services is the only target restored by default",
-        1,
+        "nothing is restored by default",
+        0,
         RevertDefaults.Default.count { it.value },
     )
-    checkEquals(
-        "developer settings is off by default",
-        false,
-        RevertDefaults.Default[ManualRevertTarget.DeveloperSettings],
-    )
-    checkEquals(
-        "wireless debugging is off by default",
-        false,
-        RevertDefaults.Default[ManualRevertTarget.WirelessDebugging],
-    )
-    // Off, to match SettingsToHide.Default. Restoring is safe in isolation - only packages
-    // IMD itself disabled are ever put back - but the pair is opt-in together, and a
-    // restore switch that is on while nothing is ever hidden is a switch that does nothing.
-    checkEquals(
-        "held overlay permissions are not restored by default",
-        false,
-        RevertDefaults.Default[ManualRevertTarget.DisplayOverOtherApps],
-    )
+    for (target in ManualRevertTarget.entries) {
+        checkEquals(
+            "revert leaves ${'$'}target alone by default",
+            false,
+            RevertDefaults.Default[target],
+        )
+    }
     check(
         "the default covers every target, so decode can never be missing one",
         RevertDefaults.Default.keys == ManualRevertTarget.entries.toSet(),
+    )
+
+    // 45b. The v1.6.6 map is frozen apart from the default, because the migration that
+    // preserves it for an existing install must not follow a later change to what a fresh
+    // install starts with.
+    checkEquals(
+        "the v1.6.6 default restores accessibility services",
+        true,
+        RevertDefaults.NarrowedV166[ManualRevertTarget.AccessibilityServices],
+    )
+    checkEquals(
+        "accessibility services is the only target the v1.6.6 default restores",
+        1,
+        RevertDefaults.NarrowedV166.count { it.value },
+    )
+    check(
+        "the v1.6.6 default covers every target",
+        RevertDefaults.NarrowedV166.keys == ManualRevertTarget.entries.toSet(),
     )
 
     // 46. Every target is written, on or off, so "off" and "not configured" stay distinct.
@@ -1327,18 +1513,24 @@ private fun revertDefaultsTests() {
         RevertDefaults.Default,
         RevertDefaults.decode(listOf("SomethingElse=0")),
     )
-    // Asserted on accessibility services rather than USB debugging, because since v1.6.6
-    // it is the only target whose default is on - and a fallback to false proves nothing,
-    // since an absent target and a target defaulting to off would look identical.
+    // Every default is off since v2.1, so a value of false proves nothing on its own -
+    // an absent target and a target defaulting to off read the same. What can be asserted
+    // is that the target is in the map at all, which is what "falls back" has to mean when
+    // the fallback value is the same as the empty one.
+    check(
+        "a missing target is still present, on its default",
+        RevertDefaults.decode(listOf("Shizuku=1"))
+            .containsKey(ManualRevertTarget.AccessibilityServices),
+    )
     checkEquals(
         "a missing target falls back to its default",
-        true,
-        RevertDefaults.decode(listOf("Shizuku=0"))[ManualRevertTarget.AccessibilityServices],
+        RevertDefaults.Default[ManualRevertTarget.AccessibilityServices],
+        RevertDefaults.decode(listOf("Shizuku=1"))[ManualRevertTarget.AccessibilityServices],
     )
     checkEquals(
         "a stored target still wins over the default",
-        false,
-        RevertDefaults.decode(listOf("Shizuku=0"))[ManualRevertTarget.Shizuku],
+        true,
+        RevertDefaults.decode(listOf("Shizuku=1"))[ManualRevertTarget.Shizuku],
     )
     checkEquals(
         "a malformed entry is ignored",
@@ -1404,30 +1596,65 @@ private fun revertDefaultsTests() {
  * opt-in because it requires a live Shizuku shell.
  */
 private fun settingsToHideTests() {
-    // 51. Shizuku is not a target. It is not a setting an app reads, and hiding it belongs
-    // to Shizuku's own "Hide Shizuku from other apps" switch — offering a toggle here would
-    // promise something this app cannot do.
+    // 51. Shizuku is a target now: stopped on the way in through its fork's stop intent. It
+    // sits between accessibility services and overlay access — the two other targets that are
+    // not plain settings rows.
     check(
-        "Shizuku is not one of the targets",
-        ManualRevertTarget.Shizuku !in SettingsToHide.Targets,
+        "Shizuku is one of the targets",
+        ManualRevertTarget.Shizuku in SettingsToHide.Targets,
     )
-    checkEquals("there are exactly five targets", 5, SettingsToHide.Targets.size)
+    checkEquals("there are exactly six targets", 6, SettingsToHide.Targets.size)
+    checkEquals(
+        "Shizuku sits between accessibility services and overlay access",
+        listOf(
+            ManualRevertTarget.AccessibilityServices,
+            ManualRevertTarget.Shizuku,
+            ManualRevertTarget.DisplayOverOtherApps,
+        ),
+        SettingsToHide.Targets.takeLast(3),
+    )
 
-    // 52. Secure-setting targets remain on by default. Overlay access is opt-in because an
-    // ADB-only install has no AppOps shell and must continue to launch apps successfully.
+    // 52. Nothing is hidden by default, as of v2.1: an install nobody has configured must
+    // not change a device on its own the first time an app is launched from it.
     checkEquals(
         "an empty configuration falls back to the default",
         SettingsToHide.Default,
         SettingsToHide.decode(emptyList()),
     )
-    check(
-        "display-over-other-apps hiding is opt-in",
-        SettingsToHide.Default[ManualRevertTarget.DisplayOverOtherApps] == false,
+    checkEquals(
+        "nothing is hidden by default",
+        0,
+        SettingsToHide.Default.count { it.value },
     )
     checkEquals(
         "the default covers every target, so decode can never be missing one",
         SettingsToHide.Targets.toSet(),
         SettingsToHide.Default.keys,
+    )
+
+    // 52b. The pre-v2.1 map, frozen for the migration that writes it down for an install
+    // that has been behaving as it all along.
+    check(
+        "the legacy default hides developer settings",
+        SettingsToHide.LegacyDefault[ManualRevertTarget.DeveloperSettings] == true,
+    )
+    check(
+        "the legacy default leaves display-over-other-apps alone",
+        SettingsToHide.LegacyDefault[ManualRevertTarget.DisplayOverOtherApps] == false,
+    )
+    check(
+        "the legacy default leaves the Shizuku service alone",
+        SettingsToHide.LegacyDefault[ManualRevertTarget.Shizuku] == false,
+    )
+    checkEquals(
+        "the legacy default hides exactly the four secure settings",
+        4,
+        SettingsToHide.LegacyDefault.count { it.value },
+    )
+    checkEquals(
+        "the legacy default covers every target",
+        SettingsToHide.Targets.toSet(),
+        SettingsToHide.LegacyDefault.keys,
     )
 
     // 53. Off is switched in the reverse of the order things are switched on in: developer
@@ -1450,6 +1677,7 @@ private fun settingsToHideTests() {
         ManualRevertTarget.UsbDebugging to false,
         ManualRevertTarget.WirelessDebugging to true,
         ManualRevertTarget.AccessibilityServices to false,
+        ManualRevertTarget.Shizuku to true,
         ManualRevertTarget.DisplayOverOtherApps to true,
     )
     checkEquals(
@@ -1472,10 +1700,11 @@ private fun settingsToHideTests() {
         SettingsToHide.decode(SettingsToHide.encode(allOff)),
     )
 
-    // 56. Shizuku cannot get in even through stored data written by another version.
-    check(
-        "a stored Shizuku entry is dropped",
-        ManualRevertTarget.Shizuku !in SettingsToHide.decode(listOf("Shizuku=1")).keys,
+    // 56. Shizuku is a real target now, so a stored entry for it is read back like any other.
+    checkEquals(
+        "a stored Shizuku entry is kept",
+        true,
+        SettingsToHide.decode(listOf("Shizuku=1"))[ManualRevertTarget.Shizuku],
     )
 
     // 57. A downgrade, or a target added later, must not poison the configuration.
@@ -1484,10 +1713,17 @@ private fun settingsToHideTests() {
         SettingsToHide.Default,
         SettingsToHide.decode(listOf("SomethingElse=0")),
     )
+    // Every default is off since v2.1, so what "falls back" can assert is that the target
+    // is in the map at all - an absent one and one defaulting to off read identically.
+    check(
+        "a missing target is still present, on its default",
+        SettingsToHide.decode(listOf("UsbDebugging=1"))
+            .containsKey(ManualRevertTarget.DeveloperSettings),
+    )
     checkEquals(
         "a missing target falls back to its default",
-        true,
-        SettingsToHide.decode(listOf("UsbDebugging=0"))[ManualRevertTarget.DeveloperSettings],
+        SettingsToHide.Default[ManualRevertTarget.DeveloperSettings],
+        SettingsToHide.decode(listOf("UsbDebugging=1"))[ManualRevertTarget.DeveloperSettings],
     )
     checkEquals(
         "a stored target still wins over the default",
@@ -1498,6 +1734,62 @@ private fun settingsToHideTests() {
         "a malformed entry is ignored",
         SettingsToHide.Default,
         SettingsToHide.decode(listOf("=1", "UsbDebugging", "")),
+    )
+
+    // 58. The pre-v2.1 fallback. MigrateRevertDefaultsUseCase writes the old default down
+    // for an install that predates the change and never saved a configuration, but it runs
+    // on a coroutine at process start and a shortcut can fire a launch in the same instant.
+    // effectiveSettingsToHide answers the same way in that window, so the launch path and
+    // the migration cannot disagree about what this install has been hiding all along.
+    checkEquals(
+        "an upgrading install that never configured reads the legacy default",
+        SettingsToHide.LegacyDefault,
+        userData(
+            ShizukuForkMode.Thedjchi,
+            hideStates = SettingsToHide.Default,
+            hideConfigured = false,
+            settingsToHideDefaultsV21 = false,
+            setupNoticeVersion = 14,
+        ).effectiveSettingsToHide,
+    )
+    // A first run has nothing to preserve: setup has never been finished, so there is no
+    // earlier behaviour to be faithful to, and the new default is the whole point.
+    checkEquals(
+        "a first run hides nothing",
+        0,
+        userData(
+            ShizukuForkMode.Thedjchi,
+            hideStates = SettingsToHide.Default,
+            hideConfigured = false,
+            settingsToHideDefaultsV21 = false,
+            setupNoticeVersion = 0,
+        ).effectiveSettingsToHide.count { it.value },
+    )
+    // Once the migration has run its answer is stored, so the fallback must stop applying -
+    // otherwise an install that later cleared every tick would be silently given the old
+    // default back on every launch.
+    checkEquals(
+        "the fallback stops once the migration has run",
+        0,
+        userData(
+            ShizukuForkMode.Thedjchi,
+            hideStates = SettingsToHide.Default,
+            hideConfigured = false,
+            settingsToHideDefaultsV21 = true,
+            setupNoticeVersion = 14,
+        ).effectiveSettingsToHide.count { it.value },
+    )
+    // And a saved configuration always wins, whatever the markers say.
+    checkEquals(
+        "a saved configuration wins over the fallback",
+        0,
+        userData(
+            ShizukuForkMode.Thedjchi,
+            hideStates = SettingsToHide.Default,
+            hideConfigured = true,
+            settingsToHideDefaultsV21 = false,
+            setupNoticeVersion = 14,
+        ).effectiveSettingsToHide.count { it.value },
     )
 }
 
@@ -1518,13 +1810,13 @@ private fun overlayManagementTests() {
     checkEquals(
         "managed hiding reads the stored tick",
         true,
-        userData(ShizukuForkMode.Thedjchi, manageOverlay = true, hideStates = hideOn)
+        userData(ShizukuForkMode.Thedjchi, authKey = "k", manageOverlay = true, hideStates = hideOn)
             .effectiveSettingsToHide[target],
     )
     checkEquals(
         "managed reverting reads the stored tick",
         true,
-        userData(ShizukuForkMode.Thedjchi, manageOverlay = true, revertStates = revertOn)
+        userData(ShizukuForkMode.Thedjchi, authKey = "k", manageOverlay = true, revertStates = revertOn)
             .effectiveRevertDefaults[target],
     )
 
@@ -1615,48 +1907,75 @@ private fun appSettingTemplate(key: String) = AppSettingTemplate(
 )
 
 /**
- * The per-app config screen's view of the overlay marker. The same rule as the device-wide
- * dialogs, one level down: while overlay management is off the "Hide Display over other apps"
- * template and any row already carrying its marker leave the screen, and both come back when
- * it is switched on - the filter is on the view, never on what is stored.
+ * The per-app config screen's view of the overlay marker.
+ *
+ * ⚠ **r4m turned this from removing to greying.** The two filters that used to drop the marker
+ * out of the templates and the added rows are gone; the screen now draws every row and asks
+ * [appSettingBlocked] whether each one can work. What is pinned here is that the question
+ * answers for exactly the three keys that mean something beyond "write this", and that it
+ * answers the same way the hide itself does.
  */
 private fun overlayMarkerVisibilityTests() {
     val overlayKey = AppSettingKeys.SYSTEM_ALERT_WINDOW
 
-    val templates = listOf(
-        appSettingTemplate(key = AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED),
-        appSettingTemplate(key = AppSettingKeys.ACCESSIBILITY_ENABLED),
-        appSettingTemplate(key = overlayKey),
+    val unmanaged = userData(ShizukuForkMode.Thedjchi, authKey = "k", manageOverlay = false)
+
+    val managed = userData(ShizukuForkMode.Thedjchi, authKey = "k", manageOverlay = true)
+
+    // 62. Off: the overlay marker is blocked, and an ordinary key beside it is not.
+    check(
+        "the overlay marker is blocked while unmanaged",
+        appSettingBlocked(userData = unmanaged, key = overlayKey),
+    )
+    check(
+        "an ordinary key is never blocked",
+        !appSettingBlocked(
+            userData = unmanaged,
+            key = AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED,
+        ),
     )
 
-    val rows = listOf(
-        appSetting(key = AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED),
-        appSetting(key = overlayKey),
+    // 63. On: nothing is blocked, and in particular the marker comes back - the block is on
+    // the drawing, never on what is stored.
+    check(
+        "the overlay marker is clear while managed",
+        !appSettingBlocked(userData = managed, key = overlayKey),
     )
 
-    // 62. Off: the marker is gone from both the picker and the added rows, and nothing else is.
-    checkEquals(
-        "the overlay template is hidden while unmanaged",
-        listOf(AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED, AppSettingKeys.ACCESSIBILITY_ENABLED),
-        templates.templatesForOverlayState(manageOverlay = false).map { it.key },
+    // 64. The accessibility flag follows its own picker, not the overlay switch. This is the
+    // gap r4m closed: with nothing selected a per-app profile used to write the raw
+    // accessibility_enabled flag, which switches off every service including IMD+'s detector.
+    check(
+        "the accessibility flag is blocked with an empty selection",
+        appSettingBlocked(
+            userData = managed.copy(managedAccessibilityServices = emptyList()),
+            key = AppSettingKeys.ACCESSIBILITY_ENABLED,
+        ),
     )
-    checkEquals(
-        "an added overlay row is hidden while unmanaged",
-        listOf(AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED),
-        rows.appSettingsForOverlayState(manageOverlay = false).map { it.key },
+    check(
+        "and clear once something is selected",
+        !appSettingBlocked(userData = managed, key = AppSettingKeys.ACCESSIBILITY_ENABLED),
     )
 
-    // 63. On: everything is shown, in the order it came - the filter adds and removes nothing
-    // else and does not reorder.
+    // 65. Only three keys mean anything beyond "write this".
     checkEquals(
-        "every template is shown while managed",
-        templates.map { it.key },
-        templates.templatesForOverlayState(manageOverlay = true).map { it.key },
+        "the overlay marker names its target",
+        ManualRevertTarget.DisplayOverOtherApps,
+        manualTargetForKey(key = overlayKey),
     )
     checkEquals(
-        "every added row is shown while managed",
-        rows.map { it.key },
-        rows.appSettingsForOverlayState(manageOverlay = true).map { it.key },
+        "the shizuku marker names its target",
+        ManualRevertTarget.Shizuku,
+        manualTargetForKey(key = AppSettingKeys.SHIZUKU_SERVICE),
+    )
+    checkEquals(
+        "the accessibility flag names its target",
+        ManualRevertTarget.AccessibilityServices,
+        manualTargetForKey(key = AppSettingKeys.ACCESSIBILITY_ENABLED),
+    )
+    check(
+        "an ordinary key names none",
+        manualTargetForKey(key = "screen_brightness") == null,
     )
 }
 
@@ -1665,6 +1984,342 @@ private fun overlayMarkerVisibilityTests() {
  * sweep the memory trigger reverts. Both are the security-load-bearing halves of the feature,
  * so both are pinned here where they can be reasoned about without a device.
  */
+/**
+ * The two fork families are driven in completely different ways, and everything here is an
+ * invariant that keeps IMD from promising Shevery something it cannot do. Shevery has no start
+ * or stop intent: its service follows the debugging transport, and its own ErrorProtect
+ * watchdog is what brings it back. So every place that offers to toggle the service has to
+ * disappear for it, and the waits differ because the two are waiting on different things.
+ */
+private fun shizukuForkStrategyTests() {
+    // 1. Only thedjchi speaks intents; Shevery is the indirect one.
+    check("thedjchi supports intents", ShizukuForkMode.Thedjchi.supportsIntents)
+    check("shevery does not support intents", !ShizukuForkMode.Other.supportsIntents)
+    check("unset supports nothing", !ShizukuForkMode.Unset.supportsIntents)
+    check("Other is the shevery family", ShizukuForkMode.Other.isShevery)
+    check("thedjchi is not shevery", !ShizukuForkMode.Thedjchi.isShevery)
+
+    // 2. The waits are waiting on different things: a broadcast being answered versus a
+    //    ten-second watchdog cycle coming round, so Shevery's must clear a full revolution.
+    checkEquals("thedjchi waits eight seconds", 8_000L, ShizukuForkMode.Thedjchi.serviceWaitMillis)
+    checkEquals("shevery waits forty seconds", 40_000L, ShizukuForkMode.Other.serviceWaitMillis)
+    check(
+        "shevery's wait clears a full ErrorProtect cycle",
+        ShizukuForkMode.Other.serviceWaitMillis > 10_000L,
+    )
+    checkEquals("unset never waits", 0L, ShizukuForkMode.Unset.serviceWaitMillis)
+
+    // 2b. 'Manage Shizuku' — the stored answer AND a configuration complete enough to act
+    //     on. The second half is what makes the switch drop when a field is emptied; the
+    //     stored answer is what makes it come back when the field is filled again.
+    val managedThedjchi = userData(ShizukuForkMode.Thedjchi, authKey = "k", manageShizuku = true)
+
+    check("manage shizuku on with everything filled", managedThedjchi.manageShizukuEffective)
+
+    check(
+        "manage shizuku off when the answer is off",
+        !managedThedjchi.copy(manageShizuku = false).manageShizukuEffective,
+    )
+
+    // Emptied, then filled again, with the stored answer untouched throughout.
+    val blanked = managedThedjchi.copy(shizukuPackageName = "")
+
+    check("manage shizuku drops when a field is blank", !blanked.manageShizukuEffective)
+
+    check("the stored answer survives the blank", blanked.manageShizuku)
+
+    check(
+        "manage shizuku comes back when the field is filled again",
+        blanked.copy(shizukuPackageName = "moe.shizuku.privileged.api").manageShizukuEffective,
+    )
+
+    // 2c. Why a Display over other apps control will not move. Reasons rather than
+    //     sentences, because two modules ask and neither can see the other's strings.
+    val dooaReady = userData(
+        ShizukuForkMode.Thedjchi,
+        authKey = "k",
+        manageOverlay = true,
+        manageShizuku = true,
+    )
+
+    check("a ready overlay setup blocks on nothing", overlayBlockReasons(dooaReady).isEmpty())
+
+    checkEquals(
+        "shevery is unsupported rather than unconfigured",
+        listOf(OverlayBlockReason.ForkUnsupported),
+        overlayBlockReasons(dooaReady.copy(shizukuForkMode = ShizukuForkMode.Other)),
+    )
+
+    checkEquals(
+        "manage shizuku off is its own reason",
+        listOf(OverlayBlockReason.ManageShizukuOff),
+        overlayBlockReasons(dooaReady.copy(manageShizuku = false)),
+    )
+
+    checkEquals(
+        "an empty picker is its own reason",
+        listOf(OverlayBlockReason.NothingSelected),
+        overlayBlockReasons(dooaReady.copy(managedOverlayPackages = emptyList())),
+    )
+
+    checkEquals(
+        "both can be missing at once, master switch first",
+        listOf(OverlayBlockReason.ManageShizukuOff, OverlayBlockReason.NothingSelected),
+        overlayBlockReasons(
+            dooaReady.copy(manageShizuku = false, managedOverlayPackages = emptyList()),
+        ),
+    )
+
+    // ⚠ Shevery short-circuits: it does not also report the empty picker behind it.
+    checkEquals(
+        "shevery reports one reason even with nothing selected",
+        listOf(OverlayBlockReason.ForkUnsupported),
+        overlayBlockReasons(
+            dooaReady.copy(
+                shizukuForkMode = ShizukuForkMode.Other,
+                managedOverlayPackages = emptyList(),
+            ),
+        ),
+    )
+
+    // 2d. The manager's own Display over other apps rule, which is not the hiding one.
+    check(
+        "thedjchi may manage overlay without the service running",
+        overlayManageableInManager(userData = dooaReady, shizukuRunning = false),
+    )
+
+    val sheveryReady = dooaReady.copy(shizukuForkMode = ShizukuForkMode.Other)
+
+    check(
+        "shevery may not manage overlay with the service down",
+        !overlayManageableInManager(userData = sheveryReady, shizukuRunning = false),
+    )
+
+    check(
+        "shevery may manage overlay once the service is up",
+        overlayManageableInManager(userData = sheveryReady, shizukuRunning = true),
+    )
+
+    check(
+        "a running service does not excuse an empty picker",
+        !overlayManageableInManager(
+            userData = sheveryReady.copy(managedOverlayPackages = emptyList()),
+            shizukuRunning = true,
+        ),
+    )
+
+    check(
+        "a running service does not excuse manage shizuku being off",
+        !overlayManageableInManager(
+            userData = sheveryReady.copy(manageShizuku = false),
+            shizukuRunning = true,
+        ),
+    )
+
+    // The auth key is only required where the fork reads it, so Shevery stays on without one.
+    check(
+        "shevery needs no auth key to be manageable",
+        userData(ShizukuForkMode.Other, authKey = "", manageShizuku = true)
+            .manageShizukuEffective,
+    )
+
+    check(
+        "thedjchi without an auth key is not manageable",
+        !userData(ShizukuForkMode.Thedjchi, authKey = "", manageShizuku = true)
+            .manageShizukuEffective,
+    )
+
+    // 3. The Shizuku entry is *removed*, not forced false: the hide loop reads
+    //    `wanted[t] == true` and the revert reads `wanted[t]?.let`, and only an absent key
+    //    makes the revert skip the target entirely rather than trying to stop it.
+    val both = SettingsToHide.Default + (ManualRevertTarget.Shizuku to true)
+    check(
+        "shevery drops the shizuku entry",
+        ManualRevertTarget.Shizuku !in both.withoutShizukuWhenNoIntents(ShizukuForkMode.Other),
+    )
+    check(
+        "thedjchi keeps the shizuku entry",
+        both.withoutShizukuWhenNoIntents(ShizukuForkMode.Thedjchi)[ManualRevertTarget.Shizuku] == true,
+    )
+
+    // 4. And it reaches the two maps the launch and revert paths actually read.
+    // ⚠ **Forced false, not dropped — r4n changed this deliberately.** The entry has to stay
+    // in the map because the hide dialog counts it and now draws its row on every fork; every
+    // reader asks `== true`, so false and absent mean the same thing to the engine. The revert
+    // map below still drops it, and that asymmetry is the point: its reader is `?.let`.
+    checkEquals(
+        "the hide config forces shizuku off on shevery, keeping the entry",
+        false,
+        userData(ShizukuForkMode.Other, hideStates = both)
+            .effectiveSettingsToHide[ManualRevertTarget.Shizuku],
+    )
+    check(
+        "the hide config keeps shizuku on thedjchi",
+        // authKey, because since r4m the gate also asks whether Shizuku is configured at all -
+        // a blank key is not a configured Thedjchi, and this assertion is about the fork.
+        userData(ShizukuForkMode.Thedjchi, authKey = "k", hideStates = both)
+            .effectiveSettingsToHide[ManualRevertTarget.Shizuku] == true,
+    )
+    check(
+        "the revert config drops shizuku on shevery",
+        ManualRevertTarget.Shizuku !in
+            userData(ShizukuForkMode.Other, revertStates = both).effectiveRevertDefaults,
+    )
+
+    // 5. The per-app markers on shevery. Since r4m they are greyed on the screen rather than
+    //    removed from it, so what is asserted is the block rather than the absence - and the
+    //    author's answer to which rows grey: both of them, and the ordinary key never.
+    val shevery = userData(ShizukuForkMode.Other, authKey = "k", manageOverlay = true)
+
+    val thedjchi = userData(ShizukuForkMode.Thedjchi, authKey = "k", manageOverlay = true)
+
+    check(
+        "shevery blocks the shizuku marker",
+        appSettingBlocked(userData = shevery, key = AppSettingKeys.SHIZUKU_SERVICE),
+    )
+    check(
+        "shevery blocks the overlay marker too",
+        appSettingBlocked(userData = shevery, key = AppSettingKeys.SYSTEM_ALERT_WINDOW),
+    )
+    check(
+        "and never an ordinary key",
+        !appSettingBlocked(userData = shevery, key = "screen_brightness"),
+    )
+    check(
+        "thedjchi blocks neither marker",
+        !appSettingBlocked(userData = thedjchi, key = AppSettingKeys.SHIZUKU_SERVICE) &&
+            !appSettingBlocked(userData = thedjchi, key = AppSettingKeys.SYSTEM_ALERT_WINDOW),
+    )
+
+    // 6. And with 'Manage Shizuku' off, which is the author's own wording for this round -
+    //    the marker is blocked on a fork that does speak intents.
+    check(
+        "manage shizuku off blocks the shizuku marker on thedjchi",
+        appSettingBlocked(
+            userData = thedjchi.copy(manageShizuku = false),
+            key = AppSettingKeys.SHIZUKU_SERVICE,
+        ),
+    )
+
+    // 7. ⚠ **Nothing leaves the screen any more — r4n.** `appSettingHidden` is gone, and with
+    //    it the one exception to "grey, don't remove": the Shizuku marker on a fork with no
+    //    intents. The author reversed his earlier *"keep them hidden until Shevery's engine
+    //    lands"*. What replaces those assertions is the rule the removal has to satisfy —
+    //    **every gated key is blocked on every fork that cannot run it**, so a row that is
+    //    drawn is either live or greyed, and never drawn-and-acted-on.
+    for (fork in listOf(shevery, thedjchi.copy(manageShizuku = false))) {
+        for (key in listOf(AppSettingKeys.SYSTEM_ALERT_WINDOW, AppSettingKeys.SHIZUKU_SERVICE)) {
+            check(
+                "a marker that cannot run is blocked, not removed: $key",
+                appSettingBlocked(userData = fork, key = key),
+            )
+        }
+    }
+
+    // And the engine's own gate is the same expression, which is what stops a greyed row and
+    // a running hide drifting apart.
+    check(
+        "the hide map refuses exactly what the screen greys",
+        shevery.effectiveSettingsToHide[ManualRevertTarget.Shizuku] == false &&
+            shevery.effectiveSettingsToHide[ManualRevertTarget.DisplayOverOtherApps] == false,
+    )
+}
+
+/**
+ * r4n — the auto-unhide coupling, and the term the v3 reset made necessary.
+ *
+ * The invariant is the author's: the Hide settings tile condition can only be honoured by the
+ * screen-lock trigger, because a session the tile starts names no app for the watcher to see
+ * leaving the foreground.
+ */
+private fun autoUnhideCouplingTests() {
+    // Ticking the tile ticks screen lock; ticking screen lock says nothing about the tile.
+    check("the tile brings the screen lock trigger with it", screenLockAfterTile(
+        onScreenLock = false,
+        onTile = true,
+    ))
+    check("and leaves it alone when it is already on", screenLockAfterTile(
+        onScreenLock = true,
+        onTile = true,
+    ))
+    check("unticking the tile does not take the trigger with it", screenLockAfterTile(
+        onScreenLock = true,
+        onTile = false,
+    ))
+    check("and does not switch it on either", !screenLockAfterTile(
+        onScreenLock = false,
+        onTile = false,
+    ))
+
+    // Unticking screen lock unticks the tile; ticking it says nothing about the tile.
+    check("losing the trigger loses the tile", !tileAfterScreenLock(
+        onTile = true,
+        onScreenLock = false,
+    ))
+    check("the tile survives a trigger that is still on", tileAfterScreenLock(
+        onTile = true,
+        onScreenLock = true,
+    ))
+    check("and a trigger coming on does not tick the tile", !tileAfterScreenLock(
+        onTile = false,
+        onScreenLock = true,
+    ))
+
+    // ⚠ **The pairing, which is the assertion worth having.** Whichever side moved, the state
+    // the two functions leave behind must satisfy the invariant: no tile without screen lock.
+    for (tile in listOf(false, true)) {
+        for (lock in listOf(false, true)) {
+            check(
+                "after a screen-lock edit the invariant holds: tile=$tile lock=$lock",
+                !tileAfterScreenLock(onTile = tile, onScreenLock = lock) || lock,
+            )
+            check(
+                "after a tile edit the invariant holds: tile=$tile lock=$lock",
+                !tile || screenLockAfterTile(onScreenLock = lock, onTile = tile),
+            )
+        }
+    }
+
+    // r4n: satisfied needs one of each. The reset unticks both conditions, so this is the
+    // difference between the switch reading off and reading on while nothing can act.
+    val ready = AutoUnhideRequirements(
+        batteryUnrestricted = true,
+        notificationsAllowed = true,
+        onAppLaunch = true,
+        onScreenLock = true,
+    )
+
+    check("a trigger and a condition satisfy it", ready.satisfied)
+    check("no condition does not", !ready.copy(onAppLaunch = false).satisfied)
+    check("no trigger does not either", !ready.copy(onScreenLock = false).satisfied)
+    check(
+        "the tile alone is a condition too",
+        ready.copy(onAppLaunch = false, onTile = true).satisfied,
+    )
+
+    // r4s: screen lock is *the* trigger, not one of three — the author's failsafe. Each of
+    // these fails if that is reverted, and the anyTrigger line beside each one is what proves
+    // it: under the old rule these cases were satisfied precisely because anyTrigger was true.
+    val idleOnly = ready.copy(onScreenLock = false, onIdle = true, usageAccess = true)
+
+    check("the idle trigger alone would once have satisfied it", idleOnly.anyTrigger)
+
+    check("but screen lock is mandatory, so it does not", !idleOnly.satisfied)
+
+    val swipeOnly = ready.copy(
+        onScreenLock = false,
+        onSwipe = true,
+        exitReasonsSupported = true,
+        dumpPermission = true,
+    )
+
+    check("the swipe trigger alone would once have satisfied it", swipeOnly.anyTrigger)
+
+    check("and it does not either, with DUMP granted", !swipeOnly.satisfied)
+
+    check("screen lock on its own is enough", ready.satisfied)
+}
+
 private fun taskerIntegrationTests() {
     // 64. A blank stored key is "never set up", and nothing gets through it - not even a
     // broadcast that helpfully sends a blank key of its own.
@@ -1726,6 +2381,1160 @@ private fun taskerIntegrationTests() {
     )
 }
 
+private fun hiddenStateTests() {
+    // 68. Nothing hidden by either mechanism: the tile is off.
+    check("a device with no debt reads as visible", !userData(ShizukuForkMode.Thedjchi).settingsHidden)
+
+    // 69. The device-wide half is the stored one, because a "Settings to hide" run that
+    // named only the secure settings leaves nothing else behind to read.
+    check(
+        "the stored flag alone makes the tile read hidden",
+        userData(ShizukuForkMode.Thedjchi, settingsHiddenDeviceWide = true).settingsHidden,
+    )
+
+    // 70. The memory half is derived from the records a launch leaves, so it needs no flag
+    // of its own and cannot disagree with what is actually outstanding.
+    val memoryOnly = userData(
+        ShizukuForkMode.Thedjchi,
+        settingStateBefore = mapOf("a/b" to mapOf("k" to "0")),
+    )
+    check("an outstanding memory snapshot reads as hidden", memoryOnly.settingsHidden)
+    check("and is attributed to the memory half", memoryOnly.memoryHoldsSettings)
+    check("with the device-wide half untouched", !memoryOnly.settingsHiddenDeviceWide)
+
+    // 70a. A per-app accessibility hold counts too: a profile that only managed services has
+    // no snapshot but is still holding something down.
+    check(
+        "a per-app accessibility hold alone reads as hidden",
+        userData(ShizukuForkMode.Thedjchi, heldAccessibility = mapOf("e/f" to listOf(SWIPE))).settingsHidden,
+    )
+
+    // 71. The device-wide holder is not a memory debt. A "Settings to hide" run records its
+    // accessibility hold under that marker, and the memory sweep must not claim it - or
+    // pressing the tile off would run the wrong revert and leave the real debt standing.
+    val deviceWideHold = userData(
+        ShizukuForkMode.Thedjchi,
+        heldAccessibility = mapOf(AccessibilityServicePlan.DEVICE_WIDE_HOLD to listOf(TALKBACK)),
+        settingsHiddenDeviceWide = true,
+    )
+    check("the device-wide holder is not a memory debt", !deviceWideHold.memoryHoldsSettings)
+    check("but the device is still hidden", deviceWideHold.settingsHidden)
+
+    // 72. Both at once is a real state, not an impossible one: the tile hides device-wide
+    // whichever mechanism is chosen, so a memory user who presses it and then launches an
+    // app from IMD owes one debt of each kind, and both halves have to say so separately.
+    val both = userData(
+        ShizukuForkMode.Thedjchi,
+        settingsHiddenDeviceWide = true,
+        settingStateBefore = mapOf("a/b" to mapOf("k" to "0")),
+    )
+    check("both debts are visible at once", both.settingsHidden)
+    check("the memory half is reported", both.memoryHoldsSettings)
+    check("the device-wide half is reported", both.settingsHiddenDeviceWide)
+}
+
+private fun repeatLaunchFailSafeTests() {
+    val holder = AccessibilityServicePlan.DEVICE_WIDE_HOLD
+
+    // 73. Nothing selected is settled by definition: there is nobody to take anything away
+    // from, and starting Shizuku to find that out was pure waste on every single launch.
+    check(
+        "an empty selection needs no overlay work",
+        overlayAlreadyWithdrawn(
+            managedOverlayPackages = emptyList(),
+            heldOverlayPackages = emptyMap(),
+        ),
+    )
+
+    // 74. The ordinary first launch: selected, nothing held yet, so the full step runs.
+    check(
+        "a selection with nothing held still needs the overlay step",
+        !overlayAlreadyWithdrawn(
+            managedOverlayPackages = listOf("com.a", "com.b"),
+            heldOverlayPackages = emptyMap(),
+        ),
+    )
+
+    // 75. The repeat launch this exists for: everything selected is already held, so there is
+    // nothing left to withdraw and the ten-second Shizuku start is skipped.
+    check(
+        "a fully held selection needs no second withdrawal",
+        overlayAlreadyWithdrawn(
+            managedOverlayPackages = listOf("com.a", "com.b"),
+            heldOverlayPackages = mapOf(holder to listOf("com.a", "com.b")),
+        ),
+    )
+
+    // 76. Half held is not held. A package added to the selection since the hide has to be
+    // dealt with, so the step runs - the safe direction to be wrong in.
+    check(
+        "a package added since the hide forces the step",
+        !overlayAlreadyWithdrawn(
+            managedOverlayPackages = listOf("com.a", "com.b"),
+            heldOverlayPackages = mapOf(holder to listOf("com.a")),
+        ),
+    )
+
+    // 77. Only the device-wide holder counts. A per-app profile's own hold is released by
+    // that app's revert, so treating it as evidence would skip a withdrawal the device-wide
+    // hide still owes.
+    check(
+        "another holder's record is not evidence",
+        !overlayAlreadyWithdrawn(
+            managedOverlayPackages = listOf("com.a"),
+            heldOverlayPackages = mapOf("some/app" to listOf("com.a")),
+        ),
+    )
+
+    // 78. A hold left over for a package no longer selected does not make the rest settled.
+    check(
+        "a stale hold does not cover a different selection",
+        !overlayAlreadyWithdrawn(
+            managedOverlayPackages = listOf("com.c"),
+            heldOverlayPackages = mapOf(holder to listOf("com.a", "com.b")),
+        ),
+    )
+}
+
+
+/**
+ * Auto-hide settings (IMD+): the three rules that decide what a hide touches, when the switch
+ * may be on, and which holders are apps.
+ *
+ * All three are the sort of thing that fails silently. A detector missing from the hide set is
+ * an accessibility service left listening through a hide; an internal holder counted as an app
+ * is a device that reads "hidden" forever; a Shizuku requirement keyed on the wrong checkbox is
+ * a switch that refuses to move for a reason the page does not show.
+ */
+private fun autoHideTests() {
+    val detector = "com.soul_99.suIMD/com.android.geto.service.AutoHideAccessibilityService"
+
+    val chosen = listOf("com.other/.Service")
+
+    // 79. A Shizuku that is asleep must not read as a refused permission - see
+    // AutoHideRequirements.shizukuUnreachable. This is the difference between IMD+ staying on
+    // and switching itself off on every device whose fork is not currently running.
+    val asleep = AutoHideRequirements(
+        shizukuPermission = false,
+        shizukuUnreachable = true,
+        shizukuManageable = true,
+        // ⚠ Stated rather than defaulted. r4n made the fork a requirement in its own right and
+        // the field defaults to false, so a fixture that omitted it would fail for the wrong
+        // reason and hide whatever it was actually testing.
+        forkSupported = true,
+        accessibilityEnabled = true,
+        batteryUnrestricted = true,
+        notificationsAllowed = true,
+        appsChosen = true,
+    )
+
+    check("an unreachable Shizuku still satisfies the requirements", asleep.satisfied)
+
+    check(
+        "a reachable Shizuku that refused does not",
+        !asleep.copy(shizukuUnreachable = false).satisfied,
+    )
+
+    check(
+        "an unreachable Shizuku with no configuration does not",
+        !asleep.copy(shizukuManageable = false).satisfied,
+    )
+
+    // r4n item 1. Unconditional, and asserted at both settings of the kill checkbox — the
+    // author's decision, and the one thing about this gate that is easy to get wrong.
+    check(
+        "Shevery is never satisfied, kill wanted",
+        !asleep.copy(forkSupported = false).satisfied,
+    )
+
+    check(
+        "Shevery is never satisfied, kill not wanted either",
+        !asleep.copy(forkSupported = false, noKillOnLaunch = true).satisfied,
+    )
+
+    // r4n item 2. 'Manage Shizuku' off is a refusal on a fork that would otherwise work.
+    check(
+        "Manage Shizuku off is not satisfied on Thedjchi",
+        !asleep.copy(shizukuManageable = false).satisfied,
+    )
+
+    // 80. The one checkbox decides the whole Shizuku question: force-stopping the launched app
+    // is the only thing IMD+ asks Shizuku for on its own account.
+    check(
+        "Shizuku is needed while the app is closed on launch",
+        AutoHideRequirements(noKillOnLaunch = false).shizukuNeeded,
+    )
+
+    check(
+        "Shizuku is not needed once the app is left alone",
+        !AutoHideRequirements(noKillOnLaunch = true).shizukuNeeded,
+    )
+
+    val withoutShizuku = AutoHideRequirements(
+        accessibilityEnabled = true,
+        batteryUnrestricted = true,
+        notificationsAllowed = true,
+        appsChosen = true,
+        forkSupported = true,
+        noKillOnLaunch = true,
+    )
+
+    check("no-kill satisfies the requirements with no Shizuku at all", withoutShizuku.satisfied)
+
+    check(
+        "the same requirements are unsatisfied once the kill comes back",
+        !withoutShizuku.copy(noKillOnLaunch = false).satisfied,
+    )
+
+    // 80b. Every one of the other four is required, whatever the checkbox says.
+    check(
+        "a missing detector is never satisfied",
+        !withoutShizuku.copy(accessibilityEnabled = false).satisfied,
+    )
+
+    check(
+        "a restricted battery is never satisfied",
+        !withoutShizuku.copy(batteryUnrestricted = false).satisfied,
+    )
+
+    check(
+        "blocked notifications are never satisfied",
+        !withoutShizuku.copy(notificationsAllowed = false).satisfied,
+    )
+
+    check("no apps chosen is never satisfied", !withoutShizuku.copy(appsChosen = false).satisfied)
+
+    // r4n: the fifth member of that group, and the reason it is in it. "No Shizuku at all" is
+    // still not "any fork at all".
+    check(
+        "an unsupported fork is never satisfied, even with no kill wanted",
+        !withoutShizuku.copy(forkSupported = false).satisfied,
+    )
+
+    // 81. The switch reads the live answer. The stored choice is kept either way, which is what
+    // lets a requirement coming back bring IMD+ back with it.
+    check(
+        "the switch is on when the answer and the requirements agree",
+        autoHideSwitchOn(
+            userData = userData(ShizukuForkMode.Thedjchi, autoHideEnabled = true),
+            requirements = withoutShizuku,
+        ),
+    )
+
+    check(
+        "the switch is off while a hide is outstanding",
+        !autoHideSwitchOn(
+            userData = userData(
+                ShizukuForkMode.Thedjchi,
+                autoHideEnabled = true,
+                settingsHiddenDeviceWide = true,
+            ),
+            requirements = withoutShizuku,
+        ),
+    )
+
+    check(
+        "the switch is off while a requirement is missing",
+        !autoHideSwitchOn(
+            userData = userData(ShizukuForkMode.Thedjchi, autoHideEnabled = true),
+            requirements = withoutShizuku.copy(appsChosen = false),
+        ),
+    )
+
+    // 82. The detector's holder is IMD's own bookkeeping, not an app's memory. Counting it
+    // would make the tile, the IMD+ switch and the memory sweep all read a device with nothing
+    // of the user's hidden as still hidden - and send the sweep looking for an app by that name.
+    val detectorOnly = userData(
+        ShizukuForkMode.Thedjchi,
+        heldAccessibility = mapOf(AccessibilityServicePlan.AUTO_HIDE_HOLD to listOf(detector)),
+    )
+
+    check("the detector's own hold is not an app's memory", !detectorOnly.memoryHoldsSettings)
+
+    check("a device holding only the detector reads as visible", !detectorOnly.settingsHidden)
+
+    check(
+        "both internal holders are excluded from the memory sweep",
+        memoryHeldComponents(
+            settingStateBefore = emptyMap(),
+            heldAccessibilityServices = mapOf(
+                AccessibilityServicePlan.DEVICE_WIDE_HOLD to listOf("a/.A"),
+                AccessibilityServicePlan.AUTO_HIDE_HOLD to listOf(detector),
+                "com.app/.Main" to listOf("b/.B"),
+            ),
+        ) == setOf("com.app/.Main"),
+    )
+
+    // 83. Revert to default releases every holder at once, so the detector comes back with the
+    // rest and needs no path of its own.
+    val release = AccessibilityServicePlan.releaseAll(
+        held = mapOf(
+            AccessibilityServicePlan.DEVICE_WIDE_HOLD to listOf("a/.A"),
+            AccessibilityServicePlan.AUTO_HIDE_HOLD to listOf(detector),
+        ),
+        currentlyEnabled = listOf("kept/.Service"),
+    )
+
+    check(
+        "releaseAll brings the detector back with everything else",
+        release.enabledAfter.toSet() == setOf("kept/.Service", "a/.A", detector),
+    )
+}
+
+// ---------------------------------------------------------------------------------
+// v3 — "only the detector is missing", the gate on switching it back on
+// ---------------------------------------------------------------------------------
+
+private fun onlyAccessibilityMissingTests() {
+    // Everything in place except the detector, with Shizuku taken out of the question by the
+    // checkbox — the ordinary shape of a device whose detector was switched off by something
+    // that was not the user.
+    val ready = AutoHideRequirements(
+        accessibilityEnabled = false,
+        batteryUnrestricted = true,
+        notificationsAllowed = true,
+        appsChosen = true,
+        forkSupported = true,
+        noKillOnLaunch = true,
+    )
+
+    check("only the detector missing is recognised", ready.onlyAccessibilityMissing)
+
+    // r4n: offering to switch the detector on for a fork IMD+ will refuse anyway is offering
+    // nothing, so the fork is a term of this too.
+    check(
+        "an unsupported fork stops it",
+        !ready.copy(forkSupported = false).onlyAccessibilityMissing,
+    )
+
+    check("and that state is not 'satisfied'", !ready.satisfied)
+
+    check(
+        "with the detector back, it is satisfied and no longer 'only missing'",
+        ready.copy(accessibilityEnabled = true).let {
+            it.satisfied && !it.onlyAccessibilityMissing
+        },
+    )
+
+    // The distinction the KDoc is about: this must not fire when other things are missing too,
+    // or IMD would switch the detector on and leave the feature just as off.
+    check(
+        "a missing battery exemption stops it",
+        !ready.copy(batteryUnrestricted = false).onlyAccessibilityMissing,
+    )
+
+    check(
+        "missing notifications stop it",
+        !ready.copy(notificationsAllowed = false).onlyAccessibilityMissing,
+    )
+
+    check(
+        "no apps chosen stops it",
+        !ready.copy(appsChosen = false).onlyAccessibilityMissing,
+    )
+
+    // Shizuku only counts when the checkbox says a kill is wanted.
+    val needsShizuku = ready.copy(noKillOnLaunch = false)
+
+    check(
+        "with a kill wanted and Shizuku unconfigured, it does not fire",
+        !needsShizuku.onlyAccessibilityMissing,
+    )
+
+    check(
+        "with a kill wanted and Shizuku ready, it does",
+        needsShizuku.copy(
+            shizukuManageable = true,
+            shizukuPermission = true,
+        ).onlyAccessibilityMissing,
+    )
+
+    // A sleeping Shizuku is not a refusal — the same rule `satisfied` already follows.
+    check(
+        "a configured but unreachable Shizuku still counts as ready",
+        needsShizuku.copy(
+            shizukuManageable = true,
+            shizukuUnreachable = true,
+        ).onlyAccessibilityMissing,
+    )
+}
+
+// ---------------------------------------------------------------------------------
+// v3 — which services the accessibility picker lists
+// ---------------------------------------------------------------------------------
+
+private fun accessibilityPickerTests() {
+    val detector = "com.soul_99.suIMD/com.android.geto.service.AutoHideAccessibilityService"
+
+    fun service(id: String, enabled: Boolean) = AccessibilityServiceData(
+        id = id,
+        packageName = id.substringBefore('/'),
+        label = id.substringBefore('/'),
+        enabled = enabled,
+    )
+
+    val all = listOf(
+        service("a/.A", enabled = true),
+        service("b/.B", enabled = false),
+        service("c/.C", enabled = false),
+        service(detector, enabled = false),
+    )
+
+    val none = accessibilityServicesForPicker(
+        services = all,
+        heldAccessibilityServices = emptyMap(),
+    )
+
+    checkEquals(
+        "with nothing held, only the enabled ones are listed",
+        listOf("a/.A"),
+        none.map { it.id },
+    )
+
+    // The whole reason this is not a plain `filter { it.enabled }`. A service IMD has switched
+    // off is not enabled, and dropping it would empty the picker during the very hide it
+    // exists to configure.
+    val held = accessibilityServicesForPicker(
+        services = all,
+        heldAccessibilityServices = mapOf("__device_wide_settings_to_hide__" to listOf("b/.B")),
+    )
+
+    checkEquals(
+        "a service IMD is holding down stays listed even though it is off",
+        listOf("a/.A", "b/.B"),
+        held.map { it.id },
+    )
+
+    check(
+        "a service that is merely off, and not held, stays out",
+        "c/.C" !in held.map { it.id },
+    )
+
+    val detectorHeld = accessibilityServicesForPicker(
+        services = all,
+        heldAccessibilityServices = mapOf("__auto_hide_own_detector__" to listOf(detector)),
+    )
+
+    check(
+        "the detector held under its own holder is listed too",
+        detector in detectorHeld.map { it.id },
+    )
+
+    checkEquals(
+        "order is preserved, so the caller's sort survives",
+        listOf("a/.A", "b/.B", "c/.C"),
+        accessibilityServicesForPicker(
+            services = all,
+            heldAccessibilityServices = mapOf(
+                "h" to listOf("c/.C", "b/.B"),
+            ),
+        ).map { it.id }.filter { it != detector },
+    )
+
+    checkEquals(
+        "an empty list in, an empty list out",
+        emptyList<String>(),
+        accessibilityServicesForPicker(
+            services = emptyList(),
+            heldAccessibilityServices = mapOf("h" to listOf("a/.A")),
+        ).map { it.id },
+    )
+
+    // r2b3b. The author reported the overlay picker dropping a package he had selected; this
+    // list had the same hole. "Held" only covers a service IMD switched off *and still has a
+    // record of* — so a service the user switched off themselves, or one whose record was
+    // discarded by 'Ignore all previous reverts', was selected, off, unheld and invisible.
+    val selected = accessibilityServicesForPicker(
+        services = all,
+        heldAccessibilityServices = emptyMap(),
+        managedAccessibilityServices = listOf("c/.C"),
+    )
+
+    checkEquals(
+        "a selected service is listed even when it is neither enabled nor held",
+        listOf("a/.A", "c/.C"),
+        selected.map { it.id },
+    )
+
+    check(
+        "and the rule it was hiding behind still holds: unselected, unheld and off stays out",
+        "b/.B" !in selected.map { it.id },
+    )
+
+    checkEquals(
+        "a selected service that is also held is listed once, not twice",
+        listOf("a/.A", "b/.B"),
+        accessibilityServicesForPicker(
+            services = all,
+            heldAccessibilityServices = mapOf(
+                "__device_wide_settings_to_hide__" to listOf("b/.B"),
+            ),
+            managedAccessibilityServices = listOf("b/.B"),
+        ).map { it.id },
+    )
+
+    checkEquals(
+        "an empty selection changes nothing",
+        listOf("a/.A"),
+        accessibilityServicesForPicker(
+            services = all,
+            heldAccessibilityServices = emptyMap(),
+            managedAccessibilityServices = emptyList(),
+        ).map { it.id },
+    )
+}
+
+// ---------------------------------------------------------------------------------
+// v3 — the IMD+ failure back-off
+// ---------------------------------------------------------------------------------
+
+private fun autoHideBackoffTests() {
+    val minute = 60L * 1000L
+
+    checkEquals(
+        "the first failure waits a minute",
+        minute,
+        autoHideFailureBackoffMillis(failures = 1),
+    )
+
+    checkEquals(
+        "the second waits five",
+        5L * minute,
+        autoHideFailureBackoffMillis(failures = 2),
+    )
+
+    checkEquals(
+        "the third waits thirty",
+        30L * minute,
+        autoHideFailureBackoffMillis(failures = 3),
+    )
+
+    // The whole point of the cap: a permanently revoked permission costs one attempt every
+    // half hour rather than one attempt per relaunch, for ever.
+    checkEquals(
+        "the fourth is capped at thirty, not reaching past the end of the table",
+        30L * minute,
+        autoHideFailureBackoffMillis(failures = 4),
+    )
+
+    checkEquals(
+        "and so is the fortieth",
+        30L * minute,
+        autoHideFailureBackoffMillis(failures = 40),
+    )
+
+    // A count of zero should never arrive - an entry is only written when a failure is
+    // recorded - but reaching back past the start of the table would throw rather than
+    // misbehave, and inside a detector callback that would take IMD+ down with it.
+    checkEquals(
+        "a zero count is treated as the first failure rather than throwing",
+        minute,
+        autoHideFailureBackoffMillis(failures = 0),
+    )
+
+    checkEquals(
+        "a negative count is clamped the same way",
+        minute,
+        autoHideFailureBackoffMillis(failures = -7),
+    )
+
+    // Written as a plain loop on purpose. `zipWithNext().all { (a, b) -> ... }` was the first
+    // shape here and it failed twice over: destructuring a Pair in a lambda hits the
+    // component1/component2 ambiguity this project has now met four times, and zipWithNext
+    // does not resolve against the host runner's classpath at all.
+    val waits = (1..6).map { failures -> autoHideFailureBackoffMillis(failures = failures) }
+
+    var neverShortens = true
+
+    for (index in 1 until waits.size) {
+        if (waits[index] < waits[index - 1]) neverShortens = false
+    }
+
+    check(
+        "the waits only ever increase, so a later failure is never retried sooner",
+        neverShortens,
+    )
+}
+
+/**
+ * The first-owner rule, and the cascade it exists for.
+ *
+ * The walk below is r2b §5.1's table, run rather than argued: two apps into one hidden window,
+ * both revert orders, and the assertion is that the setting they share ends up **on** either
+ * way. Before the rule, one of the two orders stranded it off.
+ */
+private fun firstOwnerTests() {
+    check("a hide that changes a setting owns putting it back", hideOwnsRevert("1", "0"))
+
+    check("a hide that changes nothing owns nothing", !hideOwnsRevert("0", "0"))
+
+    // Never set is not equal to anything a hide writes, so it is recorded. The revert's own
+    // rule then declines to write a null back, which is where that case is actually handled.
+    check("an unset setting is recorded", hideOwnsRevert(null, "0"))
+
+    // A profile that drives a setting to something other than off is the same question.
+    check("a non-zero target still compares by value", hideOwnsRevert("0", "2"))
+
+    check("and owns nothing when it is already there", !hideOwnsRevert("2", "2"))
+
+    // --- the cascade, both orders -------------------------------------------------------
+    //
+    // Two apps, one shared key. `live` is what the device reads; `records` is what each app
+    // owes. A hide writes "0" and records the old value only if it owns the revert.
+    val live = mutableMapOf("dev" to "1", "usb" to "1", "wifi" to "1")
+
+    val records = mutableMapOf<String, MutableMap<String, String>>()
+
+    fun hide(app: String, keys: List<String>) {
+        val owed = mutableMapOf<String, String>()
+
+        for (key in keys) {
+            val current = live.getValue(key)
+
+            if (hideOwnsRevert(currentValue = current, valueOnLaunch = "0")) {
+                owed[key] = current
+            }
+
+            live[key] = "0"
+        }
+
+        records[app] = owed
+    }
+
+    fun revert(app: String) {
+        val owed = records.remove(app) ?: return
+
+        for (key in owed.keys) {
+            live[key] = owed.getValue(key)
+        }
+    }
+
+    hide(app = "calculator", keys = listOf("dev", "usb"))
+    hide(app = "gallery", keys = listOf("usb", "wifi"))
+
+    check(
+        "the second app records nothing for a key the first already holds",
+        records.getValue("gallery").keys == setOf("wifi"),
+    )
+
+    check(
+        "and the first app still owns both of its own",
+        records.getValue("calculator").keys == setOf("dev", "usb"),
+    )
+
+    revert(app = "calculator")
+    revert(app = "gallery")
+
+    check(
+        "first-then-second leaves the shared setting on",
+        live == mapOf("dev" to "1", "usb" to "1", "wifi" to "1"),
+    )
+
+    // The other order, from the same start. This is the one that used to strand it.
+    live.putAll(mapOf("dev" to "1", "usb" to "1", "wifi" to "1"))
+
+    records.clear()
+
+    hide(app = "calculator", keys = listOf("dev", "usb"))
+    hide(app = "gallery", keys = listOf("usb", "wifi"))
+
+    revert(app = "gallery")
+    revert(app = "calculator")
+
+    check(
+        "second-then-first leaves the shared setting on too",
+        live == mapOf("dev" to "1", "usb" to "1", "wifi" to "1"),
+    )
+
+    // And the user's own choice is never overridden: a setting they had off before any hide
+    // is owned by nobody, so no revert switches it on.
+    live.putAll(mapOf("dev" to "1", "usb" to "0", "wifi" to "1"))
+
+    records.clear()
+
+    hide(app = "calculator", keys = listOf("dev", "usb"))
+
+    check(
+        "a setting the user had off is owned by nobody",
+        records.getValue("calculator").keys == setOf("dev"),
+    )
+
+    revert(app = "calculator")
+
+    check(
+        "so a revert leaves it off",
+        live == mapOf("dev" to "1", "usb" to "0", "wifi" to "1"),
+    )
+}
+
+private fun frameworkSplitTests() {
+    // The pair-off. Every pre-v3 install stored one of exactly two values, and each maps to
+    // the combination that behaves the way that install already behaved.
+    check(
+        "Revert to default migrates to IMD defaults + Revert to default",
+        hidingFrameworkFor(NotificationFunction.RevertToDefault) == HidingFramework.ImdDefaults &&
+            unhidingFrameworkFor(NotificationFunction.RevertToDefault) ==
+            UnhidingFramework.RevertToDefault,
+    )
+
+    check(
+        "the memory function migrates to Per app + Memory",
+        hidingFrameworkFor(NotificationFunction.Memory) == HidingFramework.PerApp &&
+            unhidingFrameworkFor(NotificationFunction.Memory) == UnhidingFramework.Memory,
+    )
+
+    // The whole point of the migration: no upgrading install may arrive in one of the two
+    // combinations no released version has ever run.
+    check(
+        "migration never produces a crossed pair",
+        NotificationFunction.entries.none { stored ->
+            val hiding = hidingFrameworkFor(stored)
+            val unhiding = unhidingFrameworkFor(stored)
+
+            (hiding == HidingFramework.ImdDefaults && unhiding == UnhidingFramework.Memory) ||
+                (hiding == HidingFramework.PerApp &&
+                    unhiding == UnhidingFramework.RevertToDefault)
+        },
+    )
+
+    // A fresh install is NOT the migration's pairing, and that is deliberate: it gets
+    // IMD defaults with the memory function, which is one of the two new combinations.
+    check(
+        "a new install defaults to IMD defaults + Memory",
+        HidingFramework.Default == HidingFramework.ImdDefaults &&
+            UnhidingFramework.Default == UnhidingFramework.Memory,
+    )
+
+    // Only one of the four can leave something hidden with nothing to put it back.
+    check(
+        "Per app + Revert to default is the stranding pair",
+        strandsSettings(HidingFramework.PerApp, UnhidingFramework.RevertToDefault),
+    )
+
+    check(
+        "the other three do not strand",
+        !strandsSettings(HidingFramework.ImdDefaults, UnhidingFramework.RevertToDefault) &&
+            !strandsSettings(HidingFramework.ImdDefaults, UnhidingFramework.Memory) &&
+            !strandsSettings(HidingFramework.PerApp, UnhidingFramework.Memory),
+    )
+
+    // Only the app's revert has to name it.
+    check(
+        "Per app + Memory is the pair whose revert names the app",
+        revertNamesApp(HidingFramework.PerApp, UnhidingFramework.Memory) &&
+            !revertNamesApp(HidingFramework.ImdDefaults, UnhidingFramework.Memory) &&
+            !revertNamesApp(HidingFramework.PerApp, UnhidingFramework.RevertToDefault) &&
+            !revertNamesApp(HidingFramework.ImdDefaults, UnhidingFramework.RevertToDefault),
+    )
+
+    // The three keys a Revert to default drives are exactly the ones it must not be handed
+    // back from memory afterwards — that is the double write, and adb_enabled is one of them.
+    check(
+        "the three driven keys are excluded from the extras",
+        settingsOutsideRevertDefaults(
+            mapOf(
+                AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED to "1",
+                AppSettingKeys.ADB_ENABLED to "1",
+                AppSettingKeys.ADB_WIFI_ENABLED to "1",
+            ),
+        ).isEmpty(),
+    )
+
+    check(
+        "a setting the defaults cannot reach is kept",
+        settingsOutsideRevertDefaults(
+            mapOf(
+                AppSettingKeys.ADB_ENABLED to "1",
+                "some_other_secure_setting" to "0",
+            ),
+        ) == mapOf<String, String?>("some_other_secure_setting" to "0"),
+    )
+
+    // A target configured off is still driven off, so its key stays out of the extras
+    // whatever the configuration says — the filter is on the key, not on the toggle.
+    check(
+        "the filter does not depend on how the defaults are configured",
+        settingsOutsideRevertDefaults(mapOf(AppSettingKeys.ADB_WIFI_ENABLED to null))
+            .isEmpty(),
+    )
+
+    check(
+        "nothing recorded means nothing extra",
+        settingsOutsideRevertDefaults(emptyMap()).isEmpty(),
+    )
+
+    // settingOf is the inverse of idOf, and must refuse the two reserved markers — a caller
+    // that took those for settings would try to write a row called shizuku_stopped.
+    check(
+        "an id round-trips back to its type and key",
+        settingOf(SettingSnapshot.idOf(SettingType.GLOBAL, "adb_enabled")) ==
+            (SettingType.GLOBAL to "adb_enabled"),
+    )
+
+    check(
+        "the reserved markers are not settings",
+        settingOf(SettingSnapshot.SHIZUKU_STOPPED_ID) == null &&
+            settingOf(SettingSnapshot.OVERLAY_HIDDEN_ID) == null,
+    )
+
+    check(
+        "a key containing the separator still round-trips",
+        settingOf(SettingSnapshot.idOf(SettingType.SECURE, "a\u001Fb")) ==
+            (SettingType.SECURE to "a\u001Fb"),
+    )
+
+    check(
+        "rubbish is refused rather than guessed at",
+        settingOf("") == null && settingOf("no_separator") == null,
+    )
+
+    // The device-wide memory record: what a hide measured decides where the revert drives.
+    val devId = { t: ManualRevertTarget -> deviceWideSnapshotId(t)!! }
+
+    check(
+        "a target recorded as on is driven back on",
+        deviceWideMemoryWanted(
+            mapOf(devId(ManualRevertTarget.UsbDebugging) to "1"),
+        ) == mapOf(ManualRevertTarget.UsbDebugging to true),
+    )
+
+    check(
+        "a target recorded as off or unset is left off",
+        deviceWideMemoryWanted(
+            mapOf(
+                devId(ManualRevertTarget.UsbDebugging) to "0",
+                devId(ManualRevertTarget.WirelessDebugging) to null,
+            ),
+        ) == mapOf(
+            ManualRevertTarget.UsbDebugging to false,
+            ManualRevertTarget.WirelessDebugging to false,
+        ),
+    )
+
+    // The whole point of the memory framework: a setting the user never had on before the
+    // hide must not be switched on by the revert.
+    check(
+        "an unrecorded target is not driven at all",
+        ManualRevertTarget.DeveloperSettings !in
+            deviceWideMemoryWanted(mapOf(devId(ManualRevertTarget.UsbDebugging) to "1")),
+    )
+
+    check(
+        "the three hold-backed targets are never in the wanted map",
+        deviceWideSnapshotId(ManualRevertTarget.AccessibilityServices) == null &&
+            deviceWideSnapshotId(ManualRevertTarget.Shizuku) == null &&
+            deviceWideSnapshotId(ManualRevertTarget.DisplayOverOtherApps) == null,
+    )
+
+    check(
+        "an empty record drives nothing",
+        deviceWideMemoryWanted(emptyMap()).isEmpty(),
+    )
+
+    // The debt rule: moving a settings manager switch by hand joins the outstanding revert
+    // only when there is one. With nothing pending the user is managing their own device and
+    // no later revert should undo it.
+    val deviceWideHold = AccessibilityServicePlan.DEVICE_WIDE_HOLD
+
+    val usbId = devId(ManualRevertTarget.UsbDebugging)
+
+    val wifiId = devId(ManualRevertTarget.WirelessDebugging)
+
+    check(
+        "a manual change with no revert pending records nothing",
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.UsbDebugging,
+            currentlyEnabled = true,
+            revertPending = false,
+        ) == null,
+    )
+
+    check(
+        "a manual change with a revert pending records the value it had",
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.UsbDebugging,
+            currentlyEnabled = true,
+            revertPending = true,
+        ) == mapOf(usbId to "1"),
+    )
+
+    check(
+        "switching something on records that it was off",
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.UsbDebugging,
+            currentlyEnabled = false,
+            revertPending = true,
+        ) == mapOf(usbId to "0"),
+    )
+
+    // First owner. A second press must not overwrite the first reading with the value IMD
+    // itself just wrote - the same guard recordDeviceWideValues applies on the hide side.
+    check(
+        "a key already recorded is not re-recorded",
+        manualChangeRecord(
+            settingStateBefore = mapOf(deviceWideHold to mapOf(usbId to "1")),
+            target = ManualRevertTarget.UsbDebugging,
+            currentlyEnabled = false,
+            revertPending = true,
+        ) == null,
+    )
+
+    check(
+        "a new key is merged rather than replacing the record",
+        manualChangeRecord(
+            settingStateBefore = mapOf(deviceWideHold to mapOf(usbId to "1")),
+            target = ManualRevertTarget.WirelessDebugging,
+            currentlyEnabled = true,
+            revertPending = true,
+        ) == mapOf(usbId to "1", wifiId to "1"),
+    )
+
+    check(
+        "another holder's record does not count as already recorded",
+        manualChangeRecord(
+            settingStateBefore = mapOf("com.example/.Main" to mapOf(usbId to "1")),
+            target = ManualRevertTarget.UsbDebugging,
+            currentlyEnabled = true,
+            revertPending = true,
+        ) == mapOf(usbId to "1"),
+    )
+
+    // The three hold-backed targets keep their own records - an accessibility or overlay
+    // hold is written before the shell command for crash safety, and Shizuku has no stored
+    // "before" value at all - so none of them is ever written here.
+    check(
+        "accessibility services are not recorded by a manual change",
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.AccessibilityServices,
+            currentlyEnabled = true,
+            revertPending = true,
+        ) == null,
+    )
+
+    check(
+        "Shizuku is not recorded by a manual change",
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.Shizuku,
+            currentlyEnabled = true,
+            revertPending = true,
+        ) == null,
+    )
+
+    check(
+        "Display over other apps is not recorded by a manual change",
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.DisplayOverOtherApps,
+            currentlyEnabled = true,
+            revertPending = true,
+        ) == null,
+    )
+
+    // Belt and braces on the rule itself: a hold-backed target with nothing pending is still
+    // null, so neither half of the guard is doing all the work on its own.
+    // The master pill's order. Guarded here rather than left to a reviewer, because a
+    // seventh ManualRevertTarget added later would otherwise be skipped by the pill in
+    // silence - nothing in the audit suite reads a list of enum members against its enum.
+    // Clearing the device-wide record after a memory revert. Until v3 nothing cleared it at
+    // all, so a second hide reverted to the state measured at the first one - for ever.
+    val recordBefore = mapOf(
+        deviceWideHold to mapOf(
+            devId(ManualRevertTarget.UsbDebugging) to "1",
+            devId(ManualRevertTarget.WirelessDebugging) to "1",
+        ),
+    )
+
+    check(
+        "a revert that drove everything leaves no device-wide record",
+        deviceWideRecordAfterRevert(
+            settingStateBefore = recordBefore,
+            driven = setOf(
+                ManualRevertTarget.UsbDebugging,
+                ManualRevertTarget.WirelessDebugging,
+            ),
+            failed = emptySet(),
+        ).isEmpty(),
+    )
+
+    check(
+        "a failed target stays recorded so a retry can still put it back",
+        deviceWideRecordAfterRevert(
+            settingStateBefore = recordBefore,
+            driven = setOf(
+                ManualRevertTarget.UsbDebugging,
+                ManualRevertTarget.WirelessDebugging,
+            ),
+            failed = setOf(ManualRevertTarget.WirelessDebugging),
+        ) == mapOf(
+            deviceWideHold to mapOf(devId(ManualRevertTarget.WirelessDebugging) to "1"),
+        ),
+    )
+
+    check(
+        "a target the revert never drove is left recorded",
+        deviceWideRecordAfterRevert(
+            settingStateBefore = recordBefore,
+            driven = setOf(ManualRevertTarget.UsbDebugging),
+            failed = emptySet(),
+        ) == mapOf(
+            deviceWideHold to mapOf(devId(ManualRevertTarget.WirelessDebugging) to "1"),
+        ),
+    )
+
+    check(
+        "another holder's record is untouched",
+        deviceWideRecordAfterRevert(
+            settingStateBefore = recordBefore +
+                mapOf("com.example/.Main" to mapOf(devId(ManualRevertTarget.UsbDebugging) to "1")),
+            driven = setOf(
+                ManualRevertTarget.UsbDebugging,
+                ManualRevertTarget.WirelessDebugging,
+            ),
+            failed = emptySet(),
+        ) == mapOf(
+            "com.example/.Main" to mapOf(devId(ManualRevertTarget.UsbDebugging) to "1"),
+        ),
+    )
+
+    check(
+        "a revert that drove nothing changes nothing",
+        deviceWideRecordAfterRevert(
+            settingStateBefore = recordBefore,
+            driven = emptySet(),
+            failed = emptySet(),
+        ) == recordBefore,
+    )
+
+    check(
+        "no device-wide record at all is left alone",
+        deviceWideRecordAfterRevert(
+            settingStateBefore = emptyMap(),
+            driven = setOf(ManualRevertTarget.UsbDebugging),
+            failed = emptySet(),
+        ).isEmpty(),
+    )
+
+    check(
+        "the pill order covers every target exactly once",
+        masterPillOnOrder.toSet() == ManualRevertTarget.entries.toSet() &&
+            masterPillOnOrder.size == ManualRevertTarget.entries.size,
+    )
+
+    val pillOn = masterPillOrder(enabled = true, usable = ManualRevertTarget.entries.toList())
+
+    val pillOff = masterPillOrder(enabled = false, usable = ManualRevertTarget.entries.toList())
+
+    check(
+        "on: developer options before USB debugging",
+        pillOn.indexOf(ManualRevertTarget.DeveloperSettings) <
+            pillOn.indexOf(ManualRevertTarget.UsbDebugging),
+    )
+
+    check(
+        "on: Shizuku before the overlay AppOps that need it running",
+        pillOn.indexOf(ManualRevertTarget.Shizuku) <
+            pillOn.indexOf(ManualRevertTarget.DisplayOverOtherApps),
+    )
+
+    check(
+        "on: wireless debugging last, after the Shizuku start that moves it",
+        pillOn.last() == ManualRevertTarget.WirelessDebugging,
+    )
+
+    check("off is exactly the reverse of on", pillOff == pillOn.reversed())
+
+    check(
+        "off: developer options last of all",
+        pillOff.last() == ManualRevertTarget.DeveloperSettings,
+    )
+
+    // The pill never touches a row the dialog called unusable.
+    val pillSome = listOf(ManualRevertTarget.WirelessDebugging, ManualRevertTarget.UsbDebugging)
+
+    check(
+        "an unusable row is never moved",
+        masterPillOrder(enabled = true, usable = pillSome).none { it !in pillSome },
+    )
+
+    check(
+        "a partial list keeps the canonical order",
+        masterPillOrder(enabled = true, usable = pillSome) ==
+            listOf(ManualRevertTarget.UsbDebugging, ManualRevertTarget.WirelessDebugging),
+    )
+
+    check(
+        "nothing usable orders nothing",
+        masterPillOrder(enabled = true, usable = emptyList()).isEmpty(),
+    )
+
+    check(
+        "no revert pending beats everything else",
+        manualChangeRecord(
+            settingStateBefore = mapOf(deviceWideHold to mapOf(usbId to "1")),
+            target = ManualRevertTarget.WirelessDebugging,
+            currentlyEnabled = true,
+            revertPending = false,
+        ) == null,
+    )
+
+    // The MemoryHolds fix. Until v3 the internal-holder filter was applied to the
+    // accessibility map only; the device-wide memory record now writes the same marker into
+    // settingStateBefore, and an unfiltered sweep would revert it as if it were an app.
+    check(
+        "the device-wide memory record is not swept as an app",
+        memoryHeldComponents(
+            settingStateBefore = mapOf(
+                AccessibilityServicePlan.DEVICE_WIDE_HOLD to mapOf("adb_enabled" to "1"),
+            ),
+            heldAccessibilityServices = emptyMap(),
+        ).isEmpty(),
+    )
+
+    check(
+        "IMD+'s own holder is not swept as an app either",
+        memoryHeldComponents(
+            settingStateBefore = mapOf(
+                AccessibilityServicePlan.AUTO_HIDE_HOLD to mapOf("adb_enabled" to "1"),
+            ),
+            heldAccessibilityServices = emptyMap(),
+        ).isEmpty(),
+    )
+
+    check(
+        "a real app alongside the device-wide record still is",
+        memoryHeldComponents(
+            settingStateBefore = mapOf(
+                AccessibilityServicePlan.DEVICE_WIDE_HOLD to mapOf("adb_enabled" to "1"),
+                "com.example/.Main" to mapOf("adb_enabled" to "1"),
+            ),
+            heldAccessibilityServices = emptyMap(),
+        ) == setOf("com.example/.Main"),
+    )
+
+    // settingsHidden must still read true for a device-wide hide - it just gets there through
+    // settingsHiddenDeviceWide rather than through the memory record.
+    check(
+        "a device-wide hide still reads as hidden",
+        userData(forkMode = ShizukuForkMode.Thedjchi, settingsHiddenDeviceWide = true)
+            .settingsHidden,
+    )
+
+    check(
+        "and the device-wide memory record alone does not make memoryHoldsSettings true",
+        !userData(
+            forkMode = ShizukuForkMode.Thedjchi,
+            settingStateBefore = mapOf(
+                AccessibilityServicePlan.DEVICE_WIDE_HOLD to mapOf("adb_enabled" to "1"),
+            ),
+        ).memoryHoldsSettings,
+    )
+}
+
 fun main() {
     accessibilityHoldTests()
     accessibilityReleaseTests()
@@ -1742,13 +3551,25 @@ fun main() {
     shizukuForkDefaultsTests()
     shizukuConfiguredTests()
     stopActionTests()
+    autoUnhideCouplingTests()
     launchPackageTests()
     accessibilityLiveStateTests()
     revertDefaultsTests()
     settingsToHideTests()
     overlayManagementTests()
     overlayMarkerVisibilityTests()
+    shizukuForkStrategyTests()
     taskerIntegrationTests()
+    hiddenStateTests()
+    repeatLaunchFailSafeTests()
+    autoHideTests()
+    autoHideBackoffTests()
+    accessibilityPickerTests()
+    onlyAccessibilityMissingTests()
+    frameworkSplitTests()
+    memoryRevertCoverageTests()
+    firstOwnerTests()
+    hideGateTests()
 
     println("passed: $passed")
 
@@ -1759,4 +3580,181 @@ fun main() {
         failures.forEach { println("  - $it") }
         kotlin.system.exitProcess(1)
     }
+}
+
+// ---------------------------------------------------------------------------------
+// r4g - a device-wide memory revert covers the targets it cannot measure
+// ---------------------------------------------------------------------------------
+
+private fun memoryRevertCoverageTests() {
+    // What RevertToDefaultUseCase computes as its destination, in the two shapes it takes.
+    fun destination(
+        defaults: Map<ManualRevertTarget, Boolean>,
+        override: Map<ManualRevertTarget, Boolean>?,
+    ): Map<ManualRevertTarget, Boolean> = if (override != null) {
+        defaults.filterKeys { deviceWideSnapshotId(target = it) == null } + override
+    } else {
+        defaults
+    }
+
+    val defaults = ManualRevertTarget.entries.associateWith { true }
+
+    // The author's log: a device-wide hide with all six hidden, then a memory revert.
+    val recorded = mapOf(
+        SettingSnapshot.idOf(SettingType.GLOBAL, "development_settings_enabled") to "1",
+        SettingSnapshot.idOf(SettingType.GLOBAL, "adb_enabled") to "1",
+        SettingSnapshot.idOf(SettingType.GLOBAL, "adb_wifi_enabled") to "1",
+    )
+
+    val override = deviceWideMemoryWanted(recorded = recorded)
+
+    check(
+        "the memory record can only ever carry the three keyed targets",
+        override.keys == setOf(
+            ManualRevertTarget.DeveloperSettings,
+            ManualRevertTarget.UsbDebugging,
+            ManualRevertTarget.WirelessDebugging,
+        ),
+    )
+
+    val wanted = destination(defaults = defaults, override = override)
+
+    // The bug: these three were absent, so the revert never considered them at all.
+    for (target in listOf(
+        ManualRevertTarget.AccessibilityServices,
+        ManualRevertTarget.Shizuku,
+        ManualRevertTarget.DisplayOverOtherApps,
+    )) {
+        check("a memory revert still drives $target", wanted[target] == true)
+    }
+
+    check(
+        "and the keyed three still come from the record",
+        wanted[ManualRevertTarget.UsbDebugging] == true,
+    )
+
+    // A keyed target the hide never touched stays absent: the memory framework's whole point.
+    val partial = deviceWideMemoryWanted(
+        recorded = mapOf(
+            SettingSnapshot.idOf(SettingType.GLOBAL, "development_settings_enabled") to "1",
+        ),
+    )
+
+    val fromPartial = destination(defaults = defaults, override = partial)
+
+    check(
+        "an unrecorded keyed target is not driven from the defaults",
+        ManualRevertTarget.UsbDebugging !in fromPartial,
+    )
+
+    check(
+        "and an unkeyed one still is",
+        fromPartial[ManualRevertTarget.AccessibilityServices] == true,
+    )
+
+    // A record saying a setting was off before keeps it off, over a default that wants it on.
+    val wasOff = deviceWideMemoryWanted(
+        recorded = mapOf(
+            SettingSnapshot.idOf(SettingType.GLOBAL, "adb_wifi_enabled") to "0",
+        ),
+    )
+
+    check(
+        "the record beats the default where it has an opinion",
+        destination(defaults = defaults, override = wasOff)[
+            ManualRevertTarget.WirelessDebugging,
+        ] == false,
+    )
+
+    // An explicit revert passes no override and is untouched by any of this.
+    check(
+        "an explicit revert still drives the configured defaults",
+        destination(defaults = defaults, override = null) == defaults,
+    )
+}
+
+// ---------------------------------------------------------------------------------
+// r4m - a disabled toggle does not run, for IMD+ and for every other launch route
+// ---------------------------------------------------------------------------------
+
+/**
+ * The gate that made the greyed rows true of the engine as well as of the dialog.
+ *
+ * Every one of these was a real gap: with 'Manage Shizuku' off a device-wide hide still
+ * stopped the Shizuku service, and with the accessibility picker empty it still drove
+ * accessibility_enabled. Both paths are what IMD+ runs, which is why the author asked.
+ *
+ * ⚠ **The last group is the one that must not be "fixed".** Reverts are deliberately not
+ * gated: restoring something IMD already switched off has to keep working after the toggle
+ * that hid it has greyed, or a user is left with settings down and no screen to raise them
+ * from. A build that gates both directions passes the first three groups and fails this one.
+ */
+private fun hideGateTests() {
+    val all = ManualRevertTarget.entries.associateWith { true }
+
+    val ready = userData(
+        ShizukuForkMode.Thedjchi,
+        authKey = "k",
+        manageOverlay = true,
+        hideStates = all,
+        revertStates = all,
+    )
+
+    // 1. Everything configured: the stored ticks come through untouched.
+    checkEquals(
+        "a fully configured install hides every target it was told to",
+        ManualRevertTarget.entries.size,
+        ready.effectiveSettingsToHide.count { it.value },
+    )
+
+    // 2. Manage Shizuku off. The Shizuku row leaves the manager and greys elsewhere, and the
+    //    hide has to agree - this is the gap the author's "for IMD+ also" names.
+    val noShizuku = ready.copy(manageShizuku = false)
+
+    check("manage shizuku off refuses the shizuku target", !noShizuku.canHide(ManualRevertTarget.Shizuku))
+    checkEquals(
+        "and the hide config reads it off however it was stored",
+        false,
+        noShizuku.effectiveSettingsToHide[ManualRevertTarget.Shizuku],
+    )
+    // Overlay access goes with it, because it is written through Shizuku and nothing else.
+    checkEquals(
+        "overlay access goes off with the master switch",
+        false,
+        noShizuku.effectiveSettingsToHide[ManualRevertTarget.DisplayOverOtherApps],
+    )
+    // And the three settings IMD writes directly are untouched by any of it.
+    check(
+        "the three direct settings are never gated",
+        noShizuku.canHide(ManualRevertTarget.DeveloperSettings) &&
+            noShizuku.canHide(ManualRevertTarget.UsbDebugging) &&
+            noShizuku.canHide(ManualRevertTarget.WirelessDebugging),
+    )
+
+    // 3. An empty accessibility picker. The row greys in both dialogs; before r4m the hide
+    //    went ahead and wrote the flag anyway.
+    val noAccessibility = ready.copy(managedAccessibilityServices = emptyList())
+
+    check(
+        "an empty selection refuses the accessibility target",
+        !noAccessibility.canHide(ManualRevertTarget.AccessibilityServices),
+    )
+    checkEquals(
+        "and the hide config reads it off however it was stored",
+        false,
+        noAccessibility.effectiveSettingsToHide[ManualRevertTarget.AccessibilityServices],
+    )
+
+    // 4. ⚠ Reverts are not gated. Both of these would fail on a build that collapsed the two
+    //    directions into one rule.
+    checkEquals(
+        "a revert still restores shizuku with the master switch off",
+        true,
+        noShizuku.effectiveRevertDefaults[ManualRevertTarget.Shizuku],
+    )
+    checkEquals(
+        "a revert still restores accessibility services with an empty selection",
+        true,
+        noAccessibility.effectiveRevertDefaults[ManualRevertTarget.AccessibilityServices],
+    )
 }

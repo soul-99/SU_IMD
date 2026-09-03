@@ -40,6 +40,29 @@ object AccessibilityServicePlan {
     /** Hold key used by the device-wide "Settings to hide" accessibility target. */
     const val DEVICE_WIDE_HOLD = "__device_wide_settings_to_hide__"
 
+    /**
+     * Hold key used when IMD+ switches its own detector off part-way through a run.
+     *
+     * Its own holder rather than the device-wide one for two reasons. It is placed whether or
+     * not the hide touches accessibility services at all, so it cannot ride along with a hold
+     * that may never be taken; and a per-app memory revert, which releases only its own holder,
+     * must leave it exactly where it is — the detector stays off until a real revert.
+     *
+     * [releaseAll] flattens every holder, so "Revert to default" and the manager's own switch
+     * put the detector back with everything else, with no path of its own to get wrong.
+     */
+    const val AUTO_HIDE_HOLD = "__auto_hide_own_detector__"
+
+    /**
+     * The holders that are not apps.
+     *
+     * Every other key in the held map is a component name, and several things iterate it as
+     * though that were always true — the memory sweep, the "what is still outstanding" reading
+     * behind the tile, the per-app revert. Named together here so a third internal holder
+     * cannot be added without every one of them learning about it.
+     */
+    val INTERNAL_HOLDS: Set<String> = setOf(DEVICE_WIDE_HOLD, AUTO_HIDE_HOLD)
+
     data class Hold(
         /** The new value for enabled_accessibility_services. */
         val enabledAfter: List<String>,

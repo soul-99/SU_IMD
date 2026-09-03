@@ -20,12 +20,14 @@ package com.android.geto.framework.launcherapps
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
 import android.os.Handler
 import android.os.Looper
 import android.os.Process.myUserHandle
 import android.os.UserHandle
+import com.android.geto.domain.common.IconStyleState
 import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers.Default
 import com.android.geto.domain.framework.LauncherAppsWrapper
@@ -41,6 +43,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -105,6 +108,23 @@ internal class DefaultLauncherAppsWrapper @Inject constructor(
 
         getActivityList()
 
+        // ⚠ **The Icon style changed, so every cached picture is wrong.** The cache above is
+        // keyed by component name and package update time — the right key for the package
+        // events this flow was built to survive, and blind to this one, because changing a style
+        // changes no package's update time. Clearing it is what makes the rebuild produce
+        // different bytes rather than handing back the same ones.
+        //
+        // drop(1) discards the value every new collector is replayed: at this point it means
+        // "nothing has changed yet", and acting on it would rebuild the list a second time for
+        // no reason on every subscription.
+        launch {
+            IconStyleState.revision.drop(1).collect {
+                iconCache.clear()
+
+                getActivityList()
+            }
+        }
+
         val callback = object : LauncherApps.Callback() {
 
             override fun onPackageAdded(
@@ -165,9 +185,17 @@ internal class DefaultLauncherAppsWrapper @Inject constructor(
         }
     }.distinctUntilChanged().flowOn(defaultDispatcher)
 
-    /** Component plus update time: a reinstall or an update is what changes an icon. */
+    /**
+     * Component, update time **and Icon style**: those are the three things that change an icon.
+     *
+     * ⚠ The style was missing until r4y, and the collector below cleared the whole cache to work
+     * around it. The clear stays — it frees the bytes of a style nobody is looking at any more —
+     * but this is what makes the key correct rather than merely emptied at the right moment.
+     */
     private fun LauncherActivityInfo.iconKey(lastUpdateTimes: Map<String, Long>): String =
-        componentName.flattenToString() + "@" + (lastUpdateTimes[applicationInfo.packageName] ?: 0L)
+        componentName.flattenToString() + "@" +
+            (lastUpdateTimes[applicationInfo.packageName] ?: 0L) + "@" +
+            IconStyleState.revision.value
 
     private fun LauncherActivityInfo.toLauncherAppsActivityInfo(
         lastUpdateTimes: Map<String, Long>,
@@ -180,6 +208,8 @@ internal class DefaultLauncherAppsWrapper @Inject constructor(
         firstInstallTime = firstInstallTime,
         lastUpdateTime = lastUpdateTimes[applicationInfo.packageName] ?: 0L,
         isSystem = packageManagerWrapper.isSystem(flags = applicationInfo.flags),
+        // Read at render time, so the value travels with the picture it describes.
+        iconRevision = IconStyleState.revision.value,
     )
 
     override fun getActivityInfosFlow(
@@ -285,5 +315,39 @@ internal class DefaultLauncherAppsWrapper @Inject constructor(
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()
         }
+    }
+
+    /**
+     * The launcher's own entry for the package, and the package manager's answer if it has
+     * none that LauncherApps will admit to.
+     *
+     * Two routes because they fail on different devices. LauncherApps is the right one — it is
+     * profile-aware and it is what the rest of this class uses — but it lists only apps with a
+     * launcher category, and an app that IMD+ was asked to watch may have been started some
+     * other way. The launch intent covers that case, and it is also what every launcher on the
+     * device would do.
+     */
+    override fun startPackage(packageName: String): Boolean {
+        val component = runCatching {
+            launcherApps.getActivityList(packageName, myUserHandle()).firstOrNull()?.componentName
+        }.getOrNull()
+
+        if (component != null) {
+            val started = runCatching {
+                launcherApps.startMainActivity(component, myUserHandle(), null, null)
+            }.isSuccess
+
+            if (started) return true
+        }
+
+        val intent = runCatching {
+            context.packageManager.getLaunchIntentForPackage(packageName)
+        }.getOrNull() ?: return false
+
+        // NEW_TASK because this can be started from a context that is not an activity — the
+        // app has just been force-stopped and the window IMD+ was standing in may be gone.
+        return runCatching {
+            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }.isSuccess
     }
 }

@@ -31,11 +31,11 @@ package com.android.geto.domain.model
  * memory notification function uses. This is the answer for everyone who wants the common
  * case to work without configuring anything.
  *
- * Shizuku is deliberately not one of the targets. It is not a setting an app reads, and
- * hiding it is Shizuku's own job — its "Hide Shizuku from other apps" switch. What does
- * happen is that switching USB debugging off takes the Shizuku service down with it, which
- * is why the configuration dialog says so next to that row rather than offering a toggle
- * that cannot do what its name would imply.
+ * Shizuku is one of the targets, stopped on the way in through its fork's stop intent — and,
+ * when the fork has no stop intent, by briefly cycling USB debugging to drop the transport it
+ * rides on. Stopping it before a launch is what keeps a fork's watchdog from flagging the app.
+ * It is opt-in because it only does anything once Shizuku is configured, and, like overlay
+ * access, is handled on its own terms rather than through the generic hide loop.
  */
 object SettingsToHide {
     private const val SEPARATOR = '='
@@ -43,34 +43,51 @@ object SettingsToHide {
     private const val OFF = "0"
 
     /**
-     * The settings an app can actually detect, in the order the dialog lists them.
-     *
-     * [ManualRevertTarget] also carries Shizuku, which belongs to reverting and not to
-     * hiding; taking a subset here rather than adding a second enum keeps one vocabulary
-     * of targets across both configurations, so the dialogs and the audits line up.
+     * The targets, in the order the dialog lists them. Reusing [ManualRevertTarget] rather
+     * than a second enum keeps one vocabulary of targets across both configurations, so the
+     * dialogs and the audits line up. Shizuku and Display over other apps are the two that are
+     * not plain settings rows: both are stopped/hidden on their own terms (see the hide loop),
+     * not written through the secure-settings wrapper.
      */
     val Targets: List<ManualRevertTarget> = listOf(
         ManualRevertTarget.DeveloperSettings,
         ManualRevertTarget.UsbDebugging,
         ManualRevertTarget.WirelessDebugging,
         ManualRevertTarget.AccessibilityServices,
+        ManualRevertTarget.Shizuku,
         ManualRevertTarget.DisplayOverOtherApps,
     )
 
     /**
-     * The settings backed by WRITE_SECURE_SETTINGS default on. Overlay access is opt-in
-     * because changing AppOps requires a running Shizuku service; enabling it by default
-     * would make launches fail on otherwise correctly configured ADB-only installs.
+     * Nothing, on a fresh install.
      *
-     * The two defaults differ because the risks are not symmetrical. Switching something
-     * *on* that the user keeps off is a change to their device they never asked for, so
-     * reverting starts conservative. Switching something off before launching an app is
-     * the entire point of the app, is undone by the very next revert, and hiding only some
-     * of the debugging settings is the case that fails in a way nobody can diagnose: the app still sees
-     * developer mode and still refuses to run.
+     * Every target here switches something off on the user's device, and this app is handed
+     * `WRITE_SECURE_SETTINGS` to do it. A default that arrives already ticked means an
+     * install nobody has configured is changing debugging settings the first time an app is
+     * launched from it — before its owner has read what those four rows are, and without
+     * ever having said yes to any of them. So: nothing, until somebody says what.
+     *
+     * The launch path refuses to run with nothing ticked rather than launching and doing
+     * nothing, and the setup page's first step is where to tick them, so an unconfigured
+     * install says what it needs instead of quietly behaving like a launcher.
+     *
+     * Only for installs that start here. [LegacyDefault] is what an install from before this
+     * change has been behaving as, and MigrateRevertDefaultsUseCase writes that for them:
+     * a default is a starting point, never a decision made on somebody's behalf after the
+     * fact.
      */
-    val Default: Map<ManualRevertTarget, Boolean> = Targets.associateWith {
-        it != ManualRevertTarget.DisplayOverOtherApps
+    val Default: Map<ManualRevertTarget, Boolean> = Targets.associateWith { false }
+
+    /**
+     * What every install before v2.1 behaved as when it had never opened the dialog: the four
+     * settings backed by `WRITE_SECURE_SETTINGS` on, overlay access and stopping the Shizuku
+     * service off.
+     *
+     * Kept as its own constant so the migration that preserves it cannot drift when [Default]
+     * changes again. Nothing reads this except that migration.
+     */
+    val LegacyDefault: Map<ManualRevertTarget, Boolean> = Targets.associateWith {
+        it != ManualRevertTarget.DisplayOverOtherApps && it != ManualRevertTarget.Shizuku
     }
 
     /**

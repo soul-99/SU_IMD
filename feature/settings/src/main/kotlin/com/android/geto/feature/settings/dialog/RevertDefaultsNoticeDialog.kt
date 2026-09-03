@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.designsystem.component.emphasised
+import com.android.geto.domain.model.UnhidingFramework
 import com.android.geto.feature.settings.R
 
 /**
@@ -52,6 +53,11 @@ import com.android.geto.feature.settings.R
 @Composable
 fun RevertDefaultsNoticeDialog(
     modifier: Modifier = Modifier,
+    /**
+     * Which unhiding framework is in force — the row this points at is named differently under
+     * each, so one fixed path would be wrong for whichever the reader is not using.
+     */
+    unhidingFramework: UnhidingFramework,
     onDismissRequest: () -> Unit,
 ) {
     DialogContainer(
@@ -82,7 +88,13 @@ fun RevertDefaultsNoticeDialog(
 
             Text(
                 modifier = Modifier.padding(horizontal = 10.dp),
-                text = stringResource(R.string.help_path_unhide),
+                text = stringResource(
+                    if (unhidingFramework == UnhidingFramework.Memory) {
+                        R.string.help_path_unhide
+                    } else {
+                        R.string.help_path_unhide_both
+                    },
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.primary,

@@ -34,14 +34,33 @@
     <string name="global">Global</string>
 
     <string name="language_system">系统 / 自动</string>
-    <string name="language_ai_notice">除英语以外的语言均由 AI 辅助的机器翻译生成，因此可能存在错误。如果您希望得到修正，建议在 GitHub 问题追踪器中向开发者反馈翻译错误。</string>
+    <string name="language_ai_notice">除英语以外的语言均由 机器翻译生成，因此可能存在错误。如果您希望得到修正，建议在 GitHub 问题追踪器中向开发者反馈翻译错误。</string>
 
     <string name="revert_to_default_toast">还原为默认</string>
     <string name="revert_from_memory_toast">从记忆还原</string>
-    <string name="revert_failed_shizuku_toast">无法重新启动 Shizuku 服务</string>
-    <string name="revert_failed_overlay_toast">无法通过 Shizuku 恢复“显示在其他应用的上层”权限，请查看通知</string>
-    <string name="revert_failed_shizuku_and_overlay_toast">无法恢复 Shizuku 服务和“显示在其他应用的上层”权限</string>
     <string name="settings_hidden_toast">设置已隐藏</string>
     <string name="auto_revert_to_default_toast">自动还原为默认设置</string>
     <string name="auto_revert_from_memory_toast">使用 Memory function 自动还原</string>
+    <string name="auto_hide_run_toast">IMD+ 正在隐藏你的设置…</string>
+    <string name="auto_hide_revert_toast">IMD+ 正在还原你的设置…</string>
+    <string name="toast_auto_hiding">IMD+：正在隐藏设置...</string>
+    <string name="toast_done_hidden">IMD：设置已隐藏</string>
+    <string name="toast_done_hidden_for">IMD：已为 %1$s 隐藏设置</string>
+    <string name="toast_done_reverted_defaults">IMD：设置已还原为默认值</string>
+    <string name="toast_done_restored_defaults">IMD：设置已恢复为默认值</string>
+    <string name="toast_done_restored_memory">IMD：设置已从记忆中恢复</string>
+    <string name="toast_done_restored_memory_for">IMD：设置已从记忆中恢复（%1$s）</string>
+    <string name="toast_nothing_to_restore">IMD：没有可恢复的隐藏设置</string>
+    <string name="toast_auto_done_hidden">IMD+：设置已隐藏</string>
+    <string name="toast_auto_done_hidden_for">IMD+：已为 %1$s 隐藏设置</string>
+    <string name="permissions_lost">必要权限已丢失。请先打开 IMD 并重新授予权限。</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="next">下一步</string>
+    <string name="back">上一步</string>
+    <string name="prior_hide_ignore">忽略此前所有的还原</string>
+    <string name="prior_hide_restore">先还原设置</string>
+    <string name="prior_hide_restoring">IMD 正在还原你的设置…</string>
+    <string name="prior_hide_title">检测到此前隐藏的设置，要先还原它们吗？</string>
+    <string name="retry">重试</string>
+    <string name="skip">跳过</string>
 </resources>

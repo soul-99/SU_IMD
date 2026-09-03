@@ -39,7 +39,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -49,9 +51,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import com.android.geto.common.ProjectLinks
+import com.android.geto.common.openProjectUri
 import com.android.geto.common.shareProject
 import com.android.geto.designsystem.component.DialogContainer
+import com.android.geto.designsystem.component.underlined
 import com.android.geto.designsystem.icon.GetoIcons
+import com.android.geto.designsystem.R as designR
 import com.android.geto.feature.settings.R
 
 /**
@@ -92,16 +97,37 @@ internal fun SupportDialog(
 
             Paragraph(text = stringResource(R.string.support_intro_2))
 
+            // Swapped, as the author asked. "You can do these for free" is the turn from why
+            // to how, so it now sits immediately above the list it introduces rather than with
+            // a paragraph about succession in between.
+            Paragraph(text = stringResource(R.string.support_intro_4))
+
+            // ⚠ **Bold *and* underlined, and the two are doing different jobs.** The whole
+            // line is the turn from "why" to "how you can help", which is what the bold says;
+            // the two underlined phrases are what the help is *for*, which bolding again could
+            // not have said inside a line that is already bold.
             Paragraph(
-                text = stringResource(R.string.support_intro_3),
+                text = underlined(
+                    text = stringResource(R.string.support_intro_3),
+                    names = listOf(
+                        stringResource(R.string.support_name_project),
+                        stringResource(R.string.support_name_alive),
+                    ),
+                ),
                 bold = true,
             )
 
-            Paragraph(text = stringResource(R.string.support_intro_4))
-
             Spacer(modifier = Modifier.height(12.dp))
 
-            SupportPoint(number = 1, text = stringResource(R.string.support_point_share))
+            // Two lines in one point: the ask in bold, then the author's aside under it. Not
+            // one string with a \n, because only the first line is bold and a span would have
+            // to be matched per locale for no gain.
+            SupportPoint(
+                number = 1,
+                text = stringResource(R.string.support_point_share),
+                bold = true,
+                note = stringResource(R.string.support_point_share_note),
+            )
 
             // Right under its point, because it is that point made doable. Tonal rather than a
             // link so it reads as the one thing on this list the reader can finish in a tap.
@@ -120,13 +146,57 @@ internal fun SupportDialog(
                 Text(text = stringResource(R.string.support_share_button))
             }
 
-            StarPoint(number = 2)
+            // ⚠ **No longer a link — r27, at the author's request.** Point 1 is an ask with a
+            // button under it; point 2 was an ask with a phrase inside it that happened to be
+            // tappable, which is a different affordance in the same list. It is now the same
+            // shape as point 1: the sentence, then the thing it asks for as a button.
+            //
+            // The gold star stays a glyph in the text so it flows and wraps with the words
+            // instead of floating beside them.
+            SupportPoint(
+                number = 2,
+                text = "⭐ " + stringResource(R.string.support_point_star),
+            )
 
-            SupportPoint(number = 3, text = stringResource(R.string.support_point_bugs))
+            // Deliberately the same control as the Share button above, down to the tonal fill and
+            // the 18 dp glyph: two points that can be finished in a tap should look alike, and a
+            // reader who has just used one knows what the other is.
+            FilledTonalButton(
+                modifier = Modifier.padding(start = POINT_INSET, top = 4.dp, bottom = 8.dp),
+                onClick = { context.openProjectUri(ProjectLinks.REPOSITORY) },
+            ) {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    // The glyph from the soul_99 popup, at the author's word — the app has one
+                    // GitHub mark and this is it.
+                    painter = painterResource(designR.drawable.ic_github),
+                    contentDescription = null,
+                )
 
-            SupportPoint(number = 4, text = stringResource(R.string.support_point_discuss))
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(text = stringResource(R.string.support_view_github_button))
+            }
+
+            LinkedPoint(
+                number = 3,
+                sentence = stringResource(R.string.support_point_bugs),
+                linkPhrase = stringResource(R.string.support_point_bugs_link),
+                url = ProjectLinks.ISSUES,
+            )
+
+            LinkedPoint(
+                number = 4,
+                sentence = stringResource(R.string.support_point_discuss),
+                linkPhrase = stringResource(R.string.support_point_discuss_link),
+                url = ProjectLinks.DISCUSSIONS,
+            )
 
             SupportPoint(number = 5, text = stringResource(R.string.support_point_contribute))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Signature()
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -138,6 +208,68 @@ internal fun SupportDialog(
             }
         }
     }
+}
+
+/**
+ * The author's signature, at the foot of his own note.
+ *
+ * ⚠ **The dash hangs outside the block.** The author's rule is that the **s** of *soul_99* starts
+ * where the **(** of *(Dr.* starts, so the two lines share a left edge and the dash sits to the
+ * left of it - which is a `Row` of the dash beside a `Column` of the two lines, not two lines
+ * with an offset computed from a glyph width. Nothing here measures text, so it holds at any
+ * font scale.
+ *
+ * Right-aligned as a block, so the whole thing sits at the foot of the dialog on the same side
+ * as **Close**.
+ */
+@Composable
+private fun Signature() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 4.dp),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        Text(
+            text = stringResource(R.string.support_signature_dash),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+
+        // The gap the dash's own resource cannot carry - see the comment beside it.
+        Spacer(modifier = Modifier.width(4.dp))
+
+        Column {
+            Text(
+                text = stringResource(R.string.support_signature_name),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            Text(
+                text = stringResource(R.string.support_signature_real_name),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/**
+ * The same paragraph, already marked up.
+ *
+ * An overload rather than a change of shape: three of the four paragraphs are plain strings and
+ * have no reason to be wrapped at their call sites for the sake of the fourth.
+ */
+@Composable
+private fun Paragraph(
+    text: AnnotatedString,
+    bold: Boolean = false,
+) {
+    Text(
+        modifier = Modifier.padding(bottom = 10.dp),
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        fontWeight = if (bold) FontWeight.Bold else null,
+    )
 }
 
 /** One paragraph of the note, with a little air under it so the four read as separate. */
@@ -164,31 +296,35 @@ private fun Paragraph(
  * still shown, just without the link, rather than crashing on a bad index.
  */
 @Composable
-private fun StarPoint(number: Int) {
-    val sentence = stringResource(R.string.support_point_star)
-
-    val linkPhrase = stringResource(R.string.support_point_star_link)
-
+private fun LinkedPoint(
+    number: Int,
+    sentence: String,
+    linkPhrase: String,
+    url: String,
+    prefix: String = "",
+) {
     val linkColour = MaterialTheme.colorScheme.primary
 
-    val body = remember(sentence, linkPhrase, linkColour) {
+    val body = remember(sentence, linkPhrase, url, prefix, linkColour) {
         val styles = TextLinkStyles(
             style = SpanStyle(color = linkColour, textDecoration = TextDecoration.Underline),
         )
 
         buildAnnotatedString {
-            // The gold star as a glyph, so it flows and wraps with the words instead of
-            // floating beside them.
-            append("⭐ ")
+            append(prefix)
 
             val at = sentence.indexOf(linkPhrase)
 
+            // A phrase that is not in this locale's sentence links nothing, and the point still
+            // reads correctly as plain text. `_v3_support_dialog.py` asserts every pair so this
+            // branch should be unreachable — it is here because failing soft is the right
+            // behaviour for copy, and because a translation can be edited by hand later.
             if (at < 0) {
                 append(sentence)
             } else {
                 append(sentence.substring(0, at))
 
-                withLink(LinkAnnotation.Url(url = ProjectLinks.REPOSITORY, styles = styles)) {
+                withLink(LinkAnnotation.Url(url = url, styles = styles)) {
                     append(linkPhrase)
                 }
 
@@ -207,9 +343,22 @@ private fun StarPoint(number: Int) {
 private fun SupportPoint(
     number: Int,
     text: String,
+    bold: Boolean = false,
+    /** A second line under [text], inside the same point and at the same indent. */
+    note: String? = null,
 ) {
     NumberedRow(number = number) {
-        Text(text = text, style = MaterialTheme.typography.bodyMedium)
+        Column {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (bold) FontWeight.Bold else null,
+            )
+
+            if (note != null) {
+                Text(text = note, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
     }
 }
 

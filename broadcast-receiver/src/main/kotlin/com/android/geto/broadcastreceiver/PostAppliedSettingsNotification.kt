@@ -19,64 +19,54 @@
 package com.android.geto.broadcastreceiver
 
 import android.content.Context
-import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.common.AutoUnhideWatch
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.REVERT_TO_DEFAULT_NOTIFICATION_ID
 
 /**
- * Posts whichever notification the user's chosen function calls for.
+ * Posts the notification that offers the way back from a launch.
  *
- * The choice of id is the interesting half. The memory function keys on the target app, so
- * three apps launched in a row leave three notifications, each undoing its own share.
- * "Revert to default" posts under one fixed id, which is what makes its "one notification
- * only" rule work — a second launch lands on the same id and replaces the first, because
- * the button does the same thing either way and two of it would be two ways to press the
- * same button.
+ * **One notification, one id, whatever the two frameworks say** — the author's instruction in
+ * r3, replacing a branch that posted a per-app notification under the memory function and the
+ * generic one otherwise.
  *
- * A free function taking the wrapper rather than a class holding it, because all three
- * callers already have the wrapper to hand — two of them as a composition local — and
- * plumbing an injected object into a composable to save one argument is not a trade worth
- * making.
+ * Its button is the framework-following unhide rather than the named `Revert to default`
+ * function — see `RevertToDefaultBroadcastReceiver`, which is what makes one notification
+ * correct in all four combinations. Under the memory function it puts back what the hide
+ * measured; under Revert to default it drives the configured list. That is handover_3 §2.3's
+ * rule: a notification is the way back from *this* hide, so it follows the framework.
+ *
+ * ⚠ **The old per-app branch was wrong under IMD defaults + Memory**, which is what every new
+ * install gets. The hide there is the device-wide list, but the notification it posted offered
+ * a per-app revert — and `RevertAppSettingsUseCase` opens on `getAppSettingsByComponentName`,
+ * so with no profile for that app the tap cancelled the notification and wrote nothing. The
+ * uniform answer closes that by construction rather than by another branch.
+ *
+ * The fixed id is also what makes the "one notification only" rule work: a second launch lands
+ * on the same id and replaces the first, rather than leaving a row of offers behind it.
+ *
+ * A free function taking the wrapper rather than a class holding it, because all the callers
+ * already have the wrapper to hand — two of them as a composition local — and plumbing an
+ * injected object into a composable to save one argument is not a trade worth making.
  */
 fun postAppliedSettingsNotification(
     context: Context,
     notificationManager: AndroidNotificationManagerWrapper,
-    notificationFunction: NotificationFunction,
-    componentName: String,
-    icon: ByteArray?,
-    contentTitle: String,
-    contentText: String,
 ) {
-    when (notificationFunction) {
-        NotificationFunction.Memory -> {
-            // Keyed on the component name so each target app owns its own notification and
-            // its own Revert action. Also the PendingIntent request code: identity ignores
-            // extras, so a shared code would let one app's notification rewrite another's
-            // component name and revert the wrong app.
-            val notificationId = componentName.hashCode()
+    // ⚠ **The cascade, and it still earns its place.** This launch arrived into a window
+    // something else had already hidden, so there is one shared debt — and IMD+'s own
+    // notification, which is posted under an id of its own by a different builder, is standing
+    // beside this one offering to undo its share of it. `cancelAll` sweeps it, and the post
+    // below replaces the lot.
+    //
+    // ⚠ **A state, not an event, and that is `AutoUnhideWatch.collapsed`'s job.** The launch
+    // sites derive it from the persisted records *before* they apply anything, so a process
+    // death does not break a chain: the next launch reads the records, finds a debt
+    // outstanding, and collapses again.
+    if (AutoUnhideWatch.collapsed) notificationManager.cancelAll()
 
-            notificationManager.notify(
-                id = notificationId,
-                notification = buildAppliedSettingsNotification(
-                    context = context,
-                    notificationId = notificationId,
-                    componentName = componentName,
-                    icon = icon,
-                    contentTitle = contentTitle,
-                    contentText = contentText,
-                ),
-            )
-        }
-
-        NotificationFunction.RevertToDefault -> {
-            notificationManager.notify(
-                id = REVERT_TO_DEFAULT_NOTIFICATION_ID,
-                notification = buildRevertToDefaultNotification(
-                    context = context,
-                    contentTitle = contentTitle,
-                    contentText = contentText,
-                ),
-            )
-        }
-    }
+    notificationManager.notify(
+        id = REVERT_TO_DEFAULT_NOTIFICATION_ID,
+        notification = buildRevertToDefaultNotification(context = context),
+    )
 }

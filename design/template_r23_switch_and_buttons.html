@@ -1,0 +1,222 @@
+<title>r23 Switch &amp; Manager Buttons</title>
+<style>
+  :root {
+    --ink: #16180f;
+    --page: #f4f5ec;
+    --muted: #5c6152;
+    --rule: #d3d7c6;
+    --card: #ffffff;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {}
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #e6e8dc;
+      --page: #14160f;
+      --muted: #9aa08d;
+      --rule: #2e3327;
+      --card: #1c1f16;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #e6e8dc;
+    --page: #14160f;
+    --muted: #9aa08d;
+    --rule: #2e3327;
+    --card: #1c1f16;
+  }
+
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 28px 20px 64px;
+  }
+  main { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 21px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 30px; font-size: 13.5px; }
+  h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--muted); margin: 38px 0 14px; font-weight: 600;
+    border-top: 1px solid var(--rule); padding-top: 14px;
+  }
+  p.note { color: var(--muted); font-size: 13.5px; margin: 0 0 16px; max-width: 62ch; }
+  .verdict {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 2px 7px; border-radius: 4px; vertical-align: 2px;
+    margin-left: 8px;
+  }
+  .shipped { background: #cfff91; color: #1f3800; }
+  .was { background: var(--rule); color: var(--muted); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+  /* ---- device panels: each carries its own Material scheme ---- */
+  .panel { border-radius: 14px; padding: 18px 18px 20px; border: 1px solid var(--rule); overflow: hidden; }
+  .panel h3 {
+    font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase;
+    margin: 0 0 14px; opacity: 0.65; font-weight: 600;
+  }
+  .dark {
+    --m-primary: #b3e675; --m-on-primary: #1f3800;
+    --m-primary-container: #375f05; --m-on-primary-container: #cfff91;
+    --m-secondary-container: #41512c; --m-on-secondary-container: #dff0bf;
+    --m-surface: #1b1e16; --m-on-surface: #e2e3d8;
+    --m-surface-variant: #44483d; --m-on-surface-variant: #c5c8ba;
+    --m-surface-hi: #31352b; --m-surface-highest: #3c4036;
+    --m-outline: #8f9285;
+    background: var(--m-surface); color: var(--m-on-surface);
+  }
+  .light {
+    --m-primary: #4e7819; --m-on-primary: #ffffff;
+    --m-primary-container: #cfff91; --m-on-primary-container: #102000;
+    --m-secondary-container: #dff0bf; --m-on-secondary-container: #152405;
+    --m-surface: #f9faef; --m-on-surface: #1a1c16;
+    --m-surface-variant: #e1e4d5; --m-on-surface-variant: #44483d;
+    --m-surface-hi: #e8e9de; --m-surface-highest: #e2e3d8;
+    --m-outline: #75796c;
+    background: var(--m-surface); color: var(--m-on-surface);
+  }
+
+  /* ---- the switch, at IMD's real geometry: 48x22 track, 30 thumb, 2 rim ---- */
+  .row { display: flex; align-items: center; gap: 14px; margin: 0 0 14px; font-size: 14px; }
+  .row .label { flex: 1; }
+  .sw { position: relative; width: 48px; height: 30px; flex: none; }
+  .sw .track {
+    position: absolute; left: 0; top: 4px; width: 48px; height: 22px;
+    border-radius: 11px; box-sizing: border-box;
+  }
+  .sw .thumb {
+    position: absolute; top: 0; width: 30px; height: 30px; border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.45);
+  }
+  .sw.on .thumb { left: 18px; }
+  .sw.off .thumb { left: 0; }
+
+  /* r22 — what he has now */
+  .v22.on .track { background: var(--m-primary); border: 2px solid transparent; }
+  .v22.on .thumb { background: var(--m-on-primary); }
+  /* r23 — shipped */
+  .v23.on .track { background: var(--m-primary-container); border: 2px solid var(--m-outline); }
+  .v23.on .thumb { background: var(--m-primary); }
+
+  .off .track { background: var(--m-surface-hi); border: 2px solid var(--m-outline); }
+  .off .thumb { background: var(--m-on-surface-variant); }
+
+  /* ---- the manager card, translucent over a photo, as he sees it ---- */
+  .backdrop {
+    border-radius: 14px; padding: 22px; border: 1px solid var(--rule);
+    background-image:
+      radial-gradient(circle at 22% 30%, #6f8fa6 0 18%, transparent 40%),
+      radial-gradient(circle at 78% 24%, #b08a5e 0 14%, transparent 38%),
+      radial-gradient(circle at 60% 82%, #8a6a4a 0 22%, transparent 46%),
+      linear-gradient(160deg, #7c8f95, #55636a);
+    filter: none;
+  }
+  .card {
+    border-radius: 24px; padding: 16px; backdrop-filter: blur(14px);
+  }
+  .card.dark { background: rgba(27, 30, 22, 0.62); }
+  .card.light { background: rgba(249, 250, 239, 0.62); }
+  .card h4 {
+    margin: 0 0 12px; font-size: 15px; font-weight: 600; text-align: center;
+  }
+
+  .pill { display: flex; gap: 6px; margin: 0 0 16px; }
+  .pill > div {
+    flex: 1; height: 28px; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; box-sizing: border-box;
+  }
+  .pill > div:first-child { border-radius: 14px 4px 4px 14px; }
+  .pill > div:last-child { border-radius: 4px 14px 14px 4px; }
+  .pill.was > div { background: var(--m-surface-variant); color: var(--m-on-surface-variant); }
+  .pill.now > div {
+    background: var(--m-surface-highest); color: var(--m-on-surface);
+    border: 1px solid var(--m-outline);
+  }
+
+  .actions { display: flex; gap: 8px; }
+  .actions > div {
+    flex: 1; height: 38px; border-radius: 19px; display: flex; align-items: center;
+    justify-content: center; gap: 6px; font-size: 13px; font-weight: 600;
+  }
+  .actions.was > div { background: var(--m-secondary-container); color: var(--m-on-secondary-container); }
+  .actions.now > div { background: var(--m-primary-container); color: var(--m-on-primary-container); }
+
+  .caption { font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.6; margin: 0 0 8px; }
+  .pair { display: grid; gap: 18px; }
+</style>
+
+<main>
+  <h1>r23 — the switch and the manager's buttons</h1>
+  <p class="sub">Static green at ×1.6 (dynamic theme off), drawn at IMD's real geometry: 48×22 dp track, 30 dp thumb, 2 dp rim. Shipped in the r23 zip — tell me if you want a different variant and it is a one-line change.</p>
+
+  <h2>1 · The checked switch <span class="verdict shipped">shipped</span></h2>
+  <p class="note">You said the circle is very hard to see in dark mode. r22 used Material's own pairing — bright <code>primary</code> track, dark <code>onPrimary</code> thumb — which is contrasty but puts the dark half in the knob. Since this switch's thumb <em>overhangs</em> its track, a dark knob reads as a hole punched through a bright pill. r23 swaps them: the track becomes the recess, the thumb becomes the bright thing, and the rim now runs in both states so the two can never merge the way they did on the S22&nbsp;Ultra in r21.</p>
+  <div class="grid">
+    <div class="panel dark">
+      <h3>Dark · what you have (r22)</h3>
+      <div class="row"><span class="label">Developer settings</span><span class="sw v22 on"><span class="track"></span><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">USB debugging</span><span class="sw v22 on"><span class="track"></span><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">Wireless debugging</span><span class="sw off"><span class="track"></span><span class="thumb"></span></span></div>
+    </div>
+    <div class="panel dark">
+      <h3>Dark · r23</h3>
+      <div class="row"><span class="label">Developer settings</span><span class="sw v23 on"><span class="track"></span><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">USB debugging</span><span class="sw v23 on"><span class="track"></span><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">Wireless debugging</span><span class="sw off"><span class="track"></span><span class="thumb"></span></span></div>
+    </div>
+    <div class="panel light">
+      <h3>Light · what you have (r22)</h3>
+      <div class="row"><span class="label">Developer settings</span><span class="sw v22 on"><span class="track"></span><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">Wireless debugging</span><span class="sw off"><span class="track"></span><span class="thumb"></span></span></div>
+    </div>
+    <div class="panel light">
+      <h3>Light · r23</h3>
+      <div class="row"><span class="label">Developer settings</span><span class="sw v23 on"><span class="track"></span><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">Wireless debugging</span><span class="sw off"><span class="track"></span><span class="thumb"></span></span></div>
+    </div>
+  </div>
+
+  <h2>2 · The two button rows you annotated <span class="verdict shipped">shipped</span></h2>
+  <p class="note">Drawn on a translucent card over a photo, which is the condition that made them vanish — a subtle fill has nothing solid behind it. <strong>All off / All on</strong> stays neutral (your r2b3d pick: it belongs to the switches, not to the filled pair below) but climbs to the top of the surface ladder and gains a 1 dp <code>outline</code> rim, which reads at any card opacity. <strong>Hide settings / Revert to default</strong> go from <code>secondaryContainer</code> — a muted olive in dark — up to <code>primaryContainer</code>, the strongest container the scheme has.</p>
+
+  <div class="grid">
+    <div class="backdrop">
+      <p class="caption" style="color:#fff">Dark · what you have</p>
+      <div class="card dark">
+        <h4>Settings Manager</h4>
+        <div class="pill was"><div>All off</div><div>All on</div></div>
+        <div class="row" style="font-size:13px"><span class="label">Developer settings</span><span class="sw v22 on"><span class="track"></span><span class="thumb"></span></span></div>
+        <div class="row" style="font-size:13px"><span class="label">Shizuku service</span><span class="sw v22 on"><span class="track"></span><span class="thumb"></span></span></div>
+        <div class="actions was"><div>Hide settings</div><div>Revert to default</div></div>
+      </div>
+    </div>
+    <div class="backdrop">
+      <p class="caption" style="color:#fff">Dark · r23</p>
+      <div class="card dark">
+        <h4>Settings Manager</h4>
+        <div class="pill now"><div>All off</div><div>All on</div></div>
+        <div class="row" style="font-size:13px"><span class="label">Developer settings</span><span class="sw v23 on"><span class="track"></span><span class="thumb"></span></span></div>
+        <div class="row" style="font-size:13px"><span class="label">Shizuku service</span><span class="sw v23 on"><span class="track"></span><span class="thumb"></span></span></div>
+        <div class="actions now"><div>Hide settings</div><div>Revert to default</div></div>
+      </div>
+    </div>
+    <div class="backdrop">
+      <p class="caption" style="color:#fff">Light · r23</p>
+      <div class="card light">
+        <h4>Settings Manager</h4>
+        <div class="pill now"><div>All off</div><div>All on</div></div>
+        <div class="row" style="font-size:13px"><span class="label">Developer settings</span><span class="sw v23 on"><span class="track"></span><span class="thumb"></span></span></div>
+        <div class="row" style="font-size:13px"><span class="label">Shizuku service</span><span class="sw v23 on"><span class="track"></span><span class="thumb"></span></span></div>
+        <div class="actions now"><div>Hide settings</div><div>Revert to default</div></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>3 · What changed about the blur itself</h2>
+  <p class="note">Not visual to template, but it is the substance of the round: r19 and r22 both used <code>FLAG_BLUR_BEHIND</code>, which frosts <em>everything behind</em> the window on the same display-wide layer that does dim-behind — it is not bounded by the window at any size, which is why r22's window-shrink changed nothing and your home screen is still blurred edge to edge. r23 uses <code>Window.setBackgroundBlurRadius</code> instead, the API that blurs only the window's own area, clipped to its rounded background. The page behind a frosted manager is now identical to the page behind any other dialog.</p>
+  <p class="note">The blur dialog also now prints whether your device will frost a window at all, so the S22 Ultra question answers itself on the device rather than from my guess.</p>
+</main>

@@ -18,7 +18,7 @@
  */
 package com.android.geto.domain.usecase
 
-import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.UnhidingFramework
 import com.android.geto.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -37,7 +37,7 @@ class GetAutoRevertSettingsUseCase @Inject constructor(
 ) {
     data class Settings(
         val enabled: Boolean,
-        val notificationFunction: NotificationFunction,
+        val unhidingFramework: UnhidingFramework,
     )
 
     suspend operator fun invoke(): Settings {
@@ -45,7 +45,7 @@ class GetAutoRevertSettingsUseCase @Inject constructor(
 
         return Settings(
             enabled = userData.autoRevertOnReturn,
-            notificationFunction = userData.notificationFunction,
+            unhidingFramework = userData.unhidingFramework,
         )
     }
 }

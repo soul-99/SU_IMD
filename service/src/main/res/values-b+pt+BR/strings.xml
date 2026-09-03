@@ -21,4 +21,6 @@
     <string name="waiting_for_changes">Aguardando alterações…</string>
     <string name="unknown">Desconhecido</string>
     <string name="stop">Parar</string>
+    <string name="auto_hide_service_label">IMD+ (ocultar configurações automaticamente)</string>
+    <string name="auto_hide_service_description">Permite que o IMD perceba quando um dos apps escolhidos é aberto, para ocultar as suas configurações antes que esse app as veja. O IMD lê apenas qual app veio para a frente — nunca nada da sua tela.</string>
 </resources>

@@ -34,7 +34,7 @@
     <string name="favourite_apps_options">خيارات المفضّلة</string>
     <string name="no_favourite_apps">لا توجد مفضّلة بعد</string>
     <string name="no_matching_favourite_apps">لا توجد مفضّلة تطابق هذا البحث</string>
-    <string name="no_favourite_apps_subtitle">اضغط على النجمة بجوار أي تطبيق في “كل التطبيقات”، أو على النجمة في شاشة إعداداته.</string>
+    <string name="no_favourite_apps_subtitle">أضف التطبيقات بالضغط على أيقونة النجمة في تبويب «كل التطبيقات»</string>
     <string name="view">العرض</string>
     <string name="custom">مخصّص</string>
     <string name="alphabetical">أ-ي</string>
@@ -52,19 +52,22 @@
     <string name="settings_manager_configure_revert">تحديد ما الذي يستعيده زر الاستعادة</string>
     <string name="applied_settings_failure">تعذّر تطبيق الإعدادات</string>
     <string name="applied_settings_invalid">يحتوي هذا التطبيق على إعدادات بقيم غير صالحة</string>
-    <string name="settings_manager_title">مدير خدمات IMD</string>
+    <string name="settings_manager_title">مدير إعدادات</string>
 
     <!-- settings_manager_title and the two _name_ strings below are matched as substrings
          inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_open_settings">فتح إعدادات IMD</string>
     <string name="settings_manager_info">ما الذي تفعله هذه النافذة</string>
-    <string name="settings_manager_info_live">مدير خدمات IMD يعرض الحالة الحيّة للإعدادات والخدمات. وهو لا يحدّد الإعدادات أو الخدمات التي تُخفى أو يُلغى إخفاؤها عند فتح التطبيقات عبر IMD أو عبر اختصارات التطبيقات التي أنشأها IMD.</string>
+    <string name="settings_manager_info_live">يعرض مدير إعدادات IMD الحالة المباشرة للإعدادات ويغيّرها بسهولة.</string>
     <string name="settings_manager_info_live_extra">لتحديد ما الذي يُخفى وما الذي يظهر مجددًا عند فتح التطبيقات عبر IMD، يُرجى ضبط إعدادات IMD الافتراضية داخل تطبيق IMD.</string>
     <string name="settings_manager_info_name_defaults">إعدادات IMD الافتراضية</string>
     <string name="settings_manager_info_developer">إيقاف خيارات المطوّر عبر IMD لا يفعل أكثر من تشغيل مفتاح إعدادات المطوّر أو إيقافه، وهو لا يُعيد ضبط التغييرات التي أُجريت داخل إعدادات المطوّر (مثل مقياس الرسوم المتحركة، وتطبيق تحديد الموقع الوهمي… إلخ).</string>
     <string name="settings_manager_info_developer_extra">يمكنك إعادة ضبط إعدادات المطوّر بفتح صفحة إعدادات المطوّر وإيقافها من هناك.</string>
     <string name="settings_manager_info_name_reset">إعادة ضبط إعدادات المطوّر</string>
     <string name="revert_to_default">استعادة الوضع الافتراضي</string>
+    <string name="unhide_settings">إظهار الإعدادات</string>
     <string name="not_configured_title">لا توجد إعدادات لإخفائها، عليك تحديد الإعدادات المراد إخفاؤها لهذا التطبيق.</string>
+    <string name="nothing_to_hide_message">عليك أولًا تحديد الإعدادات المراد إخفاؤها من إعدادات تطبيق IMD.</string>
     <string name="not_configured_message">في تطبيق IMD اضغط مطوّلًا على هذا التطبيق لتحديد الإعدادات المراد إخفاؤها.</string>
     <string name="got_it">حسنًا</string>
     <string name="settings_manager_open">فتح %1$s</string>
@@ -78,7 +81,6 @@
     <string name="shizuku_help_point_setup">يُرجى التأكد من أن تطبيق Shizuku مثبَّت، ومسجَّل في ADB، ومهيَّأ بشكل صحيح في صفحة إعدادات تطبيق IMD.</string>
     <string name="shizuku_help_point_permission">لا يُستخدم إذن Shizuku في تطبيق IMD إلا لمنح إذن Android المميّز WRITE_SECURE_SETTINGS مرة واحدة. ولا يُستخدم لمعرفة حالة خدمة Shizuku ولا لتشغيل خدمة Shizuku أو إيقافها.</string>
     <string name="shizuku_help_point_restart">بعد إتمام الإعداد بشكل صحيح، يُرجى إعادة تشغيل تطبيق IMD ثم المحاولة مرة أخرى.</string>
-    <string name="settings_manager_shizuku_wait">يُرجى الانتظار 10 ثوانٍ، فبعض نسخ Shizuku المعدَّلة بطيئة في بدء الخدمة عبر الـ intents</string>
     <string name="revert_developer_settings">إعدادات المطوّر</string>
     <string name="revert_usb_debugging">تصحيح أخطاء USB</string>
     <string name="revert_wireless_debugging">تصحيح الأخطاء لاسلكيًا</string>
@@ -98,4 +100,34 @@
     <string name="settings_manager_overlay_restore_failed_open">لماذا لم تتم استعادة إذن العرض فوق التطبيقات الأخرى</string>
     <string name="shizuku_starting_to_restore_overlay">جارٍ تشغيل خدمة Shizuku لاستعادة إذن العرض فوق التطبيقات الأخرى</string>
     <string name="settings_manager_overlay_note">تُدار التطبيقات المحددة في إعدادات تطبيق IMD فقط</string>
+    <string name="shizuku_unmanageable">لا يمكن إدارة خدمة Shizuku من هنا، يرجى ضبط Shizuku بشكل صحيح في إعدادات IMD</string>
+    <string name="shevery_toggle_title">خدمة Shevery</string>
+    <string name="shevery_toggle_point_status">يعرض مدير إعدادات IMD الحالة الحية للخدمة فقط.</string>
+    <string name="shevery_toggle_point_intents">التبديل غير ممكن مع Shevery (الأوامر غير مدعومة)</string>
+    <string name="accessibility_none_managed">لم يتم تعيين أي خدمات وصول لإدارتها عبر IMD، يرجى ضبط الخدمات التي تريد إدارتها في إعدادات تطبيق IMD أولًا.</string>
+    <string name="shizuku_stopping_via_intent">محاولة إيقاف Shizuku باستخدام أمر الإيقاف</string>
+    <string name="shevery_toggle_point_open">افتح تطبيق Shevery مباشرة لإدارة الخدمة</string>
+    <string name="overlay_none_managed">لم يتم إعداد أي تطبيقات لإخفاء «العرض فوق التطبيقات الأخرى» منها.\nالرجاء إضافتها من إعدادات تطبيق IMD.</string>
+    <string name="auto_hide_conflict_title">‏يحتفظ IMD+ بإعداداتك مخفية</string>
+    <string name="auto_hide_conflict_body">‏سبق أن أخفى IMD+ القائمة العامة للجهاز، وملف هذا التطبيق يطلب شيئًا لا تشمله. إخفاء المزيد فوق ذلك سيترك إعدادات لا تعيدها أيٌّ من عمليتي الاستعادة.</string>
+    <string name="auto_hide_conflict_fix">‏استعِد IMD+ أولًا — من إشعاره أو من مربّع «إخفاء الإعدادات» — ثم افتح هذا التطبيق مرة أخرى.</string>
+    <string name="shizuku_starting">‏جارٍ بدء خدمة Shizuku</string>
+    <string name="settings_manager_busy_hiding">‏IMD يخفي الإعدادات، يرجى الانتظار...</string>
+    <string name="settings_manager_busy_unhiding">‏IMD يعيد إظهار الإعدادات، يرجى الانتظار...</string>
+    <string name="settings_manager_info_name_live">الحالة المباشرة</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">يرجى ضبط الإعدادات أولاً</string>
+    <string name="dooa_thedjchi_only">إدارة \"العرض فوق التطبيقات الأخرى\" مدعومة فقط في نسخة Thedjchi من Shizuku</string>
+    <string name="help_path_accessibility">إعدادات IMD ← إعدادات IMD الافتراضية ← خدمات إمكانية الوصول المراد إخفاؤها</string>
+    <string name="help_path_dooa">إعدادات IMD ← إعدادات IMD الافتراضية ← العرض فوق التطبيقات الأخرى الذي يديره IMD</string>
+    <string name="help_path_manage_shizuku">إعدادات IMD ← إعدادات Shizuku ← إدارة Shizuku</string>
+    <string name="hide_settings">إخفاء الإعدادات</string>
+    <string name="revert_shevery">خدمة Shevery</string>
+    <string name="settings_manager_all_off">إيقاف الكل</string>
+    <string name="settings_manager_all_on">تشغيل الكل</string>
+    <string name="settings_manager_only_selected">المحددة فقط</string>
+    <string name="settings_manager_pending">يقوم IMD بإخفاء الإعدادات حاليًا، وأي تغييرات تجريها هنا قبل إظهار الإعدادات ستُلغى بعد استعادتها</string>
+    <string name="shevery_service_first">يرجى تشغيل خدمة Shevery أولاً.</string>
+    <string name="shevery_wait_countdown">في انتظار تشغيل خدمة Shevery...(%1$d)</string>
+    <string name="shizuku_wait_countdown">في انتظار تشغيل خدمة Shizuku...(%1$d)</string>
 </resources>

@@ -28,23 +28,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.android.geto.designsystem.component.GetoSwitch
 import com.android.geto.designsystem.component.DialogContainer
+import com.android.geto.designsystem.component.GetoChoiceRow
 import com.android.geto.domain.model.SortLauncherAppsActivityInfo
 import com.android.geto.domain.model.SortOrderLauncherAppsActivityInfo
 import com.android.geto.feature.apps.R
@@ -61,19 +59,19 @@ internal fun SortLauncherAppsActivityInfoDialog(
     onUpdateSortOrderLauncherAppsActivityInfo: (SortOrderLauncherAppsActivityInfo) -> Unit,
     onUpdateShowSystem: (Boolean) -> Unit,
 ) {
-    var selectedSortLauncherAppsActivityInfoIndex by remember {
+    var selectedSortLauncherAppsActivityInfoIndex by rememberSaveable {
         mutableIntStateOf(
             SortLauncherAppsActivityInfo.entries.indexOf(sortLauncherAppsActivityInfo),
         )
     }
 
-    var selectedSortOrderLauncherAppsActivityInfoIndex by remember {
+    var selectedSortOrderLauncherAppsActivityInfoIndex by rememberSaveable {
         mutableIntStateOf(
             SortOrderLauncherAppsActivityInfo.entries.indexOf(sortOrderLauncherAppsActivityInfo),
         )
     }
 
-    var selectedShowSystem by remember { mutableStateOf(showSystem) }
+    var selectedShowSystem by rememberSaveable { mutableStateOf(showSystem) }
 
     DialogContainer(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -132,37 +130,34 @@ private fun SortLauncherAppsActivityInfoDialogSelection(
     onUpdateSelectedSortLauncherAppsActivityInfoIndex: (Int) -> Unit,
     onUpdateSelectedSortOrderLauncherAppsActivityInfoIndex: (Int) -> Unit,
 ) {
-    SingleChoiceSegmentedButtonRow {
-        SortLauncherAppsActivityInfo.entries.forEachIndexed { index, sortLauncherAppsActivityInfo ->
-            SegmentedButton(
-                selected = selectedSortLauncherAppsActivityInfoIndex == index,
-                onClick = { onUpdateSelectedSortLauncherAppsActivityInfoIndex(index) },
-                shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = SortLauncherAppsActivityInfo.entries.size,
-                ),
-            ) {
-                Text(text = sortLauncherAppsActivityInfo.getTitle())
-            }
-        }
-    }
+    // ⚠ **Soft pills rather than Material's outlined segments — the author's D1.** Same component
+    // role, same one-of-N semantics; what has gone is the hairline outline and the hard dividers.
+    // See GetoChoiceRow, which is where the drawing and the reasoning both live.
+    GetoChoiceRow(
+        options = SortLauncherAppsActivityInfo.entries,
+        selected = SortLauncherAppsActivityInfo.entries[selectedSortLauncherAppsActivityInfoIndex],
+        label = { it.getTitle() },
+        onSelect = {
+            onUpdateSelectedSortLauncherAppsActivityInfoIndex(
+                SortLauncherAppsActivityInfo.entries.indexOf(it),
+            )
+        },
+    )
 
     Spacer(modifier = Modifier.height(10.dp))
 
-    SingleChoiceSegmentedButtonRow {
-        SortOrderLauncherAppsActivityInfo.entries.forEachIndexed { index, sortOrderLauncherAppsActivityInfo ->
-            SegmentedButton(
-                selected = selectedSortOrderLauncherAppsActivityInfoIndex == index,
-                onClick = { onUpdateSelectedSortOrderLauncherAppsActivityInfoIndex(index) },
-                shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = SortOrderLauncherAppsActivityInfo.entries.size,
-                ),
-            ) {
-                Text(text = sortOrderLauncherAppsActivityInfo.getTitle())
-            }
-        }
-    }
+    GetoChoiceRow(
+        options = SortOrderLauncherAppsActivityInfo.entries,
+        selected = SortOrderLauncherAppsActivityInfo.entries[
+            selectedSortOrderLauncherAppsActivityInfoIndex,
+        ],
+        label = { it.getTitle() },
+        onSelect = {
+            onUpdateSelectedSortOrderLauncherAppsActivityInfoIndex(
+                SortOrderLauncherAppsActivityInfo.entries.indexOf(it),
+            )
+        },
+    )
 }
 
 @Composable
@@ -246,7 +241,7 @@ private fun ShowSystemSetting(
             )
         }
 
-        Switch(
+        GetoSwitch(
             checked = showSystem,
             onCheckedChange = onUpdateShowSystem,
         )

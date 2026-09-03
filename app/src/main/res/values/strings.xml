@@ -1,28 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">IMD</string>
-    <string name="app_full_form" translatable="false">SU IMD — Shut up! it’s my device</string>
+    <string name="app_full_form" translatable="false">IMD - It\'s My Device</string>
     <string name="favourite_apps">Favourites</string>
     <string name="all_apps">All Apps</string>
     <string name="settings">Settings</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Open banking and other restricted apps without turning on/ off these settings manually everytime:
-1. Developer settings
-2. Debugging
-3. Accessibility services
-4. Display over other apps (needs active Shizuku service)
-5. Shizuku service
-6. and many more (you need to manually configure them using Memory function of app, hint: use Settings observer to help yourself)</string>
     <!-- The three-step flow under the description. setup_how_number draws the numeral, so a
       translation never has to carry it. -->
     <string name="setup_how_title">How this works</string>
     <string name="setup_how_number">%1$d.</string>
-    <string name="setup_how_off">IMD turns these settings off</string>
+    <string name="setup_how_off">IMD turns the settings off</string>
     <string name="setup_how_off_note">No app\'s security policy is broken</string>
     <string name="setup_how_use">You use your app</string>
     <string name="setup_how_revert">Revert</string>
-    <string name="setup_how_on">IMD turns those settings on again</string>
+    <string name="setup_how_on">IMD turns the settings on again</string>
     <string name="setup_step">Step %1$d</string>
     <string name="setup_granted">Granted</string>
     <string name="setup_not_granted">Not granted</string>
@@ -32,18 +25,26 @@
     <string name="setup_copy_command">Copy command</string>
     <string name="setup_check_again">Check again</string>
     <string name="setup_use_shizuku">Use Shizuku</string>
-    <string name="services_shortcut_label">Services manager</string>
+    <string name="services_shortcut_label">Settings manager</string>
+    <string name="hide_unhide_shortcut_label">Hide/unhide Settings</string>
     <string name="revert_shortcut_label">Revert to default</string>
     <string name="shortcut_not_configured_title">Nothing configured for this app</string>
-    <string name="shortcut_not_configured_message">You first need to configure which settings to hide for this app in IMD → All apps → click on app name → Settings template → select which settings to hide.</string>
+    <string name="shortcut_not_configured_message">You first need to configure which settings to hide for this app in IMD → All apps → long press on app name → Settings template → select which settings to hide.</string>
     <string name="shortcut_not_configured_dismiss">Got it</string>
     <string name="obtainium_title">Keeping this app up to date</string>
     <string name="obtainium_body">As this app is completely offline, please use Obtainium to check for updates and install them directly from GitHub releases.</string>
     <string name="obtainium_do_not_show_again">Do not show again</string>
     <string name="obtainium_add">Add to Obtainium</string>
     <string name="tip">Tip</string>
+    <!-- ⚠ Unshown since r4o, when the author removed the tip after setup. Left declared
+      because their locale copies are frozen along with every other translation. -->
+    <!-- The Shizuku page in setup. The author's words, with a leading capital on each. -->
+    <string name="shizuku_setup_manage">Manage shizuku configuration</string>
+    <string name="shizuku_setup_skip">Skip</string>
+    <string name="shizuku_setup_fill_first">Please fill all fields first</string>
+
     <string name="tip_got_it">Got it</string>
-    <string name="tip_developer_options">You don\'t need to keep developer options enabled for Shizuku, so you can leave them switched off. When Shizuku starts its service it enables USB debugging on its own, without enabling developer settings, using its own WRITE_SECURE_SETTINGS permission.</string>
+    <string name="tip_developer_options">You don\'t need to keep developer options enabled for Shizuku, so you can leave them switched off. Shizuku itself enables USB debugging on its own when attempting to start service.</string>
     <string name="setup_shizuku_working">Asking Shizuku…</string>
     <string name="setup_shizuku_granted">Granted through Shizuku.</string>
     <string name="setup_shizuku_not_running">No Shizuku service found. Start Shizuku, then try again.</string>
@@ -59,6 +60,34 @@
     <string name="setup_allow_notifications">Allow</string>
     <string name="setup_open_settings">Open settings</string>
     <string name="setup_notifications_denied_hint">Already refused twice? Android stops showing the prompt — use Open settings instead.</string>
+    <!-- The closing page of setup, the author's own wording. Its nested numbering is
+         written into the strings rather than drawn, so a translation can renumber if its
+         own conventions differ. -->
+    <string name="setup_done_title">Setup is now almost complete</string>
+    <string name="setup_done_1">1. Now simply launch your problematic apps by clicking on them in IMD.</string>
+    <string name="setup_done_2">2. For quick access:</string>
+    <string name="setup_done_2_1">1. Long press app icons to create homescreen shortcuts</string>
+    <string name="setup_done_2_2">2. Add apps to favourite tab</string>
+    <string name="setup_done_2_3">3. Add Hide settings quick settings toggle</string>
+    <string name="setup_done_2_3_tip">(tip: long pressing toggle opens Settings manager)</string>
+    <string name="setup_done_3">3. Use IMD\'s own Settings manager:</string>
+    <string name="setup_done_3_1">1. Use Settings manager app icon in your app drawer</string>
+    <string name="setup_done_3_2">2. Add Settings manager quick settings toggle</string>
+    <string name="setup_done_4">4. The setup is now complete but you are recommended to checkout:</string>
+    <string name="setup_done_4_1">1. Auto unhide settings (RECOMMENDED)</string>
+    <string name="setup_done_4_2">2. Auto hide settings (IMD+, needs background service)</string>
+    <string name="setup_done_4_3">3. All other settings for deeper customisation</string>
+    <string name="setup_done_4_4">4. IMD intents (Tasker / Macrodroid...etc integration)</string>
+    <string name="setup_done_add_tile">Add toggle</string>
+    <string name="setup_done_go">Let\'s go</string>
+    <string name="setup_done_signature" translatable="false">Made with \uD83D\uDC9D by soul_99</string>
+    <!-- The four configuration steps' headings, the author's own wording. -->
+    <string name="setup_step_accessibility">Select accessibility services to hide / manage</string>
+    <string name="setup_step_overlay">Select Display over other apps to hide / manage</string>
+    <string name="setup_step_manager_rows">Setting manager toggles</string>
+    <string name="setup_step_customise_ui">Customise UI</string>
+    <string name="setup_step_settings_to_hide">Select settings to hide / unhide</string>
+    <string name="setup_step_auto_unhide">Setup auto unhide settings service</string>
     <string name="setup_next">Next</string>
     <string name="setup_back">Back</string>
     <string name="setup_finish">Get started</string>
@@ -70,4 +99,9 @@
     <string name="setup_blocked">Both steps are required. The app cannot change or restore a single setting without them.</string>
     <string name="setup_copied">Copied</string>
     <string name="setup_open_settings_failed">Could not open settings on this device</string>
+    <string name="hide_tile_label">Hide settings</string>
+    <string name="hide_tile_visible">Settings visible</string>
+    <string name="hide_tile_hidden">Settings hidden</string>
+    <string name="hide_tile_working">Hiding settings…</string>
+    <string name="hide_tile_unhiding">Unhiding settings…</string>
 </resources>

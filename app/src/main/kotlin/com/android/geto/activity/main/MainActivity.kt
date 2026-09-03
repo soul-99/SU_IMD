@@ -26,11 +26,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
@@ -41,18 +43,24 @@ import com.android.geto.broadcastreceiver.AutoRevertRunner
 import com.android.geto.common.AppLocale
 import com.android.geto.common.ApplicationScope
 import com.android.geto.common.AutoRevertPending
+import com.android.geto.common.PriorHideRestore
+import com.android.geto.common.EXTRA_OPEN_ADVANCED_SETTINGS
 import com.android.geto.common.EXTRA_OPEN_REVERT_CONFIGURATION
+import com.android.geto.designsystem.component.LocalAdvancedSettingsRequest
 import com.android.geto.designsystem.component.LocalRevertConfigurationRequest
+import com.android.geto.designsystem.component.PriorHideDialog
+import com.android.geto.designsystem.component.WaitingDialog
 import com.android.geto.designsystem.theme.GetoTheme
+import com.android.geto.designsystem.theme.GetoBlurSettings
 import com.android.geto.domain.framework.ShizukuWrapper
 import com.android.geto.feature.settings.dialog.RevertDefaultsNoticeDialog
+import com.android.geto.feature.settings.dialog.DeveloperNoteDialog
 import com.android.geto.framework.launcherapps.AndroidLauncherAppsWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import com.android.geto.navigation.GetoNavHost
 import com.android.geto.onboarding.LanguageSetupScreen
 import com.android.geto.onboarding.ObtainiumDialog
 import com.android.geto.onboarding.SetupScreen
-import com.android.geto.onboarding.TipDialog
 import com.android.geto.onboarding.rememberSetupState
 import com.android.geto.ui.local.LocalLauncherApps
 import com.android.geto.ui.local.LocalNotificationManager
@@ -60,6 +68,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.android.geto.common.R as commonR
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -99,12 +108,23 @@ class MainActivity : ComponentActivity() {
      */
     private var revertConfigurationRequest by mutableIntStateOf(0)
 
+    /**
+     * Whether this launch was asked to open Settings with Advanced expanded.
+     *
+     * Counted rather than flagged, matching the request above, though only one thing sends
+     * this one and it re-launches the app to do it - so in practice it goes from 0 to 1 once
+     * and stays there for the life of the activity.
+     */
+    private var advancedSettingsRequest by mutableIntStateOf(0)
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
         setIntent(intent)
 
         consumeRevertConfigurationRequest(intent)
+
+        consumeAdvancedSettingsRequest(intent)
     }
 
     /**
@@ -120,6 +140,15 @@ class MainActivity : ComponentActivity() {
         intent.removeExtra(EXTRA_OPEN_REVERT_CONFIGURATION)
 
         revertConfigurationRequest += 1
+    }
+
+    /** The same read-and-remove, for the re-launch that follows a change of mechanism. */
+    private fun consumeAdvancedSettingsRequest(intent: Intent) {
+        if (!intent.getBooleanExtra(EXTRA_OPEN_ADVANCED_SETTINGS, false)) return
+
+        intent.removeExtra(EXTRA_OPEN_ADVANCED_SETTINGS)
+
+        advancedSettingsRequest += 1
     }
 
     /**
@@ -149,6 +178,8 @@ class MainActivity : ComponentActivity() {
 
         consumeRevertConfigurationRequest(intent)
 
+        consumeAdvancedSettingsRequest(intent)
+
         // ON_STOP, not ON_PAUSE: a dialog, the notification shade and the recents overlay all
         // pause this activity without the user having gone anywhere, and any of them would
         // otherwise count as leaving the app and arm a revert the moment they came back.
@@ -173,10 +204,27 @@ class MainActivity : ComponentActivity() {
                 LocalLauncherApps provides androidLauncherAppsWrapper,
                 LocalNotificationManager provides androidNotificationManagerWrapper,
                 LocalRevertConfigurationRequest provides revertConfigurationRequest,
+                LocalAdvancedSettingsRequest provides advancedSettingsRequest,
             ) {
                 val navController = rememberNavController()
 
                 val mainActivityUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                val priorHide by viewModel.priorHide.collectAsStateWithLifecycle()
+
+                // For the Shizuku setup page's package picker. Empty until the section asks,
+                // which it does when it is first composed - so nothing is enumerated for a
+                // user who never reaches that page.
+                val installedApps by viewModel.installedApps.collectAsStateWithLifecycle()
+
+                val installedAppsRevision by viewModel.installedAppsRevision
+                    .collectAsStateWithLifecycle()
+
+                // One reader for all four in-app routes. The apps list, favourites and the
+                // per-app settings screen are all inside the nav host below, so a spinner in
+                // each of them would be three spinners on one window.
+                val priorHideRestoring by PriorHideRestore.running
+                    .collectAsStateWithLifecycle()
 
                 when (val uiState = mainActivityUiState) {
                     MainActivityUiState.Loading -> Unit
@@ -185,6 +233,13 @@ class MainActivity : ComponentActivity() {
                         GetoTheme(
                             theme = uiState.userData.theme,
                             dynamicTheme = uiState.userData.dynamicTheme,
+                            oledBackground = uiState.userData.oledBackground,
+                            blurSettings = GetoBlurSettings(
+                                enabled = uiState.userData.progressiveBlur,
+                                radiusDp = uiState.userData.blurRadiusDp,
+                                tintPercent = uiState.userData.blurTintPercent,
+                                fadeDp = uiState.userData.blurFadeDp,
+                            ),
                         ) {
                             Surface {
                                 val setupState = rememberSetupState()
@@ -268,6 +323,11 @@ class MainActivity : ComponentActivity() {
                                         // already satisfied and asking again would read as
                                         // the app having forgotten.
                                         remindersOnly = !permissionsMissing && remindersDue,
+                                        userData = uiState.userData,
+                                        installedApps = installedApps,
+                                        installedAppsRevision = installedAppsRevision,
+                                        onRefreshInstalledApps = viewModel::refreshInstalledApps,
+                                        onSaveShizuku = viewModel::saveShizukuConfiguration,
                                         grantViaShizuku = {
                                             shizukuWrapper.grantWriteSecureSettings(
                                                 packageName = packageName,
@@ -282,6 +342,16 @@ class MainActivity : ComponentActivity() {
                                         },
                                     )
                                 } else {
+                                    // Asked here rather than at the top of the activity, so a
+                                    // first run being walked through permissions is not
+                                    // interrupted by a report about a device it has not
+                                    // touched yet. Keyed on Unit: once per composition of this
+                                    // branch, and the ViewModel's own flag makes it once per
+                                    // process.
+                                    LaunchedEffect(Unit) {
+                                        viewModel.checkPriorHide()
+                                    }
+
                                     GetoNavHost(navController = navController)
 
                                     // Gated on a stored flag rather than on "has setup
@@ -295,13 +365,52 @@ class MainActivity : ComponentActivity() {
                                     // change the app made to their device rather than
                                     // offering advice, and because it is the only one of
                                     // the three that is ever shown to an existing install.
-                                    if (uiState.userData.revertDefaultsNoticePending) {
+                                    // First of the four, because it is the one that says
+                                    // where things moved — reading it after being told what
+                                    // changed underneath would be back to front. Only ever
+                                    // shown to an install that existed before this version:
+                                    // setupNoticeVersion is zero until somebody finishes
+                                    // setup, which is the app's only record of that.
+                                    // Ahead of all four, and not one of them: they are
+                                    // advice about the app, this is a report that the device
+                                    // is still locked down by a run of IMD that is gone.
+                                    if (priorHide) {
+                                        PriorHideDialog(
+                                            title = stringResource(
+                                                commonR.string.prior_hide_title,
+                                            ),
+                                            restoreLabel = stringResource(
+                                                commonR.string.prior_hide_restore,
+                                            ),
+                                            ignoreLabel = stringResource(
+                                                commonR.string.prior_hide_ignore,
+                                            ),
+                                            onRestore = viewModel::restorePriorHide,
+                                            onIgnore = viewModel::discardPriorHide,
+                                        )
+                                    } else if (priorHideRestoring) {
+                                        // Second in the chain, so a notice cannot appear over
+                                        // the restore the user has just asked for.
+                                        WaitingDialog(
+                                            text = stringResource(
+                                                commonR.string.prior_hide_restoring,
+                                            ),
+                                        )
+                                    } else if (uiState.userData.upgradedToV3 &&
+                                        uiState.userData.settingsNoticeRevision <
+                                        SETTINGS_NOTICE_REVISION
+                                    ) {
+                                        DeveloperNoteDialog(
+                                            onDismissRequest =
+                                                viewModel::acknowledgeSettingsTabNotice,
+                                        )
+                                    } else if (uiState.userData.revertDefaultsNoticePending) {
                                         RevertDefaultsNoticeDialog(
+                                            unhidingFramework =
+                                                uiState.userData.unhidingFramework,
                                             onDismissRequest =
                                                 viewModel::acknowledgeRevertDefaultsNotice,
                                         )
-                                    } else if (!uiState.userData.tipShown) {
-                                        TipDialog(onDismissRequest = viewModel::markTipShown)
                                     } else if (!uiState.userData.obtainiumTipShown) {
                                         ObtainiumDialog(
                                             onDismissRequest = viewModel::markObtainiumTipShown,

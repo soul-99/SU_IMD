@@ -51,15 +51,24 @@ import com.android.geto.framework.notificationmanager.R
  *
  * Ongoing, so it stays until a restore actually succeeds - the device is still changed until
  * then, and a prompt that disappeared on a tap or a stray swipe would be retiring a problem
- * that has not gone away. Tapping the body opens the services manager instead of dismissing
- * it.
+ * that has not gone away. Tapping the body opens the **current Shizuku app** instead of
+ * dismissing it - r4n, the author's instruction, and the same thing its sibling
+ * [buildShizukuRevertFailedNotification] does: the text has just asked the user to start
+ * Shizuku by hand, and the tap should put them where they can.
+ *
+ * [shizukuPackage] is the fork configured in IMD. If it is blank, or has no launcher entry -
+ * uninstalled since it was configured, or a stealth build with no icon - the tap falls back to
+ * IMD's own services manager, which can at least report the state and offer to start it.
  *
  * Nothing is lost even if it is cleared - by the system, or by the user swiping it away, which
  * Android 14 allows even on an ongoing notification. The held-packages debt is persisted and is
  * never cleared by a failure, so **Revert to default** still puts overlay access back
  * afterwards, from the manager or the tile or the ongoing revert notification.
  */
-fun buildOverlayRestoreFailedNotification(context: Context): Notification {
+fun buildOverlayRestoreFailedNotification(
+    context: Context,
+    shizukuPackage: String,
+): Notification {
     val retryIntent = Intent(context, OverlayRestoreRetryBroadcastReceiver::class.java).apply {
         action = ACTION_RETRY_OVERLAY_RESTORE
     }
@@ -71,21 +80,28 @@ fun buildOverlayRestoreFailedNotification(context: Context): Notification {
         FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
     )
 
-    // Tapping the body opens the services manager, which is where the cause can be dealt
-    // with: Shizuku can be started from its row there, or from that row's arrow out to the
-    // Shizuku app. The restore itself is then this notification's Try again button, which is
-    // still in the shade because the tap does not clear it - and which is the only way back
-    // through the UI when overlay management is switched off, since the overlay row is not
-    // drawn at all then. NEW_TASK because the shade is not an activity context, CLEAR_TOP so
-    // a manager already open is reused rather than stacked behind itself.
-    val managerIntent = Intent()
-        .setClassName(context, SettingsObservationGate.SERVICES_ACTIVITY_CLASS_NAME)
-        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    // ⚠ **The Shizuku app, not the services manager - r4n.** The text tells the user to
+    // start Shizuku by hand and this is where they do it. The restore itself stays on the
+    // Try again button, which is still in the shade because the tap does not clear it - and
+    // which remains the only way back through the UI when overlay management is switched
+    // off, since the overlay row is not drawn at all then.
+    //
+    // The fallback is the services manager, for a package that is blank or has no launcher
+    // entry: uninstalled since it was configured, or a stealth build with no icon. NEW_TASK
+    // because the shade is not an activity context, CLEAR_TOP so a manager already open is
+    // reused rather than stacked behind itself.
+    val launchIntent = shizukuPackage
+        .takeIf { it.isNotBlank() }
+        ?.let { context.packageManager.getLaunchIntentForPackage(it) }
+        ?.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+        ?: Intent()
+            .setClassName(context, SettingsObservationGate.SERVICES_ACTIVITY_CLASS_NAME)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
-    val managerPendingIntent = PendingIntent.getActivity(
+    val launchPendingIntent = PendingIntent.getActivity(
         context,
         OVERLAY_RESTORE_NOTIFICATION_ID,
-        managerIntent,
+        launchIntent,
         FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
     )
 
@@ -93,7 +109,7 @@ fun buildOverlayRestoreFailedNotification(context: Context): Notification {
         context,
         AndroidNotificationManagerWrapper.ALERT_NOTIFICATION_CHANNEL_ID,
     ).apply {
-        setSmallIcon(R.drawable.ic_revert_notification_small)
+        setSmallIcon(R.drawable.ic_failure_notification_small)
         setContentTitle(context.getString(R.string.overlay_restore_failed_title))
         setContentText(context.getString(R.string.overlay_restore_failed_text))
 
@@ -105,7 +121,7 @@ fun buildOverlayRestoreFailedNotification(context: Context): Notification {
         )
         // PRIORITY_HIGH is what produces the banner below API 26; the channel's importance
         // is what does it from 26 up. Both are set because the app still supports API 24.
-        setContentIntent(managerPendingIntent)
+        setContentIntent(launchPendingIntent)
 
         // Stays up, and survives the tap. Overlay access is still withdrawn from apps that
         // had it until a restore actually succeeds, so a prompt that vanished on the first
@@ -118,7 +134,7 @@ fun buildOverlayRestoreFailedNotification(context: Context): Notification {
         setCategory(NotificationCompat.CATEGORY_ERROR)
         setDefaults(NotificationCompat.DEFAULT_ALL)
         addAction(
-            R.drawable.ic_revert_notification_small,
+            R.drawable.ic_failure_notification_small,
             context.getString(R.string.overlay_restore_retry),
             retryPendingIntent,
         )

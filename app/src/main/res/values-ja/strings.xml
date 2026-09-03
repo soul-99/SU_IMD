@@ -15,13 +15,6 @@
     <string name="settings">設定</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">毎回これらの設定を手動でオン・オフすることなく、銀行アプリなどの制限されたアプリを開けます:
-1. Developer settings
-2. Debugging
-3. Accessibility services
-4. 他のアプリの上に重ねて表示（実行中の Shizuku サービスが必要）
-5. Shizuku サービス
-6. そのほか多数（アプリの Memory function で手動設定が必要です。ヒント: Settings observer が役立ちます）</string>
     <string name="setup_step">ステップ %1$d</string>
     <string name="setup_granted">許可済み</string>
     <string name="setup_not_granted">未許可</string>
@@ -30,10 +23,10 @@
     <string name="setup_copy_command">コマンドをコピー</string>
     <string name="setup_check_again">もう一度確認</string>
     <string name="setup_use_shizuku">Shizuku を使う</string>
-    <string name="services_shortcut_label">サービスマネージャー</string>
+    <string name="services_shortcut_label">設定マネージャー</string>
     <string name="revert_shortcut_label">デフォルトに戻す</string>
     <string name="shortcut_not_configured_title">このアプリには何も設定されていません</string>
-    <string name="shortcut_not_configured_message">まず、このアプリで非表示にする設定を指定する必要があります。IMD → すべてのアプリ → アプリ名をタップ → 設定テンプレート → 非表示にする設定を選択、の順に進んでください。</string>
+    <string name="shortcut_not_configured_message">まず、このアプリで非表示にする設定を指定する必要があります。IMD → すべてのアプリ → アプリ名を長押し → 設定テンプレート → 非表示にする設定を選択、の順に進んでください。</string>
     <string name="shortcut_not_configured_dismiss">わかりました</string>
     <string name="obtainium_title">このアプリを最新に保つには</string>
     <string name="obtainium_body">このアプリは完全にオフラインで動作するため、更新の確認と GitHub リリースからの直接インストールには Obtainium をご利用ください。</string>
@@ -69,10 +62,43 @@
     <string name="setup_open_settings_failed">このデバイスでは設定を開けませんでした</string>
     <string name="setup_name_display_over_other_apps">他のアプリの上に重ねて表示</string>
     <string name="setup_how_title">仕組み</string>
-    <string name="setup_how_off">IMD がこれらの設定をオフにします</string>
+    <string name="setup_how_off">IMD が設定をオフにします</string>
     <string name="setup_how_off_note">どのアプリのセキュリティポリシーも破りません</string>
     <string name="setup_how_use">ご自身のアプリを使います</string>
     <string name="setup_how_revert">Revert</string>
-    <string name="setup_how_on">IMD がそれらの設定を再びオンに戻します</string>
+    <string name="setup_how_on">IMD が設定を再びオンに戻します</string>
     <string name="setup_how_number">%1$d.</string>
+    <string name="hide_tile_label">設定を非表示</string>
+    <string name="hide_tile_visible">設定 表示中</string>
+    <string name="hide_tile_hidden">設定 非表示</string>
+    <string name="hide_tile_working">設定を非表示にしています…</string>
+    <string name="hide_tile_unhiding">設定を再表示しています…</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="hide_unhide_shortcut_label">設定の非表示/再表示</string>
+    <string name="setup_done_1">1. あとは IMD 内で問題のあるアプリをタップして起動するだけです。</string>
+    <string name="setup_done_2">2. すばやく使うには:</string>
+    <string name="setup_done_2_1">1. アプリのアイコンを長押しするとホーム画面のショートカットを作成できます</string>
+    <string name="setup_done_2_2">2. アプリをお気に入りタブに追加します</string>
+    <string name="setup_done_2_3">3. 「設定を非表示」のクイック設定タイルを追加します</string>
+    <string name="setup_done_2_3_tip">（ヒント: タイルを長押しすると設定マネージャーが開きます）</string>
+    <string name="setup_done_3">3. IMD 自身の設定マネージャーを使います:</string>
+    <string name="setup_done_3_1">1. アプリ一覧にある設定マネージャーのアイコンを使います</string>
+    <string name="setup_done_3_2">2. 「設定マネージャー」のクイック設定タイルを追加します</string>
+    <string name="setup_done_4">4. これでセットアップは完了ですが、次もぜひご覧ください:</string>
+    <string name="setup_done_4_1">1. 自動再表示の設定（推奨）</string>
+    <string name="setup_done_4_2">2. 設定の自動非表示（IMD+、バックグラウンドサービスが必要）</string>
+    <string name="setup_done_4_3">3. さらに細かくカスタマイズするための、その他すべての設定</string>
+    <string name="setup_done_4_4">4. IMD intents（Tasker / Macrodroid... などとの連携）</string>
+    <string name="setup_done_add_tile">タイルを追加</string>
+    <string name="setup_done_go">はじめる</string>
+    <string name="setup_done_title">セットアップはあと少しで完了です</string>
+    <string name="setup_step_accessibility">非表示 / 管理するユーザー補助サービスを選択</string>
+    <string name="setup_step_auto_unhide">自動再表示の設定サービスをセットアップ</string>
+    <string name="setup_step_customise_ui">UI をカスタマイズ</string>
+    <string name="setup_step_manager_rows">設定マネージャーのスイッチ</string>
+    <string name="setup_step_overlay">非表示 / 管理する「他のアプリの上に重ねて表示」を選択</string>
+    <string name="setup_step_settings_to_hide">非表示 / 再表示する設定を選択</string>
+    <string name="shizuku_setup_fill_first">先にすべての項目を入力してください</string>
+    <string name="shizuku_setup_manage">Shizuku の構成を管理</string>
+    <string name="shizuku_setup_skip">スキップ</string>
 </resources>

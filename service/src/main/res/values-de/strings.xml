@@ -20,4 +20,6 @@
     <string name="waiting_for_changes">Warte auf Änderungen…</string>
     <string name="unknown">Unbekannt</string>
     <string name="stop">Beenden</string>
+    <string name="auto_hide_service_label">IMD+ (Einstellungen automatisch ausblenden)</string>
+    <string name="auto_hide_service_description">Damit IMD bemerkt, wenn eine deiner ausgewählten Apps geöffnet wird, und deine Einstellungen ausblenden kann, bevor diese App sie sieht. IMD liest nur, welche App in den Vordergrund kam — niemals etwas von deinem Bildschirm.</string>
 </resources>

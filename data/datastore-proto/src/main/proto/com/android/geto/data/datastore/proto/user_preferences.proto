@@ -26,6 +26,9 @@ import "com/android/geto/data/datastore/proto/sort_favourite_apps.proto";
 import "com/android/geto/data/datastore/proto/favourite_apps_view.proto";
 import "com/android/geto/data/datastore/proto/shizuku_fork_mode.proto";
 import "com/android/geto/data/datastore/proto/notification_function.proto";
+import "com/android/geto/data/datastore/proto/hiding_framework.proto";
+import "com/android/geto/data/datastore/proto/unhiding_framework.proto";
+import "com/android/geto/data/datastore/proto/icon_style.proto";
 
 option java_package = "com.android.geto.data.datastore.proto";
 option java_multiple_files = true;
@@ -248,8 +251,417 @@ message UserPreferences {
    */
   bool taskerIntegrationEnabled = 40;
 
+  /*
+   * Whether the one-time v2.1 freeze of the settings-to-hide default has run.
+   *
+   * v2.1 changes what a fresh install starts with from "the four secure settings" to
+   * "nothing", so that an install nobody has configured never changes a device on its own.
+   * An install that predates this and had never opened the dialog was behaving as the old
+   * default, and its behaviour must not change underneath it - so on the first run of this
+   * version that old default is written down as its answer, once. An install that had
+   * configured the dialog already has one and is not touched.
+   */
+  bool settingsToHideDefaultsV21 = 41;
+
+  /*
+   * Whether the device-wide "Settings to hide" is currently applied.
+   *
+   * The one half of "are settings hidden right now" that cannot be worked out from anything
+   * else. The memory function's half can: an app it has hidden settings for still has its
+   * pre-launch snapshot stored, so that side is derived and can never drift. A "Settings to
+   * hide" run leaves no comparable trace - it switches things off and, for a configuration
+   * that names only the secure settings, records nothing at all - so it has to say so here.
+   *
+   * Written true by that run and false by a revert to default, wherever either is triggered
+   * from, which is what lets the Quick Settings tile follow a revert fired from a
+   * notification, an intent or a shortcut without the tile having been involved.
+   *
+   * Deliberately not touched by the services manager's own switches. Flipping one setting by
+   * hand is not "the device is hidden", and treating it as such would make the tile claim a
+   * state no revert had been asked to undo.
+   */
+  bool settingsHiddenDeviceWide = 42;
+
+  /*
+   * ---- Auto-hide settings (IMD+) ----
+   *
+   * The feature that hides settings when a watched app is opened from the launcher, rather
+   * than waiting for the app to be opened from inside IMD.
+   */
+
+  /*
+   * Whether the user has switched IMD+ on.
+   *
+   * Stored separately from whether it *can* run: every requirement it depends on - the
+   * accessibility service, Shizuku, battery optimisation, notifications - is read live from
+   * the system, because any of them can be taken away by somebody else at any time. This is
+   * only the user's own answer, and the switch reads off whenever the live requirements do
+   * not agree with it.
+   */
+  bool autoHideEnabled = 43;
+
+  /* The apps IMD+ watches for. It does nothing at all for anything not named here. */
+  repeated string autoHidePackages = 44;
+
+  /*
+   * "Do not kill app on first launch."
+   *
+   * Off by default and recommended off: killing the app is what guarantees it has not
+   * already read the settings before IMD hid them. On, the app is left running and simply
+   * meets whatever state the hide arrives at.
+   *
+   * It is also the only thing that decides whether IMD+ needs Shizuku at all: killing an
+   * app is the one thing IMD+ asks Shizuku for on its own account, so with this on the
+   * Shizuku requirements stop applying.
+   */
+  bool autoHideNoKillOnLaunch = 45;
+
+  /*
+   * What [autoHideEnabled] was before a hide took the accessibility service away.
+   *
+   * IMD hides its own detector along with every other accessibility service, so the switch
+   * has to read off for as long as settings are hidden - it genuinely cannot work. Turning
+   * it *off* in storage would be wrong, though: the user never asked for that, and a revert
+   * has to put back what they chose. So the answer is parked here for the duration.
+   */
+  bool autoHideEnabledBeforeHide = 47;
+
+  /*
+   * Whether the settings hidden right now were hidden by IMD+.
+   *
+   * Distinct from settingsHiddenDeviceWide, which says only that the device-wide list is
+   * applied. Which of the two put it there decides what the notification says, which revert
+   * a press of it runs, and what a launch from inside IMD is allowed to do while it stands.
+   */
+  bool autoHideRunning = 48;
+
+  /*
+   * Whether auto unhide is switched on.
+   *
+   * Like autoHideEnabled this is only what the user asked for. Whether it can actually run is
+   * read live from the system every time the page is drawn - a permission revoked outside IMD
+   * must not leave a stored "on" claiming a feature that has quietly stopped working.
+   */
+  bool autoUnhideEnabled = 49;
+
+  /*
+   * The three end-of-session triggers, independently switchable.
+   *
+   * Swiping the app away from recents is the precise one; the other two are backups for the
+   * sessions a user simply walks away from. At least one has to be on or there is nothing for
+   * the feature to wait for, which is why the switch refuses to move without one.
+   */
+  bool autoUnhideOnSwipe = 50;
+  bool autoUnhideOnScreenLock = 51;
+  bool autoUnhideOnIdle = 52;
+
+  /*
+   * How long each backup waits before it decides the session is over, in minutes.
+   *
+   * Zero means never written rather than "revert immediately", and the defaults stand in for
+   * it - a literal zero would put the settings back the moment the screen went off, which is
+   * the one answer no user would have chosen.
+   */
+  int32 autoUnhideScreenLockMinutes = 53;
+  int32 autoUnhideIdleMinutes = 54;
+
+  /*
+   * Which kinds of hide auto unhide is allowed to end.
+   *
+   * "App launches" covers every hide that names an app - from inside IMD, from a generated
+   * shortcut, and from IMD+ - because those are the ones with something to watch. The tile
+   * names no app at all, so a session it started can only ever be ended by the screen-lock
+   * backup; the page says so under the checkbox rather than leaving it to be discovered.
+   *
+   * At least one is always ticked. With neither, the feature is switched on and can never
+   * act, which is worse than being off because the user would believe their settings were
+   * coming back.
+   */
+  bool autoUnhideOnAppLaunch = 56;
+  bool autoUnhideOnTile = 57;
+
+  /*
+   * Whether the two flags above were ever actually saved.
+   *
+   * Proto3 bools decode to false, so a fresh install cannot be told from a user who cleared
+   * both - and they need opposite answers: the first arrives with both on, the second is
+   * left as it was chosen. Same device as revertDefaultsConfigured and
+   * settingsToHideConfigured, for the same reason.
+   *
+   * The three *trigger* flags need no such thing any more: they now arrive off, which is
+   * exactly what proto3 already decodes them to. 55 held their configured flag and is
+   * reserved below.
+   */
+  bool autoUnhideUsedForConfigured = 58;
+
+  /*
+   * Whether the diagnostic log is being recorded.
+   *
+   * Stored so it survives a restart - a problem that only shows up after a reboot is exactly
+   * the kind worth recording, and a switch that reset itself would miss it. Nothing runs
+   * because this is true: recording is an append on code paths that were already executing,
+   * so with nothing hidden and IMD+ off it costs nothing at all.
+   */
+  bool diagnosticsEnabled = 59;
+
+  /*
+   * Whether the user has ever switched Auto hide settings (IMD+) on themselves.
+   *
+   * Not the same question as autoHideEnabled, and the difference is the whole point. IMD's own
+   * accessibility service can be switched off by things that are not the user - a manager
+   * toggle, an OEM cleaner, a restore onto a new device - and when it is, IMD+ stops meeting
+   * its requirements and the switch reads off. Someone who set it up once should not have to
+   * work out that the detector is what went missing.
+   *
+   * So this records the consent, once, and lets the switch offer to put the detector back
+   * rather than only refusing. Written the first time the user turns IMD+ on and never
+   * cleared: withdrawing consent is what turning IMD+ *off* means, and that already retires
+   * the detector - see RetireAutoHideServiceUseCase.
+   */
+  bool autoHideEverEnabled = 60;
+
+  /*
+   * Which revision of the "what changed in this update" notice the user has already seen.
+   *
+   * An int rather than a bool, and that is the whole reason to prefer it: a bool would need a
+   * second field the next time there is something to point at, and this project already
+   * carries a pair of them (revertDefaultsResetV166 plus revertDefaultsNoticePending) for one
+   * notice. Bumping a constant is cheaper than adding a field.
+   *
+   * Zero means "never shown", which is also what a fresh install decodes to - and a fresh
+   * install must not see it at all, so the check is paired with setupNoticeVersion != 0 the
+   * way MigrateRevertDefaultsUseCase decides the same question.
+   */
+  int32 settingsNoticeRevision = 61;
+
+  /*
+   * Which settings a launch hides: the same list for every app, or a profile per app.
+   *
+   * Half of what notificationFunction (22) used to decide alone. The two halves are stored
+   * separately because they are separate questions, and separating them makes two
+   * combinations reachable that no released version has ever run - "IMD defaults" hidden but
+   * restored from memory, and a per-app profile reverted to the configured defaults. Both are
+   * deliberate; see MigrateFrameworksUseCase for what an upgrading install gets.
+   *
+   * ⚠ Field 22 is NOT reserved and must never be. It is the only record of what an install
+   * chose before v3, and an install can arrive here from any older version at any time, so
+   * the migration has to be able to read it years from now.
+   */
+  HidingFrameworkProto hidingFramework = 62;
+
+  /*
+   * How a hide is undone: drive the configured defaults, or restore what was actually there.
+   *
+   * The other half of notificationFunction (22).
+   */
+  UnhidingFrameworkProto unhidingFramework = 63;
+
+  /*
+   * Whether the v3 split has already read notificationFunction (22) and written the pair
+   * above.
+   *
+   * A marker rather than a version number, and written whether or not anything changed - the
+   * same discipline as notificationFunctionResetV16 (28), and for the same reason: someone who
+   * migrates and then deliberately picks a different pair must not have that undone by the
+   * next launch.
+   */
+  bool frameworksMigratedV3 = 64;
+
+  /*
+   * Whether a memory restore is allowed to switch wireless debugging back on.
+   *
+   * False by default and left false for every install, new or upgrading, on the author's
+   * instruction: a device that comes back from a hide with wireless debugging on is
+   * listening on whatever network it is attached to, and the user cannot see that it is.
+   *
+   * ⚠ Read only on the **memory** unhiding path. Under Revert to default the destination
+   * comes from revertDefaults (16), which has its own wireless debugging row and is
+   * unaffected by this - so an install that already restores wireless debugging that way
+   * keeps doing it.
+   *
+   * Also read by the settings manager's All on button, which is not a restore: the one
+   * control that switches everything on must not be a way around this.
+   */
+  bool restoreWirelessDebugging = 65;
+
+  /*
+   * Whether IMD manages Shizuku at all — the master switch above everything in the Shizuku
+   * configuration section.
+   *
+   * Off by default, which is what proto3 decodes an unwritten bool to, and therefore what a
+   * new install gets. An install that was already using Shizuku is switched on once by
+   * MigrateManageShizukuUseCase, guarded by the marker below.
+   *
+   * ⚠ This is the user's stored answer, not what the switch shows. The switch shows
+   * manageShizuku && isShizukuConfigured, so emptying a field below drops it without
+   * touching this — and filling the field again puts it back where the user left it. That
+   * is the author's "remembers the previous state", and storing the forced-off value here
+   * instead would be the app forgetting on their behalf.
+   */
+  bool manageShizuku = 66;
+
+  /*
+   * Marker for the one-shot migration above. Written whether or not anything changed, so a
+   * deliberate switch-off afterwards is not undone by the next launch.
+   */
+  bool manageShizukuMigratedV3 = 67;
+
+  /*
+   * Marker for the one-shot v3 reset of auto unhide's three triggers and two conditions.
+   *
+   * Written whether or not anything changed, like every other one-shot here, so somebody who
+   * re-ticks a trigger afterwards is not reset again by the next launch. Once per install.
+   *
+   * ⚠ Not a "were these ever configured" flag. 55 was exactly that for the triggers and is
+   * reserved below; the triggers arrive unticked and this only says the reset has run.
+   */
+  bool autoUnhideResetV3 = 68;
+
+  /*
+   * Whether this install existed before v3.
+   *
+   * Written once by MigrateFrameworksUseCase, which is the last moment the app can still tell:
+   * it reads setupNoticeVersion, and after setup has been completed once a fresh install and an
+   * upgrade look identical.
+   *
+   * ⚠ Not "has finished setup", which is what the developer's note used to ask. That is true of
+   * a fresh install too, one launch later.
+   */
+  bool upgradedToV3 = 69;
+
+  /*
+   * Whether anything has ever chosen the Favourites tab's view.
+   *
+   * ⚠ Field 8 cannot answer this by itself. FavouriteViewList is 0, so "never chosen" and
+   * "chose List" decode identically - and the default is now Grid, so telling them apart is
+   * the difference between a new install opening on a grid and an upgrader losing the list
+   * they picked. Same shape as restartShizukuSet on field 10, for the same reason.
+   *
+   * Set by any write of field 8, and by MigrateFrameworksUseCase for an install that existed
+   * before v3.
+   */
+  bool favouriteAppsViewSet = 70;
+
+  /*
+   * Whether anything has ever chosen the Favourites tab's sort order.
+   *
+   * ⚠ Field 7 cannot answer this by itself, exactly as field 8 cannot: FavouriteSortCustom is
+   * 0, so "never chosen" and "chose Custom" decode identically - and the default is now
+   * Alphabetical.
+   *
+   * Set by any write of field 7, which includes the write the reorder dialog makes when an
+   * order is saved, and by MigrateFrameworksUseCase for an install that existed before v3.
+   */
+  bool sortFavouriteAppsSet = 71;
+
+  // How app icons are drawn - see IconStyleProto. No "…Set" companion is needed
+  // beside it, unlike the two above: the default this app wants *is* the proto
+  // default, so an install that has never written it reads correctly.
+  IconStyleProto iconStyle = 72;
+
+  // Which rows the settings manager draws, one entry per target encoded by ManagerRows as
+  // "<Name>=0" or "<Name>=1".
+  //
+  // A state per target rather than a list of the ones to show, and for the same reason
+  // revertDefaults above is: an absent name could not tell "the user hid this row" apart from
+  // "not configured yet", and those behave differently - the first is a decision, the second
+  // falls back to ManagerRows.Default, which is every row shown.
+  repeated string managerRows = 73;
+
+  // Whether the one-time pass that puts IMD+'s own detector into managedAccessibilityServices
+  // has run.
+  //
+  // The detector used to be drawn ticked by the picker itself and stored nowhere, so an install
+  // with IMD+ on and nothing else selected had an empty list - which is what greyed the
+  // Accessibility row in the settings manager. It is an ordinary selection now; this reaches the
+  // installs that were already in that state, and the write beside the IMD+ switch keeps every
+  // install right from here on.
+  bool autoHideDetectorManagedV3 = 74;
+
+  // 75 was progressiveBlurOff. See progressiveBlurOn on 79.
+
+  // The author's "OLED background mode": pure black backgrounds instead of the dark scheme's
+  // near-black. Off by default, which is what an unwritten bool already means.
+  bool oledBackground = 76;
+
+  // Which app-drawer entries IMD publishes - the author's "App drawer shortcuts".
+  //
+  // Both named for the state that is NOT the default, so proto3's unwritten false gives what he
+  // asked for on a fresh install: the Settings manager entry shown, the Hide/unhide one not. The
+  // same reasoning progressiveBlurOn on 79 uses, in the other direction.
+  bool drawerShortcutManagerOff = 77;
+
+  bool drawerShortcutHideUnhideOn = 78;
+
+  // Whether the edge blur is switched ON - the author's "Progressive UI blur".
+  //
+  // ⚠ Named the other way round from the field it replaces, because the default reversed: r17's
+  // "make the blur toggle off by default for new installs". proto3 decodes an unwritten bool to
+  // false, so a field named for the ON state is off until something writes it, which is now what
+  // was asked for.
+  //
+  // ⚠ A new number rather than the old one with its meaning flipped. Field 75 already holds a
+  // written value on every install that has run r10 or later, and reinterpreting it would turn
+  // each of those into its opposite by accident rather than by decision. 75 is reserved below.
+  bool progressiveBlurOn = 79;
+
+  // Whether anybody has touched the Progressive UI blur switch.
+  //
+  // ⚠ **Added in r27, when the author asked for the blur to be ON by default.** proto3 has no
+  // custom defaults, which is the whole reason 79 is named for the ON state; flipping the default
+  // means that name no longer describes what an unwritten field gives. Renaming it again on a
+  // fresh number would work and would throw away every stored choice, so this says whether 79
+  // means anything yet: unset, the resolution answers true; set, it answers what 79 holds. The
+  // shape favouriteAppsViewSet on 69 and blurCustomised on 80 already use.
+  //
+  // ⚠ It cannot recover a choice made before it existed. Under the old default an install that
+  // never touched the switch and one that deliberately turned it off are the same absent field,
+  // so anyone in the second group gets the blur back once and keeps their answer from then on.
+  // That is what flipping a proto3 default costs, whichever way it is done.
+  bool progressiveBlurSet = 84;
+
+  // Whether anybody has touched the dynamic colour switch.
+  //
+  // ⚠ **Added in r29, when the author asked for dynamic theme to be ON by default.** Tag 2 is
+  // named for the ON state and proto3 decodes it to false, so the name stopped describing what
+  // an unwritten field gives the moment the default moved. This says whether 2 means anything
+  // yet: unset, the resolution answers true; set, it answers what 2 holds. Keeping 2 rather
+  // than renaming onto a fresh number is what preserves every choice already stored there.
+  //
+  // ⚠ It cannot recover a choice made before it existed. Under the old default an install that
+  // never touched the switch and one that deliberately turned it off are the same absent field,
+  // so anyone in the second group gets dynamic colour back once and keeps their answer from
+  // then on. progressiveBlurSet on 84 paid the same price in r27.
+  bool dynamicThemeSet = 85;
+
+  // The three numbers behind the blur - the author's r20 sliders, which govern the page bands and
+  // the settings manager's frosted window together.
+  //
+  // ⚠ A companion bool rather than three sentinel zeroes. proto3 decodes an unwritten int32 to 0,
+  // and 0 is a value two of these sliders can legitimately land on: a tint of nothing is what
+  // somebody who wants a bare blur will pick. This is how "never opened the dialog" is told apart
+  // from "chose these", and it is the shape favouriteAppsViewSet on 69 already uses.
+  //
+  // The defaults the app falls back to are in :design-system beside the code that draws with
+  // them, not here - a preview and a fresh install have to agree and only one of them has a
+  // datastore.
+  bool blurCustomised = 80;
+
+  // Radius in dp, tint as a percentage, ramp length in dp. Stored in the units the sliders show,
+  // so a value means the same thing in the store, on the slider and in the draw.
+  int32 blurRadiusDp = 81;
+
+  int32 blurTintPercent = 82;
+
+  int32 blurFadeDp = 83;
+
   // 9 was favouriteAppsTapAction. What a tap and a long press do is now decided by the
   // notification function rather than chosen, so there is nothing left for it to store.
   // 14 was a single global suspended-services list, replaced by the map above.
-  reserved 9, 14;
+  // 46 was autoHideNoKillOnRevert. An IMD+ revert no longer closes the watched apps at all -
+  // it hands straight over to "Revert to default" - so there is nothing left to opt out of.
+  // 55 was autoUnhideTriggersConfigured. The triggers now start unticked, which is what
+  // proto3 decodes an unwritten bool to anyway, so nothing has to remember whether they were
+  // ever saved.
+  reserved 9, 14, 46, 55, 75;
 }

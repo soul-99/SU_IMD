@@ -16,10 +16,27 @@
   ~
   -->
 <resources>
-    <string name="revert_using_memory">Вернуть из памяти</string>
+    <string name="revert_using_memory">Показать настройки из памяти</string>
     <string name="revert_to_default">Вернуть по умолчанию</string>
-    <string name="overlay_restore_failed_title">Сбой возврата</string>
+    <string name="overlay_restore_failed_title">Не удалось показать настройки</string>
     <string name="overlay_restore_failed_text">Не удалось восстановить разрешение «Поверх других приложений» с помощью Shizuku. Включите службу Shizuku вручную и нажмите кнопку ниже</string>
     <string name="overlay_restore_retry">Повторить</string>
-    <string name="alert_notification_channel">Сбои возврата</string>
+    <string name="alert_notification_channel">Сбои IMD</string>
+    <string name="shizuku_usb_fallback_title">Служба Shizuku остановлена</string>
+    <string name="shizuku_usb_fallback_text">Служба Shizuku была завершена через отладку по USB, а не intent остановки; при возврате приложение может не восстановить службу Shizuku.</string>
+    <string name="shizuku_usb_fallback_text_overlay">Служба Shizuku была завершена через отладку по USB, а не intent остановки; при возврате приложение может не восстановить службу Shizuku и «Поверх других приложений».</string>
+    <string name="notification_ok">ОК</string>
+    <string name="hidden_revert_default">Настройки скрыты, нажмите, чтобы показать их.</string>
+    <string name="hidden_revert_memory">Настройки скрыты, нажмите, чтобы восстановить их из памяти.</string>
+    <string name="auto_hide_channel">Автоскрытие настроек (IMD+)</string>
+    <string name="auto_hide_hidden_revert">IMD+ скрыл ваши настройки, нажмите, чтобы показать их.</string>
+    <string name="auto_hide_hidden_revert_memory">IMD+ скрыл ваши настройки, нажмите, чтобы восстановить их из памяти.</string>
+    <string name="auto_unhide_channel">Служба автопоказа настроек</string>
+    <string name="auto_unhide_running">Служба автопоказа работает</string>
+    <string name="auto_hide_shizuku_failed">IMD+ не удалось скрыть настройки: служба Shizuku не запустилась. Проверьте настройки.</string>
+    <string name="shizuku_revert_failed">Не удалось запустить службу Shizuku, нажмите здесь, чтобы запустить её вручную</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="developer_note_channel">Уведомление об обновлении IMD</string>
+    <string name="developer_note_notification">IMD: важное сообщение от разработчика 🧑‍🔬</string>
+    <string name="shevery_start_failed">Не удалось запустить Shevery, нажмите здесь, чтобы запустить его вручную.</string>
 </resources>

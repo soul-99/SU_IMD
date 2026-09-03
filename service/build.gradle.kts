@@ -27,6 +27,8 @@ android {
 
 dependencies {
     implementation(projects.common)
+    implementation(projects.domain.common)
+    implementation(projects.domain.model)
     implementation(projects.framework.notificationManager)
 
     implementation(libs.androidx.core.ktx)

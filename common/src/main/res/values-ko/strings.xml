@@ -31,14 +31,33 @@
     <string name="global">Global</string>
 
     <string name="language_system">시스템 / 자동</string>
-    <string name="language_ai_notice">영어 이외의 언어는 AI 지원 기계 번역으로 만들어졌기 때문에 오류가 있을 수 있습니다. 수정을 원하시면 번역 오류를 GitHub 이슈 트래커를 통해 개발자에게 알려 주세요.</string>
+    <string name="language_ai_notice">영어 이외의 언어는 기계 번역으로 만들어졌기 때문에 오류가 있을 수 있습니다. 수정을 원하시면 번역 오류를 GitHub 이슈 트래커를 통해 개발자에게 알려 주세요.</string>
 
     <string name="revert_to_default_toast">기본값으로 되돌리기</string>
     <string name="revert_from_memory_toast">메모리로 되돌리기</string>
-    <string name="revert_failed_shizuku_toast">Shizuku 서비스를 다시 시작하지 못했습니다</string>
-    <string name="revert_failed_overlay_toast">Shizuku로 다른 앱 위에 표시 권한을 복원하지 못했습니다. 알림을 확인하세요</string>
-    <string name="revert_failed_shizuku_and_overlay_toast">Shizuku 서비스와 다른 앱 위에 표시 권한을 복원하지 못했습니다</string>
     <string name="settings_hidden_toast">설정이 숨겨졌습니다</string>
     <string name="auto_revert_to_default_toast">기본값으로 자동 되돌림</string>
     <string name="auto_revert_from_memory_toast">Memory function으로 자동 되돌림</string>
+    <string name="auto_hide_run_toast">IMD+가 설정을 숨기는 중…</string>
+    <string name="auto_hide_revert_toast">IMD+가 설정을 되돌리는 중…</string>
+    <string name="toast_auto_hiding">IMD+: 설정을 숨기는 중...</string>
+    <string name="toast_done_hidden">IMD: 설정이 숨겨졌습니다</string>
+    <string name="toast_done_hidden_for">IMD: %1$s의 설정이 숨겨졌습니다</string>
+    <string name="toast_done_reverted_defaults">IMD: 설정이 기본값으로 되돌려졌습니다</string>
+    <string name="toast_done_restored_defaults">IMD: 설정이 기본값으로 복원되었습니다</string>
+    <string name="toast_done_restored_memory">IMD: 설정이 메모리에서 복원되었습니다</string>
+    <string name="toast_done_restored_memory_for">IMD: 설정이 메모리에서 복원되었습니다 (%1$s)</string>
+    <string name="toast_nothing_to_restore">IMD: 복원할 숨겨진 설정이 없습니다</string>
+    <string name="toast_auto_done_hidden">IMD+: 설정이 숨겨졌습니다</string>
+    <string name="toast_auto_done_hidden_for">IMD+: %1$s의 설정이 숨겨졌습니다</string>
+    <string name="permissions_lost">필요한 권한이 사라졌습니다. 먼저 IMD를 열어 권한을 다시 부여해 주세요.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="next">다음</string>
+    <string name="back">뒤로</string>
+    <string name="prior_hide_ignore">이전 되돌리기 모두 무시</string>
+    <string name="prior_hide_restore">설정을 먼저 복원</string>
+    <string name="prior_hide_restoring">IMD가 설정을 복원하고 있습니다…</string>
+    <string name="prior_hide_title">이전에 숨긴 설정이 발견되었습니다. 먼저 복원할까요?</string>
+    <string name="retry">다시 시도</string>
+    <string name="skip">건너뛰기</string>
 </resources>

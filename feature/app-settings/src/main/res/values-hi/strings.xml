@@ -60,4 +60,13 @@
     <string name="action_app_setting">ऐप सेटिंग</string>
     <string name="action_create_shortcut">शॉर्टकट बनाएँ</string>
     <string name="action_setting_template">सेटिंग टेम्पलेट</string>
+    <string name="auto_hide_conflict_snackbar">IMD+ ने आपकी सेटिंग्स छिपा रखी हैं। पहले उसे वापस लाएँ, फिर यह प्रोफ़ाइल लागू करें।</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">कृपया पहले सेटिंग्स कॉन्फ़िगर करें</string>
+    <string name="dooa_thedjchi_only">\"अन्य ऐप्स के ऊपर दिखाएँ\" का प्रबंधन सिर्फ़ Shizuku के Thedjchi फ़ोर्क में समर्थित है</string>
+    <string name="help_path_accessibility">IMD सेटिंग्स → डिफ़ॉल्ट IMD सेटिंग्स → छिपाई जाने वाली एक्सेसिबिलिटी सेवाएँ</string>
+    <string name="help_path_dooa">IMD सेटिंग्स → डिफ़ॉल्ट IMD सेटिंग्स → IMD द्वारा प्रबंधित अन्य ऐप्स के ऊपर दिखाएँ</string>
+    <string name="help_path_manage_shizuku">IMD सेटिंग्स → Shizuku कॉन्फ़िगरेशन → Shizuku प्रबंधित करें</string>
+    <string name="shortcut_lookup_failed">इस ऐप के शॉर्टकट का विवरण नहीं पढ़ा जा सका।</string>
+    <string name="understood">समझ गया</string>
 </resources>

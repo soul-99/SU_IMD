@@ -77,3 +77,46 @@ data class ManualRevertResult(
 
     val isEmpty: Boolean get() = !noPermission && failed.isEmpty() && reverted.isEmpty()
 }
+
+/**
+ * The order the settings manager's master pill switches targets **on** in; off is the exact
+ * reverse.
+ *
+ * ⚠ **Not [ManualRevertTarget.entries], and the difference is a dependency graph rather than a
+ * preference:**
+ *
+ *  * developer options first, because USB debugging depends on it;
+ *  * Shizuku before Display over other apps, whose AppOps can only be written while Shizuku is
+ *    running;
+ *  * wireless debugging **last**, because starting a Shizuku fork brings the debugging
+ *    transport up using its own WRITE_SECURE_SETTINGS and moves wireless debugging on the way.
+ *    Settled any earlier, the fork overrules the press.
+ *
+ * Reversed on the way off, which puts Display over other apps before Shizuku stops and leaves
+ * developer options until last — the same three reasons read backwards.
+ *
+ * Lives here rather than in the ViewModel that uses it so the host tests can assert it still
+ * covers every target: a seventh one added later would otherwise be silently skipped by the
+ * pill, with nothing in the audit suite able to see it.
+ */
+val masterPillOnOrder: List<ManualRevertTarget> = listOf(
+    ManualRevertTarget.DeveloperSettings,
+    ManualRevertTarget.UsbDebugging,
+    ManualRevertTarget.AccessibilityServices,
+    ManualRevertTarget.Shizuku,
+    ManualRevertTarget.DisplayOverOtherApps,
+    ManualRevertTarget.WirelessDebugging,
+)
+
+/**
+ * The targets the master pill should move, in the order it should move them.
+ *
+ * [usable] is the dialog's own per-row test, handed over rather than recomputed — the pill's
+ * promise is that it moves exactly the rows the user could have moved by hand.
+ */
+fun masterPillOrder(
+    enabled: Boolean,
+    usable: List<ManualRevertTarget>,
+): List<ManualRevertTarget> = masterPillOnOrder.filter { it in usable }.let {
+    if (enabled) it else it.reversed()
+}

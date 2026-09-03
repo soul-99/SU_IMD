@@ -19,18 +19,38 @@
 package com.android.geto.feature.appsettings.shortcut
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.geto.designsystem.component.DialogContainer
 import com.android.geto.domain.model.GetPinShortcutResult
 import com.android.geto.domain.model.RequestPinShortcutResult
 import com.android.geto.feature.appsettings.R
 import com.android.geto.feature.appsettings.dialog.RequestPinShortcutDialog
 import com.android.geto.feature.appsettings.dialog.UpdatePinShortcutDialog
+import kotlinx.coroutines.delay
+import com.android.geto.common.R as commonR
 
 /**
  * The create-shortcut dialog for one app, wherever it is opened from.
@@ -58,8 +78,19 @@ fun ShortcutRoute(
 
     val requestResult by viewModel.requestPinShortcutResult.collectAsStateWithLifecycle()
 
-    LaunchedEffect(componentName) {
+    // Bumped by Retry, so a second attempt is a fresh read rather than a reopened dialog.
+    var attempt by remember { mutableIntStateOf(0) }
+
+    var waited by remember { mutableStateOf(false) }
+
+    LaunchedEffect(componentName, attempt) {
+        waited = false
+
         viewModel.start(componentName = componentName)
+
+        delay(WAIT_MILLIS)
+
+        waited = true
     }
 
     // A launcher that cannot pin is the one outcome the user has to be told about: nothing
@@ -71,7 +102,7 @@ fun ShortcutRoute(
                 Toast.makeText(
                     context,
                     R.string.unsupported_launcher,
-                    Toast.LENGTH_LONG,
+                    Toast.LENGTH_SHORT,
                 ).show()
 
                 viewModel.consumeRequestResult()
@@ -92,7 +123,24 @@ fun ShortcutRoute(
     // Nothing is drawn until the lookup for *this* app has landed. The ViewModel belongs
     // to the tab and outlives the dialog, so without this check the previous app's result
     // is what the first composition sees -- and the label fields, seeded once, keep it.
-    val loaded = target?.takeIf { it.componentName == componentName } ?: return
+    //
+    // ⚠ **A spinner in front of it, since r4q.** The check is right and stays; what was wrong
+    // was drawing *nothing*, because the lookup is an icon read plus a ShortcutManager query
+    // and both are cold on the first press of a session. The author's report - "first time
+    // create shortcut does not open but it does on second time, this bug does not occur every
+    // time" - is that dead interval, and the second press feeling instant is the same lookup
+    // being warm. Nothing of the previous app is drawn here, so the bug the return exists for
+    // cannot come back through it.
+    val loaded = target?.takeIf { it.componentName == componentName } ?: run {
+        ShortcutLoadingDialog(
+            modifier = modifier,
+            failed = waited,
+            onRetry = { attempt += 1 },
+            onDismissRequest = onDismissRequest,
+        )
+
+        return
+    }
 
     when (val result = loaded.result) {
         GetPinShortcutResult.RequestPinShortcut -> {
@@ -137,3 +185,70 @@ fun ShortcutRoute(
         GetPinShortcutResult.UnsupportedLauncher -> Unit
     }
 }
+
+/**
+ * What a long press shows while the icon and the existing-shortcut lookup are still running —
+ * and what it shows when they never finish.
+ *
+ * ⚠ **A dialog rather than nothing.** The lookup is fast once warm and slow exactly once per
+ * session, and drawing nothing for that interval is indistinguishable from the press having been
+ * missed - which is what the author reported and what made him press again.
+ *
+ * ⚠ **[failed] is a backstop, not the fix.** The fix is in `ShortcutViewModel.start`, which no
+ * longer loses its target when a read throws. This is here because if the cause turns out to be
+ * something else again, the author gets a button rather than a wedged dialog - and Retry re-runs
+ * the read rather than reopening anything.
+ *
+ * Dismissible throughout, so a press that turns out to have been a mistake is not a wait.
+ */
+@Composable
+private fun ShortcutLoadingDialog(
+    modifier: Modifier = Modifier,
+    failed: Boolean,
+    onRetry: () -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    DialogContainer(modifier = modifier, onDismissRequest = onDismissRequest) {
+        if (!failed) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+
+            return@DialogContainer
+        }
+
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                text = stringResource(R.string.shortcut_lookup_failed),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                TextButton(onClick = onDismissRequest) {
+                    Text(text = stringResource(commonR.string.cancel))
+                }
+
+                TextButton(onClick = onRetry) {
+                    Text(text = stringResource(commonR.string.retry))
+                }
+            }
+        }
+    }
+}
+
+/**
+ * How long the spinner is held before it offers Retry.
+ *
+ * The same eight seconds the Display over other apps setup step waits, and for the same reason:
+ * long enough not to accuse a slow device of failing, short enough that a wedged one does not
+ * look like a hung app.
+ */
+private const val WAIT_MILLIS = 8_000L

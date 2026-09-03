@@ -42,6 +42,63 @@ object SettingSnapshot {
     /** Uniquely identifies a setting: the same key can exist in more than one table. */
     fun idOf(settingType: SettingType, key: String): String = settingType.name + UNIT + key
 
+    /**
+     * The inverse of [idOf], for a caller holding a recorded id and nothing else.
+     *
+     * v3's `Revert to default` needs it: a per-app profile can record any setting by key, and
+     * the ones the configured defaults do not drive have to be written back from the record
+     * alone — there is no `AppSetting` to read the type off, because the profile that made it
+     * is not what this revert is walking.
+     *
+     * Null for [SHIZUKU_STOPPED_ID] and [OVERLAY_HIDDEN_ID], whose first field is deliberately
+     * not the name of any [SettingType] so no real row can collide with them. A caller that
+     * treated those as settings would try to write a row called `shizuku_stopped`.
+     */
+    fun settingOf(id: String): Pair<SettingType, String>? {
+        val separator = id.indexOf(UNIT)
+
+        if (separator <= 0) return null
+
+        val typeName = id.substring(0, separator)
+
+        val type = SettingType.entries.firstOrNull { it.name == typeName } ?: return null
+
+        return type to id.substring(separator + 1)
+    }
+
+    /**
+     * A reserved id — not a real setting — under which a per-app record notes that this app
+     * stopped the Shizuku service, so its revert (and only its revert) starts it again.
+     *
+     * It lives in the same per-app map as the settings snapshots so it is cleared together
+     * with them on revert, which is what keeps the memory from cumulating: once an app's
+     * record is dropped, its claim on restarting Shizuku is gone. Only the presence of this id
+     * matters — the value is a constant.
+     *
+     * Deliberately *not* built from [idOf]: its first field is not the name of any
+     * [SettingType], so no real row — including the profile's own `shizuku_service` marker
+     * row, which would otherwise produce this very string — can ever collide with it. The
+     * write-loop filters stay as well; this is the half that does not depend on remembering
+     * them.
+     */
+    val SHIZUKU_STOPPED_ID: String = "IMD" + UNIT + "shizuku_stopped"
+
+    /**
+     * The same idea for overlay access: a per-app note that *this* app's launch is the one
+     * that withdrew "Display over other apps", so its revert (and only its revert) gives it
+     * back.
+     *
+     * Without it, a second app launched while overlay access was already withdrawn - which
+     * hides nothing, because there is nothing left to hide - would still restore it on revert,
+     * undoing the first app's hide while the first app is very much still open. The record is
+     * only written when the launch actually did the withdrawing, so an app that found the work
+     * already done has no claim on undoing it.
+     *
+     * Cleared with the rest of that app's record on revert, so the claim cannot outlive the
+     * launch that earned it. Built the same non-colliding way as [SHIZUKU_STOPPED_ID].
+     */
+    val OVERLAY_HIDDEN_ID: String = "IMD" + UNIT + "overlay_hidden"
+
     fun encode(values: Map<String, String?>): String = values.entries.joinToString(
         separator = RECORD.toString(),
     ) { (id, value) ->

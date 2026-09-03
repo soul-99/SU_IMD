@@ -60,4 +60,13 @@
     <string name="action_app_setting">App-Einstellung</string>
     <string name="action_create_shortcut">Verknüpfung erstellen</string>
     <string name="action_setting_template">Einstellungsvorlage</string>
+    <string name="auto_hide_conflict_snackbar">IMD+ hält deine Einstellungen ausgeblendet. Setze es erst zurück und wende dieses Profil dann an.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">Bitte konfiguriere zuerst die Einstellungen</string>
+    <string name="dooa_thedjchi_only">die Verwaltung von „Über anderen Apps anzeigen“ wird nur vom Thedjchi-Fork von Shizuku unterstützt</string>
+    <string name="help_path_accessibility">IMD-Einstellungen → Standard-IMD-Einstellungen → Auszublendende Bedienungshilfen-Dienste</string>
+    <string name="help_path_dooa">IMD-Einstellungen → Standard-IMD-Einstellungen → Von IMD verwaltetes „Über anderen Apps anzeigen“</string>
+    <string name="help_path_manage_shizuku">IMD-Einstellungen → Shizuku-Konfiguration → Shizuku verwalten</string>
+    <string name="shortcut_lookup_failed">Die Verknüpfungsdetails dieser App konnten nicht gelesen werden.</string>
+    <string name="understood">Verstanden</string>
 </resources>

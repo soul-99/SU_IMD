@@ -22,9 +22,13 @@ import android.content.Context
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.usecase.GetOverlayRestoreFailedUseCase
 import com.android.geto.domain.usecase.SetManualTargetUseCase
+import com.android.geto.domain.usecase.SettingsWorkKind
+import com.android.geto.domain.usecase.SettingsWorkTracker
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.OVERLAY_RESTORE_NOTIFICATION_ID
 import dagger.hilt.android.qualifiers.ApplicationContext
+import com.android.geto.domain.repository.UserDataRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,13 +49,35 @@ class OverlayRestoreRunner @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val setManualTargetUseCase: SetManualTargetUseCase,
     private val getOverlayRestoreFailedUseCase: GetOverlayRestoreFailedUseCase,
+    private val settingsWorkTracker: SettingsWorkTracker,
     private val notificationManagerWrapper: AndroidNotificationManagerWrapper,
+    // r4n: the notification's body tap opens the configured fork, so this needs its package.
+    // A leaf dependency in both directions — no runner is involved, so no Hilt cycle.
+    private val userDataRepository: UserDataRepository,
 ) {
-    /** The restore itself. True when every held package got its access back. */
-    suspend fun retry(): Boolean {
+    /**
+     * The restore itself. True when every held package got its access back.
+     *
+     * Tracked like a revert, because that is what it is: the tail of one that did not
+     * finish. It writes an AppOp through Shizuku and can spend the whole start budget doing
+     * it, and a Hide settings tile press landing in the middle would be starting a hide over
+     * the top of a restore. See SettingsWorkTracker.
+     */
+    suspend fun retry(
+        /**
+         * Whether this is the settings manager's own switch rather than the notification's
+         * *Try again* button.
+         *
+         * The notification is about a debt, so it stays as it was: nothing owed, nothing to do.
+         * The manager's row is about the device, and has to be able to put the user's selection
+         * back when no debt is recorded at all — see [SetManualTargetUseCase].
+         */
+        manual: Boolean = false,
+    ): Boolean = settingsWorkTracker.track(kind = SettingsWorkKind.Unhiding) {
         val restored = setManualTargetUseCase(
             target = ManualRevertTarget.DisplayOverOtherApps,
             enabled = true,
+            manual = manual,
         )
 
         if (restored) {
@@ -60,7 +86,7 @@ class OverlayRestoreRunner @Inject constructor(
             report()
         }
 
-        return restored
+        restored
     }
 
     /**
@@ -75,11 +101,20 @@ class OverlayRestoreRunner @Inject constructor(
         return failed
     }
 
-    /** Raise, or re-raise, the notification. Posting under the same id replaces it. */
-    fun report() {
+    /**
+     * Raise, or re-raise, the notification. Posting under the same id replaces it.
+     *
+     * ⚠ **Suspend since r4n**, because the body tap now opens the configured Shizuku app and
+     * the package name comes from the repository. Every call site was already inside a suspend
+     * function, so nothing else moved.
+     */
+    suspend fun report() {
         notificationManagerWrapper.notify(
             id = OVERLAY_RESTORE_NOTIFICATION_ID,
-            notification = buildOverlayRestoreFailedNotification(context = context),
+            notification = buildOverlayRestoreFailedNotification(
+                context = context,
+                shizukuPackage = userDataRepository.userData.first().shizukuPackageName,
+            ),
         )
     }
 }

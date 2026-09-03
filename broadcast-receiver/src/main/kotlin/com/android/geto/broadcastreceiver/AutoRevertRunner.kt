@@ -20,9 +20,9 @@ package com.android.geto.broadcastreceiver
 
 import android.content.Context
 import com.android.geto.common.AutoRevertPending
-import com.android.geto.common.showAutoRevertFromMemoryToast
-import com.android.geto.common.showRevertOverlayFailedToast
-import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.common.showRestoredToast
+import com.android.geto.domain.framework.PackageManagerWrapper
+import com.android.geto.domain.model.UnhidingFramework
 import com.android.geto.domain.usecase.GetAutoRevertSettingsUseCase
 import com.android.geto.domain.usecase.RevertAppSettingsUseCase
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
@@ -49,8 +49,10 @@ class AutoRevertRunner @Inject constructor(
     private val getAutoRevertSettingsUseCase: GetAutoRevertSettingsUseCase,
     private val revertAppSettingsUseCase: RevertAppSettingsUseCase,
     private val revertToDefaultRunner: RevertToDefaultRunner,
+    private val settingsHiddenRunner: SettingsHiddenRunner,
     private val overlayRestoreRunner: OverlayRestoreRunner,
     private val notificationManagerWrapper: AndroidNotificationManagerWrapper,
+    private val packageManagerWrapper: PackageManagerWrapper,
 ) {
     /**
      * Reverts if there is anything pending and the setting is on. Safe to call on every
@@ -69,20 +71,32 @@ class AutoRevertRunner @Inject constructor(
 
         val componentName = AutoRevertPending.consume() ?: return
 
-        when (settings.notificationFunction) {
-            NotificationFunction.RevertToDefault -> revertToDefaultRunner(auto = true)
+        when (settings.unhidingFramework) {
+            UnhidingFramework.RevertToDefault -> revertToDefaultRunner()
 
-            NotificationFunction.Memory -> {
+            UnhidingFramework.Memory -> {
                 revertAppSettingsUseCase(componentName = componentName)
 
-                // The per-app notification is posted under the component name's hash code,
-                // and it now offers to undo a device that has already been put back.
+                // ⚠ **For a notification left standing by a build before r3.** Nothing
+                // posts under a component name's hash code any more, but an upgrading
+                // install can still have one in its shade, offering to undo a device that
+                // has just been put back. Cancelling an id nothing holds costs nothing.
                 notificationManagerWrapper.cancel(componentName.hashCode())
 
-                if (overlayRestoreRunner.reportIfFailed()) {
-                    context.showRevertOverlayFailedToast()
-                } else {
-                    context.showAutoRevertFromMemoryToast()
+                // ⚠ **And the one that is actually standing.** The line above was the whole
+                // of this route's notification handling, and it names an id nothing has
+                // posted under since r3 - so the live offer, under the fixed id every hide
+                // shares, was left in the shade over a restored device. The RevertToDefault
+                // branch never had this gap: RevertToDefaultRunner sweeps for itself.
+                settingsHiddenRunner.clearRevertOfferIfSettled()
+
+                if (!overlayRestoreRunner.reportIfFailed()) {
+                    context.showRestoredToast(
+                        fromMemory = true,
+                        appName = packageManagerWrapper.getActivityLabel(
+                            componentName = componentName,
+                        ),
+                    )
                 }
             }
         }

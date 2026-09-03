@@ -1,13 +1,14 @@
 # SUIMD.md
 
-**(SU) IMD - Shut up! it's my device** is a fork of [Geto](https://github.com/JackEblan/Geto)
+**IMD - It's My Device** is a fork of [Geto](https://github.com/JackEblan/Geto)
 by Jack Eblan, licensed GPL-3.0.
 
-Three parts:
+Four parts:
 
 1. **Setup guide** - the app's own help page.
-2. **Version history** - what changed in each build, what worked, what broke.
-3. **Licence and attribution** - the notices this fork is required to carry.
+2. **IMD app logics** - what the app actually does to a setting, drawn as flowcharts.
+3. **Version history** - what changed in each build, what worked, what broke.
+4. **Licence and attribution** - the notices this fork is required to carry.
 
 ---
 
@@ -19,7 +20,191 @@ Three parts:
 
 ---
 
-## 2. Version history
+## 2. IMD app logics
+
+Every decision this app makes about a setting, drawn rather than described. The order is how
+often you meet them: the first two are what happens every time you open an app and put your
+device back, and the rest sit behind a setting, a service or a feature.
+
+Each picture is rendered from a mermaid definition in `tools/logics/`, so a change to a logic
+is a change to text rather than to a drawing. **All fifteen were re-read against the code in
+r30**, which is when the last of the drift was taken out of them - the second Shizuku fork had
+reached thirty-two source files without appearing in a single drawing.
+
+Two colours carry meaning. A **red** box is where a run stops. A **green** box is a branch that
+exists only on the **Shevery** fork, which starts and stops its service in a completely
+different way from Thedjchi's and cannot manage Display over other apps on a launch at all.
+
+### 2.1 Launching an app - Settings to hide
+
+The main path, and the one every install uses out of the box. Nothing else here matters if
+this one is wrong. Note where it can stop: an overlay step that fails cancels the launch,
+because half-hidden is the worst outcome available - the app still detects whatever is left
+on, and your device has been changed anyway.
+
+⚠ **Two of those stops are not equal, and the diagram distinguishes them.** A Shizuku start
+that never succeeds has touched nothing. An AppOp write that is *refused* happens after that
+start, and the start is not rolled back - so on that path the service may be left running when
+it was not before. Only a failure later in the loop, with the grant gone, reverses the whole
+run.
+
+<p><img src="docs/logics/01-launch-hide.png" width="100%" alt="Flowchart: launching an app with the device-wide Settings to hide"></p>
+
+### 2.2 Revert to default
+
+The way back, reachable five ways so that losing the notification never strands you. The rule
+here is the opposite of the one above: on the way out, putting four settings of five back is
+strictly better than none, so a failure is reported rather than aborting the rest.
+
+<p><img src="docs/logics/02-revert-default.png" width="100%" alt="Flowchart: Revert to default"></p>
+
+### 2.3 Per app configuration - applying a profile
+
+The precise tool: one profile per app, applied on launch, and what reaches it is the **hiding
+framework** set to *Per app configuration*. What it records is the point - the values your
+device really had, not the values the profile guessed it would have - and it records them only
+where this app is the first to move a setting away from that value, so two apps cannot each
+claim to have found it in a different state.
+
+<p><img src="docs/logics/03-memory-apply.png" width="100%" alt="Flowchart: applying a per-app profile"></p>
+
+### 2.4 Per app configuration - reverting a profile
+
+The counterpart, and the one place the app's memory is spent. Note the overlay branch: only the
+app that actually withdrew overlay access gives it back, so a second app that found it already
+withdrawn does not hand back something it never took.
+
+<p><img src="docs/logics/04-memory-revert.png" width="100%" alt="Flowchart: reverting a per-app profile"></p>
+
+### 2.5 Stopping the Shizuku service
+
+Off by default, in both the device-wide settings and the per-app templates. It exists because a
+fork's watchdog can restart the service mid-session, and starting the service turns ADB back on
+- which is exactly the state a locked-down app is looking for.
+
+⚠ **The transports are not a fallback.** The stop intent goes first, and then USB and wireless
+debugging come down anyway - the service cannot outlive the transport it rides on, so this is
+the part that actually does the work. There is no confirmation poll: v3 removed it. And on
+**Shevery** nothing is sent at all, because that fork has no intents to send.
+
+<p><img src="docs/logics/05-stop-shizuku.png" width="100%" alt="Flowchart: stopping the Shizuku service"></p>
+
+### 2.6 Display over other apps
+
+The only setting here that is not a settings row at all - it is an AppOp held per package,
+written through Shizuku. Everything about this logic is built around one promise: the
+permission goes back to exactly the apps it was taken from, and to no others.
+
+<p><img src="docs/logics/06-overlay.png" width="100%" alt="Flowchart: hiding and restoring Display over other apps"></p>
+
+### 2.7 Accessibility services
+
+Only the services you picked in IMD settings are ever touched - so a revert can never switch on
+something you disabled yourself.
+
+⚠ **The claim is wider than "what was on".** It also takes a service already held by another
+profile, on purpose: without that, the other profile's revert could switch one back on in the
+middle of a hide. And a device-wide revert releases *every* holder rather than only its own -
+scoping that is what caused the bug this behaviour was written to fix.
+
+<p><img src="docs/logics/07-accessibility.png" width="100%" alt="Flowchart: holding and releasing accessibility services"></p>
+
+### 2.8 Starting the Shizuku service
+
+On **Thedjchi** a broadcast, not a command: the fork is free to ignore it, so this confirms
+rather than assumes. It is why a launch that needs Shizuku shows a spinner - eight silent
+seconds reads as a hang.
+
+⚠ **On Shevery there is no broadcast at all.** IMD switches the debugging transports on and
+waits up to forty seconds for that fork's own ErrorProtect watchdog to notice and start the
+service, then puts back exactly the transports it raised if nothing came up. It is the one
+start in the app that changes the device in order to ask, which is why it is the one that owes
+a rollback.
+
+<p><img src="docs/logics/08-shizuku-start.png" width="100%" alt="Flowchart: starting the Shizuku service"></p>
+
+### 2.9 The Settings manager
+
+The dialog that opens without the app itself having to be open - through its own launcher icon,
+a Quick Settings tile, a homescreen shortcut, the Favourites tab, or an IMD intent. Every row
+is read live and re-read twice a second, because all of these can be changed from outside this
+app.
+
+Which rows appear is yours to choose, under *Setting manager toggles*, and their order follows
+the Shizuku fork. ⚠ **A fork that is not configured does not grey its row out - the row and the
+overlay row leave the card entirely**, which is the author's instruction and the opposite of
+what this diagram used to show.
+
+<p><img src="docs/logics/09-services-manager.png" width="100%" alt="Flowchart: the Settings manager"></p>
+
+### 2.10 Auto Revert on returning
+
+Off by default. For people who always come back to IMD after using the app they launched.
+
+<p><img src="docs/logics/10-auto-revert.png" width="100%" alt="Flowchart: Auto Revert on returning"></p>
+
+### 2.11 IMD intents
+
+Off by default, and every broadcast is refused - silently - until both the switch and the auth
+key agree. ⚠ **Opening the Settings manager is the exception**: it is an activity rather than a
+broadcast, it carries no auth key, and the integration switch cannot refuse it, because all it
+does is put a screen in front of you that you then operate by hand.
+
+<p><img src="docs/logics/11-tasker.png" width="100%" alt="Flowchart: IMD intents"></p>
+
+### 2.12 Settings observer
+
+The diagnostic tool: it tells you which settings a stubborn app actually reads, so you can
+build a profile for it instead of guessing.
+
+<p><img src="docs/logics/12-observer.png" width="100%" alt="Flowchart: the settings observer"></p>
+
+### 2.13 Hide settings tile
+
+The only control here with a state rather than an action. What it shows is written by the hide
+and by every revert, wherever either was run from, so it is never a stale picture of a device
+somebody has since put back by another route - and what a press does is decided from that same
+record rather than from what the tile happened to be drawing.
+
+<p><img src="docs/logics/13-hide-tile.png" width="100%" alt="Flowchart: the Hide settings quick settings tile"></p>
+
+### 2.14 Auto-hide settings (IMD+)
+
+The only logic here that starts without anybody pressing anything, which is why it is the only
+one with two guards drawn on it rather than one. The first is at the top: IMD+ refuses to start
+while anything is already hidden or any revert is still owed, because a run on top of one of
+those leaves settings that neither revert puts back. The second is in the middle: IMD switches
+off **its own** accessibility service before it reopens the app - without that, reopening the app
+is another app coming to the foreground, which is precisely what the detector listens for, and
+IMD+ would chase its own tail forever.
+
+Note also what the revert does *not* do. It closes no apps, so it needs Shizuku only if overlay
+access has to be written; on a device with no overlay work to do it finishes in a moment.
+
+<p><img src="docs/logics/14-auto-hide.png" width="100%" alt="Flowchart: Auto-hide settings (IMD+)"></p>
+
+### 2.15 Auto unhide settings
+
+The other half of the pair above, and the one that needs no notification tapped: it watches for
+the moment a hide has served its purpose and puts the device back on its own.
+
+There are three triggers - the app swiped away from recents, the app left alone for longer than
+a timer, and the screen locked for longer than a timer - and two conditions saying which kinds
+of hide they apply to. ⚠ **Which condition is read is inferred, not stored.** A hide that named
+an app leaves a watch entry, so it is an app-launch session; a hide from the tile names nothing
+and leaves none, so it is a tile session. That is also why the screen-lock trigger is the
+failsafe and cannot be switched off while the tile condition is on: a tile session has no app
+to watch, and screen lock is the only thing that could ever end it.
+
+Two things degrade rather than fail. Without the DUMP permission the swipe trigger simply never
+fires; without usage access the idle timer measures from the hide instead of from when you last
+used the app.
+
+<p><img src="docs/logics/15-auto-unhide.png" width="100%" alt="Flowchart: Auto unhide settings"></p>
+
+---
+
+## 3. Version history
 
 Every version below was built by soul_99 in Android Studio, signed with his own keys, and
 installed and used on his own phone before release. Anything under **Broke** was found that
@@ -28,6 +213,372 @@ that shipped broken.
 
 Newest first. Every release gets an entry here, including the ones that only change
 documentation.
+
+### v3 - 3 September 2026 · versionCode 17
+
+The release where IMD stops needing to be told. Every version before this one hid settings because
+somebody pressed something - a tile, a shortcut, a row in the app - and put them back the same way.
+v3 adds the other half at both ends: **auto unhide settings** ends a hide without a press, and
+**auto hide settings (IMD+)**, begun in v2.4, is now reliable enough to be one of three automations
+rather than an experiment.
+
+It is also the release that stopped treating hiding and unhiding as one setting, which is the
+change most of the rest of this entry follows from.
+
+**Added - Auto unhide settings**
+
+A hide now ends on its own. The watcher takes one of three signals - the app you launched being
+closed, the screen locking, or your returning to IMD - and reverts when it sees one, with a silent
+ongoing notification saying it is running and going away when everything is back.
+
+- **The notification cannot be swiped off.** It is the only visible sign that the device is not as
+  you left it; a user who dismisses it and forgets has no way of knowing. It comes back while the
+  session is live.
+- **It ticks every 5 seconds while the screen is on and every 30 while it is off.** The revert
+  wants to be prompt, and a poll in a pocket wants to be cheap; those are different numbers, so it
+  is two.
+- ⚠ **A session kind the user has switched off settles rather than waiting.** The gate was right
+  from the start but its disallowed branch answered "not settled", so the service stayed up and
+  reached the same line every fifteen seconds for the whole hidden window. Answering "settled" is
+  correct because the answer cannot change: the kind is fixed the moment the hide names an app or
+  does not.
+
+**Added - hiding and unhiding are two frameworks**
+
+*Hiding-unhiding mechanism* is gone, replaced by a **hiding framework** (IMD defaults, or per app
+configuration) and an **unhiding framework** (revert to default, or memory function), both at the
+top of Advanced and each row reading *using X*.
+
+- ⚠ **This is the fix for a bug, not only a preference.** Hiding device-wide on the memory function
+  used to apply the *configured defaults* on the way back rather than restoring what the device
+  actually was - so on a new install, every tile hide put back something nobody had chosen. The
+  device-wide hide now records real state, and the revert is carried out by **the framework that
+  did the hide**, not by whichever one is selected when the revert runs.
+- Existing setups migrate without being asked: *revert to default* becomes IMD defaults + revert to
+  default, *memory* becomes per app configuration + memory function. New installs start on IMD
+  defaults + memory function.
+- A revert now also restores anything a per-app profile hid that is not one of the six default
+  targets, before the defaults are applied.
+
+**Added - recovering from a force close**
+
+If IMD is force-stopped while settings are still hidden, the next launch offers to restore them
+first or to ignore every outstanding revert - on all six ways in: the apps list, favourites, the
+per-app screen, a pinned shortcut, IMD+, and opening IMD itself. A spinner covers the restore, one
+per window.
+
+⚠ **The dialog cannot be dismissed by a back press or a tap beside it.** Both used to run the
+destructive answer, which discarded real holds - the one dialog in the app where the cheapest
+gesture was the irreversible one.
+
+**Added - the permission is reported when it goes**
+
+Losing `WRITE_SECURE_SETTINGS` used to be silent on a shortcut hide, swallowed by IMD+, and a dead
+switch in the settings manager. It is now a popup on every route that can hide - both in-app
+launches, the tile, the pinned shortcut, IMD+, the manager, and a notification for IMD intents -
+and anything that run had already hidden is undone.
+
+⚠ **A popup rather than IMD coming to the foreground.** The failure happens while you are in
+another app; dragging IMD over it to deliver the news is worse than the news.
+
+**Changed - the settings manager**
+
+Renamed **IMD Settings Manager**, and rebuilt around it: a frosted window, Material 3 switches with
+a hand-drawn tick, the whole row tappable rather than only the switch, **All on / All off**, a red
+line while a revert is outstanding, external-link icons on the rows that have an Android page, a
+**Manage Shizuku** master switch that removes the Shizuku and overlay rows on a device without it,
+and a countdown while the Shizuku service starts - 8 seconds on Thedjchi, 40 on Shevery.
+
+Rows are locked while any hide or revert runs, with a line above them saying which. They were
+pressable during an IMD+ run, a shortcut launch or a notification revert, which let a user write
+into the middle of a write.
+
+**Changed - the words**
+
+*IMD services manager* → **IMD Settings Manager** (tile and shortcut: *Settings manager*); the
+first-run screen reads **IMD - It's My Device**; IMD+ is **(needs background service)** rather than
+EXPERIMENTAL; **IMD intents** dropped its EXPERIMENTAL tag; and the About page says **Supercharged
+fork of** rather than *Fork of*.
+
+**Changed - the other ten languages**
+
+About 1,500 strings written across Hindi, Arabic, Portuguese (BR), Simplified Chinese, German,
+Spanish, French, Japanese, Korean and Russian, taking each locale from roughly 80% to essentially
+complete.
+
+⚠ **The in-app "where to find this" trails are assembled, not translated.** Each row is named
+exactly as that language's own Android settings screen names it, and the trail is built from those
+names - Arabic with the right-to-left arrow and the app name second. A translated *sentence*
+describing a path is not a path.
+
+⚠ **The six Shizuku setup step lines stay in English on purpose.** They are read against Shizuku's
+own settings screen, which is English-only.
+
+**Changed - the look and the cost**
+
+Dynamic (wallpaper) colour and progressive blur are both on by default; anyone who had turned
+either off gets it back once and their next choice sticks. The dark theme's `primary` moved from
+`#B3E675` to `#8FAE6E` - the old one was a yellow-green at high lightness *and* high chroma, which
+is the definition of a highlighter, and six switch tracks stacked in one dialog was where it showed.
+The settings manager's two buttons and the Favourites manager button moved onto that same `primary`;
+there had been three greens.
+
+Scrolling the settings page no longer re-runs the whole body every frame, and the blurred header's
+effect graph is cached rather than rebuilt per draw.
+
+**Fixed**
+
+- **The IMD+ open-and-close loop.** A hide that could not complete left IMD+ killing and relaunching
+  the app forever. It now tries once, then waits 1 minute, then 5, then 30; a success clears the
+  wait, and switching IMD+ off and on clears it immediately.
+- **Revert to default restored three of its six targets.**
+- **Auto unhide reverts were cut short** - the settings were written, the notification never cleared
+  and no toast appeared.
+- A device-wide memory revert restored whatever was true at the *first* hide, for ever; the record
+  is now cleared by the revert that used it.
+- A hide from the tile with the quick-settings trigger on and the screen-lock trigger off could
+  never be reverted, and its service never stopped.
+- Accessibility services and *Display over other apps* could be stuck off in the manager, doing
+  nothing when switched on by hand, when IMD held no record.
+- The tile could show a stale label, get stuck after a hide, or flash the wrong label on the way
+  through a revert; it is now told about hides and reverts that happen outside the shade.
+- A Shevery wait died when its dialog was dismissed; a Shizuku row that was still starting opened
+  the *unavailable* dialog.
+- Settings screens open on more devices - IMD tries a list of candidate destinations rather than one.
+- Creating a shortcut by long press no longer hangs silently; a Retry appears after 8 seconds.
+- Legacy-style app icons showed a hairline along their bottom and right edges - a float `RectF`
+  whose half-pixel edges the rasteriser rounded inward on exactly two sides.
+- Three separate bugs with the switch tick, all one cause.
+
+**Broke**
+
+Four builds failed on the author's machine during r29, and each one is a lesson worth keeping:
+
+- **`androidx.baselineprofile:1.5.0` does not exist.** The version was guessed and shipped flagged
+  but unverified. 1.4.1 is stable and **1.5.0-rc02** heads the 1.5 line; the RC is pinned
+  deliberately, because the 1.5 notes say it no longer needs `newDsl=false` under AGP 9.
+- **A child project may not name a version for a plugin already on the root classpath.** build-logic
+  puts AGP there as a plain dependency, so `com.android.test` must be applied by bare id - which
+  every one of the other twenty-nine modules already did, evidence that was in the repo and unread.
+- **aapt2 refused the whole resource table** over `values-fr.xml`: `Services d\\'accessibilité`.
+  ElementTree resolves XML entities but knows nothing of Android's backslash escapes, so a value
+  read back out of an already-translated file still carried its `\'` and the writer escaped it
+  twice. Fixed at the read/write asymmetry, and `check_escapes()` in `tools/check_translations.py`
+  now reads the raw file, because every existing check went through ElementTree and none of them
+  could see it.
+
+⚠ **The baseline profile has never been generated.** The module and the wiring are here and
+`assembleRelease` succeeds without a profile, so the APK simply ships without one. It needs one run
+on a device - see `baselineprofile/README.md` - and the output committed.
+
+⚠ **Arabic still renders `%1$d` as ٠١٢.** `Resources.getString` formats against the config locale
+and `ar` carries the `arab` numbering system, so the digits are substituted after the string is
+built. Fixing it is a change at each call site, touching strings that have already shipped.
+
+### v2.4 - 28 August 2026 · versionCode 16
+
+The release that lets IMD act on its own. Everything before this needed a press: a tile, a
+shortcut, a tap on an app inside IMD. **Auto-hide settings (IMD+)** is the first thing in this
+app that starts without one, and the whole design follows from taking that seriously.
+
+There is no versionCode for a v2.3. The IMD+ work was specified as v2.4 while v2.2 was still
+the current release, and the number was kept rather than renumbered mid-build.
+
+**Added - Auto-hide settings (IMD+)**
+
+Pick the apps you want protected. When one of them comes to the front, IMD force-stops it
+through Shizuku, hides whatever *Settings to hide/ disable* names, and opens the app again -
+so the app starts having never seen the settings it objects to. A notification stays in the
+shade and puts everything back on a tap.
+
+- **The detector reads one thing.** Its accessibility service asks for `typeWindowStateChanged`
+  and deliberately **not** `canRetrieveWindowContent`: it needs the package name of whatever is
+  in front and nothing else, and an accessibility service that can read screen content is a
+  very different thing to install than one that cannot. Android's own accessibility list shows
+  it as *IMD+ (autohide settings)* with a description saying exactly that.
+- **It switches itself off mid-run.** Reopening the app is another app coming to the
+  foreground, which is precisely what the detector listens for - so left running it would
+  detect its own relaunch and start over forever. The run switches the detector off before it
+  relaunches anything. That is a state rather than a timer: nothing depends on how long a kill
+  or a launch takes on a given device. It comes back on the revert, recorded as an ordinary
+  accessibility hold.
+- **The run happens inside a transparent window of IMD's own**, and that is a requirement
+  rather than a decoration: starting an app from the background is refused on Android 10 and
+  up unless something exempts the caller, and the exemption an accessibility service would have
+  given is the very thing the run has just switched off. The window also carries the Shizuku
+  spinner, so the wait reads as work rather than as a tap that did nothing.
+- **Switching the service on tries three things in order**, without asking: the secure setting
+  first; then, if the system declines to bind it, Shizuku is used to allow the restricted-
+  settings AppOp - which from Android 13 a sideloaded app's accessibility service cannot be
+  switched on without, by anybody - and the write is repeated. Only if both come to nothing
+  does a popup name the two things a person can do by hand. Nothing here trusts the write's
+  return value: what counts is whether the system actually bound the service.
+- **One checkbox, and it decides the Shizuku question.** *Do not close the app on the first
+  launch* is the only exception, and because force-stopping the launched app is the only thing
+  IMD+ asks Shizuku for on its own account, ticking it removes the Shizuku requirements
+  entirely.
+- **The revert closes nothing.** It hands straight to *Revert to default*, which starts Shizuku
+  only if overlay access actually has to be written and otherwise settles it at the very last
+  step. A revert with no overlay work to do now finishes in a moment rather than after a wait
+  for a shell it never used.
+
+**Changed**
+
+- **IMD's own accessibility service is now switched off by every hide**, from any route -
+  a launch inside IMD, a pinned shortcut, the tile, an intent - whether or not *Accessibility
+  services* is ticked, and only when the hide actually hides something. It is restored by
+  *Revert to default*, or by the last of the pending per-app reverts under the memory function.
+- **IMD+ will not start while any revert is still outstanding.** The switch reads off for that
+  whole period and says why.
+- **A launch from inside IMD while IMD+ is running** either opens the app with no notification,
+  because everything it wanted hidden is hidden already, or is refused and says why - when a
+  per-app profile asks for something IMD+ is not holding, satisfying it would leave settings
+  that neither mechanism's revert puts back.
+- **Every dialog in the app is capped and centred on large screens**, and fills the width on a
+  phone. Android's own dialog width is a fraction of the screen, which is the wrong way round
+  in both directions: it left dialogs narrower than a phone and wider than they should ever be
+  on a tablet. The width is decided in `DialogContainer` now, once, for all of them.
+- **The services manager's accessibility switch no longer touches IMD's own detector**, in
+  either direction. That switch stands for the services the *user* picked; the detector is
+  switched off by every hide whatever the selection says, and only a revert puts it back.
+- **A revert to default switches the detector back on** rather than only releasing the hold, as
+  long as IMD+ is configured on - so a record lost to a crash or an outside change cannot leave
+  IMD+ silently deaf until somebody opens the settings screen and notices.
+- **A new Revert to default icon**: the tick is gone and the arrow is smaller and heavier, so
+  it still reads at quick-settings size. Regenerated across the tile, the shortcut, the
+  design-system glyph, the themed icon and the mipmaps.
+
+**Broke**
+
+- Nothing new found in testing at the time of writing.
+
+### v2.2 - 27 August 2026 · versionCode 15
+
+Two releases in one. v2.1 was built, tested and never published: the crash below was found in
+it, and by the time that was fixed the quick settings toggle and the notification rework had
+landed on top, so both went out together as v2.2. There is no versionCode 15 that is only
+v2.1.
+
+**Fixed - the app could not start at all on Android 12 or below**
+
+Since the language feature shipped in v1.6.5, every device from Android 7 to Android 12 has
+died before a line of the app ran:
+
+```
+java.lang.RuntimeException: Unable to instantiate application com.android.geto.GetoApplication:
+java.lang.NullPointerException: Attempt to invoke virtual method
+  'android.content.SharedPreferences android.content.Context.getSharedPreferences(...)'
+  on a null object reference
+    at com.android.geto.GetoApplication.attachBaseContext
+```
+
+`AppLocale.prefs()` read the chosen language through `context.applicationContext`, and it is
+called from `Application.attachBaseContext` - where the Application has not been attached yet,
+so `getApplicationContext()` answers null. The wrapper returns early on Android 13 and up,
+which is exactly why it was never seen: the only devices it was tested on are Android 13+. It
+now uses the context it was handed, which is a full context with the right data directory, and
+SharedPreferences are cached per file per process so it is the same one-key file either way.
+
+Reported by a user on a realme RMX2040 running Android 11. Nothing they did caused it and
+nothing they could have done would have avoided it.
+
+**Added**
+
+- **A "Hide settings" quick settings tile.** The third tile, and the first with a state rather
+  than an action: it shows whether IMD is hiding anything right now - reading *Settings
+  visible* or *Settings hidden* - hides on a press and unhides on the next. It follows a revert
+  fired from anywhere - a notification, an intent, the home-screen shortcut, the other tile -
+  because what it reads is written by the hide and by every revert, not by the tile.
+  Long-pressing it opens the services manager.
+- **Nothing configured to hide is now said out loud.** Pressing the tile with an empty
+  "Settings to hide" leaves it off, collapses the panel and says what to configure, rather than
+  appearing to do nothing.
+- **Stop the Shizuku service as part of hiding**, device-wide and per app. The fork's own stop
+  broadcast first, then a poll, and if the fork ignores it, USB debugging is dropped for a
+  moment - which takes adbd and Shizuku with it - and put back only where it belongs. The blunt
+  path raises its own warning, because it cannot be undone as cleanly on the way back.
+- **The Shevery fork family.** Shevery has no start or stop intents; it follows the debugging
+  transport and its own ErrorProtect watchdog. Seven controls that only make sense with intents
+  are hidden on it, and choosing it is only committed after its notice is read.
+- **`CONTRIBUTING.md`** at the root of the repository.
+
+**Changed**
+
+- **A fresh install hides nothing and unhides nothing.** Both default configurations start
+  empty, so an install nobody has configured cannot change a device on its own. Existing
+  installs are untouched: a one-shot migration writes the old defaults down as the answer for
+  anyone who had never opened the dialogs, and frozen copies of those old defaults live in the
+  source so a later change cannot rewrite history.
+- **A launch with nothing ticked is refused** rather than opening the app with every setting it
+  objects to still on - which looked like IMD doing nothing. All apps, Favourites and pinned
+  shortcuts all say where to configure it.
+- **The revert notification is ongoing, says one fixed line, and reverts on tap.** No button to
+  find, no wording that depends on which app was launched, and no way to lose it by accident:
+  from Android 14 an ongoing notification can still be swiped away, so a swipe re-posts it. A
+  revert cancelling the notification itself does not, so a finished revert is final.
+- **A channel each for the two revert notifications**, so either can be silenced or sorted in
+  Android's own settings without touching the other or the observer service.
+- **"Notification function" is now "Hiding-unhiding mechanism"**, and its Save button is now
+  **Re-launch app**: changing which mechanism hides and unhides settles whatever the old one
+  still had outstanding, then starts the app over, because several screens read the mechanism
+  as they are composed.
+- **"Tasker / MacroDroid integration" is now "IMD intents (EXPERIMENTAL)".**
+- **The Shizuku start action is pre-filled and written down**, not merely displayed. A field
+  showing a default while storage held a blank made the app report itself unconfigured with
+  every box apparently filled.
+- **Launching a second app no longer redoes work that is already done.** Overlay access that
+  IMD has already withdrawn is not withdrawn again, which is what used to cost twenty seconds
+  of starting and stopping Shizuku - and sometimes a USB-debugging warning - on every repeat
+  launch.
+- **About is no longer a chain of link icons.** Only the coloured text is clickable; the two
+  rows inside the soul_99 dialog keep their marks.
+- **The overlay picker opens instantly** on a cached list, and asks the system for labels only
+  for the packages it is going to show rather than rasterising every app on the device.
+- The help page says nothing is hidden by default and that you must configure it first; the
+  shortcut's "nothing configured" dialog says **long press** on the app name.
+
+- **The services manager's "Display over other apps" row now behaves like the accessibility
+  one.** With no app selected it reads off, refuses to move, and says which screen to go to,
+  rather than reading "on" - which described the device rather than anything IMD was doing, on
+  a switch that could not have done anything about it either way.
+- **Both revert notifications show their whole line.** They were a title, which is one line
+  tall and cut off on a narrow screen - taking the half that says what a tap does with it.
+- **A re-posted notification looks like the one that was swiped away**, app icon and all: it is
+  fetched from the system rather than carried through the notification's own extras.
+- **The settings template dialog stays open** while you add rows to a profile, and closes on
+  back or a tap outside like every other dialog.
+- **Leaving an app's configuration page goes back where you came from** instead of always
+  landing on Settings.
+- The Version row is now **App version**, and the empty Favourites tab says one thing.
+- **The Revert to default notification carries the "settings hidden" glyph** rather than the
+  app's own logo - the same struck-eye drawing the Hide settings tile shows, in the coloured
+  pair the other IMD icons use. What the notification is about is that settings are hidden;
+  the logo only said which app had posted it, which the header says anyway.
+- **Pressing the tile no longer flashes the screen.** The window it opens is usually invisible
+  and finishes at once, but it was themed like the services manager - which dims the screen
+  behind it. No dim, no window animation, no starting preview.
+
+**Broke, and was fixed before release**
+
+- The overlay list took ten to fifteen seconds to open: `repeat { … return@repeat }` is
+  `continue`, not `break`, so the read ran six times whatever happened.
+- The redetect button reported "no app found" on the first press and worked on the second - a
+  fixed ceiling raced the app scan. It now waits on a count of completed reads, because a
+  "loading" boolean is observed through a collector and a waiter can see a stale `false`.
+- Fork detection was dead twice over, each time because its guard asked about a value the
+  preferences layer fills in. A blank start action is the only honest sign that nothing has
+  been configured.
+- **A second app's revert undid the first app's hide.** Launch one app that withdraws overlay
+  access, then a second that is configured to withdraw it and finds it already gone, and
+  reverting the *second* handed the permission back - starting Shizuku to do it and leaving
+  the debugging transport on behind it - while the first app was still open. The launch now
+  writes a per-app note when it is the one that did the withdrawing, and only that note earns
+  the undo. The same rule Shizuku's own stop has followed since v2.0.
+- **A standing "open Settings" request re-fired on every return.** The request that opens the
+  Settings tab from outside the navigation graph was read as a state rather than an event, so
+  once one had arrived, backing out of any app's configuration page bounced the user onto
+  Settings - and re-opened the revert configuration dialog with it. Both now fire once per
+  request, against a mark that survives the screen leaving composition.
 
 ### v2.0 - 25 August 2026 · versionCode 14
 
@@ -738,7 +1289,7 @@ The first release of the fork, built around the things that did not survive real
 
 ---
 
-## 3. Licence and attribution
+## 4. Licence and attribution
 
 ### The original work
 
@@ -755,7 +1306,7 @@ This is a **modified version** of Geto, as GPL-3.0 §5(a) requires be stated pla
 - Modified by **soul_99 (Dr. Utkarsh Rajput)** during **August 2026**, versions v1.0 to
   v1.6.1, all of which are listed above.
 - The application id was changed to `com.soul_99.suIMD` and the app renamed to
-  **(SU) IMD**, so this fork installs alongside the original and is not mistaken for it.
+  **IMD**, so this fork installs alongside the original and is not mistaken for it.
 - Source files changed by this fork carry a
   `Modifications Copyright 2026 soul_99 (suIMD)` line beneath the original copyright notice.
   A small number touched early in the fork's life still carry only the original notice; they
@@ -791,3 +1342,35 @@ The app is built on AndroidX and Jetpack Compose, Kotlin and kotlinx (coroutines
 serialization), Dagger/Hilt, Coil, and the Shizuku API (`dev.rikka.shizuku`). All are
 Apache-2.0, all are used unmodified as build dependencies, and none of their source is
 redistributed here.
+
+One third-party file *is* redistributed here, and carries its own licence:
+
+- **DejaVu Sans Mono**, at `feature/settings/src/main/res/font/dejavu_sans_mono.ttf`,
+  unmodified from the [DejaVu fonts project](https://dejavu-fonts.github.io/). It draws
+  the shell block on the About screen and nothing else. The DejaVu fonts are based on
+  Bitstream Vera, whose licence requires its copyright and permission notice to travel
+  with every copy of the font; that notice is reproduced in full in
+  [LICENSE-DejaVu.txt](LICENSE-DejaVu.txt), and shipped inside the APK as
+  `app/src/main/assets/LICENSE-DejaVu.txt` so that a built app is a copy carrying its own
+  notice rather than one relying on this repository for it. Nothing reads that asset; it
+  is there to be present. The licence is permissive — free to use, copy, modify and
+  redistribute — and compatible with GPL-3.0, so it places no condition on the rest of
+  this work. It applies to the font file alone.
+
+### Trademarks
+
+One asset in this repository is not the fork's own work and is not freely licensed:
+
+- **GitHub's "Invertocat" mark**, at
+  `design-system/src/main/res/drawable/ic_github.xml`, drawn from the official Octicons
+  `mark-github` glyph and unchanged in shape. It is a trademark of **GitHub, Inc.** It
+  appears in one place — beside the author dialog's "View GitHub" row — for the single
+  purpose GitHub's usage terms allow: marking a link that leads to GitHub. It is not part
+  of this app's branding, and its presence does not imply that GitHub endorses this app or
+  is connected with it. Under GPL-3.0 §7(e) that mark is excluded from the licence granted
+  over the rest of this work: copying this repository does not carry any right to GitHub's
+  trademark with it.
+
+Android, Google Play and Material are trademarks of Google LLC; Shizuku, Tasker,
+MacroDroid, Obtainium and F-Droid are the marks of their respective owners. All are named
+here descriptively, and none of their logos are bundled.

@@ -1,0 +1,21 @@
+flowchart TD
+    A["An automation app wants<br/>to drive IMD"] --> B{"Which kind?"}
+
+    B -- "<b>Open the Settings manager</b>" --> C["Not a broadcast, and <b>no auth key</b>. It<br/>launches an exported activity - a screen<br/>you then toggle by hand, so the<br/>integration switch cannot refuse it"]
+
+    B -- "A broadcast" --> D{"Is <b>IMD intents</b><br/>switched on?"}
+    D -- No --> Z["Refused, <b>silently</b>"]
+    D -- Yes --> E{"Auth key correct?"}
+    E -- No --> Z
+    E -- Yes --> F{"Which action?"}
+
+    F -- "Hide settings" --> G["Hide the configured settings (logic 1),<br/>suppressing the previous-hide prompt.<br/>Reports by toast and notification only"]
+    F -- "Unhide settings" --> H["Flush the outstanding reverts -<br/>and only those"]
+    F -- "Toggle settings" --> I["Exactly what the <b>Hide settings</b><br/>tile press does (logic 13)"]
+    F -- "Revert to default" --> J["Run the named function (logic 2)"]
+    F -- "Revert using memory" --> K["Still honoured for macros written before<br/>v3, but <b>no longer offered</b><br/>in the picker"]
+
+    class Z stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

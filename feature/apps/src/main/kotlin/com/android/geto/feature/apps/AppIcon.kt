@@ -29,13 +29,23 @@ import coil.request.ImageRequest
 import com.android.geto.domain.model.LauncherAppsActivityInfo
 
 /**
- * One app icon, already masked to a squircle by the drawable wrapper.
+ * One app icon, rendered by the drawable wrapper.
+ *
+ * ⚠ Not necessarily masked. An icon the system already shaped is passed through untouched; only
+ * a legacy one is given the platform's icon mask - see `LegacyIconShaping`. This line used to
+ * say every icon was masked to a squircle, which stopped being true when that masking was
+ * reverted and was still saying it a round later.
  *
  * The icon arrives as PNG bytes. Handing those straight to `AsyncImage` gives Coil nothing
  * stable to key its memory cache on, so every icon was decoded again each time its row
  * scrolled back into view — the single biggest source of jank in these lists. An explicit
  * [ImageRequest.Builder.memoryCacheKey] fixes that: the key is the component plus the
  * package's update time, so an app that updates gets a fresh decode and nothing else does.
+ *
+ * ⚠ **And the icon revision, since r4y.** Those two fields were the whole of what could change a
+ * picture until the Icon style setting existed; afterwards this key pinned the old bitmap in
+ * front of every new one, and a list that had genuinely been re-rendered drew as though nothing
+ * had happened.
  *
  * The crossfade is off because these are cache hits; fading in an icon that was already
  * decoded just draws attention to the scroll.
@@ -51,12 +61,14 @@ internal fun AppIcon(
     val request = remember(
         launcherAppsActivityInfo.componentName,
         launcherAppsActivityInfo.lastUpdateTime,
+        launcherAppsActivityInfo.iconRevision,
     ) {
         ImageRequest.Builder(context)
             .data(launcherAppsActivityInfo.activityIcon)
             .memoryCacheKey(
                 launcherAppsActivityInfo.componentName + "@" +
-                    launcherAppsActivityInfo.lastUpdateTime,
+                    launcherAppsActivityInfo.lastUpdateTime + "@" +
+                    launcherAppsActivityInfo.iconRevision,
             )
             .crossfade(false)
             .build()

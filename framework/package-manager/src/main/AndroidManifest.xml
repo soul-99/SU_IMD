@@ -15,7 +15,32 @@
   ~   limitations under the License.
   ~
   -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      Auto unhide's two detectors, both declared here because this is the module that reads
+      them.
+
+      DUMP is what lets getHistoricalProcessExitReasons answer about a package that is not
+      this one, which is the only unprivileged way to learn that the user swiped an app out
+      of recents. PACKAGE_USAGE_STATS backs the "app not in foreground" trigger.
+
+      Neither is granted by installing the app. Both carry the development protection flag,
+      so both are granted once by shell - through Shizuku from inside IMD, or over adb - and
+      stay granted afterwards. Declaring them is what makes that grant possible at all; a
+      permission the manifest does not ask for cannot be granted by pm grant either.
+
+      tools:ignore because lint is right in general and wrong here: these are indeed normally
+      system-only, and being grantable by shell is exactly the property being relied on.
+    -->
+    <uses-permission
+        android:name="android.permission.DUMP"
+        tools:ignore="ProtectedPermissions" />
+
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
 
     <queries>
         <intent>

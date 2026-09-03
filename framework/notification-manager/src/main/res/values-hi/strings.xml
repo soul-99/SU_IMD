@@ -16,10 +16,27 @@
   ~
   -->
 <resources>
-    <string name="revert_using_memory">मेमोरी से वापस लाएँ</string>
+    <string name="revert_using_memory">मेमोरी का उपयोग करके सेटिंग दिखाएँ</string>
     <string name="revert_to_default">डिफ़ॉल्ट पर वापस लाएँ</string>
-    <string name="overlay_restore_failed_title">रिवर्ट विफल</string>
+    <string name="overlay_restore_failed_title">सेटिंग दिखाने में विफल</string>
     <string name="overlay_restore_failed_text">Shizuku की मदद से दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस नहीं दी जा सकी. कृपया Shizuku सेवा मैन्युअल रूप से चालू करें और नीचे दिए गए बटन पर क्लिक करें</string>
     <string name="overlay_restore_retry">फिर कोशिश करें</string>
-    <string name="alert_notification_channel">रिवर्ट विफलताएँ</string>
+    <string name="alert_notification_channel">IMD विफलताएँ</string>
+    <string name="shizuku_usb_fallback_title">Shizuku सेवा बंद हुई</string>
+    <string name="shizuku_usb_fallback_text">Shizuku सेवा स्टॉप इंटेंट से नहीं, बल्कि USB डिबगिंग से बंद की गई; Revert करने पर ऐप Shizuku सेवा बहाल करने में विफल हो सकता है।</string>
+    <string name="shizuku_usb_fallback_text_overlay">Shizuku सेवा स्टॉप इंटेंट से नहीं, बल्कि USB डिबगिंग से बंद की गई; Revert करने पर ऐप Shizuku सेवा और \'दूसरे ऐप के ऊपर दिखाएँ\' बहाल करने में विफल हो सकता है।</string>
+    <string name="notification_ok">ठीक है</string>
+    <string name="hidden_revert_default">सेटिंग छिपा दी गईं, दिखाने के लिए टैप करें.</string>
+    <string name="hidden_revert_memory">सेटिंग छिपा दी गईं, मेमोरी से दिखाने के लिए टैप करें.</string>
+    <string name="auto_hide_channel">सेटिंग्स अपने आप छिपाएँ (IMD+)</string>
+    <string name="auto_hide_hidden_revert">IMD+ ने आपकी सेटिंग छिपा दीं, दिखाने के लिए टैप करें.</string>
+    <string name="auto_hide_hidden_revert_memory">IMD+ ने आपकी सेटिंग छिपा दीं, मेमोरी से दिखाने के लिए टैप करें.</string>
+    <string name="auto_unhide_channel">ऑटो अनहाइड सेटिंग्स सेवा</string>
+    <string name="auto_unhide_running">ऑटो अनहाइड सेवा चल रही है</string>
+    <string name="auto_hide_shizuku_failed">IMD+ सेटिंग्स नहीं छिपा सका क्योंकि Shizuku सेवा शुरू नहीं हो सकी. कृपया अपनी सेटिंग्स जाँचें.</string>
+    <string name="shizuku_revert_failed">Shizuku सेवा शुरू नहीं हो सकी, इसे मैन्युअली शुरू करने के लिए यहाँ टैप करें</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="developer_note_channel">IMD ऐप अपडेट सूचना</string>
+    <string name="developer_note_notification">IMD: डेवलपर की ओर से ज़रूरी बात 🧑‍🔬</string>
+    <string name="shevery_start_failed">Shevery चालू नहीं हो सका, इसे मैन्युअली चालू करने के लिए यहाँ टैप करें।</string>
 </resources>

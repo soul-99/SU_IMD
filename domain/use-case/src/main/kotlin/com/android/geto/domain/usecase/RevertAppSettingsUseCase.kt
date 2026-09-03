@@ -18,6 +18,7 @@
  */
 package com.android.geto.domain.usecase
 
+import com.android.geto.domain.common.Diagnostics
 import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers
 import com.android.geto.domain.framework.AccessibilityServicesWrapper
@@ -27,8 +28,10 @@ import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.SettingSnapshot
+import com.android.geto.domain.model.UnhidingFramework
 import com.android.geto.domain.model.UserData
 import com.android.geto.domain.model.isShizukuConfigured
+import com.android.geto.domain.model.settingsHidden
 import com.android.geto.domain.repository.AppSettingsRepository
 import com.android.geto.domain.repository.UserDataRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,6 +40,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+/** What a switched-on global setting stores. Matches AppSettingKeys' own `valueOnRevert` test. */
+private const val WIRELESS_DEBUGGING_ON = "1"
 
 /**
  * Wireless debugging does not come back the instant the Global flag is written; adbd has
@@ -53,13 +59,23 @@ class RevertAppSettingsUseCase @Inject constructor(
     private val secureSettingsWrapper: SecureSettingsWrapper,
     private val accessibilityServicesWrapper: AccessibilityServicesWrapper,
     private val userDataRepository: UserDataRepository,
+    private val restoreAutoHideServiceUseCase: RestoreAutoHideServiceUseCase,
     private val startShizukuUseCase: StartShizukuUseCase,
     private val setManualTargetUseCase: SetManualTargetUseCase,
     private val getManualTargetStatesUseCase: GetManualTargetStatesUseCase,
     private val shizukuStartTracker: ShizukuStartTracker,
+    private val settingsWorkTracker: SettingsWorkTracker,
     @param:Dispatcher(GetoDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
 ) {
-    suspend operator fun invoke(componentName: String): AppSettingsResult = withContext(defaultDispatcher) {
+    // A thin wrapper rather than a track { } around the body below, for the same reason as
+    // ApplyAppSettingsUseCase: the body is full of return@withContext and does not move.
+    suspend operator fun invoke(componentName: String): AppSettingsResult =
+        settingsWorkTracker.track(kind = SettingsWorkKind.Unhiding) {
+            revertProfile(componentName = componentName)
+        }
+            .also { Diagnostics.log(tag = "revert", message = "app $componentName -> $it") }
+
+    private suspend fun revertProfile(componentName: String): AppSettingsResult = withContext(defaultDispatcher) {
         val appSettings =
             appSettingsRepository.getAppSettingsByComponentName(componentName = componentName)
 
@@ -80,12 +96,59 @@ class RevertAppSettingsUseCase @Inject constructor(
                     componentName in userData.heldAccessibilityServices
                 )
 
+        // What these settings were really set to before this app's profile was applied, plus
+        // the reserved notes the launch left about what it actually did. Empty for a profile
+        // applied by an older build, in which case each setting falls back to the configured
+        // revert value and behaves exactly as it used to.
+        val recorded = userData.settingStateBefore[componentName].orEmpty()
+
+        // Overlay access comes back only when *this* app's launch is the one that took it.
+        //
+        // The profile saying so is not enough, and neither is a debt existing somewhere. Two
+        // apps that both hide overlay access, launched one after the other, leave only the
+        // first one having done any withdrawing - the second finds it already gone and hides
+        // nothing. Restoring on the second app's revert would hand the permission back while
+        // the first app, the one that asked for it to be withheld, is still open. So the
+        // launch writes a note when it does the work, and only that note earns the undo.
+        //
+        // A debt with no note left behind - an outstanding hide from before this rule, or a
+        // device-wide one from the tile or an intent - stays the province of Revert to default,
+        // which restores from the debt itself and is reachable from the notification, the
+        // tile, a shortcut and the services manager.
         val restoresOverlay = AppSettingKeys.restoresOverlayAccess(enabledAppSettings) &&
-            userData.heldOverlayPackages.isNotEmpty()
+            userData.heldOverlayPackages.isNotEmpty() &&
+            SettingSnapshot.OVERLAY_HIDDEN_ID in recorded
 
         val settingsToWrite = enabledAppSettings
             .filterNot { managesAccessibility && it.key == AppSettingKeys.ACCESSIBILITY_ENABLED }
             .filterNot { it.key == AppSettingKeys.SYSTEM_ALERT_WINDOW }
+            // Both markers, exactly as the apply side drops them. Neither has a settings row
+            // behind it, and handing one to the secure settings wrapper would be writing a key
+            // Android has never heard of - which on a strict device throws, and would take the
+            // rest of this revert down with it.
+            .filterNot { it.key == AppSettingKeys.SHIZUKU_SERVICE }
+            // ⚠ **Wireless debugging is not switched back on by a memory restore unless the
+            // user has asked for it.** A device that comes out of a hide with wireless
+            // debugging on is listening on whatever network it is attached to, with nothing
+            // on screen saying so, so the author made putting it back opt-in.
+            //
+            // Only the *on* direction. A record that says it was off before the hide still
+            // switches it off here, because that is the direction this rule exists to
+            // protect, and refusing it would leave the device more exposed than the record.
+            //
+            // Under Revert to default this never fires: that framework drives revertDefaults,
+            // which carries its own Wireless debugging row and answers this question there.
+            .filterNot { setting ->
+                userData.unhidingFramework == UnhidingFramework.Memory &&
+                    !userData.restoreWirelessDebugging &&
+                    setting.key == AppSettingKeys.ADB_WIFI_ENABLED &&
+                    SettingSnapshot.revertValue(
+                        recorded = recorded,
+                        settingType = setting.settingType,
+                        key = setting.key,
+                        configured = setting.valueOnRevert,
+                    ) == WIRELESS_DEBUGGING_ON
+            }
 
         // Overlay first, mirroring the apply side: it is the only part of this revert that
         // needs Shizuku, and the settings writes below are what take its transport away.
@@ -116,11 +179,6 @@ class RevertAppSettingsUseCase @Inject constructor(
                 }
             }
         }
-
-        // What these settings were really set to before this app's profile was applied.
-        // Empty for a profile applied by an older build, in which case each setting falls
-        // back to the configured revert value and behaves exactly as it used to.
-        val recorded = userData.settingStateBefore[componentName].orEmpty()
 
         try {
             val written = settingsToWrite.map {
@@ -158,12 +216,28 @@ class RevertAppSettingsUseCase @Inject constructor(
                     )
                 }
 
-                // Killing developer options / USB debugging / wireless debugging takes the
-                // Shizuku service down with it, and turning them back on does not bring it
-                // back. Ask Shizuku to start itself again.
-                if (AppSettingKeys.triggersShizukuRestart(enabledAppSettings)) {
-                    restartShizukuIfEnabled(userData = userData)
+                // The Shizuku service comes back on Revert in two cases. First, when this
+                // app's profile stopped it outright — the "hide Shizuku service" toggle: its
+                // own revert starts it again, and only its own, which is what the per-app
+                // record under SHIZUKU_STOPPED_ID is for (another app that found the service
+                // already down never recorded a stop, so its revert leaves it alone). Second,
+                // when the profile took the service down as a side effect of switching USB
+                // debugging back on.
+                //
+                // ⚠ **The second case is no longer behind a switch.** 'Restart Shizuku
+                // service' was the only thing reading it and v3 removed that row from
+                // Advanced at the author's own suggestion, so this path now always puts the
+                // service back — which is what the switch did when it was on, and what every
+                // other Shizuku restart in the app already does unconditionally.
+                if (
+                    SettingSnapshot.SHIZUKU_STOPPED_ID in recorded ||
+                    AppSettingKeys.triggersShizukuRestart(enabledAppSettings)
+                ) {
+                    restartShizuku(userData = userData)
                 }
+
+                // Last, and only if this was the last one owed: IMD's own IMD+ detector.
+                releaseAutoHideDetectorIfLast()
             }
 
             AppSettingsResult.Success
@@ -210,9 +284,38 @@ class RevertAppSettingsUseCase @Inject constructor(
         }
     }
 
-    private suspend fun restartShizukuIfEnabled(userData: UserData) {
-        if (!userData.restartShizuku) return
+    /**
+     * Puts IMD's own IMD+ detector back, but only once nothing else is hidden.
+     *
+     * Every launch that hides anything switches the detector off, whatever the profile says
+     * about accessibility services — see the matching call in [ApplyAppSettingsUseCase]. Its
+     * hold is IMD's own rather than any app's, so a per-app revert must not release it while
+     * another app's launch is still outstanding: the detector would come back, see the next
+     * watched app open, and start an IMD+ run on top of a device that is already hidden.
+     *
+     * So it is done here, at the end of the revert that leaves nothing behind. "Revert to
+     * default" needs no such test - it puts the whole device into a known state, so it calls
+     * the same use case unconditionally.
+     *
+     * The read is fresh rather than the `userData` from the top of this revert: the writes
+     * above are what may have just emptied the record this is testing.
+     */
+    private suspend fun releaseAutoHideDetectorIfLast() {
+        val userData = runCatching { userDataRepository.userData.first() }.getOrNull() ?: return
 
+        // Something is still hidden — this was not the last pending revert.
+        if (userData.settingsHidden) return
+
+        restoreAutoHideServiceUseCase()
+    }
+
+    /**
+     * Starts the service again. Both routes reach it directly now: a user who asked for
+     * the service to be stopped for an app plainly wants it back on that app's revert, and
+     * the transport-driven case used to sit behind the 'Restart Shizuku service' switch that
+     * v3 removed at the author's own suggestion.
+     */
+    private suspend fun restartShizuku(userData: UserData) {
         if (!userData.isShizukuConfigured) return
 
         delay(SHIZUKU_START_DELAY_MILLIS)

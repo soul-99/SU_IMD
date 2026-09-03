@@ -22,4 +22,11 @@ plugins {
 
 dependencies {
     api(libs.javax.inject)
+
+    // ⚠ **api, not implementation.** `IconStyleState.revision` is a StateFlow in this module's
+    // public signature and two other modules collect it; under `implementation` the type would
+    // not be on their compile classpath and each of them would fail instead. The sibling domain
+    // modules use `implementation` because their coroutine types stay behind their own
+    // interfaces — this one does not.
+    api(libs.kotlinx.coroutines.core)
 }

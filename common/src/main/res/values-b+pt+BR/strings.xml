@@ -31,14 +31,33 @@
     <string name="global">Global</string>
 
     <string name="language_system">Sistema / automático</string>
-    <string name="language_ai_notice">Os idiomas diferentes do inglês foram gerados com tradução automática assistida por IA, por isso podem conter erros. Se você quiser correções, informe os erros de tradução ao desenvolvedor no rastreador de problemas do GitHub.</string>
+    <string name="language_ai_notice">Os idiomas diferentes do inglês foram gerados com tradução automática, por isso podem conter erros. Se você quiser correções, informe os erros de tradução ao desenvolvedor no rastreador de problemas do GitHub.</string>
 
     <string name="revert_to_default_toast">Reverter para o padrão</string>
     <string name="revert_from_memory_toast">Reverter da memória</string>
-    <string name="revert_failed_shizuku_toast">Falha ao reiniciar o serviço Shizuku</string>
-    <string name="revert_failed_overlay_toast">Falha ao restaurar a permissão Sobreposição a outros apps usando o Shizuku, veja a notificação</string>
-    <string name="revert_failed_shizuku_and_overlay_toast">Falha ao restaurar o serviço Shizuku e as permissões Sobreposição a outros apps</string>
     <string name="settings_hidden_toast">Configurações ocultadas</string>
     <string name="auto_revert_to_default_toast">Reversão automática para o padrão</string>
     <string name="auto_revert_from_memory_toast">Reversão automática usando a Memory function</string>
+    <string name="auto_hide_run_toast">O IMD+ está ocultando suas configurações…</string>
+    <string name="auto_hide_revert_toast">O IMD+ está restaurando suas configurações…</string>
+    <string name="toast_auto_hiding">IMD+: ocultando configurações...</string>
+    <string name="toast_done_hidden">IMD: configurações ocultadas</string>
+    <string name="toast_done_hidden_for">IMD: configurações ocultadas para %1$s</string>
+    <string name="toast_done_reverted_defaults">IMD: configurações revertidas para os padrões</string>
+    <string name="toast_done_restored_defaults">IMD: configurações restauradas para os padrões</string>
+    <string name="toast_done_restored_memory">IMD: configurações restauradas da memória</string>
+    <string name="toast_done_restored_memory_for">IMD: configurações restauradas da memória (%1$s)</string>
+    <string name="toast_nothing_to_restore">IMD: nenhuma configuração oculta para restaurar</string>
+    <string name="toast_auto_done_hidden">IMD+: configurações ocultadas</string>
+    <string name="toast_auto_done_hidden_for">IMD+: configurações ocultadas para %1$s</string>
+    <string name="permissions_lost">Permissões necessárias perdidas. Abra o IMD e conceda as permissões novamente.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="next">Avançar</string>
+    <string name="back">Voltar</string>
+    <string name="prior_hide_ignore">Ignorar todas as reversões anteriores</string>
+    <string name="prior_hide_restore">Restaurar as configurações primeiro</string>
+    <string name="prior_hide_restoring">O IMD está restaurando suas configurações…</string>
+    <string name="prior_hide_title">Configurações ocultadas anteriormente detectadas, restaurá-las primeiro?</string>
+    <string name="retry">Tentar de novo</string>
+    <string name="skip">Pular</string>
 </resources>

@@ -19,13 +19,6 @@
     <string name="settings">الإعدادات</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">افتح التطبيقات المصرفية وغيرها من التطبيقات المقيَّدة دون تشغيل/إيقاف هذه الإعدادات يدويًا في كل مرة:
-1. Developer settings
-2. Debugging
-3. Accessibility services
-4. العرض فوق التطبيقات الأخرى (تتطلب خدمة Shizuku قيد التشغيل)
-5. خدمة Shizuku
-6. وغير ذلك الكثير (عليك ضبطها يدويًا عبر Memory function في التطبيق، تلميح: استعن بـ Settings observer)</string>
     <string name="setup_step">الخطوة %1$d</string>
     <string name="setup_granted">مُنِح</string>
     <string name="setup_not_granted">لم يُمنح</string>
@@ -34,10 +27,10 @@
     <string name="setup_copy_command">نسخ الأمر</string>
     <string name="setup_check_again">إعادة التحقق</string>
     <string name="setup_use_shizuku">استخدام Shizuku</string>
-    <string name="services_shortcut_label">مدير الخدمات</string>
+    <string name="services_shortcut_label">مدير الإعدادات</string>
     <string name="revert_shortcut_label">استعادة الوضع الافتراضي</string>
     <string name="shortcut_not_configured_title">لم يتم إعداد أي شيء لهذا التطبيق</string>
-    <string name="shortcut_not_configured_message">عليك أولًا تحديد الإعدادات المراد إخفاؤها لهذا التطبيق من: IMD ← كل التطبيقات ← اضغط على اسم التطبيق ← قالب الإعدادات ← اختر الإعدادات المراد إخفاؤها.</string>
+    <string name="shortcut_not_configured_message">عليك أولًا تحديد الإعدادات المراد إخفاؤها لهذا التطبيق من: IMD ← كل التطبيقات ← اضغط مطولًا على اسم التطبيق ← قالب الإعدادات ← اختر الإعدادات المراد إخفاؤها.</string>
     <string name="shortcut_not_configured_dismiss">حسنًا</string>
     <string name="obtainium_title">إبقاء هذا التطبيق محدَّثًا</string>
     <string name="obtainium_body">بما أن هذا التطبيق يعمل دون اتصال بالكامل، يُرجى استخدام Obtainium للبحث عن التحديثات وتثبيتها مباشرةً من إصدارات GitHub.</string>
@@ -73,10 +66,43 @@
     <string name="setup_open_settings_failed">تعذّر فتح الإعدادات على هذا الجهاز</string>
     <string name="setup_name_display_over_other_apps">العرض فوق التطبيقات الأخرى</string>
     <string name="setup_how_title">كيف يعمل هذا</string>
-    <string name="setup_how_off">يقوم IMD بإيقاف هذه الإعدادات</string>
+    <string name="setup_how_off">يقوم IMD بإيقاف الإعدادات</string>
     <string name="setup_how_off_note">دون خرق سياسة أمان أي تطبيق</string>
     <string name="setup_how_use">تستخدم تطبيقك</string>
     <string name="setup_how_revert">Revert</string>
-    <string name="setup_how_on">يعيد IMD تشغيل تلك الإعدادات</string>
+    <string name="setup_how_on">يعيد IMD تشغيل الإعدادات</string>
     <string name="setup_how_number">%1$d.</string>
+    <string name="hide_tile_label">إخفاء الإعدادات</string>
+    <string name="hide_tile_visible">الإعدادات ظاهرة</string>
+    <string name="hide_tile_hidden">الإعدادات مخفية</string>
+    <string name="hide_tile_working">جارٍ إخفاء الإعدادات…</string>
+    <string name="hide_tile_unhiding">جارٍ إعادة إظهار الإعدادات…</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="hide_unhide_shortcut_label">إخفاء/إظهار الإعدادات</string>
+    <string name="setup_done_1">1. الآن ما عليك سوى تشغيل تطبيقاتك المُشكِلة بالنقر عليها داخل IMD.</string>
+    <string name="setup_done_2">2. للوصول السريع:</string>
+    <string name="setup_done_2_1">1. اضغط مطوّلًا على أيقونات التطبيقات لإنشاء اختصارات على الشاشة الرئيسية</string>
+    <string name="setup_done_2_2">2. أضف التطبيقات إلى تبويب المفضلة</string>
+    <string name="setup_done_2_3">3. أضف مفتاح الإعدادات السريعة \"إخفاء الإعدادات\"</string>
+    <string name="setup_done_2_3_tip">(نصيحة: الضغط المطوّل على المفتاح يفتح مدير الإعدادات)</string>
+    <string name="setup_done_3">3. استخدم مدير الإعدادات الخاص بـ IMD:</string>
+    <string name="setup_done_3_1">1. استخدم أيقونة مدير الإعدادات في درج التطبيقات</string>
+    <string name="setup_done_3_2">2. أضف مفتاح الإعدادات السريعة \"مدير الإعدادات\"</string>
+    <string name="setup_done_4">4. اكتمل الإعداد الآن، لكن يُنصح بالاطلاع على:</string>
+    <string name="setup_done_4_1">1. إعدادات إظهار تلقائي (موصى به)</string>
+    <string name="setup_done_4_2">2. الإخفاء التلقائي للإعدادات (IMD+، يحتاج خدمة في الخلفية)</string>
+    <string name="setup_done_4_3">3. كل الإعدادات الأخرى لتخصيص أعمق</string>
+    <string name="setup_done_4_4">4. IMD intents (التكامل مع Tasker / Macrodroid... إلخ)</string>
+    <string name="setup_done_add_tile">إضافة مفتاح</string>
+    <string name="setup_done_go">هيا بنا</string>
+    <string name="setup_done_title">أوشك الإعداد على الاكتمال</string>
+    <string name="setup_step_accessibility">اختر خدمات إمكانية الوصول المراد إخفاؤها / إدارتها</string>
+    <string name="setup_step_auto_unhide">إعداد خدمة الإظهار التلقائي للإعدادات</string>
+    <string name="setup_step_customise_ui">تخصيص الواجهة</string>
+    <string name="setup_step_manager_rows">مفاتيح مدير الإعدادات</string>
+    <string name="setup_step_overlay">اختر \"العرض فوق التطبيقات الأخرى\" المراد إخفاؤه / إدارته</string>
+    <string name="setup_step_settings_to_hide">اختر الإعدادات المراد إخفاؤها / إظهارها</string>
+    <string name="shizuku_setup_fill_first">يرجى ملء جميع الحقول أولاً</string>
+    <string name="shizuku_setup_manage">إدارة إعدادات Shizuku</string>
+    <string name="shizuku_setup_skip">تخطٍّ</string>
 </resources>

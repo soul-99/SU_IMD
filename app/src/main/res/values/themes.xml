@@ -52,5 +52,45 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
+        <!--
+          The two items Theme.Geto.Tile has carried all along, and this window has the same
+          claim on them: it never draws anything. Everything visible is the card inside it,
+          and the card animates itself in.
+
+          Without windowDisablePreview, opening this from its launcher icon plays Android
+          12's splash screen first - a black square with the app icon expanding out to fill
+          the display - and only then fades the card in on top. The author, on the recording:
+          "makes user feel like a full screen app is loading which does not look seamless".
+          Translucency alone does not suppress it; this does.
+
+          Without windowAnimationStyle, pressing the IMD icon flung the whole translucent
+          window down at a corner and shrank it, as if a full-screen app were closing. That
+          is the "very broken animation" on his fold. With no window animation there is
+          nothing to fling, and IMD's own opening is the only thing on screen.
+
+          Closing is instant as a result, where the card used to fade out with the window.
+          That is the trade, and it is the behaviour Theme.Geto.Tile has always had.
+        -->
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
+    <!--
+      The Hide settings tile's window, which on most presses draws nothing at all.
+
+      Theme.Geto.Services was the obvious choice and was wrong: it dims the screen behind the
+      window, which is right for the services manager (a dialog that wants the background
+      pushed back) and quite wrong for a window whose usual job is to be invisible. A press
+      that hid the settings and finished immediately still flashed the whole screen grey.
+
+      No dim, no window animation, and no starting preview: all three are ways for a window
+      that never draws to be seen anyway. The dialogs it does sometimes show bring their own
+      scrim, so nothing is lost - Theme.Geto.Shortcut has no dim either and ShortcutActivity
+      draws these same three dialogs on it.
+    -->
+    <style name="Theme.Geto.Tile" parent="Theme.Geto.Shortcut">
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowDisablePreview">true</item>
     </style>
 </resources>

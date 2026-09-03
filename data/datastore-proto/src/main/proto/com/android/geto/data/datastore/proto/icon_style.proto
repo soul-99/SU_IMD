@@ -1,0 +1,30 @@
+/*
+ *
+ *   Copyright 2026 soul_99 (suIMD)
+ *
+ *   Licensed under the GNU General Public License v3.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       https://www.gnu.org/licenses/gpl-3.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
+syntax = "proto3";
+
+option java_package = "com.android.geto.data.datastore.proto";
+option java_multiple_files = true;
+
+// How an app icon is drawn. Zero is the default for a field nobody has written,
+// so Smart adaptive has to be zero - it is both the author's default and what
+// every install did before this option existed.
+enum IconStyleProto {
+  IconStyleSmartAdaptive = 0;
+  IconStyleSystem = 1;
+}

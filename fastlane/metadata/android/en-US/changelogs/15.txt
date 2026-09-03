@@ -1,0 +1,8 @@
+v2.2
+
+* Fixes a crash that stopped the app launching at all on Android 12 and below.
+* New "Hide settings" quick settings toggle: hides in one press, unhides in the next, and follows a revert run from anywhere else.
+* The revert notification is now ongoing, says one line, and reverts on tap; swiping it away puts it back.
+* Nothing is hidden or unhidden on a fresh install until you say what.
+* New: stop the Shizuku service as part of hiding, and support for the Shevery fork.
+* Launching a second app no longer redoes work that is already done.

@@ -31,14 +31,33 @@
     <string name="global">Global</string>
 
     <string name="language_system">Système / automatique</string>
-    <string name="language_ai_notice">Les langues autres que l\'anglais ont été produites par traduction automatique assistée par IA et peuvent donc contenir des erreurs. Si vous souhaitez une correction, signalez les erreurs de traduction au développeur dans le suivi des problèmes GitHub.</string>
+    <string name="language_ai_notice">Les langues autres que l\'anglais ont été produites par traduction automatique et peuvent donc contenir des erreurs. Si vous souhaitez une correction, signalez les erreurs de traduction au développeur dans le suivi des problèmes GitHub.</string>
 
     <string name="revert_to_default_toast">Rétablir par défaut</string>
     <string name="revert_from_memory_toast">Rétablir depuis la mémoire</string>
-    <string name="revert_failed_shizuku_toast">Impossible de redémarrer le service Shizuku</string>
-    <string name="revert_failed_overlay_toast">Impossible de restaurer l\'autorisation Superposition à d\'autres applis via Shizuku, voir la notification</string>
-    <string name="revert_failed_shizuku_and_overlay_toast">Impossible de restaurer le service Shizuku et les autorisations Superposition à d\'autres applis</string>
     <string name="settings_hidden_toast">Paramètres masqués</string>
     <string name="auto_revert_to_default_toast">Rétablissement automatique par défaut</string>
     <string name="auto_revert_from_memory_toast">Rétablissement automatique via la Memory function</string>
+    <string name="auto_hide_run_toast">IMD+ masque vos paramètres…</string>
+    <string name="auto_hide_revert_toast">IMD+ restaure vos paramètres…</string>
+    <string name="toast_auto_hiding">IMD+ : masquage des paramètres...</string>
+    <string name="toast_done_hidden">IMD : paramètres masqués</string>
+    <string name="toast_done_hidden_for">IMD : paramètres masqués pour %1$s</string>
+    <string name="toast_done_reverted_defaults">IMD : paramètres rétablis aux valeurs par défaut</string>
+    <string name="toast_done_restored_defaults">IMD : paramètres restaurés aux valeurs par défaut</string>
+    <string name="toast_done_restored_memory">IMD : paramètres restaurés depuis la mémoire</string>
+    <string name="toast_done_restored_memory_for">IMD : paramètres restaurés depuis la mémoire (%1$s)</string>
+    <string name="toast_nothing_to_restore">IMD : aucun paramètre masqué à restaurer</string>
+    <string name="toast_auto_done_hidden">IMD+ : paramètres masqués</string>
+    <string name="toast_auto_done_hidden_for">IMD+ : paramètres masqués pour %1$s</string>
+    <string name="permissions_lost">Autorisations nécessaires perdues. Veuillez ouvrir IMD et accorder à nouveau les autorisations.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="next">Suivant</string>
+    <string name="back">Retour</string>
+    <string name="prior_hide_ignore">Ignorer tous les rétablissements précédents</string>
+    <string name="prior_hide_restore">Rétablir d\'abord les paramètres</string>
+    <string name="prior_hide_restoring">IMD rétablit vos paramètres…</string>
+    <string name="prior_hide_title">Paramètres précédemment masqués détectés, les rétablir d\'abord ?</string>
+    <string name="retry">Réessayer</string>
+    <string name="skip">Ignorer</string>
 </resources>

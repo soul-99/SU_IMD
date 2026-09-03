@@ -1,0 +1,44 @@
+flowchart TD
+    A["A watched app comes<br/>to the foreground"] --> B{"Refuse before any<br/>window is opened?"}
+    B -- "Not a watched app" --> Z1["Nothing"]
+    B -- "Nothing configured for it, and<br/>the 30-minute reminder<br/>is not due" --> Z2["Nothing"]
+    B -- "A recent run failed - backing<br/>off 60s, then 5min,<br/>then 30min" --> Z3["Nothing"]
+    B -- "Already running, or<br/>something is hidden" --> Z4["Nothing"]
+    B -- No --> C["Open IMD's own transparent window - a<br/>background start could not launch<br/>an app again afterwards"]
+
+    C --> D{"Was a previous hide<br/>never undone?"}
+    D -- Yes --> E["Ask: <b>Restore</b> it first, or <b>Ignore</b><br/>and throw the record away"]
+    D -- No --> F
+    E --> F["Re-read the settings. If anything<br/>changed in the meantime, stop"]
+
+    F --> G{"Is there anything to<br/>hide for this app?"}
+    G -- "No profile, or nothing ticked" --> Y["Say so, and stamp the<br/>30-minute timer"]
+    G -- Yes --> H["Toast: <b>IMD+: Hiding settings…</b>"]
+
+    H --> I{"Close the app first?"}
+    I -- "Yes, the default" --> J["Start Shizuku if needed,<br/>then force-stop the app"]
+    I -- "No - <i>Do not kill app<br/>on first launch</i>" --> L
+    J -- "Shizuku would not start,<br/>or permission was refused" --> X["<b>Abandon the run.</b> The app was never<br/>stopped. Record the failure<br/>and post a notification"]
+    J --> L["<b>Arm the auto-unhide watch first</b>,<br/>then hide"]
+
+    L --> M{"Hiding framework?"}
+    M -- "Default IMD settings" --> N["Hide the device-wide list (logic 1),<br/>and mark IMD+ running"]
+    M -- "Per app configuration" --> O["Apply <b>that app's</b> profile (logic 3).<br/>The per-app hold is the record -<br/>nothing global is marked"]
+    N -- "Hid nothing" --> P["Give the watch back, record a<br/>failure, reopen the app"]
+    O -- "Hid nothing" --> P
+
+    N --> Q["Switch <b>IMD's own detector</b> off - before<br/>anything is launched, so IMD+ cannot<br/>detect its own relaunch"]
+    O --> Q
+    Q --> R["Reopen the app, toast, and post the<br/><b>IMD+</b> notification. Swiping<br/>it away reposts it"]
+    R --> S["Ended by: tapping it · the <b>Hide settings</b><br/>tile · or the auto-unhide watcher.<br/><b>No app is closed</b> on the way back"]
+
+    class Z1 stop
+    class Z2 stop
+    class Z3 stop
+    class Z4 stop
+    class Y stop
+    class X stop
+    class P stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

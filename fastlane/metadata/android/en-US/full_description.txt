@@ -1,33 +1,53 @@
-Some apps refuse to start — or quietly disable parts of themselves — when they notice that developer options are on, that an ADB connection is active, or that an accessibility service is running. Banking apps are the usual culprits. The usual workaround is to go into Android's settings, switch those things off, open the app, and switch them all back on afterwards. Every single time.
+IMD (It's My Device) is a powerful <b>settings/ services manager</b> and <b>settings/ services hider</b> (automated disable-enable settings) for restrictive apps (banking, payments...etc). It supports the following settings / services :
 
-(SU) IMD does that part for you. Pick an app, say which settings should change while it runs, and launch it from IMD. The settings are applied, the app opens, and an ongoing notification with a Revert action puts your device back the way it was.
+1. Developer settings
+2. ADB / Debugging
+3. Accessibility services
+4. Display over other apps (needs active Shizuku service)
+5. Shizuku service
+6. and many more (per app configuration - hiding framework, hint: use Settings observer for help)
 
-IMD services manager
+<b>How this works</b>
 
-The other half of the app is one dialog showing the live state of developer settings, USB debugging, wireless debugging, your managed accessibility services and the Shizuku service, with a switch on each and a Revert to default button at the bottom. It opens from a Quick Settings tile, a homescreen shortcut or the Favourites tab, without the app itself having to be open — which is what you reach for when an app has just refused to start and you would rather not go hunting through Android's settings to find out why.
+1. User opens app from IMD / IMD generated app shortcut
+                    ↓
+2. IMD actually disables these settings<br><u>no app's security policy is broken</u>
+                    ↓
+3. Use your app normally
+                    ↓
+4. Use Revert function<br><i>(accessible via: notification / quick toggle / Quick settings tile / homescreen shortcut / IMD settings manager)</i>
+                    ↓
+5. IMD enables the disabled settings
 
-Features
+<b>Settings manager</b>
 
-* Per-app profiles of Android system, secure and global settings.
-* Two ways back: setting memory, which restores exactly what each app changed, or Revert to default, which returns everything to one state you configure once.
-* Accessibility services can be hidden per service, and are actually stopped rather than only listed.
-* Shizuku service restart, including forks that support start-service intents.
-* A Favourites tab: short press opens an app with its settings applied, long press creates a homescreen shortcut for it.
-* Quick Settings tiles and homescreen shortcuts for both the services manager and Revert to default.
-* A searchable, sortable list of every installed app, and a browsable copy of the device's current settings.
+IMD's settings manager allows you to:
 
-Setup
+1. View the <b>live status</b> of your settings/ services
+2. Quickly toggle them on-off
 
-IMD needs the WRITE_SECURE_SETTINGS permission, granted once from a PC:
+<b>Automations</b>
 
-adb shell pm grant com.soul_99.suIMD android.permission.WRITE_SECURE_SETTINGS
+1. <b>Auto unhide settings</b>
+2. <b>Auto hide settings</b> (IMD+ : needs background service)
+3. <b>IMD Intents</b> (Tasker / MacroDroid integration, secured with auth keys)
 
-With no PC available, tap Use Shizuku on the first-run screen and it runs that command for you. The grant survives reboots, but not a reinstall. No root is required.
+<b>About Permissions</b>
 
-Privacy
+* WRITE_SECURE_SETTINGS (one time grant via adb shell or Shizuku) (MANDATORY, needed to change settings state)
+* Shizuku service (optional) (needed to hide Display over other apps permissions - an appops permission)
+* Post notifications (optional)
+* Other permissions (optional: only needed if you use automations like IMD+)
 
-The app has no internet permission at all, so it cannot talk to a network even if it wanted to. There are no ads, no analytics, no trackers, no accounts and nothing to sign in to. Because it has no network access it also cannot check for its own updates — Obtainium or your F-Droid client is how you find out there is one.
+<b>Security Concerns</b>
 
-Credit
+* No internet access or unnecessary continuous background services (so almost zero battery / system resource use).
+* Does not tamper with any apps on the device.
+* The parts of this app that change settings cannot be triggered by another app, so only you can change them.
+* No ads, analytics, trackers or accounts of any kind. The app has no network permission at all - which is also why it cannot check for its own updates, and why Obtainium is how you find out there is one.
 
-(SU) IMD is a fork of Geto by Jack Eblan, licensed GPL-3.0. The original design and the great majority of the code are his. This fork rebuilds the parts that did not survive real use: Shizuku dying along with USB debugging, accessibility services that were listed but never stopped, and a quick way to put everything back from outside the app.
+<b>Package:</b> com.soul_99.suIMD - installs alongside stock Geto, both can coexist
+<b>Requires:</b> Android 7.0 (API 24) or newer. No root.
+<b>Licence:</b> GPL-3.0
+
+Supercharged fork of Geto (https://github.com/JackEblan/Geto)

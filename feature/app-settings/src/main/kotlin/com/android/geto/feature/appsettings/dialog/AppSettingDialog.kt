@@ -45,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -80,25 +81,25 @@ internal fun AppSettingDialog(
         text: String,
     ) -> Unit,
 ) {
-    var selectedRadioOptionIndex by remember { mutableIntStateOf(0) }
+    var selectedRadioOptionIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    var label by remember { mutableStateOf("") }
+    var label by rememberSaveable { mutableStateOf("") }
 
-    var key by remember { mutableStateOf("") }
+    var key by rememberSaveable { mutableStateOf("") }
 
-    var valueOnLaunch by remember { mutableStateOf("") }
+    var valueOnLaunch by rememberSaveable { mutableStateOf("") }
 
-    var valueOnRevert by remember { mutableStateOf("") }
+    var valueOnRevert by rememberSaveable { mutableStateOf("") }
 
-    var showLabelError by remember { mutableStateOf(false) }
+    var showLabelError by rememberSaveable { mutableStateOf(false) }
 
-    var showKeyError by remember { mutableStateOf(false) }
+    var showKeyError by rememberSaveable { mutableStateOf(false) }
 
-    var showKeyNotFoundError by remember { mutableStateOf(false) }
+    var showKeyNotFoundError by rememberSaveable { mutableStateOf(false) }
 
-    var showValueOnLaunchError by remember { mutableStateOf(false) }
+    var showValueOnLaunchError by rememberSaveable { mutableStateOf(false) }
 
-    var showValueOnRevertError by remember { mutableStateOf(false) }
+    var showValueOnRevertError by rememberSaveable { mutableStateOf(false) }
 
     var secureSettingsExpanded by remember { mutableStateOf(false) }
 

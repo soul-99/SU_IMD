@@ -1,0 +1,7 @@
+v2.4
+
+* New: Auto-hide settings (IMD+). Pick the apps you want protected and IMD hides your settings by itself when one of them opens, then reopens the app so it starts with nothing to object to. A notification puts it all back. For advanced users.
+* IMD's own accessibility service is now hidden with every hide, and restored on the revert.
+* IMD+ will not start while a revert is outstanding.
+* Dialogs no longer stretch on tablets.
+* New Revert to default icon.

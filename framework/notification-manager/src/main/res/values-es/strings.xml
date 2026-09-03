@@ -22,10 +22,27 @@
       The two notification actions stay distinct, as in English: one restores what this app
       changed for this app, the other drives the whole device to the configured state.
     -->
-    <string name="revert_using_memory">Revertir usando la memoria</string>
+    <string name="revert_using_memory">Mostrar ajustes usando la memoria</string>
     <string name="revert_to_default">Revertir a valores predeterminados</string>
-    <string name="overlay_restore_failed_title">Error al revertir</string>
+    <string name="overlay_restore_failed_title">Error al mostrar los ajustes</string>
     <string name="overlay_restore_failed_text">No se ha podido restaurar el permiso Mostrar sobre otras aplicaciones con Shizuku. Activa el servicio Shizuku manualmente y pulsa el botón de abajo</string>
     <string name="overlay_restore_retry">Reintentar</string>
-    <string name="alert_notification_channel">Errores al revertir</string>
+    <string name="alert_notification_channel">Errores de IMD</string>
+    <string name="shizuku_usb_fallback_title">Servicio de Shizuku detenido</string>
+    <string name="shizuku_usb_fallback_text">El servicio de Shizuku se cerró usando la depuración USB, no el intent de parada; puede que la app no logre restaurar el servicio de Shizuku al revertir.</string>
+    <string name="shizuku_usb_fallback_text_overlay">El servicio de Shizuku se cerró usando la depuración USB, no el intent de parada; puede que la app no logre restaurar el servicio de Shizuku ni Mostrar sobre otras apps al revertir.</string>
+    <string name="notification_ok">Aceptar</string>
+    <string name="hidden_revert_default">Ajustes ocultados, toca para mostrarlos.</string>
+    <string name="hidden_revert_memory">Ajustes ocultados, toca para mostrarlos desde la memoria.</string>
+    <string name="auto_hide_channel">Ocultar ajustes automáticamente (IMD+)</string>
+    <string name="auto_hide_hidden_revert">IMD+ ocultó tus ajustes, toca para mostrarlos.</string>
+    <string name="auto_hide_hidden_revert_memory">IMD+ ocultó tus ajustes, toca para mostrarlos desde la memoria.</string>
+    <string name="auto_unhide_channel">Servicio de reexhibición automática</string>
+    <string name="auto_unhide_running">Servicio de reexhibición automática en marcha</string>
+    <string name="auto_hide_shizuku_failed">IMD+ no pudo ocultar los ajustes porque el servicio Shizuku no se pudo iniciar. Comprueba tus ajustes.</string>
+    <string name="shizuku_revert_failed">No se pudo iniciar el servicio Shizuku, toca aquí para iniciarlo manualmente</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="developer_note_channel">Aviso de actualización de IMD</string>
+    <string name="developer_note_notification">IMD: nota importante del desarrollador 🧑‍🔬</string>
+    <string name="shevery_start_failed">No se pudo iniciar Shevery, toca aquí para iniciarlo manualmente.</string>
 </resources>

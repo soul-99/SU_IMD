@@ -60,4 +60,13 @@
     <string name="action_app_setting">Paramètre d\'application</string>
     <string name="action_create_shortcut">Créer un raccourci</string>
     <string name="action_setting_template">Modèle de paramètres</string>
+    <string name="auto_hide_conflict_snackbar">IMD+ garde vos paramètres masqués. Restaurez-le d\'abord, puis appliquez ce profil.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">Veuillez d\'abord configurer les paramètres</string>
+    <string name="dooa_thedjchi_only">la gestion de « Superposition sur les autres applis » n\'est prise en charge que par le fork Thedjchi de Shizuku</string>
+    <string name="help_path_accessibility">Paramètres IMD → Paramètres IMD par défaut → Services d\'accessibilité à masquer</string>
+    <string name="help_path_dooa">Paramètres IMD → Paramètres IMD par défaut → Superposition sur les autres applis gérée par IMD</string>
+    <string name="help_path_manage_shizuku">Paramètres IMD → Configuration de Shizuku → Gérer Shizuku</string>
+    <string name="shortcut_lookup_failed">Impossible de lire les détails du raccourci de cette application.</string>
+    <string name="understood">Compris</string>
 </resources>

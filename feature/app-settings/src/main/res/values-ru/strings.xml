@@ -60,4 +60,13 @@
     <string name="action_app_setting">Настройка приложения</string>
     <string name="action_create_shortcut">Создать ярлык</string>
     <string name="action_setting_template">Шаблон настроек</string>
+    <string name="auto_hide_conflict_snackbar">IMD+ удерживает ваши настройки скрытыми. Сначала верните их, затем примените этот профиль.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">Сначала настройте параметры</string>
+    <string name="dooa_thedjchi_only">управление «Поверх других приложений» поддерживается только форком Thedjchi для Shizuku</string>
+    <string name="help_path_accessibility">Настройки IMD → Стандартные настройки IMD → Скрываемые службы специальных возможностей</string>
+    <string name="help_path_dooa">Настройки IMD → Стандартные настройки IMD → Поверх других приложений под управлением IMD</string>
+    <string name="help_path_manage_shizuku">Настройки IMD → Конфигурация Shizuku → Управлять Shizuku</string>
+    <string name="shortcut_lookup_failed">Не удалось прочитать сведения о ярлыке этого приложения.</string>
+    <string name="understood">Понятно</string>
 </resources>

@@ -18,9 +18,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--
+      Android 14 made a foreground service type mandatory, and none of the named ones
+      describes "stay alive until the user has finished with somebody else's app". The plain
+      FOREGROUND_SERVICE and the dataSync type are already declared by the settings observer
+      in the :service module and merge in from there.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
     <application
         android:name=".GetoApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -77,6 +85,102 @@
             android:theme="@style/Theme.Geto.Services" />
 
         <!--
+          The second launcher icon, at the author's instruction: installing IMD puts two entries
+          in the launcher, one for the app and one for the Settings manager.
+
+          An activity-alias rather than a second activity, because ServicesActivity is already
+          exactly this screen and already exported for the tile and the pinned shortcut. The
+          alias adds a door with its own label and icon and changes nothing about the room.
+
+          ⚠ Declared after its target: targetActivity is resolved against what the platform has
+          already read, so an alias above its activity does not build.
+
+          The icon is the one the pinned Settings manager shortcut already uses, so the launcher
+          entry looks like the thing it opens rather than like a second copy of IMD.
+        -->
+        <activity-alias
+            android:name=".activity.services.SettingsManagerLauncher"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_services"
+            android:label="@string/services_shortcut_label"
+            android:targetActivity=".activity.services.ServicesActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!--
+          The app drawer's "Hide/unhide Settings" entry, at the author's r11 instruction. One
+          press does whatever the Quick Settings tile's press does, and the entry's icon follows
+          the device's state.
+
+          ⚠ **Exported, and it has to be.** A launcher entry is started by the launcher, which
+          is another app; there is no way to publish an app-drawer icon only IMD can start. The
+          consequence - that any app knowing this name can trigger a hide or an unhide without
+          the auth key the Tasker broadcasts require - was put to the author before this was
+          built and he asked for it anyway. HideToggleActivity's own header says the same.
+
+          excludeFromRecents and noHistory because it draws nothing: a press should leave no
+          window and no card in the recents list. The empty taskAffinity for the reason
+          ServicesActivity has one - without it this joins the app's task and a press brings
+          the whole app forward behind an invisible window.
+        -->
+        <activity
+            android:name=".activity.hide.HideToggleActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Geto.Shortcut" />
+
+        <!--
+          And the entry itself, twice.
+
+          ⚠ **Two aliases rather than one entry, because a launcher icon cannot be changed at
+          runtime.** An activity-alias carries its icon in the manifest; the only lever an app
+          has is whether the alias exists at all. So there is one alias per state, with the same
+          label and different icons, and DrawerShortcuts enables exactly the one that matches
+          the device - see that class, which names both of these as strings and cannot be told
+          by the compiler if either is renamed here.
+
+          Both start disabled: the author asked for only the Settings manager entry on a fresh
+          install, and the "App drawer shortcuts" dialog is what turns this pair on.
+
+          Declared after HideToggleActivity: targetActivity resolves against what the platform
+          has already read, so an alias above its activity does not build.
+        -->
+        <activity-alias
+            android:name=".activity.hide.HideUnhideVisibleLauncher"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_hide_visible"
+            android:label="@string/hide_unhide_shortcut_label"
+            android:targetActivity=".activity.hide.HideToggleActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".activity.hide.HideUnhideHiddenLauncher"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_hide_hidden"
+            android:label="@string/hide_unhide_shortcut_label"
+            android:targetActivity=".activity.hide.HideToggleActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!--
           Runs the revert and finishes without drawing anything.
 
           Not exported, and neither of its two callers needs it to be. The launcher starts
@@ -102,8 +206,52 @@
             android:theme="@style/Theme.Geto.Shortcut" />
 
         <!--
+          Hides or unhides and finishes, drawing something only when there is something to
+          say: a spinner while Shizuku is being waited on, and a dialog for the two outcomes
+          that cannot be shown on a tile - nothing ticked to hide, and Shizuku refusing to
+          start.
+
+          Not exported, and nothing needs it to be: the tile starts it from inside this app,
+          which is exactly the identity that would otherwise be handed to every other app on
+          the device. Hiding settings is a privileged state change, the same as reverting.
+
+          The empty taskAffinity for the same reason ServicesActivity has one - without it
+          this window joins the app's task and pressing the tile brings the whole app forward
+          behind a transparent window.
+        -->
+        <activity
+            android:name=".activity.hide.HideActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Geto.Tile" />
+
+        <!--
+          Where an Auto-hide settings (IMD+) run happens. Transparent, and closes the moment
+          the run is over; it draws only the Shizuku spinner, and only while there is a wait
+          to explain.
+
+          It has to be an activity rather than work done inside the detector: starting an app
+          from the background is refused on Android 10 and up, and the run switches off the
+          accessibility service that would otherwise have exempted it. A window already in
+          front is never refused.
+
+          Not exported. It is started by this app's own detector, and nothing else has any
+          business hiding the user's settings. The empty taskAffinity keeps it out of the
+          app's task, so a run does not bring the whole of IMD forward behind it.
+        -->
+        <activity
+            android:name=".activity.autohide.AutoHideActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Geto.Tile" />
+
+        <!--
           Android allows one long-press target per app however many tiles it publishes, so
-          both tiles arrive here and are told apart by EXTRA_COMPONENT_NAME.
+          all three tiles arrive here and are told apart by EXTRA_COMPONENT_NAME.
         -->
         <activity
             android:name=".activity.revert.TilePreferencesActivity"
@@ -138,6 +286,41 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
+        </service>
+
+        <!--
+          The one tile with a state rather than an action. Its icon here is the "off" one,
+          which is what the tile picker shows before it has ever been added; from then on the
+          service sets both icon and label to match which way it is set.
+        -->
+        <service
+            android:name=".activity.hide.HideTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_hide_tile"
+            android:label="@string/hide_tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!--
+          Auto unhide's watcher. Not exported: nothing outside IMD starts it, and the hidden
+          state is what decides when it runs.
+
+          Two types declared because two eras of Android want different answers - specialUse
+          from 14, where a type is mandatory and none of the named ones fits, and dataSync on
+          10 to 13, which is what the platform offered then. The service picks the right one
+          for the version it finds itself on; a type passed to startForeground has to be one
+          the manifest declared.
+        -->
+        <service
+            android:name=".activity.autounhide.AutoUnhideService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync|specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Waits for a hidden session to end so IMD can revert the settings it hid" />
         </service>
 
     </application>

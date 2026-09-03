@@ -35,8 +35,40 @@ object ProjectLinks {
 
     const val RELEASES = "$REPOSITORY/releases"
 
-    /** The section the version line points at: what changed, per version. */
-    const val CHANGELOG = "$REPOSITORY#added-in-this-fork"
+    /** Where the Support dialog's "report bugs" point sends people. */
+    const val ISSUES = "$REPOSITORY/issues/"
+
+    /**
+     * The community subreddit, which the Support dialog's "join discussions" point links to.
+     *
+     * Not derived from [REPOSITORY] — it is a different host that happens to share the name,
+     * and interpolating one into the other would tie two unrelated things together.
+     */
+    const val DISCUSSIONS = "https://www.reddit.com/r/SU_IMD/"
+
+    /**
+     * What changed, per version, written for whoever is reading it rather than for the build.
+     *
+     * ⚠ **A file, not an anchor, since r30.** This used to point at the README's
+     * *Added in this fork* heading; r30 moved the changelog out into `CHANGELOG.md` and deleted
+     * that heading, which turned this into a link that opened the repository — GitHub serves a
+     * page it cannot find an anchor in scrolled to the top rather than erroring, so nothing said
+     * so. `tools/check_doc_links.py` now fails on exactly this.
+     *
+     * ⚠ **Declared and not yet used.** The version row opens [RELEASES]. That is why it was
+     * still wrong: a constant nobody presses is a constant nobody finds broken.
+     */
+    const val CHANGELOG = "$REPOSITORY/blob/main/CHANGELOG.md"
+
+    /**
+     * SUIMD.md section 2, the flowcharts of what IMD actually does.
+     *
+     * The anchor is GitHub's own rendering of the heading `## 2. IMD app logics`: lowercased,
+     * punctuation dropped, spaces hyphenated. It has to be kept in step with that heading -
+     * rename the section and this link lands at the top of the file instead, silently, which
+     * is the failure mode worth knowing about rather than guarding against.
+     */
+    const val LOGICS = "$REPOSITORY/blob/main/SUIMD.md#2-imd-app-logics"
 
     /**
      * Obtainium's documented "add app" deep link: it opens Obtainium's Add App page with

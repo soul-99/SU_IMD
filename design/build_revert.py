@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""'Revert to default' icon: the app's gear with a revert arrow and a tick inside it.
+"""'Revert to default' icon: the app's gear with a revert arrow inside it.
 
 The gear is not redrawn — it is lifted from the shipped launcher icon and normalised back to
 the size it was authored at, so this stays a sibling of the app icon and of the Services
@@ -11,11 +11,12 @@ Two things about the arrow are deliberate and easy to get wrong:
   the circle. A tip placed on the circle drags the apex inward while the base stays radial,
   which shears the head — it reads as a flag bent off the arc instead of a head sitting on
   it.
-* The ring is as large as the gear's flat centre will take. The gear's rim is a wave — 20.6
-  units out at each tooth, 15.2 in each valley — and the C sweeps past every valley, so the
-  valleys set the ceiling. The containment check at the bottom is what enforces it: an
-  overhang is nearly invisible on the coloured icon but cuts a notch out of the gear on the
-  tile, where the glyph is a knockout rather than a colour.
+* The ring is deliberately *not* as large as the gear's flat centre will take. It was, while
+  a tick shared the space with it; on its own that read as an arrow jammed against the rim.
+  The containment check at the bottom still enforces the ceiling — the gear's rim is a wave,
+  20.6 units out at each tooth and 15.2 in each valley, and the C sweeps past every valley —
+  because an overhang is nearly invisible on the coloured icon but cuts a notch out of the
+  gear on the tile, where the glyph is a knockout rather than a colour.
 
 Writes the drawables straight into the res tree. Re-runnable: the gear is re-normalised from
 whatever the launcher icon currently holds, so this does not compound if the art is rescaled.
@@ -49,7 +50,12 @@ GROW = float(sys.argv[1]) if len(sys.argv) > 1 else 1.35   # must match scale_ap
 GLYPH_SHRINK = float(sys.argv[2]) if len(sys.argv) > 2 else 0.88
 
 # ── the arrow, option B1 ─────────────────────────────────────────────────────
-R_OUT, BAND, GAP_DEG = 14.2, 3.5, 76.0
+# The ring was 14.2 with a 3.5 band while a tick sat inside it. With the tick gone the
+# arrow was left alone against the rim, so it is smaller and heavier: the space the tick
+# used to occupy becomes margin, and the weight it used to carry goes into the band.
+# Shrinking the whole glyph instead would have thinned the stroke along with the ring,
+# which is the opposite of what a 24dp tile needs.
+R_OUT, BAND, GAP_DEG = 11.61, 3.7, 76.0
 SOFT = 0.55             # corner radius on the arrowhead
 START_DEG = -144.0      # where the gap opens; nudged off -140 so the head clears a tooth
 HEAD_W, HEAD_L, HEAD_BACK = 1.5, 1.9, 0.10
@@ -164,24 +170,13 @@ def arrow_head():
     return soft
 
 
-def tick():
-    """A checkmark centred in the ring, scaled off the inner radius so it keeps proportion."""
-    k = R_IN / 10.6
-    pts = [(CX + x * k, CY + y * k) for x, y in ((-5.0, 0.4), (-1.6, 3.9), (5.4, -3.6))]
-
-    return LineString(pts).buffer(BAND * 0.47 * k, **ROUND)
-
-
-glyph = unary_union([g.buffer(0) for g in (arc(), arrow_head(), tick())])
+glyph = unary_union([g.buffer(0) for g in (arc(), arrow_head())])
 parts = list(glyph.geoms) if glyph.geom_type == 'MultiPolygon' else [glyph]
 
 # The ring must stay a C, never a closed O — a closed one would gain an interior ring, which
 # the knockout renders as a filled disc in the middle of the arrow.
 for part in parts:
     assert not list(part.interiors), 'the revert glyph closed on itself; widen the gap'
-
-tick_clear = tick().distance(unary_union([arc(), arrow_head()]))
-assert tick_clear > 0.6, f'the tick is crowding the arrow ({tick_clear:.2f})'
 
 gear_poly = Polygon([
     (c.real, c.imag) for c in (parse_path(GEAR).point(i / 1999) for i in range(2000))
@@ -258,6 +253,9 @@ GLYPHS.mkdir(parents=True, exist_ok=True)
 for src, dst in (('ic_revert_tile', 'ic_revert_glyph'), ('ic_services_tile', 'ic_services_glyph')):
     (GLYPHS / f'{dst}.xml').write_text((RES / f'drawable/{src}.xml').read_text())
 
+# ⚠ This also writes ic_revert_notification_large.xml, which build_hidden_notification.py
+# then replaces with the struck-eye 'settings hidden' artwork. **Run that script after
+# this one**, or the notification silently goes back to carrying a revert arrow.
 NOTIF = REPO / 'framework/notification-manager/src/main/res/drawable'
 (NOTIF / 'ic_revert_notification_large.xml').write_text(vector(
     path(gear_grown, MINT) + path(glyph_grown, GREEN, even_odd=True)))
@@ -281,7 +279,7 @@ NOTIF = REPO / 'framework/notification-manager/src/main/res/drawable'
     f'<rect width="108" height="108" fill="#FFFFFF"/><path fill="{MINT}" d="{gear_grown}"/>'
     f'<path fill="{GREEN}" fill-rule="evenodd" d="{glyph_grown}"/></svg>')
 
-print(f'revert: grow x{GROW}  glyph x{GLYPH_SHRINK}  tick_clear={tick_clear:.2f}  '
+print(f'revert: grow x{GROW}  glyph x{GLYPH_SHRINK}  '
       f'gear_clear={gear_clear:.2f} at full size  parts={len(parts)}')
 print('wrote ic_revert_foreground / _monochrome / _tile, mipmap-anydpi-v26/ic_revert.xml,\n      framework/notification-manager ic_revert_notification_{large,small}.xml,\n'
       '      design-system ic_revert_glyph.xml + ic_services_glyph.xml')

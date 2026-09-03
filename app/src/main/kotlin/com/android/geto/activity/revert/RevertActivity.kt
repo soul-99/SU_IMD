@@ -21,7 +21,7 @@ package com.android.geto.activity.revert
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import com.android.geto.broadcastreceiver.RevertToDefaultRunner
+import com.android.geto.broadcastreceiver.SettingsHiddenRunner
 import com.android.geto.common.AppLocale
 import com.android.geto.common.ApplicationScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,12 +55,15 @@ class RevertActivity : ComponentActivity() {
     lateinit var appScope: CoroutineScope
 
     @Inject
-    lateinit var revertToDefaultRunner: RevertToDefaultRunner
+    lateinit var settingsHiddenRunner: SettingsHiddenRunner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        appScope.launch { revertToDefaultRunner() }
+        // `explicit`: this activity is the Revert to default tile and the launcher
+        // shortcut, two of the three routes the author named as still saying
+        // "reverted" rather than "restored". Nothing here is undoing a hide.
+        appScope.launch { settingsHiddenRunner.revertToDefault() }
 
         finish()
 

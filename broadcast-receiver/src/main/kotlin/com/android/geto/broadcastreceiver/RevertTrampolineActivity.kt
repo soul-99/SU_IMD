@@ -22,6 +22,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
+import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.ACTION_AUTO_HIDE_REVERT
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.ACTION_REVERT_SETTINGS
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.ACTION_REVERT_TO_DEFAULT
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper.Companion.NOTIFICATION_EXTRA_COMPONENT_NAME
@@ -73,17 +74,28 @@ class RevertTrampolineActivity : Activity() {
      */
     private fun forwardIntentFor(action: String?): Intent? {
         val receiver: Class<*> = when (action) {
-            ACTION_REVERT_SETTINGS -> RevertSettingsBroadcastReceiver::class.java
+            // ⚠ **A migration shim, not a live route.** Nothing posts a per-app revert
+            // notification any more - r3 made every launch post the one generic notification -
+            // but an install upgrading from r2b3d can have one standing in the shade, and its
+            // PendingIntent still names this action. Sent to the framework-following unhide
+            // rather than dropped, so a tap does what the notification it came from promised
+            // instead of clearing itself and reverting nothing. It can go once nobody can
+            // still be holding one.
+            ACTION_REVERT_SETTINGS -> RevertToDefaultBroadcastReceiver::class.java
             ACTION_REVERT_TO_DEFAULT -> RevertToDefaultBroadcastReceiver::class.java
+            ACTION_AUTO_HIDE_REVERT -> AutoHideRevertBroadcastReceiver::class.java
             else -> return null
         }
 
         return Intent(this, receiver).apply {
             this.action = action
 
-            // Only the per-app revert identifies a target; "Revert to default" is about the
-            // whole device and carries nothing.
-            if (action == ACTION_REVERT_SETTINGS) {
+            // The one action that can name a target. An IMD+ revert does so only when the
+            // memory function was in force, and then the extra is the app whose page it
+            // applied. Every other revert here is about the whole device and carries nothing.
+            // Copying a null extra is harmless - the receiver reads it as "no app", which is
+            // exactly what an IMD+ run in the other mode means.
+            if (action == ACTION_AUTO_HIDE_REVERT) {
                 putExtra(
                     NOTIFICATION_EXTRA_COMPONENT_NAME,
                     intent.getStringExtra(NOTIFICATION_EXTRA_COMPONENT_NAME),

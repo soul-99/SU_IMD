@@ -27,6 +27,7 @@ import com.android.geto.domain.usecase.GetPinShortcutUseCase
 import com.android.geto.domain.usecase.RequestPinShortcutUseCase
 import com.android.geto.domain.usecase.UpdatePinShortcutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -86,9 +87,36 @@ class ShortcutViewModel @Inject constructor(
         viewModelScope.launch {
             _target.update { null }
 
-            val icon = packageManagerWrapper.getActivityIcon(componentName = componentName)
+            // ⚠ **Both reads are guarded, and that is the whole of the intermittent bug.**
+            // Unguarded, a throw from either one ends this coroutine at that line and leaves
+            // the target null — and since `start` is called once per component, nothing ever
+            // tries again. What the user sees is a long press that opens a spinner and never
+            // leaves it, or before r4q, a long press that did nothing.
+            //
+            // Neither throw is exotic. The icon read catches `NameNotFoundException` and
+            // nothing else, so the drawable conversion under it can still raise; and the
+            // shortcut query throws while the user is locked.
+            val icon = try {
+                packageManagerWrapper.getActivityIcon(componentName = componentName)
+            } catch (cancellation: CancellationException) {
+                // ⚠ Rethrown, always. A cancelled composition is not a failed read, and
+                // catching it here would leave a dead coroutine reporting success.
+                throw cancellation
+            } catch (_: Exception) {
+                // The dialog draws a null icon already.
+                null
+            }
 
-            val result = getPinShortcutUseCase(id = componentName)
+            val result = try {
+                getPinShortcutUseCase(id = componentName)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                // ⚠ "Offer to create one" is the honest answer to *I could not find out
+                // whether one exists*. The launcher reconciles a duplicate id itself, and the
+                // alternative — no dialog — is the bug this is fixing.
+                GetPinShortcutResult.RequestPinShortcut
+            }
 
             _target.update {
                 ShortcutTarget(componentName = componentName, icon = icon, result = result)

@@ -40,6 +40,12 @@ internal class DefaultNotificationManagerWrapper @Inject constructor(@param:Appl
         }
     }
 
+    override fun deleteNotificationChannel(channelId: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            runCatching { notificationManager.deleteNotificationChannel(channelId) }
+        }
+    }
+
     override fun cancel(id: Int) {
         notificationManager.cancel(id)
     }

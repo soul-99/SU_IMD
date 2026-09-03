@@ -31,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.android.geto.designsystem.icon.GetoIcons
@@ -54,6 +53,14 @@ internal fun SystemSettingsButton(
     modifier: Modifier = Modifier,
     text: String,
     intent: Intent,
+    /**
+     * False where this button shares a row with another one.
+     *
+     * The icon says "this leaves the app", which is worth saying when the button stands alone.
+     * Beside a second button it costs the width that keeps both labels on one line, and the
+     * pairing already makes the difference between the two clear.
+     */
+    showIcon: Boolean = true,
 ) {
     val context = LocalContext.current
 
@@ -61,13 +68,15 @@ internal fun SystemSettingsButton(
         modifier = modifier.fillMaxWidth(),
         onClick = { context.startSystemSettings(intent) },
     ) {
-        Icon(
-            modifier = Modifier.size(18.dp),
-            imageVector = GetoIcons.OpenInNew,
-            contentDescription = null,
-        )
+        if (showIcon) {
+            Icon(
+                modifier = Modifier.size(18.dp),
+                imageVector = GetoIcons.OpenInNew,
+                contentDescription = null,
+            )
 
-        Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+        }
 
         Text(text = text)
     }
@@ -85,7 +94,7 @@ private fun Context.startSystemSettings(intent: Intent) {
         android.widget.Toast.makeText(
             this,
             R.string.system_settings_unavailable,
-            android.widget.Toast.LENGTH_LONG,
+            android.widget.Toast.LENGTH_SHORT,
         ).show()
     }
 }

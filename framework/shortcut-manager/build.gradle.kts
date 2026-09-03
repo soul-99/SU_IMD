@@ -28,4 +28,7 @@ android {
 dependencies {
     implementation(projects.domain.common)
     implementation(projects.domain.framework)
+    // r4p: LegacyIconShaping, shared with the in-app renderer so the two cannot disagree about
+    // what a shaped legacy icon looks like.
+    implementation(projects.framework.drawable)
 }

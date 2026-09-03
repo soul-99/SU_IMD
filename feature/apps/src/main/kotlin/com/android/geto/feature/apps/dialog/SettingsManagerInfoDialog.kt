@@ -70,9 +70,17 @@ internal fun SettingsManagerInfoDialog(
         ) {
             InfoPoint(
                 number = 1,
+                // Two bolded phrases now: the manager's own name and "live status". Both are
+                // resources rather than literals so that each locale bolds its own words —
+                // a phrase passed here must occur verbatim in that locale's sentence or the
+                // emphasis silently matches nothing, which is the Russian-case bug this
+                // project already paid for once.
                 text = emphasised(
                     text = stringResource(R.string.settings_manager_info_live),
-                    names = listOf(stringResource(R.string.settings_manager_title)),
+                    names = listOf(
+                        stringResource(R.string.settings_manager_title),
+                        stringResource(R.string.settings_manager_info_name_live),
+                    ),
                 ),
                 extra = emphasised(
                     text = stringResource(R.string.settings_manager_info_live_extra),

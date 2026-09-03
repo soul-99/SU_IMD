@@ -28,9 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.geto.designsystem.component.DialogContainer
+import com.android.geto.designsystem.component.GetoChoiceRow
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.feature.apps.R
@@ -80,39 +78,24 @@ internal fun FavouriteAppsOptionsDialog(
 
             OptionLabel(text = stringResource(R.string.sort))
 
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                SortFavouriteApps.entries.forEachIndexed { index, entry ->
-                    SegmentedButton(
-                        selected = entry == sortFavouriteApps,
-                        onClick = { onUpdateSortFavouriteApps(entry) },
-                        shape = SegmentedButtonDefaults.itemShape(
-                            index = index,
-                            count = SortFavouriteApps.entries.size,
-                        ),
-                    ) {
-                        Text(text = entry.getTitle())
-                    }
-                }
-            }
+            // Soft pills rather than outlined segments — the author's D1. See GetoChoiceRow.
+            GetoChoiceRow(
+                options = SortFavouriteApps.entries,
+                selected = sortFavouriteApps,
+                label = { it.getTitle() },
+                onSelect = onUpdateSortFavouriteApps,
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             OptionLabel(text = stringResource(R.string.view))
 
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                FavouriteAppsView.entries.forEachIndexed { index, entry ->
-                    SegmentedButton(
-                        selected = entry == favouriteAppsView,
-                        onClick = { onUpdateFavouriteAppsView(entry) },
-                        shape = SegmentedButtonDefaults.itemShape(
-                            index = index,
-                            count = FavouriteAppsView.entries.size,
-                        ),
-                    ) {
-                        Text(text = entry.getTitle())
-                    }
-                }
-            }
+            GetoChoiceRow(
+                options = FavouriteAppsView.entries,
+                selected = favouriteAppsView,
+                label = { it.getTitle() },
+                onSelect = onUpdateFavouriteAppsView,
+            )
 
             Row(
                 modifier = Modifier

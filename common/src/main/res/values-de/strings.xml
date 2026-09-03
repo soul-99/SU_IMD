@@ -34,14 +34,33 @@
     <string name="global">Global</string>
 
     <string name="language_system">System / automatisch</string>
-    <string name="language_ai_notice">Sprachen außer Englisch wurden mit KI-gestützter maschineller Übersetzung erstellt und können daher Fehler enthalten. Wenn du eine Korrektur möchtest, melde Übersetzungsfehler bitte im GitHub-Issue-Tracker an den Entwickler.</string>
+    <string name="language_ai_notice">Sprachen außer Englisch wurden mit maschineller Übersetzung erstellt und können daher Fehler enthalten. Wenn du eine Korrektur möchtest, melde Übersetzungsfehler bitte im GitHub-Issue-Tracker an den Entwickler.</string>
 
     <string name="revert_to_default_toast">Standard wiederherstellen</string>
     <string name="revert_from_memory_toast">Aus dem Speicher wiederherstellen</string>
-    <string name="revert_failed_shizuku_toast">Shizuku-Dienst konnte nicht neu gestartet werden</string>
-    <string name="revert_failed_overlay_toast">Die Berechtigung Über anderen Apps einblenden konnte mit Shizuku nicht wiederhergestellt werden, siehe Benachrichtigung</string>
-    <string name="revert_failed_shizuku_and_overlay_toast">Shizuku-Dienst und Über anderen Apps einblenden-Berechtigungen konnten nicht wiederhergestellt werden</string>
     <string name="settings_hidden_toast">Einstellungen verborgen</string>
     <string name="auto_revert_to_default_toast">Automatisch auf Standard zurückgesetzt</string>
     <string name="auto_revert_from_memory_toast">Automatisch über die Memory function zurückgesetzt</string>
+    <string name="auto_hide_run_toast">IMD+ blendet deine Einstellungen aus…</string>
+    <string name="auto_hide_revert_toast">IMD+ stellt deine Einstellungen wieder her…</string>
+    <string name="toast_auto_hiding">IMD+: Einstellungen werden ausgeblendet...</string>
+    <string name="toast_done_hidden">IMD: Einstellungen ausgeblendet</string>
+    <string name="toast_done_hidden_for">IMD: Einstellungen für %1$s ausgeblendet</string>
+    <string name="toast_done_reverted_defaults">IMD: Einstellungen auf Standard zurückgesetzt</string>
+    <string name="toast_done_restored_defaults">IMD: Einstellungen auf den Standard wiederhergestellt</string>
+    <string name="toast_done_restored_memory">IMD: Einstellungen aus dem Speicher wiederhergestellt</string>
+    <string name="toast_done_restored_memory_for">IMD: Einstellungen aus dem Speicher wiederhergestellt (%1$s)</string>
+    <string name="toast_nothing_to_restore">IMD: Keine ausgeblendeten Einstellungen zum Wiederherstellen</string>
+    <string name="toast_auto_done_hidden">IMD+: Einstellungen ausgeblendet</string>
+    <string name="toast_auto_done_hidden_for">IMD+: Einstellungen für %1$s ausgeblendet</string>
+    <string name="permissions_lost">Notwendige Berechtigungen verloren. Bitte öffne IMD und erteile die Berechtigungen erneut.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="next">Weiter</string>
+    <string name="back">Zurück</string>
+    <string name="prior_hide_ignore">Alle vorherigen Wiederherstellungen ignorieren</string>
+    <string name="prior_hide_restore">Einstellungen zuerst wiederherstellen</string>
+    <string name="prior_hide_restoring">IMD stellt deine Einstellungen wieder her …</string>
+    <string name="prior_hide_title">Zuvor ausgeblendete Einstellungen erkannt — zuerst wiederherstellen?</string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="skip">Überspringen</string>
 </resources>

@@ -1,0 +1,238 @@
+<title>r24 M3 Switch Options</title>
+<style>
+  :root {
+    --ink: #16180f; --page: #f4f5ec; --muted: #5c6152; --rule: #d3d7c6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #e6e8dc; --page: #14160f; --muted: #9aa08d; --rule: #2e3327;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #e6e8dc; --page: #14160f; --muted: #9aa08d; --rule: #2e3327;
+  }
+
+  body {
+    background: var(--page); color: var(--ink); margin: 0; padding: 26px 18px 70px;
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 21px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 8px; font-size: 13.5px; max-width: 70ch; }
+  h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted);
+    margin: 36px 0 6px; font-weight: 600; border-top: 1px solid var(--rule); padding-top: 14px;
+  }
+  p.note { color: var(--muted); font-size: 13.5px; margin: 0 0 18px; max-width: 70ch; }
+  .flag {
+    border-left: 3px solid #d08a2c; padding: 10px 0 10px 14px; margin: 0 0 20px;
+    font-size: 13.5px; max-width: 70ch;
+  }
+  .flag b { color: var(--ink); }
+  code { font-size: 0.9em; opacity: 0.85; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; }
+  .panel { border-radius: 14px; padding: 18px; border: 1px solid var(--rule); }
+  .panel h3 {
+    font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 16px;
+    opacity: 0.6; font-weight: 600;
+  }
+  .dark {
+    --primary: #b3e675; --on-primary: #1f3800;
+    --primary-container: #375f05; --on-primary-container: #cfff91;
+    --outline: #8f9285; --surface-high: #31352b; --surface-highest: #3c4036;
+    --surface: #1b1e16; --on-surface: #e2e3d8; --on-surface-variant: #c5c8ba;
+    --error: #ffb4ab; --error-container: #93000a; --on-error-container: #ffdad6;
+    background: var(--surface); color: var(--on-surface);
+  }
+  .light {
+    --primary: #4e7819; --on-primary: #ffffff;
+    --primary-container: #cfff91; --on-primary-container: #102000;
+    --outline: #75796c; --surface-high: #e8e9de; --surface-highest: #e2e3d8;
+    --surface: #f9faef; --on-surface: #1a1c16; --on-surface-variant: #44483d;
+    --error: #ba1a1a; --error-container: #ffdad6; --on-error-container: #410002;
+    background: var(--surface); color: var(--on-surface);
+  }
+  /* the settings card, so the off track can be judged against what it actually sits on */
+  .oncard { background: var(--surface-highest); border-radius: 10px; padding: 12px 14px; }
+
+  .row { display: flex; align-items: center; gap: 12px; padding: 7px 0; font-size: 14px; }
+  .row .label { flex: 1; }
+  .row .what { font-size: 11px; opacity: 0.55; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* ---------- M3 switch: 52 x 32 track, drawn at 1.35x for a phone screen ---------- */
+  .sw {
+    --u: 1.35;
+    position: relative; flex: none;
+    width: calc(52px * var(--u)); height: calc(32px * var(--u));
+    border-radius: calc(16px * var(--u)); box-sizing: border-box;
+    transition: background 180ms cubic-bezier(.2,0,0,1), border-color 180ms;
+  }
+  .sw .thumb {
+    position: absolute; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; overflow: hidden;
+    transition: all 180ms cubic-bezier(.2,0,0,1);
+  }
+  .sw .thumb svg { width: calc(16px * var(--u)); height: calc(16px * var(--u)); }
+
+  /* off */
+  .sw.off { background: var(--surface-high); border: calc(2px * var(--u)) solid var(--outline); }
+  .sw.off .thumb {
+    width: calc(16px * var(--u)); height: calc(16px * var(--u));
+    left: calc(6px * var(--u)); top: calc(6px * var(--u)); background: var(--outline);
+  }
+  /* off, icon variant — thumb stays 24 */
+  .sw.off.chunky .thumb {
+    width: calc(24px * var(--u)); height: calc(24px * var(--u));
+    left: calc(2px * var(--u)); top: calc(2px * var(--u));
+  }
+  /* on */
+  .sw.on { background: var(--primary); border: calc(2px * var(--u)) solid transparent; }
+  .sw.on .thumb {
+    width: calc(24px * var(--u)); height: calc(24px * var(--u));
+    left: calc(24px * var(--u)); top: calc(2px * var(--u)); background: var(--on-primary);
+    color: var(--on-primary-container);
+  }
+  /* off with content in the thumb (busy while starting) */
+  .sw.off .thumb.filled {
+    width: calc(24px * var(--u)); height: calc(24px * var(--u));
+    left: calc(2px * var(--u)); top: calc(2px * var(--u)); color: var(--surface-high);
+  }
+  /* error */
+  .sw.err { background: var(--error-container); border-color: var(--error); }
+  .sw.err .thumb { background: var(--error); }
+  /* disabled */
+  .sw.dis { opacity: 0.38; }
+
+  /* spinner */
+  .spin {
+    width: calc(16px * var(--u)); height: calc(16px * var(--u));
+    border-radius: 50%; box-sizing: border-box;
+    border: calc(2px * var(--u)) solid currentColor;
+    border-right-color: transparent; border-bottom-color: transparent;
+    animation: rot 900ms linear infinite;
+  }
+  @keyframes rot { to { transform: rotate(360deg); } }
+
+  /* the current switch, for comparison: 48x22 track under a 30 thumb */
+  .old { --u: 1.35; position: relative; flex: none; width: calc(48px * var(--u)); height: calc(30px * var(--u)); }
+  .old .track {
+    position: absolute; left: 0; top: calc(4px * var(--u));
+    width: calc(48px * var(--u)); height: calc(22px * var(--u));
+    border-radius: calc(11px * var(--u)); box-sizing: border-box;
+    border: calc(2px * var(--u)) solid var(--outline);
+  }
+  .old .knob {
+    position: absolute; top: 0; width: calc(30px * var(--u)); height: calc(30px * var(--u));
+    border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,.45);
+  }
+  .old.on .track { background: var(--primary-container); }
+  .old.on .knob { left: calc(18px * var(--u)); background: var(--primary); }
+  .old.off .track { background: var(--surface-high); }
+  .old.off .knob { left: 0; background: var(--on-surface-variant); }
+
+  .pick {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-left: 8px;
+    background: #cfff91; color: #1f3800; vertical-align: 2px;
+  }
+  .qa { border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; margin-top: 30px; }
+  .qa h4 { margin: 0 0 8px; font-size: 14px; }
+  .qa p { margin: 0 0 10px; font-size: 13.5px; color: var(--muted); }
+</style>
+
+<main>
+  <h1>r24 — Material 3 switches, with a tick and a spinner in the thumb</h1>
+  <p class="sub">Static green at ×1.6. Drawn at 1.35× so the detail is visible on a phone; the real thing is Material's 52 × 32 dp track. Nothing here is built yet — this is the pick I need from you first.</p>
+
+  <div class="flag">
+    <b>One conflict to settle before I build it.</b> The Material 3 spec makes the off thumb a small <b>16 dp dot</b> and grows it to 24 dp when on. But you reported the off switch as hard to see three rounds running — r17b, r18, r21 — and each fix made the off state <em>bigger and rimmed</em>, not smaller. So the spec's own off state is the opposite direction from where we ended up. <b>Column A</b> is the spec. <b>Column B</b> is Material's own <em>icon</em> configuration, which keeps the thumb at 24 dp in both states — still M3, just the variant that always reserves room for a glyph. Both keep the always-on 2 dp rim and the <code>surfaceContainerHigh</code> off track from r21, so the off switch never matches the card again.
+  </div>
+
+  <h2>A · Material 3 spec — small dot when off</h2>
+  <div class="grid">
+    <div class="panel dark">
+      <h3>Dark · on the settings card</h3>
+      <div class="oncard">
+        <div class="row"><span class="label">Dynamic theme</span><span class="what">off</span><span class="sw off"><span class="thumb"></span></span></div>
+        <div class="row"><span class="label">OLED background</span><span class="what">on</span><span class="sw on"><span class="thumb"></span></span></div>
+        <div class="row"><span class="label">Progressive UI blur</span><span class="what">just turned on</span><span class="sw on"><span class="thumb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span></span></div>
+      </div>
+    </div>
+    <div class="panel light">
+      <h3>Light · on the settings card</h3>
+      <div class="oncard">
+        <div class="row"><span class="label">Dynamic theme</span><span class="what">off</span><span class="sw off"><span class="thumb"></span></span></div>
+        <div class="row"><span class="label">OLED background</span><span class="what">on</span><span class="sw on"><span class="thumb"></span></span></div>
+        <div class="row"><span class="label">Progressive UI blur</span><span class="what">just turned on</span><span class="sw on"><span class="thumb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>B · Material 3 icon variant — 24 dp thumb in both states</h2>
+  <div class="grid">
+    <div class="panel dark">
+      <h3>Dark · on the settings card</h3>
+      <div class="oncard">
+        <div class="row"><span class="label">Dynamic theme</span><span class="what">off</span><span class="sw off chunky"><span class="thumb"></span></span></div>
+        <div class="row"><span class="label">OLED background</span><span class="what">on</span><span class="sw on"><span class="thumb"></span></span></div>
+        <div class="row"><span class="label">Progressive UI blur</span><span class="what">just turned on</span><span class="sw on"><span class="thumb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span></span></div>
+      </div>
+    </div>
+    <div class="panel light">
+      <h3>Light · on the settings card</h3>
+      <div class="oncard">
+        <div class="row"><span class="label">Dynamic theme</span><span class="what">off</span><span class="sw off chunky"><span class="thumb"></span></span></div>
+        <div class="row"><span class="label">OLED background</span><span class="what">on</span><span class="sw on"><span class="thumb"></span></span></div>
+        <div class="row"><span class="label">Progressive UI blur</span><span class="what">just turned on</span><span class="sw on"><span class="thumb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>The spinner, in the thumb — settings manager</h2>
+  <p class="note">Today it is a 14 dp ring beside the row's <em>title</em>. Moved into the thumb it says the thing that is working is the switch. While a service is starting the switch still reads as off, so the thumb takes the 24 dp icon size to hold the ring — that grow is itself part of the signal.</p>
+  <div class="grid">
+    <div class="panel dark">
+      <h3>Dark · Settings Manager</h3>
+      <div class="row"><span class="label">Developer settings</span><span class="sw on"><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">Shizuku service</span><span class="what">starting</span><span class="sw off"><span class="thumb filled"><span class="spin"></span></span></span></div>
+      <div class="row"><span class="label">Shevery service</span><span class="what">starting</span><span class="sw off"><span class="thumb filled"><span class="spin"></span></span></span></div>
+      <div class="row"><span class="label">Display over other apps</span><span class="what">failed</span><span class="sw off err"><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">USB debugging</span><span class="what">inert</span><span class="sw off dis"><span class="thumb"></span></span></div>
+    </div>
+    <div class="panel light">
+      <h3>Light · Settings Manager</h3>
+      <div class="row"><span class="label">Developer settings</span><span class="sw on"><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">Shizuku service</span><span class="what">starting</span><span class="sw off"><span class="thumb filled"><span class="spin"></span></span></span></div>
+      <div class="row"><span class="label">Shevery service</span><span class="what">starting</span><span class="sw off"><span class="thumb filled"><span class="spin"></span></span></span></div>
+      <div class="row"><span class="label">Display over other apps</span><span class="what">failed</span><span class="sw off err"><span class="thumb"></span></span></div>
+      <div class="row"><span class="label">USB debugging</span><span class="what">inert</span><span class="sw off dis"><span class="thumb"></span></span></div>
+    </div>
+  </div>
+
+  <h2>What you have now, for comparison</h2>
+  <p class="note">Your W1 pick from r11: a 48 × 22 track under a 30 dp thumb that overhangs it. Material's is 52 × 32 with the thumb inside the track — slightly wider, noticeably taller, and no overhang. The settings manager scales its switches down, so its row heights are unaffected; elsewhere the rows grow by about 2 dp.</p>
+  <div class="grid">
+    <div class="panel dark">
+      <h3>Dark · current (r23)</h3>
+      <div class="oncard">
+        <div class="row"><span class="label">Dynamic theme</span><span class="what">off</span><span class="old off"><span class="track"></span><span class="knob"></span></span></div>
+        <div class="row"><span class="label">OLED background</span><span class="what">on</span><span class="old on"><span class="track"></span><span class="knob"></span></span></div>
+      </div>
+    </div>
+    <div class="panel light">
+      <h3>Light · current (r23)</h3>
+      <div class="oncard">
+        <div class="row"><span class="label">Dynamic theme</span><span class="what">off</span><span class="old off"><span class="track"></span><span class="knob"></span></span></div>
+        <div class="row"><span class="label">OLED background</span><span class="what">on</span><span class="old on"><span class="track"></span><span class="knob"></span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <h4>What I need from you</h4>
+    <p><b>1 · A or B</b> for the off thumb — spec's small dot, or the icon variant that stays 24 dp.</p>
+    <p><b>2 · The tick everywhere, or only where a turn-on can fail?</b> You said throughout, and that is what I will build unless you say otherwise. The thing to know: on the settings page a switch turns on instantly, so the tick is decoration; in the manager it is real information, because the switch only goes on once the service actually started.</p>
+    <p><b>3 · One thing I am changing without asking, tell me if it is wrong:</b> the manager's Shevery row currently shows a <em>muted</em> on-switch — visibly on, visibly not pressable. Material's switch has no muted middle state, so that row becomes a fully bright on-switch that simply does not respond to a press. The row already explains itself, and a service that genuinely is running arguably deserves the bright reading.</p>
+  </div>
+</main>

@@ -33,23 +33,108 @@
 
     <!-- Shizuku -->
     <string name="shizuku">Shizuku configuration</string>
-    <string name="restart_shizuku_service">Restart Shizuku service</string>
-    <string name="restart_shizuku_service_description">On reverting USB debugging from Notification (memory function only), autostart Shizuku service.</string>
+    <string name="restart_shizuku_service">Restart Shizuku service (for Memory function mechanism)</string>
+    <string name="restart_shizuku_service_description">On reverting USB debugging, auto restart Shizuku service via intents</string>
     <!--
       The section's opening warning, drawn in the error colour. Two lines: what does not
       work, then what to install instead. shizuku_rikka_recommend_link is the clickable
       half of the second line and is appended to the prefix, so the two must read as one
       sentence.
     -->
-    <string name="shizuku_rikka_warning">The original RikkaApps version of Shizuku (Playstore/ F-droid/ Github) does not support start-stop intents</string>
+    <string name="shizuku_rikka_warning">The original RikkaApps version of Shizuku is not supported as it does not support start-stop intents.</string>
     <string name="shizuku_rikka_recommend_prefix">RikkaApps Shizuku is outdated and not maintained now, so it is recommended to download</string>
     <string name="shizuku_rikka_recommend_link">Thedjchi fork of Shizuku (community maintained)</string>
 
     <string name="shizuku_fork_shevery" translatable="false">Shevery</string>
-    <string name="shizuku_fork_mode_thedjchi">Thedjchi based forks of Shizuku</string>
-    <!-- Appended after the linked word Shevery, so it begins mid-sentence. -->
-    <string name="shizuku_fork_mode_other_suffix">/ other forks of Shizuku that support start-stop intents without auth key</string>
+    <string name="shizuku_fork_thedjchi" translatable="false">Thedjchi</string>
+    <!-- Appended after the linked word Thedjchi, so it begins mid-sentence. -->
+    <string name="shizuku_fork_mode_thedjchi_suffix">/ other forks of Shizuku that support start-stop intents</string>
+    <!-- The warning that rides beside the Shevery option. The whole bracket is one tap
+      target: it opens the dialog explaining what choosing Shevery actually costs. -->
+    <string name="shizuku_fork_shevery_caution">supported, but not recommended</string>
+
+    <!-- The Shevery explainer, shown from that bracket and again every time the option is
+      switched on. Shevery has no start or stop intent: its service follows the debugging
+      transport, and its own ErrorProtect watchdog is what brings it back. -->
+    <string name="shevery_notice_title">Shevery support</string>
+    <string name="shevery_notice_point_errorprotect">Shevery is supported via Shevery\'s own ErrorProtect service (make sure it is turned on within your Shevery app)</string>
+    <string name="shevery_notice_name_errorprotect">ErrorProtect service</string>
+    <string name="shevery_notice_point_stop">To stop Shevery\'s service you need to configure IMD to hide both debugging settings, which will indirectly kill Shevery.</string>
+    <string name="shevery_notice_name_stop">stop</string>
+    <string name="shevery_notice_point_restart">To restart Shevery\'s service, you need to configure IMD to unhide debugging settings, Shevery\'s ErrorProtect service will start it again (scans every 10s)</string>
+    <string name="shevery_notice_name_restart">restart</string>
+    <string name="shevery_notice_point_delay">So it might add a slight delay within IMD to do tasks requiring Shizuku access (like hiding/ unhiding Display over other apps).</string>
+    <string name="shevery_notice_point_hidden">Shizuku service toggles will become hidden under hide and unhide settings of IMD as IMD is not managing those directly.</string>
+    <string name="shevery_notice_point_warning">Depending how you have setup IMD, Shevery framework might be prone to failure.</string>
+    <!-- ============================ r3: the Shizuku section ============================ -->
+
+    <!-- The master switch above everything in the Shizuku section. RECOMMENDED... is drawn
+      entirely bold, which is how the author wrote it. manage_shizuku_blocked is Claude's
+      sentence, not the author's - he has been told. -->
+    <string name="manage_shizuku">Manage Shizuku</string>
+    <string name="manage_shizuku_recommended">RECOMMENDED ON if you use Shizuku</string>
+    <string name="manage_shizuku_blocked">Please fill in all the fields below first.</string>
+
+    <!-- The phrases the two red descriptions bold. Held apart rather than positioned, so a
+      translation can move them and still be found. Shevery used to carry a fourth; r4m took
+      it out of the first line, and its name left the emphasis list with it. -->
+    <string name="shizuku_rikka_name_rikka">RikkaApps version of Shizuku</string>
+    <string name="shizuku_rikka_name_unsupported">not supported</string>
+    <string name="shizuku_rikka_name_outdated">outdated</string>
+
+    <!-- The two fork setup pop-ups. The author numbered the steps himself, so the numbers are
+      inside the strings; the ON / OFF word in each is bolded by name. -->
+    <string name="shizuku_setup_lead">Please open your Shizuku app &gt; Settings and do the following:</string>
+    <string name="shizuku_setup_on" translatable="false">ON</string>
+    <string name="shizuku_setup_off" translatable="false">OFF</string>
+    <string name="shizuku_setup_tcp_port">you should change your TCP port to something random other than 5555 for security</string>
+    <string name="thedjchi_setup_1" translatable="false">1. Watchdog OFF</string>
+    <string name="thedjchi_setup_2" translatable="false">2. TCP mode ON</string>
+    <string name="thedjchi_setup_3" translatable="false">3. Auto disable USB debugging OFF</string>
+    <string name="thedjchi_setup_4">4. Stop and restart Shizuku service</string>
+    <string name="thedjchi_setup_reboot">You will need to start Shizuku manually atleast once after every device reboot.</string>
+    <string name="shevery_setup_1" translatable="false">1. ErrorProtect ON</string>
+    <string name="shevery_setup_2" translatable="false">2. TCP mode ON</string>
+    <string name="shevery_setup_3" translatable="false">3. Auto-disable USB debugging OFF</string>
+    <string name="shevery_setup_4">4. Stop and restart Shevery service</string>
+    <string name="shevery_setup_reboot">You will need to start Shevery manually atleast once after every device reboot.</string>
+
+    <!-- The How this works section of the Shevery pop-up. Its numbers are drawn rather than
+      baked in, because point 1 reuses a string that already existed. -->
+    <string name="shevery_how_title">How this works</string>
+    <string name="shevery_flow_stop">To stop</string>
+    <string name="shevery_flow_restart">To restart</string>
+    <string name="shevery_flow_hide">IMD hides USB debugging settings</string>
+    <string name="shevery_flow_stopped">Shevery service stops</string>
+    <string name="shevery_flow_unhide">IMD unhides USB debugging settings</string>
+    <string name="shevery_flow_started">ErrorProtect starts it again (scans every 10s)</string>
+    <string name="shevery_how_delay">Shevery takes upto 40s to restart after revert.</string>
+    <!-- Added after r4a, above the last red point. Both bold and in the error colour: they
+      are the scope of Shevery support rather than advice about it. -->
+    <string name="shevery_how_manager_only">Managing Shevery service &amp; Display over other apps is only allowed in IMD settings manager.</string>
+    <string name="shevery_how_no_launch">Hiding-unhiding for app launches is not supported for both settings mentioned above and IMD+.</string>
+    <string name="shevery_how_warning">Shevery framework might be prone to failures</string>
+
+
+    <!-- ===================== r3: greyed toggles, and where to fix them ==================== -->
+
+    <!-- The author's sentence, followed by one location tree per thing that is missing. -->
+    <string name="configure_first">Please configure the settings first</string>
+    <string name="dooa_thedjchi_only">managing Display over other apps is only supported for Thedjchi fork of Shizuku</string>
+    <string name="shizuku_thedjchi_only">managing the Shizuku service is only supported for Thedjchi fork of Shizuku</string>
+
+    <!-- Whole strings in the house shape, so a translation can reorder them. help_path_accessibility
+      already existed and is reused unchanged. -->
+    <string name="help_path_dooa">IMD Settings \u2192 Default IMD settings \u2192 Display over other apps managed by IMD</string>
+    <string name="help_path_manage_shizuku">IMD Settings \u2192 Shizuku configuration \u2192 Manage Shizuku</string>
+
+    <!-- The heading of the Shizuku page in setup, which shows this section's contents. -->
+    <string name="shizuku_setup_page_title">Shizuku configuration</string>
     <string name="shizuku_choose_app">Choose an installed app</string>
+    <string name="shizuku_refresh_apps">Refresh app list</string>
+    <!-- Shown under the package field when neither a matching label nor the stock package
+      name is installed, so the empty field is explained rather than just empty. -->
+    <string name="shizuku_app_not_found">No Shizuku app found</string>
     <string name="shizuku_fill_advanced">Please fill the Shizuku configuration section first</string>
     <string name="show_value">Show</string>
     <string name="hide_value">Hide</string>
@@ -62,7 +147,8 @@
     <!-- Accessibility. The section header this used to title is gone; the entry now
          sits under Default IMD settings, beside the two configurations it qualifies. -->
     <string name="accessibility_services">Accessibility services to hide</string>
-    <string name="accessibility_services_dialog_description">These services are switched off when an app setting hides accessibility services, and switched back on when you revert it. Only the ones this app turned off are ever restored.</string>
+    <string name="accessibility_services_row">Accessibility services\nmanaged by IMD</string>
+    <string name="accessibility_services_dialog_description">Only enabled ones are shown below</string>
     <string name="accessibility_services_none_selected">None selected. %1$d currently enabled on this device.</string>
     <string name="accessibility_services_selected">%1$d selected, %2$d currently enabled on this device.</string>
     <string name="accessibility_service_enabled">Enabled · %1$s</string>
@@ -71,7 +157,7 @@
 
     <!-- About -->
     <string name="about">About</string>
-    <string name="about_version">Version %1$s</string>
+    <string name="about_version">App version %1$s</string>
     <string name="about_check_releases">Open GitHub release page to check for updates</string>
     <string name="about_add_to_obtainium">Add to Obtainium</string>
     <string name="about_obtainium_note">(to track updates/ auto-update app)</string>
@@ -79,58 +165,81 @@
     <string name="about_author_name" translatable="false">soul_99</string>
     <!-- The Support button above the author line, and its popup. The author's own message,
       kept in the first person, as four separate paragraphs. In point 2 a yellow star is drawn
-      before the sentence and the phrase in support_point_star_link is turned into the repo
-      link, so that phrase must appear inside support_point_star verbatim. -->
+      before the sentence.
+      r29 deleted support_point_star_link: r27 had already replaced the inline link with a button
+      under the point, and the only reason it was kept - not orphaning the translations - expired
+      when this round translated the rest. -->
     <string name="support_button">Support the project 🫶 (for free)</string>
     <string name="support_intro_1">I created this app in my busy schedule of full-time medical residency.</string>
     <string name="support_intro_2">Initially it was born out of my personal needs, but after positive community feedback, I decided to share it with the FOSS community.</string>
-    <string name="support_intro_3">You can do these for free, if you want to support my work and keep this project alive</string>
-    <string name="support_intro_4">I want it to be taken over by a more capable developer in future, as my profession does not allow me to maintain it all year round.</string>
+    <!-- Underlined inside support_intro_3. Their own resources so a translation can say
+         what its version of each phrase is - a search for the English inside a translated
+         sentence finds nothing. -->
+    <string name="support_name_project">support this project</string>
+    <string name="support_name_alive">keep it alive</string>
+    <string name="support_intro_3">You can do these for free, if you want to support this project and keep it alive.</string>
+    <string name="support_intro_4">I want it to be taken over by more capable developers in future, as my profession does not allow me to maintain it all year round.</string>
     <string name="support_point_number">%1$d.</string>
-    <string name="support_point_share">Spread the word if you can - it helps the community, and I don\'t need any credit or mention.</string>
+    <string name="support_point_share">Share this project/app to community. This is most helpful and will help to keep the project alive.</string>
     <string name="support_point_star">the GitHub repo to increase its visibility.</string>
-    <string name="support_point_star_link">GitHub repo</string>
     <string name="support_point_bugs">Report bugs in the main repo.</string>
     <string name="support_point_discuss">Join discussions.</string>
     <string name="support_point_contribute">Contribute to the code or docs, if you are a developer.</string>
     <string name="support_share_button">Share</string>
+    <!-- The author's own capitalisation, confirmed deliberate: lowercase view, capital Project. -->
+    <string name="support_view_github_button" translatable="false">view Project on GitHub</string>
+    <!--
+      The author's signature at the foot of the dialog. Names, so untranslatable - and the dash
+      carries no trailing space, because aapt would strip it; the gap is a Spacer.
+    -->
+    <string name="support_signature_dash" translatable="false">-</string>
+    <string name="support_signature_name" translatable="false">soul_99</string>
+    <string name="support_signature_real_name" translatable="false">(Dr. Utkarsh Rajput)</string>
     <string name="support_share_message">Hey! checkout this FOSS app, I found it useful</string>
     <string name="about_contributions">Contributions</string>
     <string name="about_contributor_name" translatable="false">RafayGhafoor</string>
-    <string name="about_contributor_scope">(Display over other apps)</string>
+    <string name="about_contributor_scope">(Display over other apps initial framework)</string>
     <string name="about_view_github">View GitHub</string>
-    <string name="about_fork_of">Fork of</string>
+    <string name="about_email">Email</string>
+    <string name="about_fork_of">Supercharged fork of</string>
     <string name="about_geto_app">Geto app</string>
     <!-- "Fork of Geto by JackEblan (Blanc)" - about_fork_by is the "by", about_fork_author is
       the original author's name (a proper name, so not translated) linking to his profile. -->
     <string name="about_fork_by">by</string>
-    <string name="about_fork_author" translatable="false">JackEblan (Blanc)</string>
+    <string name="about_fork_author" translatable="false">JackEblan</string>
     <string name="about_license_heading">License:</string>
     <string name="about_licence_name" translatable="false">GNU General Public License v3.0</string>
 
-    <string name="long_live_foss">Long live free and open source software!</string>
+    <!-- Two lines, the second expanding the first. The space before the "!" is the author's. -->
+    <string name="long_live_foss">Long live FOSS !</string>
+    <string name="long_live_foss_expansion">(Free and Open Source Software)</string>
 
     <!-- suIMD: collapsible section headers -->
     <string name="section_ui">User interface</string>
+    <string name="icon_style">Icon style</string>
+    <string name="icon_style_smart">Smart adaptive icons</string>
+    <string name="icon_style_smart_note">Older icons are trimmed and given your device\'s own icon shape, so every icon matches.</string>
+    <string name="icon_style_system">System icons</string>
+    <string name="icon_style_system_note">Icons are drawn exactly as Android hands them over.</string>
     <string name="language">Language</string>
     <string name="section_app_functions">Default IMD settings</string>
 
     <!-- suIMD: notification function -->
-    <string name="notification_function">Notification function</string>
+    <string name="notification_function">Hiding-unhiding mechanism</string>
     <string name="notification_function_memory">Memory function</string>
     <!--
       The picker's own labels, separate from the two above. Those name the function and are
       what the settings row shows as the current choice, where a "(Recommended)" trailing
       the thing you already picked would read as nonsense.
     -->
-    <string name="notification_function_memory_option">Memory function (old method)</string>
+    <string name="notification_function_memory_option">Memory function</string>
     <string name="notification_function_memory_summary">Multiple notification per different app launch</string>
     <string name="notification_function_memory_detail">saves the previous device setting\'s state before turning off the configured device settings for that app and restores only those which were turned off by IMD</string>
     <!-- What choosing the memory function costs. Red because these are consequences, not
          features: the first is work the user takes on, the second is a limit on what the
          choice actually covers. The third is the reason someone might want it anyway. -->
     <string name="notification_function_memory_warning_config">You will need to manually configure what settings to hide for each individual app by long pressing that app icon in All apps or Favourites tab.</string>
-    <string name="notification_function_memory_warning_revert">Only Revert button in notifications will use memory function, all other revert functions (quick setting tile, in app button... etc) will still revert to Settings to unhide on Revert configuration from IMD app settings.</string>
+    <string name="notification_function_memory_warning_revert">Only these methods allow you to revert from memory:\n•  Revert using notification\n•  Revert using the Hide settings QS toggle\n•  Revert using memory intent\n\nThese still revert to the defaults configured under IMD settings:\n•  Revert to default QS tile\n•  Revert to default home screen shortcut\n•  Revert to default button in the Favourites tab\n•  Revert to default button in the IMD Settings Manager\n•  Revert to default intent</string>
     <string name="notification_function_memory_note">Memory function allows you to hide additional settings other than the default 4 settings of IMD app</string>
     <string name="notif_name_all_apps">All apps</string>
     <string name="notif_name_favourites">Favourites</string>
@@ -140,6 +249,23 @@
     <string name="notification_function_revert_summary">Single notification only</string>
     <string name="notification_function_revert_detail">reverts the device settings to Settings to unhide on Revert configured in IMD settings</string>
     <string name="save">Save</string>
+
+    <!-- suIMD v3: the Hiding framework / Unhiding framework split. The two
+         questions the old hiding-unhiding mechanism answered with one switch. -->
+    <string name="hiding_framework">Hiding framework</string>
+    <string name="unhiding_framework">Unhiding framework</string>
+    <string name="framework_using">using %1$s</string>
+    <string name="hiding_framework_defaults">IMD defaults</string>
+    <string name="hiding_framework_defaults_summary">Hide same settings for every app</string>
+    <string name="hiding_framework_per_app">Per app configuration</string>
+    <string name="hiding_framework_per_app_summary">Hide different settings for different apps.\nLong press app icons in IMD to set what settings to hide</string>
+    <string name="hiding_framework_per_app_extra">This option allows you to hide additional settings other than the default 3-5 settings of IMD app ;)</string>
+    <string name="unhiding_framework_memory">Memory function (Revert to what was actually hidden)</string>
+    <string name="unhiding_framework_recommended">(Recommended)</string>
+    <string name="unhiding_framework_memory_summary">Memorises and restores to the actual settings state before hiding them</string>
+    <string name="unhiding_framework_revert">Revert to default</string>
+    <string name="framework_pending_reverts">Pending reverts found, IMD will perform pending reverts then save the new settings</string>
+    <string name="framework_pending_reverts_failed">Unable to perform pending reverts, please check notifications to proceed</string>
 
     <!-- suIMD: revert to default configuration -->
     <string name="revert_defaults">Revert to default configuration</string>
@@ -156,32 +282,72 @@
     <string name="revert_defaults_description">These settings are unhidden/re-enabled when you click on \'Revert to default\' button anywhere.</string>
     <string name="revert_defaults_summary">%1$d of %2$d switched on</string>
 
+    <string name="unhiding_framework_revert_summary">always reverts to Revert to default configuration under default IMD settings</string>
+    <string name="settings_to_hide_defaults_label">Default settings to hide</string>
+    <string name="settings_to_hide_both_label">Settings to hide / unhide</string>
+    <string name="revert_defaults_entry_both">Settings to unhide +\nRevert to default configuration</string>
+    <string name="settings_to_hide_desc_defaults_revert">These are the default settings which are hidden(disabled) for app launches, the Hide settings QS tile and IMD intents.</string>
+    <string name="settings_to_hide_desc_defaults_memory">These are the default settings which are hidden(disabled) and unhidden(re-enabled) for app launches, the Hide settings QS tile and IMD intents, only if IMD disabled them before.</string>
+    <string name="settings_to_hide_desc_per_app_revert">These are the default settings which are hidden(disabled) only for the Hide settings QS tile and IMD intents.</string>
+    <string name="settings_to_hide_desc_per_app_memory">These are the default settings which are hidden(disabled) and unhidden(re-enabled) only for the Hide settings QS tile and IMD intents, only if IMD disabled them before.</string>
+    <!-- Above the two below, and bold: what this list is for, which is the same answer
+         under either unhiding framework. Those two say when it runs, which is not. -->
+    <string name="revert_defaults_desc_recover">Helps you to quickly recover to a settings state you configured here in case of unsatisfactory outcomes.</string>
+    <string name="revert_defaults_desc_revert">These settings are unhidden(re-enabled) on every unhide, and whenever you use \'Revert to default\' anywhere.</string>
+    <string name="revert_defaults_desc_memory">These settings are unhidden(re-enabled) only when you use \'Revert to default\' anywhere.</string>
+    <string name="per_app_hide_notice">Using per app configuration hiding mechanism (see advanced settings in IMD)\nOnly using these for:\n  1. Hide settings quick setting toggle\n  2. IMD intents (Tasker, Macrodroid... etc)</string>
+    <string name="per_app_hide_notice_red">These are not being used for apps when launched via IMD.</string>
     <string name="settings_to_hide">Settings to hide</string>
     <string name="settings_to_hide_title">Settings to hide/ disable</string>
     <string name="settings_to_hide_description">These settings are hidden when you launch an app.</string>
     <string name="settings_to_hide_summary">%1$d of %2$d switched on</string>
-    <string name="settings_to_hide_usb_note">stopping USB debugging will also kill Shizuku service(if running), please configure Shizuku settings under IMD app to restart the Shizuku service after Revert</string>
-    <string name="settings_to_hide_overlay_note">Shizuku must be configured properly in IMD settings\nOnly apps selected in IMD settings are managed</string>
+    <string name="settings_to_hide_usb_note">stopping USB debugging will kill Shizuku service, so it is advised to also tick Shizuku service here if you use it</string>
+    <string name="settings_to_hide_overlay_note">Only apps selected in IMD settings\nneeds Shizuku service to function</string>
     <string name="settings_to_hide_info_per_app">If you want to hide different settings per individual app, please use memory function in IMD settings &gt; Advanced &gt; Notification function</string>
     <string name="settings_to_hide_info_all">Hiding only developer settings does not turn off USB and wireless debugging, and some apps might still detect that as developer settings turned on, so it is recommended to select all three</string>
-    <string name="settings_to_hide_info_shizuku">to hide Shizuku from apps use the Hide Shizuku from other apps function within the Shizuku app.</string>
+    <string name="settings_to_hide_shizuku_note">ensure Shizuku values are properly configured in IMD settings</string>
+    <string name="settings_to_hide_info_shizuku">to hide Shizuku application (not service) use the Hide Shizuku from other apps function within the Shizuku app.</string>
     <string name="settings_to_hide_name_shizuku_hide">Hide Shizuku from other apps</string>
     <string name="settings_to_hide_info_watchdog">It is recommended to keep Shizuku\'s watchdog service off as if Shizuku restarts in the background it will also turn on ADB, when settings are hidden and your apps might be able to detect that.</string>
     <string name="settings_to_hide_name_shizuku_watchdog">Shizuku\'s watchdog service</string>
     <string name="revert_defaults_developer_settings">Developer settings</string>
     <string name="revert_defaults_usb_debugging">USB debugging</string>
     <string name="revert_defaults_wireless_debugging">Wireless debugging</string>
+
+    <!--
+      Wireless debugging, and the one setting in this app that is deliberately not put back.
+
+      restore_wireless_also is a nested checkbox under the Wireless debugging row in
+      Settings to hide/unhide, drawn only under the memory unhiding framework - under Revert
+      to default the destination is that dialog's own Wireless debugging switch instead, and
+      one question with two answers is worse than either.
+
+      The two popups are different on purpose. The two-point one belongs to the checkbox;
+      the one-liner belongs to the Revert to default switch, where point 1 would be false.
+    -->
+    <string name="restore_wireless_also">Restore wireless debugging also</string>
+    <string name="restore_wireless_notice_1">1. By default IMD only hides wireless debugging and does not restore it on unhiding for public WiFi security reasons.</string>
+    <string name="restore_wireless_notice_2">2. Only enable this if you always use private WiFi.</string>
+    <string name="wireless_private_wifi_notice">Only enable this if you always use private WiFi.</string>
     <string name="revert_defaults_accessibility_services">Accessibility services</string>
-    <string name="settings_to_hide_accessibility_note">Only services selected in IMD settings are managed</string>
-    <string name="revert_defaults_accessibility_note">Only apps selected in IMD settings are turned on again if turned off by IMD</string>
+    <string name="settings_to_hide_accessibility_note">Only apps selected in IMD settings</string>
+    <string name="revert_defaults_accessibility_note">Only apps selected in IMD settings</string>
     <string name="revert_defaults_shizuku">Shizuku service</string>
-    <string name="revert_defaults_shizuku_note">Depending on which method Shizuku uses to start the service it will re-enable either one of USB debugging or wireless debugging, which it also needs to keep the Shizuku service running</string>
+
+    <!--
+      The same row under the other fork, and the only one of the six labels this module was
+      missing: the two dialogs that already use these strings never rename it. Added for
+      "Setting manager toggles", which does - the manager renames it, so the list that says
+      which manager rows are drawn has to rename it too, or it would be offering to hide a row
+      by a name that is not on the card.
+    -->
+    <string name="revert_defaults_shevery">Shevery service</string>
+    <string name="revert_defaults_shizuku_note">Depending on which method Shizuku uses to keep service alive, it will enable/disable USB or wireless debugging.</string>
     <string name="revert_defaults_display_over_other_apps">Display over other apps</string>
-    <string name="revert_defaults_overlay_note">Shizuku must be configured properly in IMD settings\nOnly apps selected in IMD settings are turned on again if turned off by IMD</string>
+    <string name="revert_defaults_overlay_note">Only apps selected in IMD settings</string>
     <string name="overlay_needs_shizuku_configured">Shizuku must be configured properly in IMD settings before this can be used</string>
 
     <!-- suIMD: the setup help, shown on onboarding page two and from Settings -->
-    <string name="help_button">Help (readme)</string>
     <string name="help_close">Close</string>
     <string name="help_title">How to setup this app (don\'t skip)</string>
     <string name="help_intro">These are things you need to setup yourself.</string>
@@ -192,33 +358,42 @@
          whole strings rather than assembled from parts so a translator can reorder them,
          and so a renamed screen is one edit rather than several. -->
     <string name="help_path_help">IMD Settings → About → Help (readme)</string>
-    <string name="help_path_hide">IMD Settings → Default IMD settings → Settings to hide</string>
-    <string name="help_path_unhide">IMD Settings → Default IMD settings → Settings to unhide on Revert</string>
-    <string name="help_path_accessibility">IMD Settings → Default IMD settings → Accessibility services to hide</string>
+    <string name="help_path_hide">IMD Settings → Default IMD settings → Settings to hide / unhide</string>
+    <string name="help_path_hide_defaults">IMD Settings → Default IMD settings → Default settings to hide</string>
+    <string name="help_path_unhide">IMD Settings → Default IMD settings → Revert to default configuration</string>
+    <string name="help_path_unhide_both">IMD Settings → Default IMD settings → Settings to unhide + Revert to default configuration</string>
+    <string name="help_path_accessibility">IMD Settings → Default IMD settings → Accessibility services managed by IMD</string>
     <string name="help_path_shizuku">IMD Settings → Shizuku configuration</string>
 
-    <string name="help_hide_title">Setup what settings to hide (MANDATORY)</string>
-    <string name="help_hide_body">by default all settings are hidden (recommended), but you can customise it as per your liking.</string>
+    <string name="help_hide_title">Setup what settings to hide / unhide (MANDATORY)</string>
+    <string name="help_hide_body">by default nothing is hidden (security reasons), you need to configure the settings to hide first before using the app.</string>
 
-    <string name="help_revert_title">Setup what settings to unhide on Revert (RECOMMENDED)</string>
-    <string name="help_revert_body">by default only Accessibility services is enabled, as everything else in that list is a debugging setting and switching those back on automatically is a security risk. You can customise it to your liking.</string>
+    <string name="help_revert_title">Setup Revert to default (RECOMMENDED)</string>
+    <string name="help_revert_body">It allows user to set a default setting state to be restored in non satisfactory cases.</string>
 
-    <string name="help_accessibility_title">Setup Accessibility services to hide</string>
-    <string name="help_accessibility_body">The app will not touch any accessibility service until you say which ones, then tick the ones that should be switched off while a locked-down app is open. They are switched back on when you revert.</string>
+    <string name="help_accessibility_title">Setup Accessibility services / Display over other apps to hide</string>
+    <string name="help_accessibility_body">This app will not touch any accessibility services or Display over other apps (needs Shizuku), until you select which ones.</string>
 
-    <string name="help_shizuku_title">Setup Shizuku Start Intents (only if you use Shizuku)</string>
+    <string name="help_shizuku_title">Setup Shizuku configuration</string>
     <string name="help_shizuku_body">If you use Shizuku service, whenever IMD will toggle off debugging settings it will kill the Shizuku service, so it is recommended to setup &amp; verify Shizuku start intents.</string>
 
     <string name="help_general_title">General info</string>
     <string name="help_general_how_title">HOW TO USE IMD</string>
-    <string name="help_general_launch">1. To use the blocked apps you need to launch them either from within the IMD app or via IMD created app shortcuts on homescreen.</string>
+    <string name="help_general_launch">1. To use the blocked apps you need to launch them from one of these:\n•  The IMD app\n•  IMD created app shortcuts on homescreen\n•  Normally from your launcher, if settings are hidden using Hide settings quick toggle</string>
     <string name="help_general_shortcuts">2. In this app you can create app shortcuts directly to your homescreen by long pressing an app name in the All apps or Favourites tab.</string>
-    <string name="help_general_revert">3. After you are done using your app, use the Revert / Revert to default button to unhide/ re-enable your previous settings.</string>
+    <string name="help_general_revert">3. After you are done using your app, use the Revert / Revert to default button or Hide settings quick toggle to unhide/ re-enable your previous settings.</string>
     <string name="help_general_revert_places">You can use the revert button from these places:</string>
     <string name="help_general_revert_items">•  notifications after app launch\n•  Android quick setting toggle\n•  Favourites tab\n•  Home screen shortcut (long press IMD icon to generate shortcut)</string>
-    <string name="help_general_manager_title">IMD SERVICES MANAGER</string>
-    <string name="help_general_manager">Use this service manager to quickly view the live status of your settings/services and also quickly toggle them on-off.</string>
-    <string name="help_general_manager_places">You can open the IMD services manager from these places:</string>
+    <string name="help_general_manager_title">IMD SETTINGS MANAGER</string>
+    <string name="help_general_manager">Use this settings manager to quickly view the live status of your settings/services and also quickly toggle them on-off.</string>
+    <string name="help_general_manager_places">You can open the IMD Settings Manager from these places:</string>
+    <string name="help_automations_title">Discover &amp; setup automations</string>
+    <string name="help_automations_auto_unhide">1.  Auto unhide settings</string>
+    <string name="help_automations_auto_hide">2.  Auto hide settings (needs background service)</string>
+    <string name="help_automations_intents">3.  IMD intents for Tasker/ Macrodroid... etc.</string>
+    <string name="help_path_auto_unhide">IMD Settings → Default IMD settings → Auto unhide settings</string>
+    <string name="help_path_auto_hide">IMD Settings → IMD+ (needs background service) → Auto hide settings</string>
+    <string name="help_path_intents">IMD Settings → Advanced → IMD intents</string>
     <string name="help_general_manager_items">•  Android quick setting toggle\n•  Favourites tab\n•  Home screen shortcut (long press IMD icon to generate shortcut)</string>
 
     <!-- Phrases bolded inside the sentences above, passed as the same resources the
@@ -242,25 +417,30 @@
       names below match IMD's own actions. The intent field labels (Type, Package, Class,
       Action, Extra) are not resources - they are shown in English to match the automation
       apps' own editors. -->
-    <string name="tasker_integration">Tasker / MacroDroid integration (Experimental)</string>
-    <string name="tasker_integration_subtitle">Trigger IMD from automation apps with an auth key</string>
+    <string name="tasker_integration">IMD intents</string>
+    <string name="tasker_integration_subtitle">for Tasker / MacroDroid... etc</string>
     <string name="tasker_integration_intro">Set these up as intents in your automation app. Three are broadcasts, secured by the auth key below; opening the services manager is an activity and needs no key.</string>
     <string name="tasker_integration_package_warning">Always set the Package field to this app, so the auth key reaches only IMD and is not broadcast to other apps.</string>
     <string name="tasker_auth_key">Auth key</string>
     <string name="tasker_auth_key_note">One key for every trigger, and the only thing protecting them, so keep it private. Refresh to retire every macro built on the old key.</string>
     <string name="tasker_refresh_key">Refresh key</string>
     <string name="tasker_copy">Copy</string>
-    <string name="tasker_fn_services">Open IMD services manager</string>
+    <string name="tasker_fn_services">Open IMD Settings Manager</string>
     <string name="tasker_fn_services_note">No auth key - it only opens a screen you toggle by hand.</string>
     <string name="tasker_fn_revert_default">Revert to default</string>
     <string name="tasker_fn_revert_memory">Revert using memory</string>
+    <string name="tasker_fn_unhide">Unhide settings and services</string>
     <string name="tasker_fn_hide">Hide settings and services</string>
+    <!-- The author's own name for the toggle intent, spacing included. -->
+    <string name="tasker_fn_toggle">Hide/ unhide settings</string>
     <!-- The settings observer's log. The four fields shown per entry are exactly the four
       the Add setting form asks for, which is the whole point of running the observer. -->
     <string name="page_back">Back</string>
     <!-- The overlay picker, the counterpart of the accessibility one above it. -->
     <string name="overlay_packages">Display over other apps to hide</string>
-    <string name="overlay_packages_dialog_description">These apps lose permission to display over other apps when an app setting hides Display over other apps, and get it back when you revert. Only the ones this app turned off are ever restored.</string>
+    <string name="overlay_packages_row">Display over other apps\nmanaged by IMD</string>
+    <string name="overlay_packages_dialog_delay">1. Might add slight delay in hiding-unhiding process</string>
+    <string name="overlay_packages_dialog_description">2. Uses Shizuku to turn Display over other apps on/off.\n3. Only enabled ones are shown below</string>
     <string name="overlay_packages_none_selected">None selected. %1$d currently allowed on this device.</string>
     <string name="overlay_packages_selected">%1$d selected, %2$d currently allowed on this device.</string>
     <string name="overlay_package_allowed">Allowed · %1$s</string>
@@ -296,4 +476,216 @@
     <string name="auto_revert_notice_early_resume">Opening your app from within IMD won\'t start it fresh, your app will launch from wherever you left it  : )</string>
     <string name="auto_revert_turn_on">I understand, turn it on</string>
     <string name="auto_revert_keep_off">No, keep it off</string>
+    <!-- The overlay list is read through Shizuku, which is often not ready for a second or
+      two after a cold start. The spinner covers that; the error is only shown once the
+      retries are exhausted. -->
+    <string name="overlay_loading_list">loading list</string>
+    <string name="overlay_load_failed">Error: unable to connect to Shizuku service to load list</string>
+    <string name="memory_hide_notice">Memory function is enabled, only using these for:\n•  Hide settings QS toggle\n•  IMD intents</string>
+    <string name="relaunch_app">Re-launch app</string>
+    <string name="pending_reverts_running">Performing all the pending reverts</string>
+    <string name="help_launch_tile_name">Hide settings quick toggle</string>
+    <string name="auto_hide">Auto hide settings</string>
+    <string name="imd_plus_experimental">EXPERIMENTAL</string>
+    <string name="auto_hide_setup">click to setup</string>
+    <string name="auto_hide_title">Auto hide settings</string>
+    <string name="auto_hide_switch">Auto-hide settings</string>
+    <string name="auto_hide_switch_on">On. IMD+ is watching the apps you chose.</string>
+    <string name="auto_hide_switch_off">Off. Nothing happens when a watched app opens.</string>
+    <string name="auto_hide_switch_incomplete">Cannot run yet — see the requirements below.</string>
+    <string name="auto_hide_switch_blocked">Settings are hidden right now. Revert first, then switch IMD+ on.</string>
+    <string name="auto_hide_how_it_works">How IMD+ works</string>
+    <string name="auto_hide_apps">Apps to watch</string>
+    <string name="auto_hide_apps_none">No apps chosen yet</string>
+    <string name="auto_hide_apps_chosen">%1$d chosen</string>
+    <string name="auto_hide_apps_description">IMD+ acts when one of these apps comes to the front. Nothing here changes your device; the list is read the next time one of them is opened.</string>
+    <string name="auto_hide_apps_search">Search apps</string>
+    <string name="auto_hide_apps_loading">Reading the installed apps…</string>
+    <string name="auto_hide_requirements">Requirements</string>
+    <string name="auto_hide_req_accessibility">IMD+ accessibility service</string>
+    <string name="auto_hide_req_accessibility_note">to detect app launches</string>
+    <string name="auto_hide_req_shizuku_permission">Shizuku permission</string>
+    <string name="auto_hide_req_shizuku_permission_note">to kill app on first launch</string>
+    <string name="auto_hide_req_shizuku_configured">Shizuku configuration in IMD</string>
+    <!-- Appended to the row above after a space, in the error colour. The two together
+      are the author's sentence: "Shizuku configuration in IMD (Shevery not supported)" -->
+    <string name="auto_hide_req_shizuku_shevery">(Shevery not supported)</string>
+    <string name="auto_hide_req_shizuku_configured_note">to start shizuku if not running </string>
+    <string name="auto_hide_req_battery">Disable battery optimisation</string>
+    <string name="auto_hide_req_battery_note">to keep IMD alive</string>
+    <string name="auto_hide_battery_settings">Open battery settings</string>
+    <string name="auto_hide_req_notifications">Notification permission</string>
+    <string name="auto_hide_req_notifications_note">to send revert notification</string>
+    <string name="auto_hide_notification_settings">Open notification settings</string>
+    <string name="auto_hide_no_kill_launch">Do not kill app on first launch(recommended off)</string>
+    <string name="auto_hide_no_kill_launch_note">your apps might detect settings before they are hidden by IMD+</string>
+    <string name="auto_hide_flow_intro">What happens when you open one of the apps you chose:</string>
+    <string name="auto_hide_flow_1">You open a watched app.</string>
+    <string name="auto_hide_flow_2">IMD+ closes it through Shizuku (as first launch might detect settings before IMD hiding them).</string>
+    <string name="auto_hide_flow_3">IMD hides whatever Settings to hide/ disable.</string>
+    <string name="auto_hide_flow_4">IMD switches off its own accessibility service, so it does not react to the next step.</string>
+    <string name="auto_hide_flow_5">IMD opens the app again. It starts with nothing to object to.</string>
+    <string name="auto_hide_flow_6">A notification stays in the shade saying the settings are hidden.</string>
+    <string name="auto_hide_blocked_title">IMD+ could not switch its accessibility service on</string>
+    <string name="auto_hide_blocked_1">1. Either grant the accessibility service through Shizuku, or</string>
+    <string name="auto_hide_blocked_2">2. Allow restricted settings for IMD+ (on Android 13 and later a sideloaded app must be given restricted-settings permission before its accessibility service can be switched on).</string>
+    <string name="auto_hide_blocked_retry">Then try again.</string>
+    <string name="accessibility_service_own">IMD\'s own detector - managed by IMD+</string>
+    <string name="auto_hide_intro">1. Simply open you apps normally from launcher to hide settings and after use press revert button\n2. IMD needs a background service for this to work.</string>
+    <string name="auto_hide_flow_7">You press the notification or Revert function is used.</string>
+    <string name="auto_hide_flow_8">IMD restores your defaults. No app is closed.</string>
+    <string name="auto_hide_flow_9">IMD\'s own accessibility service comes back with the rest, and IMD+ is armed again.</string>
+
+    <!--
+      The bracket names the cost rather than the risk. It is the only thing a reader sees
+      before deciding whether to open the section, and needing a background service is what
+      decides it. The EXPERIMENTAL warning that briefly sat below in auto_hide_setup is
+      gone at the author's instruction, and the row's subtitle says only what a tap does.
+    -->
+    <string name="section_imd_plus">IMD+ (needs background service)</string>
+    <string name="auto_hide_how_it_works_button">HOW THIS WORKS (⚠️ please read)</string>
+    <string name="auto_hide_battery_disable">Disable battery optimisations</string>
+    <string name="auto_hide_notification_grant">Grant notification permission</string>
+    <string name="auto_hide_permission_granted">Permission granted</string>
+    <string name="auto_hide_notification_denied">Permission denied</string>
+    <!-- ⚠ Unshown since r4o, when the author removed the pop-up the Shizuku service
+      checkbox raised. Left declared because eleven locale copies exist and translations are
+      frozen; the same two facts are still told by the fork setup dialogs. -->
+    <string name="shizuku_service_notice_watchdog">If using thedjchi Shizuku, please disable Watchdog in Shizuku app settings, otherwise it will not work (IMD uses intents to start-stop Shizuku; If you keep Watchdog on it won\'t allow IMD to hide USB debugging)</string>
+    <string name="shizuku_service_notice_shevery">If using Shevery, please enable ErrorReporting in Shevery app settings, otherwise IMD will not be able to restore Shizuku service on unhiding.</string>
+    <string name="auto_hide_blocked_reverts">Please perform all pending reverts before managing IMD+ settings.</string>
+    <string name="about_logics">IMD app Logics</string>
+    <string name="about_shell_command" translatable="false">su_imd --why</string>
+    <string name="about_shell_emoji" translatable="false">🌙☕️🥲 .............</string>
+    <string name="about_shell_sanity" translatable="false">developer lost his sanity</string>
+    <string name="about_shell_creating" translatable="false">creating &amp; perfecting these.</string>
+    <string name="auto_hide_nothing_to_hide">Please set what settings to hide under IMD default settings to use IMD+ auto hide.</string>
+    <string name="auto_hide_no_profile">IMD+ autohide: No settings configured to be hidden for this app.\nPlease configure the settings to hide by long pressing the app icon in IMD app\'s All apps/Favourites Tab.</string>
+    <string name="auto_unhide">Auto unhide settings</string>
+    <string name="auto_unhide_adb_body">Connect your phone to a computer and run this once. It stays granted until IMD is reinstalled.</string>
+    <string name="auto_unhide_adb_copy">Copy command</string>
+    <string name="auto_unhide_adb_title">Grant dump permission over adb</string>
+    <string name="auto_unhide_permissions_blocked">Please grant required permissions first</string>
+    <string name="auto_unhide_blocked">Please setup Auto unhide settings first</string>
+    <string name="auto_unhide_dump_adb">Show adb command</string>
+    <string name="auto_unhide_dump_grant">Grant dump permission</string>
+    <string name="auto_unhide_flow_1">IMD hides your settings when you open an app from IMD, a shortcut, the tile or IMD+.</string>
+    <string name="auto_unhide_flow_2">A silent notification says the auto unhide service is running.</string>
+    <string name="auto_unhide_flow_3">You use the app normally.</string>
+    <string name="auto_unhide_flow_4">You swipe the app away from recent apps, or press close all.</string>
+    <string name="auto_unhide_flow_5">IMD sees the app was closed and reverts your settings on its own.</string>
+    <string name="auto_unhide_flow_6">If you forget, the screen lock or app not in foreground timer reverts them instead.</string>
+    <string name="auto_unhide_flow_7">The notification goes away once everything is back.</string>
+    <string name="auto_unhide_flow_intro">What happens after IMD hides your settings:</string>
+    <string name="auto_unhide_how_it_works">How auto unhide works</string>
+    <string name="auto_unhide_intro">1. Auto unhides settings based on below triggers.\n2. Uses dump permission along with time/screen lock based backup methods</string>
+    <string name="auto_unhide_minutes">%1$d min</string>
+    <string name="auto_unhide_req_dump">Dump permission</string>
+    <string name="auto_unhide_req_dump_note">to detect app close from recents</string>
+    <string name="auto_unhide_req_notifications_note">to keep unhide service running</string>
+    <string name="auto_unhide_req_usage">App usage access</string>
+    <string name="auto_unhide_req_usage_note">to detect app not in foreground</string>
+    <string name="auto_unhide_setup">click to setup</string>
+    <string name="auto_unhide_switch">Auto unhide settings</string>
+    <string name="auto_unhide_switch_off">Off. Hidden settings stay hidden until you revert them.</string>
+    <string name="auto_unhide_switch_on">On. IMD will unhide by itself when a session ends.</string>
+    <string name="auto_unhide_time_idle">Unhide after app not used for</string>
+    <string name="auto_unhide_time_lock">Unhide after screen locked for</string>
+    <string name="auto_unhide_title">Auto unhide settings</string>
+    <string name="auto_unhide_trigger_idle">App not in foreground</string>
+    <string name="auto_unhide_trigger_idle_note">to unhide after app is not used, tap to set time</string>
+    <string name="auto_unhide_trigger_lock">Screen lock</string>
+    <string name="auto_unhide_trigger_lock_note">to unhide after screen stays locked, tap to set time</string>
+    <string name="auto_unhide_trigger_swipe">Swipe away from recents</string>
+    <string name="auto_unhide_trigger_swipe_note">to unhide when app is swiped away or closed from recents</string>
+    <string name="auto_unhide_trigger_swipe_unsupported">needs Android 11 or newer</string>
+    <string name="auto_unhide_triggers">Triggers</string>
+    <string name="auto_unhide_usage_grant">Grant usage access</string>
+    <string name="auto_unhide_usage_settings">Open usage access settings</string>
+    <string name="about_logics_how">(How this app works)</string>
+    <string name="auto_unhide_intro_battery">3. Even when battery optimisation disabled, IMD app only runs in the background when settings are hidden by IMD with Auto unhide enabled or you use IMD+.</string>
+    <string name="auto_unhide_used_for">Used for, when settings are hidden by :</string>
+    <string name="auto_unhide_used_for_blocked">At least one of these has to stay ticked, or auto unhide has nothing to act on.</string>
+    <string name="auto_unhide_used_for_launch">App launches</string>
+    <string name="auto_unhide_used_for_launch_note">IMD, app shortcuts and IMD+ auto hide</string>
+    <string name="auto_unhide_used_for_tile">Hide settings QS toggle</string>
+    <string name="auto_unhide_used_for_tile_note">Only works with Screen lock timer trigger</string>
+    <string name="diagnostics_clear">Clear log</string>
+    <string name="diagnostics_copy">Copy log</string>
+    <string name="diagnostics_empty">No log yet. Switch recording on, reproduce the problem, then come back.</string>
+    <string name="diagnostics_save">Save log file</string>
+    <string name="diagnostics_switch">Record diagnostic log</string>
+    <string name="diagnostics_switch_off">Off. Nothing is being recorded.</string>
+    <string name="diagnostics_switch_on">On. Kept for 7 days, then deleted.</string>
+    <string name="diagnostics_title">Diagnostics</string>
+    <string name="help_button_label">Help</string>
+    <string name="help_button_scope">(readme)</string>
+    <string name="support_point_share_note">(I don\'t need any credit or mentions)</string>
+    <string name="support_point_bugs_link">Report</string>
+    <string name="support_point_discuss_link">Join</string>
+    <string name="auto_hide_setup_first">Please setup Auto hide settings first</string>
+    <!-- ⚠ Unused since r4n, when DeveloperNoteDialog replaced this notice. Left declared
+      because eleven locale copies exist and translations are frozen for the project; deleting
+      the English half is what turns them into orphans nobody is allowed to fix. -->
+    <string name="settings_tab_notice">App settings updated, please checkout the new Settings tab</string>
+    <string name="settings_tab_notice_name">new Settings tab</string>
+
+    <!-- The developer's note, shown once to an install that existed before v3. Every line is
+      the author's own; the two pairs below it are bullets rather than numbers at his
+      correction. -->
+    <string name="developer_note_title">Note from developer 🧑‍🔬</string>
+    <string name="developer_note_body">IMD have undergone a major update and I have matched your previous settings to your corresponding current ones. But, still:</string>
+    <string name="developer_note_point_1">it is recommended to clear IMD app data, or</string>
+    <string name="developer_note_point_2">At least check all the settings of IMD once before using the app.</string>
+    <string name="developer_note_new">New functions in the app to try:</string>
+    <string name="developer_note_new_1">Auto unhide settings(RECOMMENDED)</string>
+    <string name="developer_note_new_2">Auto hide settings (needs background service).</string>
+
+    <!--
+      "Setting manager toggles" - which rows the settings manager draws. Renamed by the author
+      in r11; it was "Settings manager options" until then.
+
+      The description is the author's own sentence and goes in exactly as he wrote it. The
+      apostrophe is escaped because Android requires it in a string resource; nothing about what
+      is drawn changes.
+
+      The summary counts what is shown, the way revert_defaults_summary counts what is switched
+      on - the row carries its own state so the dialog is for changing it, not for reading it.
+    -->
+    <string name="manager_rows_entry">Setting manager toggles</string>
+    <string name="oled_background_mode">OLED background mode</string>
+    <string name="oled_background_mode_summary">pure black UI background</string>
+    <string name="progressive_ui_blur">Progressive UI blur</string>
+    <!-- The same switch on a device with no blur available. See ProgressiveBottomBlur. -->
+    <string name="blur_settings_title">Blur settings</string>
+    <string name="blur_settings_description">These apply to the blurred bands on every page and to the settings manager\'s frosted window.</string>
+    <string name="blur_settings_radius">Blur radius</string>
+    <string name="blur_settings_radius_hint">How soft the blur is. The window blurs twice as hard as a page band.</string>
+    <string name="blur_settings_tint">Tint opacity</string>
+    <string name="blur_settings_tint_hint">How dark a band gets, and how solid the frosted window is.</string>
+    <string name="blur_settings_fade">Fade length</string>
+    <string name="blur_settings_fade_hint">How far a band takes to disappear once it leaves the header. Pages only.</string>
+    <string name="blur_settings_dp">%1$d dp</string>
+    <string name="blur_settings_percent">%1$d%%</string>
+    <string name="blur_settings_window_supported">This device can frost the settings manager\'s window.</string>
+    <string name="blur_settings_window_unsupported">This device will not frost the settings manager\'s window — the system has cross-window blur switched off. Page blur is unaffected.</string>
+    <string name="blur_settings_reset">Reset</string>
+    <string name="progressive_ui_blur_summary">applies a blur to the bottom section of app</string>
+    <string name="manager_rows_title">Setting manager toggles</string>
+    <string name="manager_rows_description">These are the settings/ services which are shown in the IMD\'s Settings manager window.</string>
+    <string name="manager_rows_description_two">The Settings manager allows you to quickly see the live status of the current settings and toggle them on-off easily.</string>
+    <string name="manager_rows_only_selected">only selected ones</string>
+    <string name="manager_rows_summary">%1$d of %2$d shown</string>
+
+    <!--
+      "App drawer shortcuts" - which of IMD's two extra launcher entries exist.
+
+      The two labels are the entries' own names. "Settings manager" is a copy of the :app
+      module's services_shortcut_label, which this module cannot see; the two must say the same
+      thing or the dialog would be offering to hide an entry by a name that is not on it.
+    -->
+    <string name="drawer_shortcuts_entry">App drawer shortcuts</string>
+    <string name="drawer_shortcuts_summary">%1$d of %2$d shown</string>
+    <string name="drawer_shortcut_manager">Settings manager</string>
+    <string name="drawer_shortcut_hide_unhide">Hide/unhide Settings</string>
 </resources>

@@ -36,7 +36,7 @@
     <string name="favourite_apps_options">收藏选项</string>
     <string name="no_favourite_apps">暂无收藏</string>
     <string name="no_matching_favourite_apps">没有与该搜索匹配的收藏</string>
-    <string name="no_favourite_apps_subtitle">在「所有应用」中点击应用旁边的星标，或在该应用的设置页面中点击星标。</string>
+    <string name="no_favourite_apps_subtitle">在“全部应用”标签页点击星形图标即可添加应用</string>
     <string name="view">视图</string>
     <string name="custom">自定义</string>
     <string name="alphabetical">按名称</string>
@@ -54,19 +54,22 @@
     <string name="settings_manager_configure_revert">配置「还原」会恢复哪些内容</string>
     <string name="applied_settings_failure">无法应用设置</string>
     <string name="applied_settings_invalid">该应用的设置中含有无效的值</string>
-    <string name="settings_manager_title">IMD 服务管理器</string>
+    <string name="settings_manager_title">设置管理器</string>
 
     <!-- settings_manager_title and the two _name_ strings below are matched as substrings
          inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_open_settings">打开 IMD 设置</string>
     <string name="settings_manager_info">该对话框的作用</string>
-    <string name="settings_manager_info_live">IMD 服务管理器显示设置和服务的实时状态。它并不决定通过 IMD 或 IMD 创建的应用快捷方式打开应用时，要隐藏或取消隐藏哪些设置/服务。</string>
+    <string name="settings_manager_info_live">IMD 设置管理器显示设置的实时状态，并可轻松更改。</string>
     <string name="settings_manager_info_live_extra">要指定通过 IMD 启动应用时隐藏和取消隐藏哪些内容，请在 IMD 应用内配置默认 IMD 设置。</string>
     <string name="settings_manager_info_name_defaults">默认 IMD 设置</string>
     <string name="settings_manager_info_developer">通过 IMD 关闭开发者选项，只是把开发者选项这个开关关掉，并不会重置您在开发者选项中所做的更改（例如动画缩放设置、模拟位置应用…等）。</string>
     <string name="settings_manager_info_developer_extra">要重置开发者选项，请打开开发者选项页面，并从那里将其关闭。</string>
     <string name="settings_manager_info_name_reset">重置开发者选项</string>
     <string name="revert_to_default">还原为默认</string>
+    <string name="unhide_settings">取消隐藏设置</string>
     <string name="not_configured_title">没有要隐藏的设置，您需要为该应用配置要隐藏哪些设置。</string>
+    <string name="nothing_to_hide_message">您需要先在 IMD 应用设置中配置要隐藏哪些设置。</string>
     <string name="not_configured_message">在 IMD 应用中长按该应用，即可打开要隐藏的设置。</string>
     <string name="got_it">知道了</string>
     <string name="settings_manager_open">打开 %1$s</string>
@@ -80,7 +83,6 @@
     <string name="shizuku_help_point_setup">请确认 Shizuku 应用已安装、已在 ADB 中注册，并已在 IMD 应用的设置页面中正确配置。</string>
     <string name="shizuku_help_point_permission">IMD 应用的 Shizuku 权限只用于一次性授予 Android 的特权权限 WRITE_SECURE_SETTINGS。它不会用来检测 Shizuku 服务的状态，也不会用来开启或关闭 Shizuku 服务。</string>
     <string name="shizuku_help_point_restart">正确配置之后，请重启 IMD 应用并重试。</string>
-    <string name="settings_manager_shizuku_wait">请等待 10 秒，因为某些 Shizuku 分支版本通过 Intent 启动服务的速度较慢</string>
     <string name="revert_developer_settings">开发者选项</string>
     <string name="revert_usb_debugging">USB 调试</string>
     <string name="revert_wireless_debugging">无线调试</string>
@@ -100,4 +102,34 @@
     <string name="settings_manager_overlay_restore_failed_open">为何未恢复“显示在其他应用的上层”权限</string>
     <string name="shizuku_starting_to_restore_overlay">正在启动 Shizuku 服务以恢复“显示在其他应用的上层”权限</string>
     <string name="settings_manager_overlay_note">仅管理在 IMD 应用设置中选择的应用</string>
+    <string name="shizuku_unmanageable">无法从此处管理 Shizuku 服务，请在 IMD 设置中正确配置 Shizuku</string>
+    <string name="shevery_toggle_title">Shevery 服务</string>
+    <string name="shevery_toggle_point_status">IMD 设置管理器仅显示服务的实时状态。</string>
+    <string name="shevery_toggle_point_intents">Shevery 无法切换（不支持 intent）</string>
+    <string name="accessibility_none_managed">没有设置任何要由 IMD 管理的无障碍服务，请先在 IMD 应用设置中配置需要管理的服务。</string>
+    <string name="shizuku_stopping_via_intent">正在尝试使用停止 intent 停止 Shizuku</string>
+    <string name="shevery_toggle_point_open">请直接打开 Shevery 应用来管理该服务</string>
+    <string name="overlay_none_managed">尚未配置要隐藏“显示在其他应用上层”的应用。\n请在 IMD 应用设置中添加。</string>
+    <string name="auto_hide_conflict_title">IMD+ 正在保持你的设置处于隐藏状态</string>
+    <string name="auto_hide_conflict_body">IMD+ 已经隐藏了设备级列表，而此应用的配置要求的内容不在其中。在此之上再隐藏更多，会留下两种还原都无法恢复的设置。</string>
+    <string name="auto_hide_conflict_fix">请先还原 IMD+——通过它的通知或“隐藏设置”磁贴——然后再打开此应用。</string>
+    <string name="shizuku_starting">正在启动 Shizuku 服务</string>
+    <string name="settings_manager_busy_hiding">IMD 正在隐藏设置，请稍候...</string>
+    <string name="settings_manager_busy_unhiding">IMD 正在恢复设置，请稍候...</string>
+    <string name="settings_manager_info_name_live">实时状态</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">请先配置设置</string>
+    <string name="dooa_thedjchi_only">只有 Shizuku 的 Thedjchi 分支支持管理“显示在其他应用上层”</string>
+    <string name="help_path_accessibility">IMD 设置 → 默认 IMD 设置 → 要隐藏的无障碍服务</string>
+    <string name="help_path_dooa">IMD 设置 → 默认 IMD 设置 → 由 IMD 管理的显示在其他应用上层</string>
+    <string name="help_path_manage_shizuku">IMD 设置 → Shizuku 配置 → 管理 Shizuku</string>
+    <string name="hide_settings">隐藏设置</string>
+    <string name="revert_shevery">Shevery 服务</string>
+    <string name="settings_manager_all_off">全部关闭</string>
+    <string name="settings_manager_all_on">全部开启</string>
+    <string name="settings_manager_only_selected">仅选中的项目</string>
+    <string name="settings_manager_pending">IMD 当前正在隐藏设置，在你取消隐藏之前于此处所做的任何更改，都会在设置还原后被撤销</string>
+    <string name="shevery_service_first">请先开启 Shevery 服务。</string>
+    <string name="shevery_wait_countdown">正在等待 Shevery 服务运行...(%1$d)</string>
+    <string name="shizuku_wait_countdown">正在等待 Shizuku 服务运行...(%1$d)</string>
 </resources>

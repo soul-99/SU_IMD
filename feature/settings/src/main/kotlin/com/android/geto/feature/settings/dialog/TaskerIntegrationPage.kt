@@ -43,7 +43,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.android.geto.designsystem.icon.GetoIcons
-import com.android.geto.domain.model.NotificationFunction
 import com.android.geto.domain.model.TaskerIntegration
 import com.android.geto.feature.settings.R
 
@@ -72,7 +71,6 @@ private const val TYPE_ACTIVITY = "Activity"
 internal fun TaskerIntegrationPage(
     modifier: Modifier = Modifier,
     authKey: String,
-    notificationFunction: NotificationFunction,
     onEnsureAuthKey: () -> Unit,
     onRefreshAuthKey: () -> Unit,
     onDismissRequest: () -> Unit,
@@ -168,26 +166,39 @@ internal fun TaskerIntegrationPage(
             ValueRow(label = FIELD_ACTION, value = TaskerIntegration.ACTION_VIEW)
         }
 
+        // ⚠ **Directly under the manager, at the author's instruction**, and before the two
+        // one-way functions: it is the one an automation reaches for first, because it needs no
+        // knowledge of which way the device currently is.
         BroadcastSection(
-            title = stringResource(R.string.tasker_fn_revert_default),
+            title = stringResource(R.string.tasker_fn_toggle),
             packageName = packageName,
-            action = TaskerIntegration.ACTION_REVERT_TO_DEFAULT,
+            action = TaskerIntegration.ACTION_TOGGLE_SETTINGS,
         )
-
-        // Only when the memory function is the one in use. The trigger works regardless, but
-        // offering it in any other mode would be documenting a button the user has not chosen.
-        if (notificationFunction == NotificationFunction.Memory) {
-            BroadcastSection(
-                title = stringResource(R.string.tasker_fn_revert_memory),
-                packageName = packageName,
-                action = TaskerIntegration.ACTION_REVERT_USING_MEMORY,
-            )
-        }
 
         BroadcastSection(
             title = stringResource(R.string.tasker_fn_hide),
             packageName = packageName,
             action = TaskerIntegration.ACTION_HIDE_SETTINGS,
+        )
+
+        // ⚠ **Not conditional any more, and that is the change.** Its predecessor appeared
+        // only under the memory function, because offering it in the other mode would have
+        // documented a button the user had not chosen. This one settles whatever is
+        // outstanding the way the current Unhiding framework says, so it is the right thing
+        // to offer under either — and it is the route that answers the old objection to the
+        // memory function, that a lost notification leaves no way back.
+        BroadcastSection(
+            title = stringResource(R.string.tasker_fn_unhide),
+            packageName = packageName,
+            action = TaskerIntegration.ACTION_UNHIDE_SETTINGS,
+        )
+
+        // ⚠ **Last, at the author's instruction**: manager, hide, unhide, revert. It is the
+        // order of a session rather than the order these were built in.
+        BroadcastSection(
+            title = stringResource(R.string.tasker_fn_revert_default),
+            packageName = packageName,
+            action = TaskerIntegration.ACTION_REVERT_TO_DEFAULT,
         )
     }
 }

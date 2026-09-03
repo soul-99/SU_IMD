@@ -38,6 +38,48 @@ enum class ShizukuForkMode {
 
     /** Only thedjchi's fork authenticates the broadcast. */
     val requiresAuthKey: Boolean get() = this == Thedjchi
+
+    /**
+     * Whether this family can be started and stopped by broadcasting an intent at it.
+     *
+     * Only thedjchi's can. Shevery has no start or stop action to send: what brings its
+     * service back is Shevery's own **ErrorProtect** watchdog, which polls every ten seconds
+     * and starts the server itself the moment the debugging transport is available again. So
+     * IMD does not drive Shevery at all — it gives debugging back and waits, and it stops
+     * Shevery by taking debugging away. Every screen that offers to toggle the service, and
+     * every code path that would send it an intent, has to know which of the two it is
+     * talking to.
+     */
+    val supportsIntents: Boolean get() = this == Thedjchi
+
+    /**
+     * Shevery and the forks alongside it: driven indirectly, through the debugging transport,
+     * because there is no intent contract to use.
+     */
+    val isShevery: Boolean get() = this == Other
+
+    /**
+     * How long to wait for the service to appear after asking for it, in milliseconds.
+     *
+     * Two different numbers because two different things are being waited on. thedjchi's fork
+     * is answering a broadcast this app just sent, so the wait covers only its own start-up —
+     * eight seconds is generous for that. Shevery is not answering anything: the wait is for
+     * its ErrorProtect watchdog to come round again, notice the transport is back and start
+     * the server itself. That poll is on a ten-second cycle, so anything at or under ten
+     * seconds can miss a whole revolution.
+     *
+     * ⚠ **Forty seconds for Shevery, the author's number in v3**, up from thirteen. Thirteen
+     * left room for one cycle plus the server's own start-up and nothing more, so a watchdog
+     * that had just gone round when the transport came back was already outside the window.
+     *
+     * [Unset] never waits, because nothing was ever asked.
+     */
+    val serviceWaitMillis: Long
+        get() = when (this) {
+            Unset -> 0L
+            Thedjchi -> 8_000L
+            Other -> 40_000L
+        }
 }
 
 /**
@@ -52,3 +94,18 @@ val UserData.isShizukuConfigured: Boolean
         shizukuPackageName.isNotBlank() &&
         shizukuStartAction.isNotBlank() &&
         (!shizukuForkMode.requiresAuthKey || shizukuAuthKey.isNotBlank())
+
+/**
+ * Whether IMD is managing Shizuku right now — the master switch as the UI must read it.
+ *
+ * [UserData.manageShizuku] is the user's stored answer; this is that answer **and** a Shizuku
+ * configuration complete enough to act on. The author's rule is that the switch "gets
+ * automatically toggled off if any field below is blank, but remembers the previous state in
+ * case a field below is emptied and filled again" — which is this expression exactly, with
+ * nothing written on the way through.
+ *
+ * ⚠ **Every gate in the app reads this, never the stored field.** A row that asked
+ * [UserData.manageShizuku] alone would offer to drive a Shizuku IMD cannot reach.
+ */
+val UserData.manageShizukuEffective: Boolean
+    get() = manageShizuku && isShizukuConfigured

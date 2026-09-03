@@ -36,6 +36,48 @@ interface ShizukuWrapper {
     suspend fun isShizukuRunning(): Boolean
 
     /**
+     * Whether Shizuku has already granted this app its permission — asking nothing.
+     *
+     * Separate from every call that *uses* the permission, because IMD+ has to report the
+     * requirement on a settings page without a prompt appearing every time the page is drawn.
+     */
+    suspend fun hasShizukuPermission(): Boolean
+
+    /** Asks Shizuku for its permission, showing its prompt. False if refused or unavailable. */
+    suspend fun requestShizukuPermission(): Boolean
+
+    /**
+     * Force-stops a package.
+     *
+     * What IMD+ does to an app on its first launch, so the app reads the settings after they
+     * have been hidden rather than before. `am force-stop` needs FORCE_STOP_PACKAGES, which no
+     * ordinary app can hold — Shizuku's shell runs as the adb user, which can.
+     */
+    suspend fun forceStop(packageName: String): Boolean
+
+    /**
+     * Clears the "restricted setting" block on a package.
+     *
+     * From Android 13, a sideloaded app's accessibility service cannot be switched on — not by
+     * the user in Settings, and not by writing the secure setting either — until this AppOp is
+     * allowed. IMD is sideloaded by definition, so IMD+ cannot enable its own detector on a
+     * modern device without this.
+     */
+    suspend fun allowRestrictedSettings(packageName: String): Boolean
+
+    /** Exempts a package from battery optimisation, so it survives long enough to be useful. */
+    suspend fun allowBatteryUnrestricted(packageName: String): Boolean
+
+    /**
+     * Grants IMD `android.permission.DUMP` once, so auto unhide can read another app's process
+     * exit reasons without Shizuku ever being alive again afterwards.
+     */
+    suspend fun grantDumpPermission(packageName: String): ShizukuGrant
+
+    /** Grants the usage-access AppOp, the alternative to sending the user to a settings list. */
+    suspend fun allowUsageAccess(packageName: String): Boolean
+
+    /**
      * Packages whose SYSTEM_ALERT_WINDOW AppOp is currently allowed, or null when the
      * Shizuku shell is unavailable.
      */

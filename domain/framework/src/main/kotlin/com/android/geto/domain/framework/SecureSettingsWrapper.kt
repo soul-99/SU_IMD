@@ -27,6 +27,22 @@ interface SecureSettingsWrapper {
         value: String,
     ): Boolean
 
+    /**
+     * Whether `WRITE_SECURE_SETTINGS` is still granted — asked *before* a hide, not after it.
+     *
+     * The grant is given once over adb and can be taken away again: by hand, or by Android's
+     * own automatic revocation of permissions belonging to an app nobody has opened for
+     * months. Without it every write in this app fails, and it fails in the least legible way
+     * possible — a settings row that will not move, with nothing saying why.
+     *
+     * **Asked first because it makes the answer free.** The permission that switches a setting
+     * off is the same one needed to switch it back on, so a hide that discovers the loss
+     * halfway has, by definition, hidden nothing through it — but it may already have withdrawn
+     * Display over other apps through Shizuku, which does not use this permission at all. Asking
+     * up front means the usual case never reaches that state and has nothing to undo.
+     */
+    suspend fun hasWriteSecureSettingsPermission(): Boolean
+
     suspend fun getSecureSettings(settingType: SettingType): List<SecureSetting>
 
     /**

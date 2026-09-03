@@ -34,7 +34,7 @@
     <string name="favourite_apps_options">पसंदीदा के विकल्प</string>
     <string name="no_favourite_apps">अभी कोई पसंदीदा नहीं</string>
     <string name="no_matching_favourite_apps">इस खोज से मेल खाता कोई पसंदीदा नहीं</string>
-    <string name="no_favourite_apps_subtitle">“सभी ऐप” में किसी ऐप के आगे बने तारे पर टैप करें, या उसकी सेटिंग्स स्क्रीन पर बने तारे पर।</string>
+    <string name="no_favourite_apps_subtitle">‘सभी ऐप्स’ टैब में स्टार आइकॉन दबाकर ऐप्स जोड़ें</string>
     <string name="view">दृश्य</string>
     <string name="custom">अपना क्रम</string>
     <string name="alphabetical">अ–ज्ञ</string>
@@ -51,19 +51,22 @@
     <string name="settings_manager_configure_revert">तय करें कि “वापस लाएँ” क्या-क्या लौटाए</string>
     <string name="applied_settings_failure">सेटिंग्स लागू नहीं हो सकीं</string>
     <string name="applied_settings_invalid">इस ऐप की सेटिंग्स में अमान्य मान हैं</string>
-    <string name="settings_manager_title">IMD सेवा प्रबंधक</string>
+    <string name="settings_manager_title">सेटिंग्स प्रबंधक</string>
 
     <!-- settings_manager_title and the two _name_ strings below are matched as substrings
          inside the longer strings, to bold them. They must stay worded identically. -->
+    <string name="settings_manager_open_settings">IMD सेटिंग खोलें</string>
     <string name="settings_manager_info">यह डायलॉग क्या करता है</string>
-    <string name="settings_manager_info_live">IMD सेवा प्रबंधक सेटिंग्स और सेवाओं की मौजूदा स्थिति दिखाता है। यह तय नहीं करता कि IMD या IMD से बने ऐप शॉर्टकट से ऐप खोलने पर कौन-सी सेटिंग्स/सेवाएँ छिपाई या दिखाई जाएँगी।</string>
+    <string name="settings_manager_info_live">IMD सेटिंग्स प्रबंधक सेटिंग्स की लाइव स्थिति दिखाता है और उन्हें आसानी से बदलता है.</string>
     <string name="settings_manager_info_live_extra">IMD से ऐप खोलने पर क्या छिपाना और क्या दिखाना है, यह तय करने के लिए कृपया IMD ऐप के अंदर डिफ़ॉल्ट IMD सेटिंग्स कॉन्फ़िगर करें।</string>
     <string name="settings_manager_info_name_defaults">डिफ़ॉल्ट IMD सेटिंग्स</string>
     <string name="settings_manager_info_developer">IMD से डेवलपर विकल्प बंद करने पर सिर्फ़ डेवलपर सेटिंग्स का फ़्लैग चालू-बंद होता है; डेवलपर सेटिंग्स में किए गए बदलाव (जैसे ऐनिमेशन स्केल, मॉक लोकेशन ऐप… आदि) रीसेट नहीं होते।</string>
     <string name="settings_manager_info_developer_extra">डेवलपर सेटिंग्स रीसेट करें के लिए डेवलपर सेटिंग्स का पेज खोलें और उसे वहीं से बंद करें।</string>
     <string name="settings_manager_info_name_reset">डेवलपर सेटिंग्स रीसेट करें</string>
     <string name="revert_to_default">डिफ़ॉल्ट पर वापस लाएँ</string>
+    <string name="unhide_settings">सेटिंग दिखाएँ</string>
     <string name="not_configured_title">छिपाने के लिए कोई सेटिंग नहीं है; आपको इस ऐप के लिए तय करना होगा कि कौन-सी सेटिंग्स छिपानी हैं।</string>
+    <string name="nothing_to_hide_message">आपको पहले IMD ऐप सेटिंग्स में यह तय करना होगा कि कौन-सी सेटिंग्स छिपानी हैं।</string>
     <string name="not_configured_message">IMD ऐप में इस ऐप को देर तक दबाकर रखें, ताकि यह चुन सकें कि कौन-सी सेटिंग्स छिपानी हैं।</string>
     <string name="got_it">समझ गया</string>
     <string name="settings_manager_open">%1$s खोलें</string>
@@ -77,7 +80,6 @@
     <string name="shizuku_help_point_setup">कृपया सुनिश्चित करें कि Shizuku ऐप इंस्टॉल है, ADB में पंजीकृत है, और IMD ऐप के सेटिंग्स पेज में सही तरह से सेट किया गया है।</string>
     <string name="shizuku_help_point_permission">IMD ऐप की Shizuku अनुमति का उपयोग केवल एक बार विशेषाधिकार वाली Android अनुमति WRITE_SECURE_SETTINGS देने के लिए होता है। इसका उपयोग न तो Shizuku सेवा की स्थिति जानने के लिए होता है और न ही Shizuku सेवा को चालू या बंद करने के लिए।</string>
     <string name="shizuku_help_point_restart">सही तरह से सेट करने के बाद कृपया IMD ऐप को दोबारा चालू करें और फिर कोशिश करें।</string>
-    <string name="settings_manager_shizuku_wait">कृपया 10 सेकंड रुकें, क्योंकि कुछ Shizuku फ़ोर्क इंटेंट से सेवा शुरू करने में धीमे होते हैं</string>
     <string name="revert_developer_settings">डेवलपर सेटिंग्स</string>
     <string name="revert_usb_debugging">USB डीबगिंग</string>
     <string name="revert_wireless_debugging">वायरलेस डीबगिंग</string>
@@ -97,4 +99,34 @@
     <string name="settings_manager_overlay_restore_failed_open">दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति क्यों वापस नहीं दी गई</string>
     <string name="shizuku_starting_to_restore_overlay">दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस देने के लिए Shizuku सेवा शुरू की जा रही है</string>
     <string name="settings_manager_overlay_note">सिर्फ़ IMD ऐप्लिकेशन सेटिंग में चुने गए ऐप्लिकेशन ही मैनेज किए जाते हैं</string>
+    <string name="shizuku_unmanageable">यहाँ से Shizuku सेवा प्रबंधित नहीं की जा सकती, कृपया IMD सेटिंग्स में Shizuku को सही ढंग से कॉन्फ़िगर करें</string>
+    <string name="shevery_toggle_title">Shevery सेवा</string>
+    <string name="shevery_toggle_point_status">IMD सेटिंग्स प्रबंधक केवल सेवा की लाइव स्थिति दिखाता है।</string>
+    <string name="shevery_toggle_point_intents">Shevery के लिए टॉगल करना संभव नहीं है (इंटेंट समर्थित नहीं)</string>
+    <string name="accessibility_none_managed">IMD के ज़रिए प्रबंधित करने के लिए कोई एक्सेसिबिलिटी सेवा सेट नहीं है, कृपया पहले IMD ऐप सेटिंग में वे सेवाएँ कॉन्फ़िगर करें जिन्हें आप प्रबंधित करना चाहते हैं।</string>
+    <string name="shizuku_stopping_via_intent">स्टॉप इंटेंट से Shizuku रोकने का प्रयास</string>
+    <string name="shevery_toggle_point_open">सेवा प्रबंधित करने के लिए सीधे अपना Shevery ऐप खोलें</string>
+    <string name="overlay_none_managed">‘अन्य ऐप्स के ऊपर दिखाएँ’ छिपाने के लिए कोई ऐप कॉन्फ़िगर नहीं है।\nकृपया उन्हें IMD ऐप सेटिंग्स से जोड़ें।</string>
+    <string name="auto_hide_conflict_title">IMD+ ने आपकी सेटिंग्स छिपा रखी हैं</string>
+    <string name="auto_hide_conflict_body">IMD+ पहले ही डिवाइस-व्यापी सूची छिपा चुका है, और इस ऐप की प्रोफ़ाइल कुछ ऐसा माँगती है जो उस सूची में नहीं है। उसके ऊपर और छिपाने से ऐसी सेटिंग्स रह जाएँगी जिन्हें कोई भी वापसी बहाल नहीं करती।</string>
+    <string name="auto_hide_conflict_fix">पहले IMD+ को वापस लाएँ — उसकी सूचना से या “सेटिंग्स छिपाएँ” टाइल से — फिर यह ऐप दोबारा खोलें।</string>
+    <string name="shizuku_starting">Shizuku सेवा शुरू हो रही है</string>
+    <string name="settings_manager_busy_hiding">IMD सेटिंग्स छिपा रहा है, कृपया प्रतीक्षा करें...</string>
+    <string name="settings_manager_busy_unhiding">IMD सेटिंग्स फिर से दिखा रहा है, कृपया प्रतीक्षा करें...</string>
+    <string name="settings_manager_info_name_live">लाइव स्थिति</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">कृपया पहले सेटिंग्स कॉन्फ़िगर करें</string>
+    <string name="dooa_thedjchi_only">\"अन्य ऐप्स के ऊपर दिखाएँ\" का प्रबंधन सिर्फ़ Shizuku के Thedjchi फ़ोर्क में समर्थित है</string>
+    <string name="help_path_accessibility">IMD सेटिंग्स → डिफ़ॉल्ट IMD सेटिंग्स → छिपाई जाने वाली एक्सेसिबिलिटी सेवाएँ</string>
+    <string name="help_path_dooa">IMD सेटिंग्स → डिफ़ॉल्ट IMD सेटिंग्स → IMD द्वारा प्रबंधित अन्य ऐप्स के ऊपर दिखाएँ</string>
+    <string name="help_path_manage_shizuku">IMD सेटिंग्स → Shizuku कॉन्फ़िगरेशन → Shizuku प्रबंधित करें</string>
+    <string name="hide_settings">सेटिंग्स छिपाएँ</string>
+    <string name="revert_shevery">Shevery सेवा</string>
+    <string name="settings_manager_all_off">सभी बंद</string>
+    <string name="settings_manager_all_on">सभी चालू</string>
+    <string name="settings_manager_only_selected">सिर्फ़ चुनी हुई</string>
+    <string name="settings_manager_pending">IMD इस समय सेटिंग्स छिपा रहा है; सेटिंग्स दोबारा दिखाने से पहले यहाँ किए गए कोई भी बदलाव बहाली के बाद पलट दिए जाएँगे</string>
+    <string name="shevery_service_first">कृपया पहले Shevery सेवा चालू करें।</string>
+    <string name="shevery_wait_countdown">Shevery सेवा चालू होने का इंतज़ार...(%1$d)</string>
+    <string name="shizuku_wait_countdown">Shizuku सेवा चालू होने का इंतज़ार...(%1$d)</string>
 </resources>

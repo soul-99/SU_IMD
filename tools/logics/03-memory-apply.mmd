@@ -1,0 +1,27 @@
+flowchart TD
+    A["An app is launched while the<br/><b>Hiding framework</b> is<br/><b>Per app configuration</b>"] --> B{"Is there a profile,<br/>and is anything on?"}
+    B -- "No profile at all" --> Z1["<b>Stop.</b> Say so. The app<br/>is <b>not</b> opened"]
+    B -- "A profile, every row off" --> Z2["Open the app.<br/>Nothing is changed"]
+    B -- "IMD+ is running" --> Z3["Open it, or refuse -<br/>depending on whose hold it is"]
+    B -- "A previous hide stands,<br/>or the grant has gone" --> Z4["<b>Stop.</b> Offer to restore,<br/>or report the loss"]
+    B -- Yes --> C{"Does this profile hide<br/><b>Display over other apps</b>,<br/>and may it?"}
+
+    C -- "No; or not <b>Thedjchi</b>;<br/>or Manage Shizuku<br/>is incomplete" --> E
+    C -- Yes --> D["Start Shizuku if needed, withdraw<br/>overlay access, and note <b>this app</b><br/>as the one that did it"]
+    D --> E["<b>Record what each setting holds now</b> -<br/>but only where this app is the first to<br/>move it away from that value"]
+
+    E --> F["Write the profile's settings"]
+    F --> G{"Does it hide<br/>accessibility services?"}
+    G -- Yes --> H["Switch off the services IMD manages,<br/>and claim them against this app"]
+    G -- No --> I
+    H --> I{"Does it stop Shizuku?"}
+    I -- Yes --> J["Stop it (logic 5), and note that<br/>this app took it down"]
+    I -- No --> K
+    J --> K["Switch off <b>IMD's own IMD+ detector</b>"]
+    K --> L["Open the app, and post the one<br/>shared ongoing notification"]
+
+    class Z1 stop
+    class Z4 stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

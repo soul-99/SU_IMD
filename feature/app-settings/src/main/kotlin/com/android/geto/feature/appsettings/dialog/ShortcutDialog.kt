@@ -35,7 +35,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,13 +63,13 @@ fun RequestPinShortcutDialog(
     // Both seeded with the app's own name, the same way the update dialog seeds from the
     // shortcut it is editing. Two blank required fields made creating a shortcut a typing
     // exercise whose only sensible answer was the name already on the screen behind it.
-    var shortLabel by remember(activityLabel) { mutableStateOf(activityLabel) }
+    var shortLabel by rememberSaveable(activityLabel) { mutableStateOf(activityLabel) }
 
-    var showShortLabelError by remember { mutableStateOf(false) }
+    var showShortLabelError by rememberSaveable { mutableStateOf(false) }
 
-    var longLabel by remember(activityLabel) { mutableStateOf(activityLabel) }
+    var longLabel by rememberSaveable(activityLabel) { mutableStateOf(activityLabel) }
 
-    var showLongLabelError by remember { mutableStateOf(false) }
+    var showLongLabelError by rememberSaveable { mutableStateOf(false) }
 
     DialogContainer(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -147,17 +147,17 @@ fun UpdatePinShortcutDialog(
         longLabel: String,
     ) -> Unit,
 ) {
-    var shortLabel by remember(getoShortcutInfoCompat) {
+    var shortLabel by rememberSaveable(getoShortcutInfoCompat) {
         mutableStateOf(getoShortcutInfoCompat.shortLabel)
     }
 
-    var showShortLabelError by remember { mutableStateOf(false) }
+    var showShortLabelError by rememberSaveable { mutableStateOf(false) }
 
-    var longLabel by remember(getoShortcutInfoCompat) {
+    var longLabel by rememberSaveable(getoShortcutInfoCompat) {
         mutableStateOf(getoShortcutInfoCompat.longLabel)
     }
 
-    var showLongLabelError by remember { mutableStateOf(false) }
+    var showLongLabelError by rememberSaveable { mutableStateOf(false) }
 
     DialogContainer(
         modifier = modifier.verticalScroll(rememberScrollState()),

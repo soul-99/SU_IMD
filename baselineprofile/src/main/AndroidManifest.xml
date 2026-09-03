@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 soul_99 (suIMD)
+  ~
+  ~ Licensed under the GNU General Public License v3.0. See LICENSE.
+  -->
+<manifest xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      The generator drives the app from outside its own process, so it needs to see what is
+      installed. Instrumentation-only: this manifest is never merged into the app.
+    -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+</manifest>

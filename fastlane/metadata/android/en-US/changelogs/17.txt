@@ -1,0 +1,8 @@
+v3
+
+* New: Auto unhide settings - your settings come back on their own when you close the app, lock the screen, or return to IMD.
+* Hiding and unhiding are now two separate choices, so a device-wide hide can put back exactly what was there.
+* Force-closed with settings still hidden? The next launch offers to restore them.
+* You are now told when the Write Secure Settings permission is lost, whichever way you hid.
+* Ten languages essentially complete.
+* Settings manager rebuilt, plus many fixes.

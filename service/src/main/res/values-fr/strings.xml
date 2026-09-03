@@ -20,4 +20,6 @@
     <string name="waiting_for_changes">En attente de modifications…</string>
     <string name="unknown">Inconnu</string>
     <string name="stop">Arrêter</string>
+    <string name="auto_hide_service_label">IMD+ (masquage automatique des paramètres)</string>
+    <string name="auto_hide_service_description">Permet à IMD de repérer l\'ouverture d\'une de vos applications choisies, afin de masquer vos paramètres avant que cette application ne les consulte. IMD lit uniquement quelle application est passée au premier plan, jamais le contenu de votre écran.</string>
 </resources>

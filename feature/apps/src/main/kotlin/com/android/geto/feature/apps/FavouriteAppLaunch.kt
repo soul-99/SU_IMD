@@ -19,24 +19,35 @@
 package com.android.geto.feature.apps
 
 import com.android.geto.domain.model.AppSettingsResult
-import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.HidingFramework
 
 /**
  * The outcome of applying a favourite's settings, on its way to the UI so it can post the
  * revert notification and open the app.
  *
- * Not a data class: [icon] is a ByteArray, whose equality is identity-based, and the state
- * is cleared to null after handling anyway — so structural equality would buy nothing and
- * mislead anyone who assumed it worked.
+ * ⚠ **It carried the launched app's icon and the unhiding framework until r3**, both solely
+ * to fill arguments on `postAppliedSettingsNotification`. That function now takes neither:
+ * every launch posts the one generic revert notification, so there is no icon to draw and no
+ * branch to choose. The icon was a rasterised bitmap fetched over binder on every launch.
+ *
+ * Not a data class, still: the state is cleared to null after handling, so nothing compares
+ * two of these, and structural equality would only mislead the next reader into thinking
+ * something does.
  */
 class FavouriteAppLaunch(
     val componentName: String,
     val result: AppSettingsResult,
-    val icon: ByteArray?,
     /**
-     * Read when the settings were applied rather than when the notification is posted, so a
-     * launch cannot be applied under one function and announced under the other if the
-     * preference changes in the moment between.
+     * The **hiding** half, and the app's label, for the completion toast.
+     *
+     * Which sentence the toast uses is a hiding question — "Settings hidden for X" means the
+     * hide read X's own profile, which is what Per app configuration does. Read at the same
+     * moment as everything else here, so a framework changed between the hide and the toast
+     * cannot have the toast describe a hide that did not run.
+     *
+     * [appName] is null when the component has gone between the launch and this record, and
+     * the toast then says the sentence that names no app rather than one with a blank in it.
      */
-    val notificationFunction: NotificationFunction,
+    val hidingFramework: HidingFramework,
+    val appName: String?,
 )

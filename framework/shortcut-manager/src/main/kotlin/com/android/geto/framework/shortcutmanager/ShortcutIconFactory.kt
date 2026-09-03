@@ -29,6 +29,8 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.IconCompat
+import com.android.geto.domain.common.IconStyleState
+import com.android.geto.framework.drawable.LegacyIconShaping
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -107,7 +109,26 @@ internal class ShortcutIconFactory @Inject constructor(
 
         val bitmap = BitmapFactory.decodeByteArray(icon, 0, icon.size) ?: return null
 
-        return IconCompat.createWithBitmap(bitmap)
+        // ⚠ **An adaptive bitmap, not a plain one, and that is the author's report.**
+        // createWithBitmap says "this is a finished picture, do not touch it", so the launcher
+        // could not mask it and a legacy shortcut sat square beside round neighbours. Handing
+        // over a full-bleed square instead lets the launcher apply its own shape and inset -
+        // the same route the adaptive branch above already takes, which is why that one has
+        // always looked right.
+        //
+        // Below API 26 there is no adaptive icon to match, so the finished picture is still the
+        // honest answer there.
+        //
+        // ⚠ **And when the user has chosen System icons**, which is what that choice means on
+        // this path: hand the launcher a finished picture and let it sit unshaped, exactly as
+        // every build before v3 did. See IconStyleState.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !IconStyleState.shapeLegacyIcons) {
+            return IconCompat.createWithBitmap(bitmap)
+        }
+
+        return IconCompat.createWithAdaptiveBitmap(
+            LegacyIconShaping.adaptiveCanvas(source = bitmap, size = ADAPTIVE_BITMAP_SIZE),
+        )
     }
 
     private fun Drawable.drawInto(canvas: Canvas, size: Int) {

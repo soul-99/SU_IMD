@@ -19,4 +19,16 @@ package com.android.geto.framework.launcherapps
 
 interface AndroidLauncherAppsWrapper {
     fun startMainActivity(componentName: String)
+
+    /**
+     * Opens an app by package name, whichever launcher entry it has.
+     *
+     * What Auto-hide settings (IMD+) needs: it watches packages, because a package name is all
+     * an accessibility event carries, and the app it has just force-stopped has to be put back
+     * in front of the user. [startMainActivity] cannot serve — a component name is a finer
+     * thing than IMD+ ever knows.
+     *
+     * False when the package has no launcher entry, or the system refused the launch.
+     */
+    fun startPackage(packageName: String): Boolean
 }

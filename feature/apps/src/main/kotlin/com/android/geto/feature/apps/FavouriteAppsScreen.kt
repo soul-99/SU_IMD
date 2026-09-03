@@ -22,9 +22,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,55 +37,51 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallFloatingActionButton
+import com.android.geto.designsystem.component.GetoSearchFieldHeight
+import com.android.geto.designsystem.component.LocalFloatingHeaderHeight
+import com.android.geto.designsystem.component.LocalHeaderMetrics
+import com.android.geto.designsystem.component.getoFloatingBarInset
+import com.android.geto.designsystem.component.getoFloatingHeaderInset
+import com.android.geto.designsystem.component.progressiveEdgeBlur
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.android.geto.broadcastreceiver.postAppliedSettingsNotification
-import com.android.geto.designsystem.component.DialogContainer
+import com.android.geto.designsystem.component.PriorHideDialog
 import com.android.geto.designsystem.icon.GetoIcons
-import com.android.geto.domain.model.AppSettingsResult
 import com.android.geto.domain.model.FavouriteAppsData
 import com.android.geto.domain.model.FavouriteAppsView
 import com.android.geto.domain.model.LauncherAppsActivityInfo
-import com.android.geto.domain.model.NotificationFunction
+import com.android.geto.domain.model.HidingFramework
 import com.android.geto.domain.model.SortFavouriteApps
 import com.android.geto.feature.apps.dialog.FavouriteAppsOptionsDialog
+import com.android.geto.feature.apps.dialog.AutoHideConflictDialog
 import com.android.geto.feature.apps.dialog.OverlayFailureDialog
 import com.android.geto.feature.apps.dialog.ReorderFavouriteAppsDialog
 import com.android.geto.feature.apps.dialog.ShizukuStartingDialog
-import com.android.geto.feature.apps.manager.SettingsManagerRoute
 import com.android.geto.feature.appsettings.shortcut.ShortcutRoute
-import com.android.geto.ui.local.LocalLauncherApps
-import com.android.geto.ui.local.LocalNotificationManager
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.time.Duration.Companion.milliseconds
-import com.android.geto.designsystem.R as designR
+import com.android.geto.common.R as commonR
 
 @Composable
 internal fun FavouriteAppsRoute(
@@ -103,7 +99,24 @@ internal fun FavouriteAppsRoute(
 
     var notConfigured by rememberSaveable { mutableStateOf(false) }
 
+    var nothingToHide by rememberSaveable { mutableStateOf(false) }
+
     var overlayFailure by rememberSaveable { mutableStateOf(false) }
+
+    // The WRITE_SECURE_SETTINGS grant has gone, so nothing this app writes can land.
+    // Saved like the others: it is the only explanation the user is given, and losing it
+    // to a rotation would leave a launch that simply did nothing.
+    var permissionsLost by rememberSaveable { mutableStateOf(false) }
+
+    // Auto-hide settings (IMD+) is holding the device down with a list this app's
+    // profile does not fit inside. Saved like the two above, so rotating the device
+    // while it is up does not lose the only explanation the user was given.
+    var autoHideConflict by rememberSaveable { mutableStateOf(false) }
+
+    // Which app was being launched when IMD noticed that the settings already down belong to a
+    // run of itself that is no longer alive. The component name rather than a flag, because
+    // both answers end in launching that same app. Saved for the same reason as the rest.
+    var priorHide by rememberSaveable { mutableStateOf<String?>(null) }
 
     // Survives the launch that raised it: the wait runs in a NonCancellable scope
     // that outlives this composition, and the spinner has to still be there when it
@@ -115,7 +128,11 @@ internal fun FavouriteAppsRoute(
         appLaunch = appLaunch,
         snackbarHostState = snackbarHostState,
         onNotConfigured = { notConfigured = true },
+        onNothingToHide = { nothingToHide = true },
         onOverlayFailure = { overlayFailure = true },
+        onAutoHideConflict = { autoHideConflict = true },
+        onPermissionsLost = { permissionsLost = true },
+        onPriorHide = { priorHide = it },
         onConsumed = viewModel::consumeAppLaunch,
     )
 
@@ -123,10 +140,42 @@ internal fun FavouriteAppsRoute(
         NotConfiguredDialog(onDismissRequest = { notConfigured = false })
     }
 
+    if (nothingToHide) {
+        NothingToHideDialog(onDismissRequest = { nothingToHide = false })
+    }
+
     overlayStart?.let { ShizukuStartingDialog(reason = it) }
+
+    if (autoHideConflict) {
+        AutoHideConflictDialog(onDismissRequest = { autoHideConflict = false })
+    }
 
     if (overlayFailure) {
         OverlayFailureDialog(onDismissRequest = { overlayFailure = false })
+    }
+
+    if (permissionsLost) {
+        PermissionsLostDialog(onDismissRequest = { permissionsLost = false })
+    }
+
+    // Cleared before either call, so the Shizuku spinner underneath is visible for the wait
+    // rather than hidden behind a dialog nobody can answer any more.
+    priorHide?.let { componentName ->
+        PriorHideDialog(
+            title = stringResource(commonR.string.prior_hide_title),
+            restoreLabel = stringResource(commonR.string.prior_hide_restore),
+            ignoreLabel = stringResource(commonR.string.prior_hide_ignore),
+            onRestore = {
+                priorHide = null
+
+                viewModel.restoreThenLaunch(componentName = componentName)
+            },
+            onIgnore = {
+                priorHide = null
+
+                viewModel.discardThenLaunch(componentName = componentName)
+            },
+        )
     }
 
     FavouriteAppsScreen(
@@ -138,7 +187,6 @@ internal fun FavouriteAppsRoute(
         onUpdateSortFavouriteApps = viewModel::updateSortFavouriteApps,
         onUpdateFavouriteAppsView = viewModel::updateFavouriteAppsView,
         onUpdateFavouriteComponentNames = viewModel::updateFavouriteComponentNames,
-        onRevertToDefault = viewModel::revertToDefault,
     )
 }
 
@@ -156,16 +204,10 @@ internal fun FavouriteAppsScreen(
     onUpdateSortFavouriteApps: (SortFavouriteApps) -> Unit,
     onUpdateFavouriteAppsView: (FavouriteAppsView) -> Unit,
     onUpdateFavouriteComponentNames: (List<String>) -> Unit,
-    onRevertToDefault: () -> Unit,
 ) {
-    var showManagerDialog by rememberSaveable { mutableStateOf(false) }
-
-    // Read from the persisted preferences, so the ticks survive closing the dialog, the
-    // app, and the device. Before they have loaded the dialog cannot be opened anyway.
-    // The manager is not tied to any selection any more, so it is offered whenever the
-    // screen has something to show.
-    val managerAvailable = favouriteAppsUiState is FavouriteAppsUiState.Success
-
+    // ⚠ **The two floating buttons left this screen in r12.** They are drawn by the home
+    // scaffold now — see `AppsFloatingActions` — so that they appear over All apps as well and
+    // do not travel with a tab change. Nothing about them was ever per-tab.
     Box(modifier = modifier.fillMaxSize()) {
         when (favouriteAppsUiState) {
             FavouriteAppsUiState.Loading -> {
@@ -185,50 +227,6 @@ internal fun FavouriteAppsScreen(
             }
         }
 
-        if (managerAvailable) {
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                // Left of Revert, and the smaller of the two. A tonal container rather than
-                // the primary one, so the pair reads as one prominent action with a way in
-                // to the detail beside it rather than as two equal buttons.
-                SmallFloatingActionButton(
-                    onClick = { showManagerDialog = true },
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                ) {
-                    // The Quick Settings tile artwork rather than two stacked Material
-                    // icons: the tile, the launcher shortcut and this button all open the
-                    // same dialog, and looking like each other is how that reads as one
-                    // thing rather than three.
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        painter = painterResource(designR.drawable.ic_services_glyph),
-                        contentDescription = stringResource(R.string.settings_manager_title),
-                    )
-                }
-
-                // The primary FAB, on the right, where a thumb lands. It is the one press
-                // that fixes the situation this tab exists for - an app has just refused to
-                // start and the device needs putting back - so it is the one that gets the
-                // weight.
-                FloatingActionButton(onClick = onRevertToDefault) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        painter = painterResource(designR.drawable.ic_revert_glyph),
-                        contentDescription = stringResource(R.string.revert_to_default),
-                    )
-                }
-            }
-        }
-    }
-
-    if (showManagerDialog && managerAvailable) {
-        SettingsManagerRoute(onDismissRequest = { showManagerDialog = false })
     }
 }
 
@@ -249,9 +247,9 @@ private fun Success(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
 
-    var showOptionsDialog by remember { mutableStateOf(false) }
+    var showOptionsDialog by rememberSaveable { mutableStateOf(false) }
 
-    var showReorderDialog by remember { mutableStateOf(false) }
+    var showReorderDialog by rememberSaveable { mutableStateOf(false) }
 
     val userData = favouriteAppsData.userData
 
@@ -264,14 +262,20 @@ private fun Success(
     // Which app the create-shortcut dialog is for, or null for closed. Held here rather
     // than navigated to, because the shortcut is made for the row that was held and the
     // list behind it is the context for that.
-    var shortcutFor by remember { mutableStateOf<LauncherAppsActivityInfo?>(null) }
+    //
+    // The component name and the label, which is all the dialog asks for, rather than the
+    // LauncherAppsActivityInfo they came from. Saved, so a rotation with the dialog open does
+    // not close it - and it is the pair rather than the whole object precisely so that it
+    // *can* be: that object carries the app's rendered icon, a few hundred kilobytes of PNG
+    // that would go into the saved-state bundle on every rotation to be thrown away unread.
+    var shortcutFor by rememberSaveable { mutableStateOf<Pair<String, String>?>(null) }
 
     // A tap always launches. What a long press does depends on the notification function,
     // because the two modes need different things behind it: with Revert to default the
     // settings to hide are device-wide and there is no per-app profile to edit, so the
     // useful thing is a shortcut; with the memory function the per-app profile is the only
     // thing that decides what a launch does, so that is what a long press has to reach.
-    val perApp = userData.notificationFunction == NotificationFunction.Memory
+    val perApp = userData.hidingFramework == HidingFramework.PerApp
 
     val onTap: (LauncherAppsActivityInfo) -> Unit = { info ->
         onLaunchApp(info.componentName)
@@ -281,12 +285,111 @@ private fun Success(
         if (perApp) {
             onModifyApp(info.componentName, info.activityLabel)
         } else {
-            shortcutFor = info
+            shortcutFor = info.componentName to info.activityLabel
         }
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    // The room the page gives up at each end now that the header and the tab bar float over it.
+    // Free to read here: LocalHeaderMetrics is static, so this is not a subscription to
+    // anything — the numbers inside it are read in the blur's draw lambdas below.
+    val headerMetrics = LocalHeaderMetrics.current
+
+    val headerInset = getoFloatingHeaderInset()
+
+    val barInset = getoFloatingBarInset()
+
+    // ⚠ **A Box, not a Column, and the order inside it is the whole point.** The list is drawn
+    // first and the search field after, so the field sits over the list rather than above it -
+    // the author's "the header and search bar floating on top of it". The band is on the list
+    // alone, which is what keeps the field, the two floating buttons and the title sharp.
+    Box(modifier = modifier.fillMaxSize()) {
+        val listPadding = PaddingValues(
+            top = headerInset + GetoSearchFieldHeight,
+            bottom = barInset,
+        )
+
+        // ⚠ **Only the list goes inside.** The search field below is a sibling drawn afterwards,
+        // so it sits over the list and stays sharp — the author's "the header and search bar
+        // floating on top of it".
+        // ⚠ **Built once and applied to whichever list is showing — r13b.** The treatment
+        // hangs off the scrolling node now rather than off a wrapper; there are two lists here
+        // and an empty state, so the chain is named instead of repeated. The empty state gets
+        // none: a centred star and one line of text have no edge to fade into.
+        // ⚠ **The same anchor All apps uses — r15b**: full strength behind the search field
+        // and fading out below it, and nothing along the bottom on any device.
+        val edgeBlur = Modifier.progressiveEdgeBlur(
+            blur = userData.progressiveBlur,
+            topSolid = { headerMetrics.height + GetoSearchFieldHeight },
+            strength = { headerMetrics.fraction },
+        )
+
+        Box(modifier = Modifier.matchParentSize()) {
+            if (favouriteAppsData.launcherAppsActivityInfos.isEmpty()) {
+                // Distinguishes "you have no favourites" from "your search matched none of
+                // them", which are very different things to be told.
+                EmptyFavourites(
+                    modifier = Modifier.padding(listPadding),
+                    searching = query.isNotEmpty(),
+                )
+            } else {
+                when (userData.favouriteAppsView) {
+                    FavouriteAppsView.List -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .then(edgeBlur),
+                            // ⚠ **Content padding at both ends, so the list scrolls under both.**
+                            // Layout padding would end the viewport at the header and the bar, and
+                            // then neither band would have anything behind it to blur.
+                            contentPadding = listPadding,
+                        ) {
+                            items(
+                                items = favouriteAppsData.launcherAppsActivityInfos,
+                                key = { it.componentName },
+                            ) { info ->
+                                FavouriteAppListItem(
+                                    launcherAppsActivityInfo = info,
+                                    onTap = { onTap(info) },
+                                    onLongPress = { onLongPress(info) },
+                                )
+                            }
+                        }
+                    }
+
+                    FavouriteAppsView.Grid -> {
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(96.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .then(edgeBlur),
+                            contentPadding = listPadding,
+                        ) {
+                            items(
+                                items = favouriteAppsData.launcherAppsActivityInfos,
+                                key = { it.componentName },
+                            ) { info ->
+                                FavouriteAppGridItem(
+                                    launcherAppsActivityInfo = info,
+                                    onTap = { onTap(info) },
+                                    onLongPress = { onLongPress(info) },
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Last inside the Box and so on top of the list, pinned under the floating title.
+        // ⚠ **The *current* header height, not the expanded one.** r11 pinned the field at the
+        // expanded height, so when the title collapsed the field stayed where it was and left the
+        // gap the author reported. The list's content padding still uses the expanded height —
+        // an inset that moved would drag the list under the finger — but the field is drawn, not
+        // laid out, so it can and must follow the title.
         AppsSearchField(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = LocalFloatingHeaderHeight.current),
             query = query,
             onQueryChange = { query = it },
             trailingIcon = {
@@ -302,53 +405,12 @@ private fun Success(
                 }
             },
         )
-
-        if (favouriteAppsData.launcherAppsActivityInfos.isEmpty()) {
-            // Distinguishes "you have no favourites" from "your search matched none of
-            // them", which are very different things to be told.
-            EmptyFavourites(searching = query.isNotEmpty())
-        } else {
-            when (userData.favouriteAppsView) {
-                FavouriteAppsView.List -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(
-                            items = favouriteAppsData.launcherAppsActivityInfos,
-                            key = { it.componentName },
-                        ) { info ->
-                            FavouriteAppListItem(
-                                launcherAppsActivityInfo = info,
-                                onTap = { onTap(info) },
-                                onLongPress = { onLongPress(info) },
-                            )
-                        }
-                    }
-                }
-
-                FavouriteAppsView.Grid -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(96.dp),
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        items(
-                            items = favouriteAppsData.launcherAppsActivityInfos,
-                            key = { it.componentName },
-                        ) { info ->
-                            FavouriteAppGridItem(
-                                launcherAppsActivityInfo = info,
-                                onTap = { onTap(info) },
-                                onLongPress = { onLongPress(info) },
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 
-    shortcutFor?.let { info ->
+    shortcutFor?.let { (componentName, activityLabel) ->
         ShortcutRoute(
-            componentName = info.componentName,
-            activityLabel = info.activityLabel,
+            componentName = componentName,
+            activityLabel = activityLabel,
             onDismissRequest = { shortcutFor = null },
         )
     }
@@ -398,42 +460,63 @@ private fun EmptyFavourites(
     modifier: Modifier = Modifier,
     searching: Boolean,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
+        // ⚠ **Behind the words rather than above them, solid rather than outlined, and dim** —
+        // the author's "on fav tab with no apps we display a fav icon on BG make it solid", and
+        // his pick of 200 dp at 12% from the r10 ladder. The words sit on top of it and stay the
+        // thing being read; the star is the backdrop that says which tab this is.
+        //
+        // The shape is whatever GetoIcons.Star is, which since r10 is the rounded star - his
+        // "curvy" and "less pointy". Nothing is decided here.
         Icon(
-            modifier = Modifier.size(100.dp),
-            imageVector = GetoIcons.StarBorder,
+            modifier = Modifier.size(EMPTY_STAR_SIZE),
+            imageVector = GetoIcons.Star,
             contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = EMPTY_STAR_ALPHA),
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = if (searching) {
-                stringResource(R.string.no_matching_favourite_apps)
-            } else {
-                stringResource(R.string.no_favourite_apps)
-            },
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-        )
-
-        if (!searching) {
-            Spacer(modifier = Modifier.height(10.dp))
-
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text(
-                text = stringResource(R.string.no_favourite_apps_subtitle),
-                style = MaterialTheme.typography.bodyLarge,
+                text = if (searching) {
+                    stringResource(R.string.no_matching_favourite_apps)
+                } else {
+                    stringResource(R.string.no_favourite_apps)
+                },
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
             )
+
+            if (!searching) {
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = stringResource(R.string.no_favourite_apps_subtitle),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }
+
+/** The author's pick from the r10 ladder: big enough to read as a backdrop, not as an icon. */
+private val EMPTY_STAR_SIZE = 200.dp
+
+/**
+ * And how faint it is.
+ *
+ * ⚠ **Low on purpose, and it is `primary` rather than `onSurface`.** At 12% the app's green is
+ * present without competing with the two lines of text drawn over it; a neutral ink at the same
+ * alpha reads as a smudge on the page rather than as a star.
+ */
+private const val EMPTY_STAR_ALPHA = 0.12f
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

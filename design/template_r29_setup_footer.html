@@ -1,0 +1,215 @@
+<title>r29 setup footer</title>
+<style>
+  :root {
+    --primary: #4E7819;
+    --on-primary: #FFFFFF;
+    --surface: #F9FAEF;
+    --on-surface: #1A1C16;
+    --on-surface-variant: #44483D;
+    --outline: #75796C;
+    --surface-container-high: #E8E9DE;
+    --page: #EEEFE3;
+  }
+  .dark {
+    --primary: #B3E675;
+    --on-primary: #1F3800;
+    --surface: #1B1E16;
+    --on-surface: #E2E3D8;
+    --on-surface-variant: #C5C8BA;
+    --outline: #8F9285;
+    --surface-container-high: #2F332A;
+    --page: #262920;
+  }
+  body {
+    margin: 0;
+    background: #d9dbcf;
+    font-family: Roboto, "Segoe UI", system-ui, sans-serif;
+    color: #1A1C16;
+    padding: 28px;
+  }
+  h1 { font-size: 19px; margin: 0 0 4px; font-weight: 600; }
+  .lede { font-size: 13px; color: #4a4e42; margin: 0 0 22px; max-width: 62em; line-height: 1.5; }
+  h2 { font-size: 13px; margin: 26px 0 10px; text-transform: uppercase; letter-spacing: .09em; color: #5a5e51; font-weight: 600; }
+  .row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .cell { }
+  .cap { font-size: 11.5px; color: #4a4e42; margin: 7px 0 0; max-width: 300px; line-height: 1.45; }
+  .cap b { color: #1A1C16; font-weight: 600; }
+
+  .sheet {
+    width: 300px;
+    background: var(--surface);
+    color: var(--on-surface);
+    border-radius: 26px;
+    padding: 18px 0 0;
+    box-shadow: 0 5px 18px rgba(0,0,0,.17);
+    overflow: hidden;
+  }
+  .sheet.dark { box-shadow: 0 5px 18px rgba(0,0,0,.45); }
+  .title { font-size: 17px; font-weight: 500; padding: 0 20px 12px; }
+  .body { padding: 0 20px 8px; }
+  .line { height: 9px; border-radius: 5px; background: var(--on-surface); opacity: .10; margin-bottom: 11px; }
+  .line.s { width: 62%; }
+  .line.m { width: 84%; }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px;
+  }
+  .actions.between { justify-content: space-between; }
+  .actions.end { justify-content: flex-end; }
+  .grow { flex: 1; }
+
+  .text-btn {
+    font-size: 14px; font-weight: 500; color: var(--primary);
+    padding: 10px 12px; border-radius: 20px; background: none; border: 0;
+    font-family: inherit; letter-spacing: .01em; white-space: nowrap;
+  }
+  .filled-btn {
+    font-size: 14px; font-weight: 700; color: var(--on-primary);
+    background: var(--primary); border: 0; border-radius: 20px;
+    padding: 10px 24px; font-family: inherit; letter-spacing: .01em; white-space: nowrap;
+  }
+  .icon-back { display: inline-flex; align-items: center; gap: 4px; }
+  .icon-back svg { width: 17px; height: 17px; }
+
+  .old { outline: 2px dashed #b3453a; outline-offset: 5px; }
+  .new { outline: 2px solid #4E7819; outline-offset: 5px; }
+  .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; margin-bottom: 12px; display: inline-block; padding: 3px 8px; border-radius: 5px; }
+  .tag.o { background: #f2ded9; color: #8e3128; }
+  .tag.n { background: #dcf0c4; color: #3b5c12; }
+  hr { border: 0; border-top: 1px solid #c3c6b8; margin: 30px 0 0; }
+</style>
+
+<h1>r29 — setup step footer</h1>
+<p class="lede">
+  Back added to the six configuration steps, left of Next. Next becomes a filled, bold button.
+  The same six footers are also what these dialogs show when they are opened from Settings rather
+  than from setup — that second state is the last row, and it is the thing to decide.
+</p>
+
+<h2>1 · Setup flow — what changes</h2>
+<div class="row">
+  <div class="cell">
+    <span class="tag o">now</span>
+    <div class="sheet old">
+      <div class="title">Select settings to hide / unhide</div>
+      <div class="body"><div class="line"></div><div class="line m"></div><div class="line s"></div></div>
+      <div class="actions between">
+        <button class="text-btn">Skip</button>
+        <button class="text-btn">Next</button>
+      </div>
+    </div>
+    <p class="cap">Skip hard left, Next hard right, both flat text. Nothing goes back.</p>
+  </div>
+
+  <div class="cell">
+    <span class="tag n">r29</span>
+    <div class="sheet new">
+      <div class="title">Select settings to hide / unhide</div>
+      <div class="body"><div class="line"></div><div class="line m"></div><div class="line s"></div></div>
+      <div class="actions">
+        <button class="text-btn">Skip</button>
+        <span class="grow"></span>
+        <button class="text-btn icon-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back
+        </button>
+        <button class="filled-btn">Next</button>
+      </div>
+    </div>
+    <p class="cap"><b>Skip stays at the left edge.</b> Back and Next travel together at the right, so
+      the pair that moves you through the flow reads as a pair. Next is filled and bold — it is the
+      one thing on the page you are meant to press.</p>
+  </div>
+
+  <div class="cell">
+    <span class="tag n">r29 · dark</span>
+    <div class="sheet dark new">
+      <div class="title">Setting manager toggles</div>
+      <div class="body"><div class="line"></div><div class="line m"></div><div class="line s"></div></div>
+      <div class="actions">
+        <button class="text-btn">Skip</button>
+        <span class="grow"></span>
+        <button class="text-btn icon-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back
+        </button>
+        <button class="filled-btn">Next</button>
+      </div>
+    </div>
+    <p class="cap">Filled Next on the dark palette: <code>primary #B3E675</code> with
+      <code>onPrimary #1F3800</code>.</p>
+  </div>
+</div>
+
+<h2>2 · Alternative — Back with no chevron</h2>
+<div class="row">
+  <div class="cell">
+    <div class="sheet">
+      <div class="title">Select settings to hide / unhide</div>
+      <div class="body"><div class="line"></div><div class="line m"></div><div class="line s"></div></div>
+      <div class="actions">
+        <button class="text-btn">Skip</button>
+        <span class="grow"></span>
+        <button class="text-btn">Back</button>
+        <button class="filled-btn">Next</button>
+      </div>
+    </div>
+    <p class="cap">Word only, matching Skip exactly. Three plain words and one filled button; the
+      chevron above is the only thing that distinguishes Back from Skip at a glance, so this
+      version leans harder on position.</p>
+  </div>
+
+  <div class="cell">
+    <div class="sheet">
+      <div class="title">Select settings to hide / unhide</div>
+      <div class="body"><div class="line"></div><div class="line m"></div><div class="line s"></div></div>
+      <div class="actions between">
+        <button class="text-btn icon-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back
+        </button>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="text-btn">Skip</button>
+          <button class="filled-btn">Next</button>
+        </div>
+      </div>
+    </div>
+    <p class="cap">Back hard left instead, where a back control normally lives, and Skip moves over
+      beside Next. <b>Not what you asked for</b> — included only because it is the arrangement your
+      instruction displaces, so you can see what is being given up.</p>
+  </div>
+</div>
+
+<hr>
+
+<h2>3 · The same footers, opened from Settings — this is the decision</h2>
+<div class="row">
+  <div class="cell">
+    <span class="tag o">now, and unchanged if scoped</span>
+    <div class="sheet">
+      <div class="title">Accessibility services managed by IMD</div>
+      <div class="body"><div class="line"></div><div class="line m"></div><div class="line s"></div></div>
+      <div class="actions end">
+        <button class="text-btn">Cancel</button>
+        <button class="text-btn">Update</button>
+      </div>
+    </div>
+    <p class="cap">Outside setup there is no Skip and no Back — Next is called <b>Update</b>, Skip is
+      <b>Cancel</b>, and both sit right. Six dialogs reach this state from the settings list.</p>
+  </div>
+
+  <div class="cell">
+    <span class="tag n">if the filled Next applies everywhere</span>
+    <div class="sheet">
+      <div class="title">Accessibility services managed by IMD</div>
+      <div class="body"><div class="line"></div><div class="line m"></div><div class="line s"></div></div>
+      <div class="actions end">
+        <button class="text-btn">Cancel</button>
+        <button class="filled-btn">Update</button>
+      </div>
+    </div>
+    <p class="cap">Update inherits the filled, bold treatment. Consistent with setup, and it does
+      make the committing button obvious — but it changes six dialogs you did not ask about, and
+      every other dialog in the app still ends in two flat words.</p>
+  </div>
+</div>

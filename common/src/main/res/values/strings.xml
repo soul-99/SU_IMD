@@ -17,6 +17,12 @@
   -->
 <resources>
     <string name="add">Add</string>
+    <!-- The setup flow's two footer buttons, here rather than in :app because the
+         dialogs that draw them live in a feature module. -->
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="back">Back</string>
+    <string name="retry">Retry</string>
     <string name="update">Update</string>
     <string name="cancel">Cancel</string>
     <string name="system">System</string>
@@ -25,7 +31,7 @@
 
     <!-- suIMD: language selection, shown both in settings and on the first-run screen -->
     <string name="language_system">System / automatic</string>
-    <string name="language_ai_notice">Languages other than English were generated using AI assisted machine translation, so might contain errors. Users are recommended to flag translation errors to the developer in the GitHub issue tracker if you want rectification.</string>
+    <string name="language_ai_notice">Languages other than English were generated using machine translation, so might contain errors. Users are recommended to flag translation errors to the developer in the GitHub issue tracker if you want rectification.</string>
 
     <string name="revert_to_default_toast">Revert to default</string>
     <string name="revert_from_memory_toast">Revert from memory</string>
@@ -34,9 +40,38 @@
     <!-- Shown after a revert that could not finish. Only the two targets that depend on
       something outside this app get their own message; everything else is visible in the
       services manager and fixable from there. -->
-    <string name="revert_failed_shizuku_toast">Failed to restart Shizuku service</string>
-    <string name="revert_failed_overlay_toast">Failed to revert Display over other apps permission using Shizuku, see notification</string>
-    <string name="revert_failed_shizuku_and_overlay_toast">Failed to revert Shizuku service &amp; Display over other apps permissions</string>
     <!-- Confirms the Tasker/MacroDroid "hide settings" trigger, which otherwise opens nothing. -->
     <string name="settings_hidden_toast">Settings hidden</string>
+    <string name="auto_hide_run_toast">IMD+ is hiding your settings…</string>
+    <string name="auto_hide_revert_toast">IMD+ is restoring your settings…</string>
+    <string name="toast_auto_hiding">IMD+: Hiding settings...</string>
+    <string name="toast_done_hidden">IMD: Settings hidden</string>
+    <string name="toast_done_hidden_for">IMD: Settings hidden for %1$s</string>
+    <string name="toast_done_reverted_defaults">IMD: Settings reverted to defaults</string>
+    <string name="toast_done_restored_defaults">IMD: Settings restored to defaults</string>
+    <string name="toast_done_restored_memory">IMD: Settings restored from memory</string>
+    <string name="toast_done_restored_memory_for">IMD: Settings restored from memory (%1$s)</string>
+    <string name="toast_nothing_to_restore">IMD: No hidden settings to restore</string>
+    <string name="toast_auto_done_hidden">IMD+: Settings hidden</string>
+    <string name="toast_auto_done_hidden_for">IMD+: Settings hidden for %1$s</string>
+    <string name="permissions_lost">Necessary permissions lost, Please open IMD and re-grant the permissions first.</string>
+
+    <!--
+      The force-close popup. English only for now: the author's rule from this round on is that
+      translation happens in one pass when everything is built, so these three are listed in
+      check_translations.py's DEFERRED set rather than copied into eleven locales twice.
+
+      'Ignore all previous reverts' says what it does on purpose. An earlier draft read just
+      'Ignore', which sounds like "carry on" rather than "throw the record away" - and throwing
+      it away is permanent.
+    -->
+    <string name="prior_hide_title">Previously hidden settings detected, restore them first?</string>
+    <string name="prior_hide_restore">Restore settings first</string>
+    <string name="prior_hide_ignore">Ignore all previous reverts</string>
+    <!--
+      Shown while 'Restore settings first' is working. Modelled on auto_hide_revert_toast,
+      "IMD+ is restoring your settings…", which is the one string in the project that already
+      describes this event.
+    -->
+    <string name="prior_hide_restoring">IMD is restoring your settings…</string>
 </resources>

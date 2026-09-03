@@ -17,6 +17,7 @@
  */
 package com.android.geto.framework.packagemanager
 
+import com.android.geto.domain.framework.AppSessionWrapper
 import com.android.geto.domain.framework.PackageManagerWrapper
 import dagger.Binds
 import dagger.Module
@@ -31,4 +32,8 @@ internal interface PackageManagerModule {
     @Binds
     @Singleton
     fun packageManagerWrapper(impl: DefaultPackageManagerWrapper): PackageManagerWrapper
+
+    @Binds
+    @Singleton
+    fun appSessionWrapper(impl: DefaultAppSessionWrapper): AppSessionWrapper
 }

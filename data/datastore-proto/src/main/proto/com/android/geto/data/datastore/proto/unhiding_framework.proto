@@ -1,0 +1,35 @@
+/*
+ *
+ *   Copyright 2023 Einstein Blanco
+ *   Modifications Copyright 2026 soul_99 (suIMD)
+ *
+ *   Licensed under the GNU General Public License v3.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       https://www.gnu.org/licenses/gpl-3.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
+syntax = "proto3";
+
+option java_package = "com.android.geto.data.datastore.proto";
+option java_multiple_files = true;
+
+// How a hide is undone. The other half of the old NotificationFunctionProto.
+//
+// Zero is "not chosen", for the same reason as HidingFrameworkProto: the recommendation
+// moved once already - v1.6 steered people to Revert to default, v3 steers new installs to
+// the memory function - and a default that lives in the domain can move again without a
+// renumbering or a migration.
+enum UnhidingFrameworkProto {
+  UnhidingFrameworkUnset = 0;
+  UnhidingFrameworkMemory = 1;
+  UnhidingFrameworkRevertToDefault = 2;
+}

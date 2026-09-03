@@ -1,0 +1,17 @@
+flowchart TD
+    A["A hide asks for the Shizuku<br/>service to stop"] --> B{"Which fork?"}
+    B -- "<b>Shevery</b> - it has<br/>no intents" --> S["<b>Nothing is sent.</b> Reported as<br/><i>not configured</i>, never<br/>as a failure"]
+    B -- "Not configured" --> Z["Nothing to send. Skipped,<br/>never a failure"]
+    B -- "<b>Thedjchi</b>" --> C{"Service running?"}
+
+    C -- No --> Y["Already stopped"]
+    C -- Yes --> D["Broadcast the fork's own<br/><b>stop intent</b>"]
+    D --> E["Switch <b>USB debugging</b> off, then<br/><b>wireless debugging</b> off - always,<br/>not as a fallback: the service cannot<br/>outlive the transport it rides on"]
+    E --> F["Wait 300ms for the<br/>transports to settle"]
+    F --> G["Put back only the transports the<br/><b>caller</b> asked to leave up. It knows<br/>what was on before, and what<br/>this run is hiding"]
+    G --> H["<b>Stopped.</b> There is no confirmation<br/>poll - v3 removed it"]
+
+    class S fork
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

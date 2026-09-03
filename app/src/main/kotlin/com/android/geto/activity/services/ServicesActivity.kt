@@ -26,7 +26,12 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.geto.common.AppLocale
+import com.android.geto.common.openImdApp
 import com.android.geto.designsystem.theme.GetoTheme
+import com.android.geto.designsystem.theme.GetoBlurSettings
+import com.android.geto.domain.model.DEFAULT_FADE_DP
+import com.android.geto.domain.model.DEFAULT_RADIUS_DP
+import com.android.geto.domain.model.DEFAULT_TINT_PERCENT
 import com.android.geto.domain.model.Theme
 import com.android.geto.feature.apps.manager.SettingsManagerRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,6 +58,24 @@ class ServicesActivity : ComponentActivity() {
 
     private val viewModel: ServicesActivityViewModel by viewModels()
 
+    /**
+     * The app icon on the manager's title line: bring IMD up, then get out of the way.
+     *
+     * ⚠ **Started before finished, and the order is the fix — r5.** This activity is translucent,
+     * `excludeFromRecents`, and carries an empty `taskAffinity`, so it is a window in a task of
+     * its own and IMD's window is in another. Finishing first asks the window manager to remove
+     * this task and raise that one at the same moment, and which of the two the transition
+     * settles on is a race: the author saw IMD arrive *behind* the manager on his razr, and saw
+     * the transition into it drawn out of a window with nothing solid in it. Starting while this
+     * window is still up leaves one ordinary open transition, with this one removed from behind
+     * it afterwards.
+     */
+    private fun openImdAppAndFinish() {
+        openImdApp()
+
+        finish()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -65,8 +88,18 @@ class ServicesActivity : ComponentActivity() {
             GetoTheme(
                 theme = userData?.theme ?: Theme.FOLLOW_SYSTEM,
                 dynamicTheme = userData?.dynamicTheme ?: false,
+                oledBackground = userData?.oledBackground ?: false,
+                blurSettings = GetoBlurSettings(
+                    enabled = userData?.progressiveBlur ?: false,
+                    radiusDp = userData?.blurRadiusDp ?: DEFAULT_RADIUS_DP,
+                    tintPercent = userData?.blurTintPercent ?: DEFAULT_TINT_PERCENT,
+                    fadeDp = userData?.blurFadeDp ?: DEFAULT_FADE_DP,
+                ),
             ) {
-                SettingsManagerRoute(onDismissRequest = ::finish)
+                SettingsManagerRoute(
+                    onDismissRequest = ::finish,
+                    onOpenImdApp = ::openImdAppAndFinish,
+                )
             }
         }
     }

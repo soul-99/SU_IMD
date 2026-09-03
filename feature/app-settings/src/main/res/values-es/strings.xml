@@ -60,4 +60,13 @@
     <string name="action_app_setting">Ajuste de app</string>
     <string name="action_create_shortcut">Crear acceso directo</string>
     <string name="action_setting_template">Plantilla de ajustes</string>
+    <string name="auto_hide_conflict_snackbar">IMD+ mantiene tus ajustes ocultos. Revierte primero y luego aplica este perfil.</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="configure_first">Configura primero los ajustes</string>
+    <string name="dooa_thedjchi_only">la gestión de «Mostrar sobre otras aplicaciones» solo es compatible con el fork Thedjchi de Shizuku</string>
+    <string name="help_path_accessibility">Ajustes de IMD → Ajustes predeterminados de IMD → Servicios de accesibilidad que se ocultan</string>
+    <string name="help_path_dooa">Ajustes de IMD → Ajustes predeterminados de IMD → Mostrar sobre otras aplicaciones gestionado por IMD</string>
+    <string name="help_path_manage_shizuku">Ajustes de IMD → Configuración de Shizuku → Gestionar Shizuku</string>
+    <string name="shortcut_lookup_failed">No se pudieron leer los detalles del acceso directo de esta aplicación.</string>
+    <string name="understood">Entendido</string>
 </resources>

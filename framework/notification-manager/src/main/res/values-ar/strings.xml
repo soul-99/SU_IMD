@@ -23,10 +23,27 @@
       one restores from memory what this app changed, the other drives the device to the
       configured default. The same two wordings are used in :common for the toasts.
     -->
-    <string name="revert_using_memory">استعادة من الذاكرة</string>
+    <string name="revert_using_memory">إظهار الإعدادات باستخدام الذاكرة</string>
     <string name="revert_to_default">استعادة الوضع الافتراضي</string>
-    <string name="overlay_restore_failed_title">فشل الاستعادة</string>
+    <string name="overlay_restore_failed_title">فشل إظهار الإعدادات</string>
     <string name="overlay_restore_failed_text">تعذّرت استعادة إذن العرض فوق التطبيقات الأخرى باستخدام Shizuku، يُرجى تشغيل خدمة Shizuku يدويًا ثم الضغط على الزر أدناه</string>
     <string name="overlay_restore_retry">إعادة المحاولة</string>
-    <string name="alert_notification_channel">حالات فشل الاستعادة</string>
+    <string name="alert_notification_channel">أعطال IMD</string>
+    <string name="shizuku_usb_fallback_title">تم إيقاف خدمة Shizuku</string>
+    <string name="shizuku_usb_fallback_text">تم إنهاء خدمة Shizuku باستخدام تصحيح أخطاء USB وليس أمر الإيقاف، وقد يفشل التطبيق في استعادة خدمة Shizuku عند الإرجاع.</string>
+    <string name="shizuku_usb_fallback_text_overlay">تم إنهاء خدمة Shizuku باستخدام تصحيح أخطاء USB وليس أمر الإيقاف، وقد يفشل التطبيق في استعادة خدمة Shizuku و«العرض فوق التطبيقات الأخرى» عند الإرجاع.</string>
+    <string name="notification_ok">حسنًا</string>
+    <string name="hidden_revert_default">تم إخفاء الإعدادات، اضغط لإظهار الإعدادات.</string>
+    <string name="hidden_revert_memory">تم إخفاء الإعدادات، اضغط لإظهار الإعدادات من الذاكرة.</string>
+    <string name="auto_hide_channel">‏إخفاء الإعدادات تلقائيًا (IMD+)</string>
+    <string name="auto_hide_hidden_revert">‏IMD+ أخفى إعداداتك، اضغط لإظهار الإعدادات.</string>
+    <string name="auto_hide_hidden_revert_memory">‏IMD+ أخفى إعداداتك، اضغط لإظهار الإعدادات من الذاكرة.</string>
+    <string name="auto_unhide_channel">خدمة إعدادات الإظهار التلقائي</string>
+    <string name="auto_unhide_running">خدمة الإظهار التلقائي قيد التشغيل</string>
+    <string name="auto_hide_shizuku_failed">فشل ‏IMD+ في إخفاء الإعدادات لتعذّر تشغيل خدمة Shizuku. يرجى التحقق من إعداداتك.</string>
+    <string name="shizuku_revert_failed">تعذّر تشغيل خدمة Shizuku، اضغط هنا لتشغيلها يدويًا</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="developer_note_channel">إشعار تحديث تطبيق IMD</string>
+    <string name="developer_note_notification">IMD: ملاحظة مهمة من المطوِّر 🧑‍🔬</string>
+    <string name="shevery_start_failed">تعذّر تشغيل Shevery، انقر هنا لتشغيله يدويًا.</string>
 </resources>

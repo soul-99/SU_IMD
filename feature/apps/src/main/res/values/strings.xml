@@ -33,7 +33,7 @@
     <string name="favourite_apps_options">Favourites options</string>
     <string name="no_favourite_apps">No favourites yet</string>
     <string name="no_matching_favourite_apps">No favourites match that search</string>
-    <string name="no_favourite_apps_subtitle">Tap the star next to an app in All Apps, or the star in its settings screen.</string>
+    <string name="no_favourite_apps_subtitle">Add apps by pressing star icon in All apps tab</string>
     <string name="view">View</string>
     <string name="custom">Custom</string>
     <string name="alphabetical">A–Z</string>
@@ -54,24 +54,30 @@
     <!-- Manual revert -->
     <!-- Not "revert": :framework:notification-manager owns that name for the
          notification action, and the two merge into one resource in :app. -->
-    <string name="settings_manager_title">IMD services manager</string>
+    <string name="settings_manager_title">Settings Manager</string>
 
     <!--
       The manager's information popup. settings_manager_title, and the two _name_ strings
       below, are matched as substrings inside the longer strings to bold them - word them
       differently in the two places and nothing is bolded, silently.
     -->
+    <string name="settings_manager_open_settings">Open IMD settings</string>
     <string name="settings_manager_info">What this dialog does</string>
-    <string name="settings_manager_info_live">IMD services manager displays the live status of the settings and services. It does not decide which settings/services to hide or un-hide when apps are opened via IMD / IMD created app shortcuts.</string>
+    <string name="settings_manager_info_live">IMD Settings Manager displays the live status of settings and helps you turn them on/off easily.</string>
     <string name="settings_manager_info_live_extra">To set what to hide and un-hide on launching apps via IMD, please configure the default IMD settings within the IMD app.</string>
     <string name="settings_manager_info_name_defaults">default IMD settings</string>
     <string name="settings_manager_info_developer">Turning developer options off via IMD only turns the developer settings flag on-off, it does not reset the changes made in developer settings (like animation scale settings, mock location app…etc).</string>
     <string name="settings_manager_info_developer_extra">To reset developer settings open the developer settings page and turn it off from there.</string>
     <string name="settings_manager_info_name_reset">reset developer settings</string>
     <string name="revert_to_default">Revert to default</string>
+    <string name="unhide_settings">Unhide settings</string>
+    <string name="hide_settings">Hide settings</string>
     <string name="not_configured_title">No settings to hide, you need to configure the settings to hide for this app.</string>
+    <string name="nothing_to_hide_message">You need to configure what settings to hide first under IMD app settings.</string>
     <string name="not_configured_message">In IMD app long press this app to open what settings to hide.</string>
     <string name="got_it">Got it</string>
+    <!-- Under the two rows that read a selection list. Deliberately four words. -->
+    <string name="settings_manager_only_selected">Only selected ones</string>
     <string name="settings_manager_open">Open %1$s</string>
     <string name="settings_manager_accessibility_note">only services selected in the IMD app settings are managed</string>
     <string name="settings_manager_overlay_note">only apps selected in the IMD app settings are managed</string>
@@ -79,12 +85,21 @@
     <string name="settings_manager_cannot_open">Could not open that screen on this device</string>
     <string name="settings_manager_no_shizuku">No Shizuku app found — set the package name in Settings</string>
     <string name="ok">OK</string>
+    <string name="shizuku_unmanageable">Unable to manage Shizuku service from here, please configure Shizuku properly in IMD settings</string>
+    <!-- Shown when the Shizuku row is tapped on a Shevery install. The row still reports the
+      live state; it just cannot be operated, because Shevery has no intents to send. -->
+    <string name="shevery_toggle_title">Shevery service</string>
+    <string name="shevery_toggle_point_intents">Toggling is not possible for Shevery (intents not supported)</string>
+    <string name="shevery_toggle_point_status">IMD Settings Manager just display the live status of service.</string>
+    <string name="shevery_toggle_point_open">Open your Shevery app directly to manage the service</string>
+    <!-- Shown when the accessibility row is tapped with nothing selected to manage. The row
+      reads off in that state, because IMD is holding nothing down. -->
+    <string name="accessibility_none_managed">No Accessibility services are set to be managed via IMD, please configure the ones you want to manage in IMD app settings first.</string>
     <string name="shizuku_help_title">Shizuku service unavailable</string>
     <string name="shizuku_help_bullet">%1$d.</string>
     <string name="shizuku_help_point_setup">Please make sure the Shizuku app is installed, registered in ADB, and configured correctly in the IMD app\'s settings page.</string>
     <string name="shizuku_help_point_permission">IMD app\'s Shizuku permission is only used to grant the privileged Android permission WRITE_SECURE_SETTINGS once. It is not used to detect Shizuku service status or to turn the Shizuku service on and off.</string>
     <string name="shizuku_help_point_restart">After proper setup please restart the IMD app and try again.</string>
-    <string name="settings_manager_shizuku_wait">Please wait 10s, as some Shizuku forks are slow to start service via intents</string>
     <string name="revert_developer_settings">Developer settings</string>
     <string name="revert_usb_debugging">USB debugging</string>
     <string name="revert_wireless_debugging">Wireless debugging</string>
@@ -98,6 +113,7 @@
     <!-- Shown over a launch that is waiting for a Shizuku fork to come up, and over the
       failure that follows if it never does. -->
     <string name="shizuku_starting_to_hide_overlay">Starting Shizuku service to hide Display over other apps permission</string>
+    <string name="shizuku_stopping_via_intent">Attempting to stop shizuku using stop intent</string>
     <string name="shizuku_starting_to_restore_overlay">Starting Shizuku service to restore Display over other apps permission</string>
     <string name="overlay_failure_title">Unable to modify Display over other apps permission using Shizuku</string>
     <string name="overlay_failure_check">Please make sure:</string>
@@ -105,4 +121,42 @@
     <string name="overlay_failure_point_configuration">Recheck your Shizuku configuration under IMD app\'s Settings</string>
     <string name="settings_manager_overlay_restore_failed">Failed to restore Display over other apps permissions using Shizuku, please start Shizuku service manually from the Shizuku app and try again</string>
     <string name="settings_manager_overlay_restore_failed_open">Why Display over other apps was not restored</string>
+    <string name="overlay_none_managed">No Display over other apps are configured to be hidden.\nPlease add those from IMD app settings.</string>
+    <string name="auto_hide_conflict_title">IMD+ is holding your settings</string>
+    <string name="auto_hide_conflict_body">Auto-hide settings (IMD+) has already hidden the device-wide list, and this app\'s profile asks for something it does not cover. Hiding more on top of that would leave settings that neither revert puts back.</string>
+    <string name="auto_hide_conflict_fix">Revert IMD+ first — from its notification or the Hide settings tile — then open this app again.</string>
+    <string name="shizuku_starting">Starting Shizuku service</string>
+    <string name="settings_manager_busy_hiding">IMD hiding settings, please wait...</string>
+    <string name="settings_manager_busy_unhiding">IMD unhiding settings, please wait...</string>
+    <string name="settings_manager_info_name_live">live status</string>
+
+    <!-- The master pill below the last toggle. Two halves of one control, one long shape. -->
+    <string name="settings_manager_all_on">All on</string>
+    <string name="settings_manager_all_off">All off</string>
+
+    <!--
+      Shown above the toggles while IMD is holding something it has not reverted yet.
+
+      ⚠ It opens with the same words as settings_manager_busy_hiding above and means
+      something else: that one is work running right now, this one is a hide that finished
+      with its revert still owing. They are never drawn together - the dialog suppresses this
+      one while the busy note is up - which is the only reason the overlap is survivable.
+    -->
+    <string name="settings_manager_pending">IMD hiding settings currently, any changes made here before you unhide settings, will be undone after settings restoration</string>
+
+    <!-- ===================== r3: greyed toggles, and where to fix them =====================
+      ⚠ Copies of the same five strings in :feature:settings. This module cannot see that
+      module's resources, and check5_dupes treats identical strings across modules as
+      intentional - string/understood is already shared exactly this way. -->
+    <string name="configure_first">Please configure the settings first</string>
+    <string name="dooa_thedjchi_only">managing Display over other apps is only supported for Thedjchi fork of Shizuku</string>
+    <string name="help_path_accessibility">IMD Settings \u2192 Default IMD settings \u2192 Accessibility services managed by IMD</string>
+    <string name="help_path_dooa">IMD Settings \u2192 Default IMD settings \u2192 Display over other apps managed by IMD</string>
+    <string name="help_path_manage_shizuku">IMD Settings \u2192 Shizuku configuration \u2192 Manage Shizuku</string>
+
+    <!-- ======================= r4b: Shevery, in the manager only ======================= -->
+    <string name="revert_shevery">Shevery service</string>
+    <string name="shevery_service_first">Please turn on Shevery service first.</string>
+    <string name="shevery_wait_countdown">Waiting for Shevery service to run...(%1$d)</string>
+    <string name="shizuku_wait_countdown">Waiting for Shizuku service to run...(%1$d)</string>
 </resources>

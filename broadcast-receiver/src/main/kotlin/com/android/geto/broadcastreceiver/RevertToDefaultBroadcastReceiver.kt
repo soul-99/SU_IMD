@@ -41,7 +41,7 @@ class RevertToDefaultBroadcastReceiver : BroadcastReceiver() {
     lateinit var appScope: CoroutineScope
 
     @Inject
-    lateinit var revertToDefaultRunner: RevertToDefaultRunner
+    lateinit var settingsHiddenRunner: SettingsHiddenRunner
 
     override fun onReceive(context: Context?, intent: Intent?) {
         // Same reason as the per-app receiver: without goAsync the process drops to a
@@ -51,7 +51,16 @@ class RevertToDefaultBroadcastReceiver : BroadcastReceiver() {
 
         appScope.launch {
             try {
-                revertToDefaultRunner()
+                // ⚠ **The framework-following unhide, not the named `Revert to default`
+                // function — and v3 is where those stopped being the same thing.** This is
+                // the button on the notification a hide posted: it is the way back from that
+                // hide, so it has to undo it the way the Unhiding framework says. Calling
+                // RevertToDefaultRunner straight would drive the configured defaults under
+                // UnhidingFramework.Memory too, which is precisely the "app switches on a
+                // setting I never had on" that the memory function exists to avoid — and it
+                // would do it to every new install, since IMD defaults + Memory is what one
+                // gets. The explicit Revert to default routes still call the runner directly.
+                settingsHiddenRunner.unhide()
             } finally {
                 pendingResult.finish()
             }

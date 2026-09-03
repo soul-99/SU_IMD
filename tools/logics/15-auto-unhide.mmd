@@ -1,0 +1,45 @@
+flowchart TD
+    A["A hide leaves the device hidden"] --> B["The watcher service runs for as long as<br/><b>Auto unhide</b> is on and something is<br/>hidden - read from stored state, so it<br/>survives the process being killed"]
+    A --> C{"Did the hide<br/>name an app?"}
+    C -- "A launch from IMD, a<br/>shortcut, or IMD+" --> D["Add a watch entry: the package, and the<br/>component <b>only</b> under the<br/>memory framework"]
+    C -- "The <b>Hide settings</b> tile" --> E["<b>No entry.</b> A tile hide names nothing, so<br/>only the screen-lock trigger<br/>can ever end it"]
+
+    B --> F["Tick every 5s with the screen on,<br/>every 30s with it off"]
+    F --> G{"Still armed, and still<br/>something hidden?"}
+    G -- No --> S1["Clear the watch, and<br/><b>stop the service</b>"]
+    G -- Yes --> H{"Are there entries?"}
+
+    H -- Yes --> I["An <b>app-launch</b> session -<br/>gate on that checkbox"]
+    H -- No --> J["A <b>tile</b> session -<br/>gate on that checkbox"]
+    I --> K{"Is that checkbox ticked?"}
+    J --> K
+    K -- No --> S2["Stop watching, but <b>keep the<br/>entries</b>. They are still true"]
+    K -- Yes --> L{"Is a hide or revert<br/>running right now?"}
+    L -- Yes --> W
+
+    L -- No --> M{"<b>Screen lock</b> - screen off<br/>longer than the timer?"}
+    M -- Yes --> R2["<b>Revert everything.</b> The failsafe<br/>that can end any session"]
+    M -- No --> N{"For each watched app"}
+
+    N -- "<b>Swiped</b> away from recents -<br/>needs Android 11 and DUMP" --> O["That session has ended"]
+    N -- "<b>Idle</b> longer than the timer,<br/>measured from last use - or from<br/>the hide, if usage access<br/>is missing" --> O
+    N -- Neither --> W
+
+    O --> P{"Does the entry name<br/>a component?"}
+    P -- Yes --> R1["Revert that one profile (logic 4)<br/>and forget the entry"]
+    P -- "No, it is device-wide" --> Q{"Have <b>all</b> the device-wide<br/>entries ended?"}
+    Q -- No --> W
+    Q -- Yes --> R2
+
+    R1 --> W
+    R2 --> T["Withdraw the notification the moment<br/>unhiding <b>starts</b>, then flush the<br/>reverts and clear every watch"]
+    T --> S1
+
+    W["<b>Keep watching.</b> Nothing has ended yet -<br/>wait for the next tick"]
+
+    class S1 stop
+    class S2 stop
+    class E stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

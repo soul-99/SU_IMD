@@ -20,4 +20,6 @@
     <string name="waiting_for_changes">बदलावों की प्रतीक्षा…</string>
     <string name="unknown">अज्ञात</string>
     <string name="stop">बंद करें</string>
+    <string name="auto_hide_service_label">IMD+ (सेटिंग्स अपने आप छिपाएँ)</string>
+    <string name="auto_hide_service_description">इससे IMD को पता चलता है कि आपका चुना हुआ ऐप कब खोला गया, ताकि वह ऐप देखने से पहले आपकी सेटिंग्स छिपाई जा सकें। IMD सिर्फ़ यह पढ़ता है कि कौन-सा ऐप सामने आया — आपकी स्क्रीन का कुछ भी नहीं।</string>
 </resources>

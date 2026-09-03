@@ -35,6 +35,8 @@ import androidx.core.app.ServiceCompat
 import com.android.geto.common.AppLocale
 import com.android.geto.common.SettingsChangeLog
 import com.android.geto.common.SettingsObservationGate
+import com.android.geto.domain.common.Diagnostics
+import com.android.geto.domain.model.AppSettingKeys
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,11 +90,34 @@ class SettingsObserverService : Service() {
             // Registered with notifyForDescendants, so the last path segment is the key that
             // changed. Without one there is nothing to read and nothing worth logging.
             if (key != null && table != SettingsChangeLog.Table.Unknown) {
+                val value = readValue(table = table, key = key)
+
                 SettingsChangeLog.record(
                     table = table,
                     key = key,
-                    value = readValue(table = table, key = key),
+                    value = value,
                 )
+
+                // The diagnostic log gets the five keys this app writes and none of the rest.
+                //
+                // This callback fires for every row in three tables - brightness on every
+                // ambient light change, volume on every key press, whatever a launcher happens
+                // to poke - and copying all of that into a diagnostic log would bury the six
+                // lines anyone is actually looking for under tens of megabytes of noise.
+                //
+                // Deliberately after the pause gate, so these are the changes suIMD did *not*
+                // make: something else moved a setting under it. Its own writes are logged
+                // where they happen, by the use cases that make them, which say what they were
+                // trying to do as well as what changed.
+                //
+                // No observer is registered for this. It rides on the one the Settings observer
+                // already runs, so with that feature off this costs exactly nothing.
+                if (key in AppSettingKeys.MANAGED_KEYS) {
+                    Diagnostics.log(
+                        tag = "setting",
+                        message = "external change $category.$key = ${value ?: "unset"}",
+                    )
+                }
             }
 
             androidNotificationManagerWrapper.notify(

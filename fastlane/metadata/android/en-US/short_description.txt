@@ -1,1 +1,1 @@
-Open banking and other apps that refuse to run with developer options on
+Settings manager/ hide settings from apps

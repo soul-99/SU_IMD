@@ -17,10 +17,27 @@
   -->
 <resources>
     <!-- Brazilian Portuguese. Machine translation, reviewed for consistency of terminology. -->
-    <string name="revert_using_memory">Reverter usando a memória</string>
+    <string name="revert_using_memory">Reexibir configurações usando a memória</string>
     <string name="revert_to_default">Reverter para o padrão</string>
-    <string name="overlay_restore_failed_title">Falha na reversão</string>
+    <string name="overlay_restore_failed_title">Falha ao reexibir configurações</string>
     <string name="overlay_restore_failed_text">Não foi possível restaurar a permissão Sobreposição a outros apps usando o Shizuku. Ative o serviço Shizuku manualmente e toque no botão abaixo</string>
     <string name="overlay_restore_retry">Tentar novamente</string>
-    <string name="alert_notification_channel">Falhas na reversão</string>
+    <string name="alert_notification_channel">Falhas do IMD</string>
+    <string name="shizuku_usb_fallback_title">Serviço do Shizuku parado</string>
+    <string name="shizuku_usb_fallback_text">O serviço do Shizuku foi encerrado usando a depuração USB, não a intent de parada; o app pode não conseguir restaurar o serviço do Shizuku ao reverter.</string>
+    <string name="shizuku_usb_fallback_text_overlay">O serviço do Shizuku foi encerrado usando a depuração USB, não a intent de parada; o app pode não conseguir restaurar o serviço do Shizuku e a permissão Sobrepor a outros apps ao reverter.</string>
+    <string name="notification_ok">OK</string>
+    <string name="hidden_revert_default">Configurações ocultadas, toque para reexibir as configurações.</string>
+    <string name="hidden_revert_memory">Configurações ocultadas, toque para reexibi-las da memória.</string>
+    <string name="auto_hide_channel">Ocultar configurações automaticamente (IMD+)</string>
+    <string name="auto_hide_hidden_revert">O IMD+ ocultou suas configurações, toque para reexibi-las.</string>
+    <string name="auto_hide_hidden_revert_memory">O IMD+ ocultou suas configurações, toque para reexibi-las da memória.</string>
+    <string name="auto_unhide_channel">Serviço de reexibição automática</string>
+    <string name="auto_unhide_running">Serviço de reexibição automática ativo</string>
+    <string name="auto_hide_shizuku_failed">O IMD+ não conseguiu ocultar as configurações porque o serviço Shizuku não pôde ser iniciado. Verifique suas configurações.</string>
+    <string name="shizuku_revert_failed">Falha ao iniciar o serviço Shizuku, toque aqui para iniciá-lo manualmente</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="developer_note_channel">Aviso de atualização do app IMD</string>
+    <string name="developer_note_notification">IMD: nota importante do desenvolvedor 🧑‍🔬</string>
+    <string name="shevery_start_failed">Falha ao iniciar o Shevery, toque aqui para iniciá-lo manualmente.</string>
 </resources>

@@ -16,10 +16,27 @@
   ~
   -->
 <resources>
-    <string name="revert_using_memory">Aus dem Speicher wiederherstellen</string>
+    <string name="revert_using_memory">Einstellungen aus dem Speicher einblenden</string>
     <string name="revert_to_default">Standard wiederherstellen</string>
-    <string name="overlay_restore_failed_title">Zurücksetzen fehlgeschlagen</string>
+    <string name="overlay_restore_failed_title">Einblenden der Einstellungen fehlgeschlagen</string>
     <string name="overlay_restore_failed_text">Die Berechtigung Über anderen Apps einblenden konnte mit Shizuku nicht wiederhergestellt werden. Bitte aktivieren Sie den Shizuku-Dienst manuell und tippen Sie auf die Schaltfläche unten</string>
     <string name="overlay_restore_retry">Erneut versuchen</string>
-    <string name="alert_notification_channel">Fehler beim Zurücksetzen</string>
+    <string name="alert_notification_channel">IMD-Fehler</string>
+    <string name="shizuku_usb_fallback_title">Shizuku-Dienst gestoppt</string>
+    <string name="shizuku_usb_fallback_text">Der Shizuku-Dienst wurde über USB-Debugging beendet, nicht über den Stopp-Intent. Beim Zurücksetzen kann die App den Shizuku-Dienst möglicherweise nicht wiederherstellen.</string>
+    <string name="shizuku_usb_fallback_text_overlay">Der Shizuku-Dienst wurde über USB-Debugging beendet, nicht über den Stopp-Intent. Beim Zurücksetzen kann die App den Shizuku-Dienst und „Über anderen Apps anzeigen“ möglicherweise nicht wiederherstellen.</string>
+    <string name="notification_ok">OK</string>
+    <string name="hidden_revert_default">Einstellungen ausgeblendet, zum Einblenden tippen.</string>
+    <string name="hidden_revert_memory">Einstellungen ausgeblendet, zum Einblenden aus dem Speicher tippen.</string>
+    <string name="auto_hide_channel">Einstellungen automatisch ausblenden (IMD+)</string>
+    <string name="auto_hide_hidden_revert">IMD+ hat Ihre Einstellungen ausgeblendet, zum Einblenden tippen.</string>
+    <string name="auto_hide_hidden_revert_memory">IMD+ hat Ihre Einstellungen ausgeblendet, zum Einblenden aus dem Speicher tippen.</string>
+    <string name="auto_unhide_channel">Dienst für automatisches Einblenden</string>
+    <string name="auto_unhide_running">Dienst für automatisches Einblenden läuft</string>
+    <string name="auto_hide_shizuku_failed">IMD+ konnte die Einstellungen nicht ausblenden, da der Shizuku-Dienst nicht gestartet werden konnte. Bitte prüfen Sie Ihre Einstellungen.</string>
+    <string name="shizuku_revert_failed">Shizuku-Dienst konnte nicht gestartet werden, hier tippen, um ihn manuell zu starten</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="developer_note_channel">IMD App-Update-Hinweis</string>
+    <string name="developer_note_notification">IMD: Wichtiger Hinweis vom Entwickler 🧑‍🔬</string>
+    <string name="shevery_start_failed">Shevery konnte nicht gestartet werden — tippe hier, um ihn manuell zu starten.</string>
 </resources>

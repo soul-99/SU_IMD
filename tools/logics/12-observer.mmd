@@ -1,0 +1,14 @@
+flowchart TD
+    A["<b>Settings Observer Service</b> switched<br/>on under Advanced"] --> B["Watch <b>System</b>, <b>Secure</b> and <b>Global</b> for<br/>as long as the service runs - no app<br/>has to be open"]
+    B --> C{"Who changed it?"}
+    C -- "<b>IMD itself</b>" --> D["Ignored. The log is for what<br/><i>something else</i> moved"]
+    C -- "Anything else" --> E["Record the table, the key, and the<br/>value before and after"]
+    E --> F["Rewrite the ongoing notification<br/>with the table and key"]
+    F --> G["Advanced → <b>View log</b>, or <b>Clear log</b>"]
+    G --> H["Kept <b>in memory only</b>, capped at 300<br/>entries, and gone when the service<br/>stops. It is a live window,<br/>not a history"]
+    H --> I["The four fields it records are exactly the<br/>four the <i>Add setting</i> form asks for,<br/>so a row can be copied across"]
+
+    class D stop
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

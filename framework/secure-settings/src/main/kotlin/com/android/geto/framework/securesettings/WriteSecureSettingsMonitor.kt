@@ -20,25 +20,14 @@ package com.android.geto.framework.securesettings
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "WriteSecureSettings"
-
-/**
- * How long to wait before bringing the setup screen up again after having just done so.
- *
- * A single revert can attempt several writes in a row, and every one of them fails the same
- * way. Without this the user would be handed the same activity four or five times in a
- * second, and each launch would interrupt the one before it.
- */
-private const val RELAUNCH_COOLDOWN_MILLIS = 5_000L
 
 /**
  * Watches for the WRITE_SECURE_SETTINGS grant disappearing underneath the app.
@@ -61,8 +50,6 @@ private const val RELAUNCH_COOLDOWN_MILLIS = 5_000L
 class WriteSecureSettingsMonitor @Inject constructor(
     @param:ApplicationContext private val context: Context,
 ) {
-    private val lastLaunchUptime = AtomicLong(Long.MIN_VALUE)
-
     fun hasPermission(): Boolean = ContextCompat.checkSelfPermission(
         context,
         Manifest.permission.WRITE_SECURE_SETTINGS,
@@ -71,48 +58,19 @@ class WriteSecureSettingsMonitor @Inject constructor(
     /**
      * Called when a write was refused. Returns true when the permission really is gone, so
      * the caller can tell that apart from a write that failed on its own merits.
+     *
+     * ⚠ **It used to drag the app to the foreground from here, and no longer does**, on the
+     * author's instruction. The message the user now gets asks them to open IMD and re-grant
+     * the permission; an app that yanks itself in front of whatever they were doing and *then*
+     * tells them to open it is saying two different things, and the one they read is stale
+     * before they finish reading it. Every route that hides settings now reports the loss for
+     * itself — see `permissions_lost`.
      */
     fun onWriteRefused(): Boolean {
         if (hasPermission()) return false
 
-        Log.w(TAG, "WRITE_SECURE_SETTINGS has been revoked; reopening setup")
-
-        openSetup()
+        Log.w(TAG, "WRITE_SECURE_SETTINGS has been revoked")
 
         return true
-    }
-
-    /**
-     * Brings the app's own launcher activity to the front.
-     *
-     * It needs no extra telling it why: the setup screen is shown whenever the permission is
-     * missing and re-checked on every resume, so arriving there with no grant lands on step
-     * one and staying there until it is fixed is the existing behaviour rather than
-     * something added here.
-     *
-     * Resolved through the package manager instead of naming MainActivity, which lives in a
-     * module this one cannot see.
-     */
-    private fun openSetup() {
-        val now = android.os.SystemClock.uptimeMillis()
-
-        val previous = lastLaunchUptime.get()
-
-        if (now - previous < RELAUNCH_COOLDOWN_MILLIS) return
-
-        if (!lastLaunchUptime.compareAndSet(previous, now)) return
-
-        val intent = context.packageManager
-            .getLaunchIntentForPackage(context.packageName)
-            ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            ?: return
-
-        runCatching { context.startActivity(intent) }.onFailure {
-            // A background activity start can be blocked outright on Android 10 and up. The
-            // permission is still gone and the app is still broken, but there is nothing
-            // more to be done from here — the next time the user opens it themselves, the
-            // setup gate will catch them.
-            Log.w(TAG, "Could not reopen setup", it)
-        }
     }
 }

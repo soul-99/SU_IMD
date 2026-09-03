@@ -41,7 +41,10 @@ enum class TopLevelDestination(
     ),
     ALL_APPS(
         label = R.string.all_apps,
-        icon = GetoIcons.Apps,
+        // r27: the author's own nine-square grid, replacing Material's dotted one. The same
+        // drawing carries the App drawer shortcuts row — see GetoIcons.AppGrid for why it is an
+        // ImageVector rather than a drawable.
+        icon = GetoIcons.AppGrid,
         contentDescription = R.string.all_apps,
         route = AppsRouteData::class,
     ),

@@ -45,6 +45,36 @@ object AppSettingKeys {
     const val SYSTEM_ALERT_WINDOW = "op_system_alert_window"
 
     /**
+     * A marker, not a settings key — the same idea as [SYSTEM_ALERT_WINDOW]. There is no
+     * Settings row behind stopping the Shizuku service: it is done by broadcasting the fork's
+     * stop intent (or, when the fork has no stop intent, by cycling USB debugging to drop the
+     * transport it rides on). A per-app profile carries it in the same list as everything
+     * else, and it is filtered out of the plain write loop wherever it appears — handing it
+     * to the secure settings wrapper would be writing a key Android has never heard of.
+     */
+    const val SHIZUKU_SERVICE = "shizuku_service"
+
+    /**
+     * The real Settings rows this app writes, and nothing else.
+     *
+     * Exists so the settings observer can tell a change that matters from the constant
+     * background traffic in those three tables - screen brightness, ringer volume, wallpaper,
+     * a dozen keys a launcher touches - which is most of what a content observer on
+     * System/Secure/Global actually sees.
+     *
+     * [SYSTEM_ALERT_WINDOW] and [SHIZUKU_SERVICE] are deliberately absent. They are markers,
+     * not keys: there is no Settings row behind either, so neither can ever arrive as the last
+     * path segment of a changed URI, and listing them would suggest a watch that cannot exist.
+     */
+    val MANAGED_KEYS = setOf(
+        DEVELOPMENT_SETTINGS_ENABLED,
+        ADB_ENABLED,
+        ADB_WIFI_ENABLED,
+        ACCESSIBILITY_ENABLED,
+        ENABLED_ACCESSIBILITY_SERVICES,
+    )
+
+    /**
      * Turning any of these back on is what Shizuku needs in order to be startable again.
      *
      * Kept as a set even though only [ADB_ENABLED] triggers the restart now, because the
@@ -103,5 +133,21 @@ object AppSettingKeys {
     /** True when reverting this profile should give overlay access back. */
     fun restoresOverlayAccess(appSettings: List<AppSetting>): Boolean = appSettings.any {
         it.enabled && it.key == SYSTEM_ALERT_WINDOW
+    }
+
+    /**
+     * True when applying this profile is meant to stop the Shizuku service. As with the
+     * overlay marker, only a launch value of "0" counts, so a row that is present but not
+     * set to stop the service cannot trigger a stop.
+     *
+     * There is deliberately no `restoresShizukuService` counterpart to this. Whether a revert
+     * starts the service again is not a question about the profile but about what actually
+     * happened on the way in: only an app that took a *running* service down has anything to
+     * put back, and that is recorded per app under [SettingSnapshot.SHIZUKU_STOPPED_ID] at the
+     * moment it happens. Reading it off the profile instead would have every app carrying the
+     * marker start Shizuku on revert, including the ones that found it already stopped.
+     */
+    fun stopsShizukuService(appSettings: List<AppSetting>): Boolean = appSettings.any {
+        it.enabled && it.key == SHIZUKU_SERVICE && it.valueOnLaunch == "0"
     }
 }

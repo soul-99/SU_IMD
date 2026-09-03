@@ -26,6 +26,11 @@ android {
 }
 
 dependencies {
+    // For rememberLauncherForActivityResult, which is how the IMD+ page asks Android for the
+    // notification permission. The feature convention plugin does not carry it.
+    implementation(libs.androidx.activity.compose)
+
+    implementation(projects.broadcastReceiver)
     implementation(projects.common)
     implementation(projects.domain.framework)
     implementation(projects.domain.repository)

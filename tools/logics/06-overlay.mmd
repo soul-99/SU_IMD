@@ -1,0 +1,31 @@
+flowchart TD
+    A["A hide or a revert reaches<br/>the overlay step"] --> B{"May IMD manage it?"}
+    B -- "The fork is not<br/><b>Thedjchi</b>" --> Z1["Skipped. <b>Shevery cannot do<br/>this on a launch</b>"]
+    B -- "Manage Shizuku incomplete,<br/>or no apps selected" --> Z2["Skipped"]
+    B -- Yes --> C{"Already withdrawn from<br/>every selected app?"}
+
+    C -- Yes --> Z3["Skipped - and the Shizuku<br/>start is skipped with it"]
+    C -- No --> D{"Shizuku running?"}
+    D -- No --> E["Start it (logic 8)"]
+    D -- Yes --> F
+    E -- "Would not start" --> X1["<b>Stop.</b> Nothing touched"]
+    E --> F["Ask Shizuku which apps currently<br/>hold the permission"]
+    F -- "No answer" --> X2["<b>Stop</b>"]
+
+    F --> G["<b>Record the debt first</b>, extending what<br/>is already owed rather than replacing it -<br/>a write that dies halfway must<br/>still be repayable"]
+    G --> H["Withdraw the AppOp"]
+    H -- Refused --> X3["<b>Stop.</b> The Shizuku start is<br/><b>not</b> rolled back"]
+    H --> I["On the way back, give it to the apps<br/>recorded - minus any another holder<br/>still owns, and any whose install<br/>identity has changed"]
+    I -- "Restore refused" --> J["Post <b>Unhide settings failure</b> with<br/><i>Try again</i>. The debt survives a<br/>reboot and is retried"]
+
+    N["In the <b>Settings manager</b> only, <b>Shevery</b><br/>may drive this too - while its service<br/>is actually running"] -.-> B
+
+    class Z1 stop
+    class X1 stop
+    class X2 stop
+    class X3 stop
+    class J stop
+    class N fork
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

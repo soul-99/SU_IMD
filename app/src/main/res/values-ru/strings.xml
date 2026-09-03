@@ -15,13 +15,6 @@
     <string name="settings">Настройки</string>
 
     <!-- First-run setup -->
-    <string name="setup_purpose">Открывайте банковские и другие защищённые приложения, не включая и не выключая каждый раз вручную эти настройки:
-1. Developer settings
-2. Debugging
-3. Accessibility services
-4. Поверх других приложений (нужна работающая служба Shizuku)
-5. Служба Shizuku
-6. и многое другое (это нужно настроить вручную через Memory function приложения, подсказка: в этом поможет Settings observer)</string>
     <string name="setup_step">Шаг %1$d</string>
     <string name="setup_granted">Предоставлено</string>
     <string name="setup_not_granted">Не предоставлено</string>
@@ -30,10 +23,10 @@
     <string name="setup_copy_command">Скопировать команду</string>
     <string name="setup_check_again">Проверить снова</string>
     <string name="setup_use_shizuku">Использовать Shizuku</string>
-    <string name="services_shortcut_label">Диспетчер служб</string>
+    <string name="services_shortcut_label">Диспетчер настроек</string>
     <string name="revert_shortcut_label">Вернуть по умолчанию</string>
     <string name="shortcut_not_configured_title">Для этого приложения ничего не настроено</string>
-    <string name="shortcut_not_configured_message">Сначала нужно указать, какие настройки скрывать для этого приложения: IMD → Все приложения → нажмите на название приложения → Шаблон настроек → выберите, какие настройки скрывать.</string>
+    <string name="shortcut_not_configured_message">Сначала нужно указать, какие настройки скрывать для этого приложения: IMD → Все приложения → нажмите и удерживайте название приложения → Шаблон настроек → выберите, какие настройки скрывать.</string>
     <string name="shortcut_not_configured_dismiss">Понятно</string>
     <string name="obtainium_title">Как обновлять это приложение</string>
     <string name="obtainium_body">Приложение полностью работает офлайн, поэтому проверяйте обновления и устанавливайте их прямо из релизов GitHub через Obtainium.</string>
@@ -69,10 +62,43 @@
     <string name="setup_open_settings_failed">Не удалось открыть настройки на этом устройстве</string>
     <string name="setup_name_display_over_other_apps">Поверх других приложений</string>
     <string name="setup_how_title">Как это работает</string>
-    <string name="setup_how_off">IMD выключает эти настройки</string>
+    <string name="setup_how_off">IMD выключает настройки</string>
     <string name="setup_how_off_note">Политика безопасности приложений не нарушается</string>
     <string name="setup_how_use">Вы пользуетесь своим приложением</string>
     <string name="setup_how_revert">Revert</string>
-    <string name="setup_how_on">IMD включает эти настройки обратно</string>
+    <string name="setup_how_on">IMD включает настройки обратно</string>
     <string name="setup_how_number">%1$d.</string>
+    <string name="hide_tile_label">Скрыть настройки</string>
+    <string name="hide_tile_visible">Настройки видимы</string>
+    <string name="hide_tile_hidden">Настройки скрыты</string>
+    <string name="hide_tile_working">Скрытие настроек…</string>
+    <string name="hide_tile_unhiding">Восстановление настроек…</string>
+    <!-- r29: the batch that closed the gap - see design/_v3_r29f_translations.py. -->
+    <string name="hide_unhide_shortcut_label">Скрыть/показать настройки</string>
+    <string name="setup_done_1">1. Теперь просто запускайте проблемные приложения, нажимая на них в IMD.</string>
+    <string name="setup_done_2">2. Для быстрого доступа:</string>
+    <string name="setup_done_2_1">1. Удерживайте значки приложений, чтобы создать ярлыки на главном экране</string>
+    <string name="setup_done_2_2">2. Добавьте приложения на вкладку избранного</string>
+    <string name="setup_done_2_3">3. Добавьте плитку быстрых настроек «Скрыть настройки»</string>
+    <string name="setup_done_2_3_tip">(совет: долгое нажатие на плитку открывает диспетчер настроек)</string>
+    <string name="setup_done_3">3. Пользуйтесь собственным диспетчером настроек IMD:</string>
+    <string name="setup_done_3_1">1. Используйте значок диспетчера настроек в списке приложений</string>
+    <string name="setup_done_3_2">2. Добавьте плитку быстрых настроек «Диспетчер настроек»</string>
+    <string name="setup_done_4">4. Настройка завершена, но рекомендуем ознакомиться с:</string>
+    <string name="setup_done_4_1">1. Автопоказ настроек (РЕКОМЕНДУЕТСЯ)</string>
+    <string name="setup_done_4_2">2. Автоскрытие настроек (IMD+, нужна фоновая служба)</string>
+    <string name="setup_done_4_3">3. Все остальные настройки для более тонкой подстройки</string>
+    <string name="setup_done_4_4">4. IMD intents (интеграция с Tasker / Macrodroid... и т. д.)</string>
+    <string name="setup_done_add_tile">Добавить плитку</string>
+    <string name="setup_done_go">Поехали</string>
+    <string name="setup_done_title">Настройка почти завершена</string>
+    <string name="setup_step_accessibility">Выберите специальные возможности для скрытия / управления</string>
+    <string name="setup_step_auto_unhide">Настройте службу автопоказа настроек</string>
+    <string name="setup_step_customise_ui">Настроить интерфейс</string>
+    <string name="setup_step_manager_rows">Переключатели диспетчера настроек</string>
+    <string name="setup_step_overlay">Выберите «Поверх других приложений» для скрытия / управления</string>
+    <string name="setup_step_settings_to_hide">Выберите настройки для скрытия / показа</string>
+    <string name="shizuku_setup_fill_first">Сначала заполните все поля</string>
+    <string name="shizuku_setup_manage">Управлять конфигурацией Shizuku</string>
+    <string name="shizuku_setup_skip">Пропустить</string>
 </resources>

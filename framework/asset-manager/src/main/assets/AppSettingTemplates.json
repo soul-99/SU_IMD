@@ -34,5 +34,13 @@
     "key": "op_system_alert_window",
     "valueOnLaunch": "0",
     "valueOnRevert": "1"
+  },
+  {
+    "settingType": "SECURE",
+    "label": "Hide Shizuku service",
+    "description": "using stop intent",
+    "key": "shizuku_service",
+    "valueOnLaunch": "0",
+    "valueOnRevert": "1"
   }
 ]

@@ -1,0 +1,30 @@
+flowchart TD
+    A["Something needs Shizuku running"] --> B{"Configured, and the<br/>app installed?"}
+    B -- No --> Z["Fail immediately.<br/>Do not burn the wait"]
+    B -- Yes --> C{"Which fork?"}
+
+    C -- "<b>Thedjchi</b>" --> D["Broadcast the fork's <b>start intent</b><br/>- with the auth key, if it needs one"]
+    D --> E["Poll every 0.5s, resend the broadcast<br/>every 2s, for up to <b>8 seconds</b>"]
+    E --> F{"Running?"}
+    F -- Yes --> G["Started. The fork brings the<br/>debugging transport up with it"]
+    F -- "8s elapsed" --> H["Give up, and <b>record the failure</b> so<br/>the Settings manager can<br/>show it later"]
+
+    C -- "<b>Shevery</b>" --> P["<b>No intent, and no auth key.</b> Switch<br/><b>USB</b> and <b>wireless debugging</b> on -<br/>but only the ones that were off"]
+    P --> Q["Wait for <b>ErrorProtect</b>, Shevery's own<br/>watchdog, to notice and start the<br/>service. It scans every 10s"]
+    Q --> R["Poll every 0.5s for up to<br/><b>40 seconds</b>"]
+    R --> S{"Running?"}
+    S -- Yes --> T["Started. <b>IMD</b> brought the transport up,<br/>and the fork followed"]
+    S -- "40s elapsed" --> U["Put back <b>exactly</b> the transports this<br/>attempt switched on, then record<br/>the failure"]
+    U --> V["From the Settings manager, also post<br/><b>Failed to start Shevery</b>. The countdown<br/>outlives the dialog that started it"]
+
+    class H stop
+    class U stop
+    class V stop
+    class P fork
+    class Q fork
+    class R fork
+    class S fork
+    class T fork
+
+    classDef stop fill:#2A1B18,stroke:#FFB4AB,color:#FFB4AB
+    classDef fork fill:#1B2415,stroke:#B1D18A,color:#CFE9A8

@@ -42,6 +42,13 @@ import javax.inject.Inject
  * Packages IMD is currently holding down are included even though the live AppOp says they
  * are not allowed. They are only off because of this app, and leaving them out would empty
  * the list for exactly as long as the hiding is in force.
+ *
+ * ⚠ **And the selection itself**, which is the author's own report: a package that is selected,
+ * off, and *not* held — because the user withdrew the permission themselves, or because the
+ * hold record was discarded — was in neither of the two sets above and disappeared from the
+ * list. It is the one row somebody opening this picker most needs, since it is the only place
+ * it can be unselected. The `allowed` flag still reports what the device says, so the row shows
+ * up with its permission off, which is the truth.
  */
 class GetOverlayPackagesUseCase @Inject constructor(
     private val shizukuWrapper: ShizukuWrapper,
@@ -58,11 +65,22 @@ class GetOverlayPackagesUseCase @Inject constructor(
 
         val held = userData.heldOverlayPackages.values.flatten().toSet()
 
+        val names = allowed + held + userData.managedOverlayPackages
+
+        // Labels for these packages only. This used to enumerate every application on the
+        // device and rasterise an icon for each - a second or more of work, all of it thrown
+        // away except the labels, to put names on a list of a dozen rows that show no icons.
         val labels = runCatching {
-            packageManagerWrapper.getInstalledApps().associate { it.packageName to it.label }
+            packageManagerWrapper.getAppLabels(names)
         }.getOrDefault(emptyMap())
 
-        (allowed + held)
+        // ⚠ **These packages only** — the same rule as the labels above, and for the reason the
+        // paragraph there records. A dozen icons is nothing; every icon on the device is seconds.
+        val icons = runCatching {
+            packageManagerWrapper.getAppIcons(names)
+        }.getOrDefault(emptyMap())
+
+        names
             .map { packageName ->
                 OverlayPackageData(
                     packageName = packageName,
@@ -71,6 +89,7 @@ class GetOverlayPackagesUseCase @Inject constructor(
                     // it may still be sitting in the selection waiting to be unticked.
                     label = labels[packageName] ?: packageName,
                     allowed = packageName in allowed,
+                    icon = icons[packageName],
                 )
             }
             // Selected-but-currently-held first, then alphabetically: the rows that are off

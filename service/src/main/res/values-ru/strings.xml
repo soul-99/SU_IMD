@@ -20,4 +20,6 @@
     <string name="waiting_for_changes">Ожидание изменений…</string>
     <string name="unknown">Неизвестно</string>
     <string name="stop">Остановить</string>
+    <string name="auto_hide_service_label">IMD+ (автоскрытие настроек)</string>
+    <string name="auto_hide_service_description">Позволяет IMD замечать, когда открывается одно из выбранных приложений, и скрывать настройки до того, как это приложение их увидит. IMD считывает только то, какое приложение вышло на передний план, и никогда — содержимое экрана.</string>
 </resources>

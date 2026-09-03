@@ -18,10 +18,12 @@
  */
 package com.android.geto.framework.accessibility
 
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.ComponentName
 import android.content.Context
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
+import com.android.geto.common.AutoHideDetection
 import com.android.geto.domain.common.dispatcher.Dispatcher
 import com.android.geto.domain.common.dispatcher.GetoDispatchers.IO
 import com.android.geto.domain.framework.AccessibilityServicesWrapper
@@ -111,6 +113,32 @@ internal class DefaultAccessibilityServicesWrapper @Inject constructor(
         )
 
         wroteServices && wroteMasterFlag
+    }
+
+    override fun autoHideServiceComponent(): String = ComponentName(
+        context.packageName,
+        AutoHideDetection.SERVICE_CLASS_NAME,
+    ).flattenToString()
+
+    override suspend fun isAutoHideServiceRunning(): Boolean = withContext(ioDispatcher) {
+        val component = ComponentName(context.packageName, AutoHideDetection.SERVICE_CLASS_NAME)
+
+        // The system's list of services it has actually bound, not the setting that asks for
+        // them. On Android 13+ a sideloaded service can be in the setting and never bound.
+        val bound = runCatching {
+            accessibilityManager.getEnabledAccessibilityServiceList(
+                AccessibilityServiceInfo.FEEDBACK_ALL_MASK,
+            )
+        }.getOrNull().orEmpty().any {
+            it.resolveInfo?.serviceInfo?.let { info ->
+                info.packageName == component.packageName && info.name == component.className
+            } == true
+        }
+
+        // The service's own report is the tie-breaker rather than the answer. The manager's
+        // list is authoritative but can lag a bind by a moment, and this is polled straight
+        // after asking for one — so a service that has already said "connected" counts.
+        bound || AutoHideDetection.isRunning
     }
 
     /**
