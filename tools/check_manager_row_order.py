@@ -10,7 +10,7 @@ keeps the copy honest. It did not exist. This is it.
 
 What is checked, for each of the two configured services:
 
-  * the same six targets,
+  * the same seven targets,
   * in the same order,
   * at the same indent.
 
@@ -109,8 +109,8 @@ def main() -> int:
 
         want = manager[fork]
 
-        if len(want) != 6:
-            problems.append(f"{fork}: the manager lists {len(want)} rows, expected 6")
+        if len(want) != 7:
+            problems.append(f"{fork}: the manager lists {len(want)} rows, expected 7")
 
         if got != want:
             problems.append(

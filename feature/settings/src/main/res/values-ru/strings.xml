@@ -239,6 +239,7 @@
     <string name="about_contributor_scope">(первоначальная основа «Поверх других приложений»)</string>
     <string name="overlay_needs_shizuku_configured">Прежде чем использовать это, Shizuku должен быть правильно настроен в настройках IMD</string>
     <string name="revert_defaults_display_over_other_apps">Поверх других приложений</string>
+    <string name="revert_defaults_location">Местоположение</string>
     <string name="revert_defaults_overlay_note">восстанавливает только те приложения, которые ранее отключил IMD; Shizuku должен быть правильно настроен в настройках IMD</string>
     <string name="settings_to_hide_overlay_note">все приложения, которым сейчас разрешено отображаться поверх других, временно отключаются; Shizuku должен быть правильно настроен в настройках IMD</string>
     <string name="settings_log_view">Показать журнал</string>
@@ -280,6 +281,7 @@
     <string name="system_settings_unavailable">На этом устройстве нет экрана для этой настройки</string>
     <string name="settings_to_hide_accessibility_note">Управляются только службы, выбранные в настройках IMD</string>
     <string name="settings_to_hide_shizuku_note">убедитесь, что Shizuku правильно настроен в настройках IMD (использует intent остановки), помогает избежать ошибки watchdog</string>
+    <string name="settings_to_hide_location_note">Местоположение включается, пока приложение открыто, и возвращается в прежнее состояние при откате</string>
     <string name="shevery_notice_point_delay">Поэтому в IMD возможна небольшая задержка для задач, требующих доступа к Shizuku (например, скрытие/возврат «Поверх других приложений»).</string>
     <string name="shizuku_fork_shevery_caution">поддерживается, но не рекомендуется</string>
     <string name="shevery_notice_point_restart">Чтобы перезапустить службу Shevery, настройте IMD на возврат настроек отладки — служба ErrorProtect запустит её снова (проверяет каждые 10 с)</string>

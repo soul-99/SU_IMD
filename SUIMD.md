@@ -214,6 +214,35 @@ that shipped broken.
 Newest first. Every release gets an entry here, including the ones that only change
 documentation.
 
+### Unreleased - Location
+
+Restrictive apps object to debugging surfaces and, increasingly, insist on a position fix. The
+first half of that is what this app is for; the second half had no answer at all, so a user had
+to leave the app they were opening, turn location on in Android's own settings, use the app, and
+remember to turn it off again.
+
+**Added - Location as a managed setting**
+
+- **It is the one target whose hidden state is *on*.** A hide drives every target in
+  `SettingsToHide.Targets` to `ManualRevertTarget.stateWhileHidden`; that is `false` for the six
+  rows that existed and `true` for location, because the app being opened is the whole reason it
+  is wanted. One property rather than a special case in the hide loop, the partial-hide undo and
+  the memory record.
+- **Tick it in *Settings to hide*** and location comes on when an app is opened - from the apps
+  list, Favourites, a generated shortcut, the tile or IMD+ - and goes back when the session ends.
+- ⚠ **Off for everyone until it is ticked**, including upgrading installs: `LegacyDefault` forces
+  it false even though that map turns the four secure settings on, because a privileged change
+  nobody asked for is exactly what that map is careful about.
+- ⚠ **The memory record measures it in its own vocabulary.** `deviceWideSnapshotId` now answers
+  for any keyed target rather than only the Global ones, and the record stores the mode it found -
+  `0` or `3`, not `1`/`0`. A revert therefore puts back high accuracy for somebody who had it on,
+  and off for somebody who did not, instead of reading a working GPS as "off" and switching it on
+  as sensors-only.
+- **A row in the Settings manager**, with live state, a switch and an arrow to Android's location
+  screen, for the one-off case that is not worth configuring: press, use the app, revert.
+- **And a row in *Revert to default***, off by default - which is what makes a revert switch
+  location off - and tickable for users who keep location on all day.
+
 ### v3 - 3 September 2026 · versionCode 17
 
 The release where IMD stops needing to be told. Every version before this one hid settings because

@@ -77,6 +77,43 @@ object AutoUnhideWatch {
     private val entries = ConcurrentHashMap<String, Entry>()
 
     /**
+     * Told that a hide has been applied and its watch entry is in place, so the app can make sure
+     * the watcher is running.
+     *
+     * ⚠ **Why this exists, and the bug it closes.** The watcher is started by the stored state —
+     * `autoUnhideEnabled && settingsHidden` — and the hide writes `settingsHidden` *before* it
+     * returns, while [armIfApplied] is called by the launch that asked for the hide, after it. So
+     * the service can start, tick, find `entries` still empty, conclude the session is a **tile**
+     * session (the tile arms nothing), and stop itself — milliseconds before the launch arms its
+     * entry. The log of one failed run reads:
+     *
+     * ```
+     * .477 svc    auto unhide watcher started
+     * .485 unhide settled: session kind not enabled, watched=0 onAppLaunch=true onTile=false
+     * .487 hide   device-wide -> Success
+     * .489 svc    auto unhide watcher stopped
+     * ```
+     *
+     * Nothing was watching the session, so swiping the app away reverted nothing — which is the
+     * author's report, and it presented as "the location row never goes back off". Settling a
+     * session kind is right and stays; what was missing is that a *launch that has just armed an
+     * entry* is its own reason for the watcher to be up.
+     *
+     * ⚠ **Called from [armIfApplied], not from [arm].** IMD+ arms *before* it hides — it has to,
+     * because it wants the entry in place whatever the hide turns out to write — and a watcher
+     * started at that moment would tick with `settingsHidden` still false, clear the entry it was
+     * meant to watch, and stop. IMD+ is served by the stored-state collector instead, which fires
+     * when its hide flips `settingsHidden` and finds the entry already there. Only the three launch
+     * routes arm *after* a hide has landed, and only they need this.
+     *
+     * Installed once by the application, in the same idiom as `Diagnostics.install`: this module
+     * has no Context and cannot start a service, and three call sites are three chances to forget
+     * a fourth.
+     */
+    @Volatile
+    var onArmed: (() -> Unit)? = null
+
+    /**
      * Start watching [packageName], from now.
      *
      * Re-arming a package that is already watched replaces its anchors rather than keeping the
@@ -125,6 +162,12 @@ object AutoUnhideWatch {
             packageName = componentName.substringBefore('/'),
             componentName = componentName.takeIf { memory && !collapsed },
         )
+
+        // ⚠ **After the entry is stored, and only on this path.** A watcher started before the
+        // entry existed would tick an empty map, take the session for a tile press and stop — and
+        // a watcher started before the *hide* (which is where IMD+ arms, in [arm]) would find
+        // `settingsHidden` false and clear the entry it was meant to watch. See [onArmed].
+        runCatching { onArmed?.invoke() }
     }
 
     /**

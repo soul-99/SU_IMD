@@ -97,7 +97,7 @@ flowchart TD
     F -- "Would not start" --> X1["<b>Stop.</b> Nothing was touched"]
     G -- "The write was refused" --> X2["<b>Stop.</b> The Shizuku start is<br/><b>not</b> rolled back"]
 
-    G --> H["Write the remaining targets in<br/><b>HideOrder</b> - the reverse of the<br/>order a revert puts them back"]
+    G --> H["Write the remaining targets in<br/><b>HideOrder</b> - the reverse of the<br/>order a revert puts them back.<br/><b>Location</b> is the one row written<br/><b>on</b> rather than off"]
     H --> I["Stop Shizuku last (logic 5), told<br/>which transports to leave up"]
     I --> J{"A write refused, and<br/>the grant gone?"}
     J -- Yes --> K["<b>Undo everything this run did</b>, in<br/>reverse, then report the loss"]
@@ -116,7 +116,7 @@ flowchart TD
 add("02-revert-default", "Revert to default", """
 flowchart TD
     A["<b>Revert to default</b>, the named function:<br/>its Quick Settings tile · a homescreen shortcut ·<br/>the Settings manager's button · an IMD intent"] --> B["Clear any IMD+ hold, sweep every per-app<br/>memory record, and drop the auto-unhide<br/>and auto-revert watches"]
-    B --> C["<b>Restore the extras first</b> - settings a<br/>profile changed that the six targets<br/>cannot reach"]
+    B --> C["<b>Restore the extras first</b> - settings a<br/>profile changed that the targets this<br/>revert drives cannot reach"]
     C --> D["Read <b>Settings to unhide on Revert</b>"]
 
     D --> E{"Does overlay access<br/>need a write?"}
@@ -127,7 +127,7 @@ flowchart TD
     G -- No --> G1["Record the debt and post<br/><b>Unhide settings failure</b>,<br/>with a <i>Try again</i> button"]
     G -- Yes --> H
 
-    H["Write the ordinary targets in order"] --> I{"Shizuku available -<br/>configured <b>and</b> installed?"}
+    H["Write the ordinary targets in order.<br/><b>Location</b> is driven to its configured<br/>default - <b>off</b> unless it was ticked"] --> I{"Shizuku available -<br/>configured <b>and</b> installed?"}
     I -- "No, or this fork<br/>has no intents" --> L
     I -- Yes --> J["Start or stop it to match what<br/>the configuration asks. A start<br/>that fails is not retried here"]
     J --> K["If it was started, re-settle wireless<br/>debugging - a fork takes it<br/>down on its way up"]

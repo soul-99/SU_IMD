@@ -235,6 +235,7 @@
     <string name="about_contributor_scope">(Estructura inicial de «Mostrar sobre otras apps»)</string>
     <string name="overlay_needs_shizuku_configured">Shizuku debe estar configurado correctamente en los ajustes de IMD antes de poder usar esto</string>
     <string name="revert_defaults_display_over_other_apps">Mostrar sobre otras aplicaciones</string>
+    <string name="revert_defaults_location">Ubicación</string>
     <string name="revert_defaults_overlay_note">solo restaura las aplicaciones que IMD había desactivado; Shizuku debe estar configurado correctamente en los ajustes de IMD</string>
     <string name="settings_to_hide_overlay_note">todas las aplicaciones que ahora pueden mostrarse sobre otras se desactivan temporalmente; Shizuku debe estar configurado correctamente en los ajustes de IMD</string>
     <string name="settings_log_view">Ver registro</string>
@@ -276,6 +277,7 @@
     <string name="system_settings_unavailable">Este dispositivo no tiene pantalla para ese ajuste</string>
     <string name="settings_to_hide_accessibility_note">Solo se gestionan los servicios seleccionados en los ajustes de IMD</string>
     <string name="settings_to_hide_shizuku_note">asegúrate de que Shizuku esté configurado correctamente en los ajustes de IMD (usa el intent de parada), ayuda a evitar el error del watchdog</string>
+    <string name="settings_to_hide_location_note">La ubicación se activa mientras una app está abierta y se restaura al revertir</string>
     <string name="shevery_notice_point_delay">Por eso puede añadir un ligero retraso en IMD para tareas que requieren acceso a Shizuku (como ocultar/mostrar Mostrar sobre otras apps).</string>
     <string name="shizuku_fork_shevery_caution">compatible, pero no recomendado</string>
     <string name="shevery_notice_point_restart">Para reiniciar el servicio de Shevery debes configurar IMD para mostrar de nuevo los ajustes de depuración; el servicio ErrorProtect de Shevery lo iniciará otra vez (comprueba cada 10s)</string>

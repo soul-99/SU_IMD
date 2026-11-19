@@ -236,6 +236,7 @@
     <string name="about_contributor_scope">(Base initiale de l\'affichage par-dessus les autres applications)</string>
     <string name="overlay_needs_shizuku_configured">Shizuku doit être correctement configuré dans les paramètres d\'IMD avant de pouvoir utiliser ceci</string>
     <string name="revert_defaults_display_over_other_apps">Superposition à d\'autres applis</string>
+    <string name="revert_defaults_location">Localisation</string>
     <string name="revert_defaults_overlay_note">ne restaure que les applis qu\'IMD avait désactivées ; Shizuku doit être correctement configuré dans les paramètres d\'IMD</string>
     <string name="settings_to_hide_overlay_note">toutes les applis actuellement autorisées à se superposer aux autres sont temporairement désactivées ; Shizuku doit être correctement configuré dans les paramètres d\'IMD</string>
     <string name="settings_log_view">Voir le journal</string>
@@ -277,6 +278,7 @@
     <string name="system_settings_unavailable">Cet appareil n\'a pas d\'écran pour ce paramètre</string>
     <string name="settings_to_hide_accessibility_note">Seuls les services sélectionnés dans les paramètres d\'IMD sont gérés</string>
     <string name="settings_to_hide_shizuku_note">assurez-vous que Shizuku est correctement configuré dans les paramètres IMD (utilise l\'intent d\'arrêt), aide à éviter l\'erreur du watchdog</string>
+    <string name="settings_to_hide_location_note">La localisation est activée tant qu\'une app est ouverte et rétablie lors du retour</string>
     <string name="shevery_notice_point_delay">Cela peut donc ajouter un léger délai dans IMD pour les tâches nécessitant Shizuku (comme masquer/réafficher « Affichage par-dessus les autres applications »).</string>
     <string name="shizuku_fork_shevery_caution">pris en charge, mais non recommandé</string>
     <string name="shevery_notice_point_restart">Pour redémarrer le service Shevery, vous devez configurer IMD afin de réafficher les paramètres de débogage ; le service ErrorProtect de Shevery le relancera (analyse toutes les 10s)</string>

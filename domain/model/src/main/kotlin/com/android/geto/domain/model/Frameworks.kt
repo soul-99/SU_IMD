@@ -53,7 +53,7 @@ fun unhidingFrameworkFor(notificationFunction: NotificationFunction): UnhidingFr
  *
  * True only for [HidingFramework.PerApp] with [UnhidingFramework.RevertToDefault]: a per-app
  * profile can hide any setting by key, while *Revert to default configuration* drives only the
- * six [ManualRevertTarget]s. Anything the profile hid outside those would be left switched off
+ * [ManualRevertTarget]s. Anything the profile hid outside those would be left switched off
  * with nothing that clears it.
  *
  * It is not a reason to forbid the combination — the author chose to allow all four — it is
@@ -69,10 +69,17 @@ fun strandsSettings(
 /**
  * The recorded settings a Revert to default will **not** drive, and so has to restore itself.
  *
- * A Revert to default drives all six [ManualRevertTarget]s to their configured state — in both
+ * A Revert to default drives every [ManualRevertTarget] to its configured state — in both
  * directions, so a target configured *off* is being driven just as much as one configured on.
- * Only three of them name a global setting key; anything else a per-app profile recorded is
+ * Only the keyed ones name a settings row at all; anything else a per-app profile recorded is
  * outside the revert's reach entirely.
+ *
+ * ⚠ **Every keyed target counts, not only the Global ones.** The set is built from the ids the
+ * revert is going to write, and location is written by it too — in the Secure table, which a
+ * per-app profile can carry a row for just as easily. Leaving it out would restore a profile's
+ * record and then immediately overwrite it with the configured default, which is the exact
+ * double write this function exists to prevent, and it would do it to the one row whose
+ * repertoire is a mode: three values swapped for "off" inside the same revert.
  *
  * ⚠ **This is why the revert does not simply flush every pending revert first.** Flushing and
  * then driving the defaults reaches the same end state, but writes the overlapping settings
@@ -83,7 +90,11 @@ fun strandsSettings(
 fun settingsOutsideRevertDefaults(
     recorded: Map<String, String?>,
 ): Map<String, String?> {
-    val driven = ManualRevertTarget.entries.mapNotNull { it.globalSettingKey }.toSet()
+    val driven = ManualRevertTarget.entries
+        .mapNotNull { target ->
+            target.settingKey?.let { SettingSnapshot.idOf(settingType = target.settingType, key = it) }
+        }
+        .toSet()
 
     return recorded.filterKeys { key -> key !in driven }
 }
@@ -132,21 +143,25 @@ fun hideOwnsRevert(currentValue: String?, valueOnLaunch: String): Boolean =
 /**
  * The device-wide memory record's id for one manual target.
  *
- * The same [SettingSnapshot] encoding the per-app records use, on the Global table, which is
- * where `SetManualTargetUseCase` reads and writes all three keyed targets. Sharing the
+ * The same [SettingSnapshot] encoding the per-app records use, with the target's own table
+ * and key — which is where `SetManualTargetUseCase` writes every keyed target. Sharing the
  * encoding is what lets the device-wide record live in the same `settingStateBefore` map under
  * [AccessibilityServicePlan.DEVICE_WIDE_HOLD] instead of needing a proto field of its own.
+ *
+ * ⚠ **Every keyed target, not only the Global ones**, so location is measured and put back
+ * like the rest: a hide that switched location on has to be able to say what it was before it
+ * did, or the only "before" a revert could use is the configured default.
  */
 fun deviceWideSnapshotId(target: ManualRevertTarget): String? =
-    target.globalSettingKey?.let { key ->
-        SettingSnapshot.idOf(settingType = SettingType.GLOBAL, key = key)
+    target.settingKey?.let { key ->
+        SettingSnapshot.idOf(settingType = target.settingType, key = key)
     }
 
 /**
  * The state a device-wide **memory** revert should drive each target to.
  *
  * Built from what the hide measured rather than from the configured defaults, which is the
- * whole difference between the two unhiding frameworks for a device-wide hide: the three keyed
+ * whole difference between the two unhiding frameworks for a device-wide hide: the keyed
  * targets go back to what was actually there, and a setting the user never had on before the
  * hide stays off afterwards.
  *
@@ -158,6 +173,12 @@ fun deviceWideSnapshotId(target: ManualRevertTarget): String? =
  *
  * A target the record has nothing for is left out too — the revert then leaves it alone, which
  * is the right answer for a setting this hide never switched off.
+ *
+ * ⚠ **That includes an entirely empty record, and the caller has to pass it rather than null.**
+ * `wantedOverride = null` means "drive the configured defaults", which is the *other* framework; an
+ * empty map means "this hide changed nothing measurable, so leave every keyed target alone". A
+ * hide that only touched accessibility services records nothing keyed, and folding that to null is
+ * what would switch location off under somebody who had it on.
  */
 fun deviceWideMemoryWanted(
     recorded: Map<String, String?>,
@@ -169,9 +190,14 @@ fun deviceWideMemoryWanted(
 
         if (id !in recorded) continue
 
-        // Anything that is not exactly "1" was off or unset before the hide, and both mean
-        // the same thing to a revert: do not switch it on.
-        wanted[target] = recorded[id] == "1"
+        // ⚠ **Anything but "off" means it was on, and the pair is the target's own.** For the
+        // Global rows "1" is on and "0" is off, which is what this always compared; location
+        // records 3/0, and comparing against a literal "1" would have read a device left on
+        // high accuracy as having been off before the hide - so the revert would switch off a
+        // setting the user had on before IMD ever touched it.
+        val value = recorded[id]
+
+        wanted[target] = value != null && value != target.valueOff
     }
 
     return wanted
@@ -210,7 +236,7 @@ fun manualChangeRecord(
 
     return SettingSnapshot.merge(
         existing = existing,
-        measured = mapOf(id to if (currentlyEnabled) "1" else "0"),
+        measured = mapOf(id to if (currentlyEnabled) target.valueOn else target.valueOff),
     )
 }
 

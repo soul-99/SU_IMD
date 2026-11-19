@@ -101,12 +101,22 @@ class RevertToDefaultRunner @Inject constructor(
 
             // Read inside the try, after cancelAll, so a record cleared by something else
             // in the meantime cannot have this drive a stale destination.
+            //
+            // ⚠ **An empty record is the answer "this hide changed nothing keyed", not "use the
+            // configured defaults".** It used to be folded to null on the reasoning that an empty
+            // destination has nothing to say — but null means "drive every target to its
+            // configured state", and since Location became a target that is a setting switched
+            // off on somebody who had it on before the hide: a hide that only touched
+            // accessibility services records no keyed target, so the record is empty and a null
+            // override would drive Location to its default of off. Passing the empty map through
+            // keeps `wantedOverride != null`, which already means "leave every keyed target the
+            // record says nothing about exactly as it is".
             val wantedOverride = if (fromMemory) {
                 deviceWideMemoryWanted(
                     recorded = userDataRepository.userData.first()
                         .settingStateBefore[AccessibilityServicePlan.DEVICE_WIDE_HOLD]
                         .orEmpty(),
-                ).takeIf { it.isNotEmpty() }
+                )
             } else {
                 null
             }

@@ -22,7 +22,7 @@ flowchart TD
     F -- "Would not start" --> X1["<b>Stop.</b> Nothing was touched"]
     G -- "The write was refused" --> X2["<b>Stop.</b> The Shizuku start is<br/><b>not</b> rolled back"]
 
-    G --> H["Write the remaining targets in<br/><b>HideOrder</b> - the reverse of the<br/>order a revert puts them back"]
+    G --> H["Write the remaining targets in<br/><b>HideOrder</b> - the reverse of the<br/>order a revert puts them back.<br/><b>Location</b> is the one row written<br/><b>on</b> rather than off"]
     H --> I["Stop Shizuku last (logic 5), told<br/>which transports to leave up"]
     I --> J{"A write refused, and<br/>the grant gone?"}
     J -- Yes --> K["<b>Undo everything this run did</b>, in<br/>reverse, then report the loss"]

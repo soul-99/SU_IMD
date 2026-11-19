@@ -302,16 +302,21 @@ class ApplySettingsToHideUseCase @Inject constructor(
 
             if (wanted[target] != true) continue
 
-            // Already off. Writing it again is not harmless: for the accessibility
+            // ⚠ **Off for every target but one.** Location's hidden state is *on*: the app being
+            // opened is the reason it is wanted, and this is the moment it is in front. Asking
+            // the target rather than spelling `false` here is what keeps the loop one loop.
+            val hidden = target.stateWhileHidden
+
+            // Already there. Writing it again is not harmless: for the accessibility
             // services target a second disable would record a fresh hold over services
             // that are already held, and nothing would ever discharge the duplicate.
             if (target != ManualRevertTarget.AccessibilityServices &&
-                !before.isEnabled(target)
+                before.isEnabled(target) == hidden
             ) {
                 continue
             }
 
-            if (setManualTargetUseCase(target = target, enabled = false)) {
+            if (setManualTargetUseCase(target = target, enabled = hidden)) {
                 switchedOffHere += target
 
                 continue
@@ -387,14 +392,17 @@ class ApplySettingsToHideUseCase @Inject constructor(
 
             if (id in existing) continue
 
-            // ⚠ **The first-owner rule**, in its device-wide shape. A device-wide hide always
-            // drives its targets off, so "not already at the value about to be written" reads
-            // here as "not already off" — and a target that is already off is one somebody else
-            // is holding down, or one the user never had on. Either way this hide does not owe
-            // putting it back. See `hideOwnsRevert`.
-            if (!before.isEnabled(target)) continue
+            // ⚠ **The first-owner rule**, in its device-wide shape. A device-wide hide drives
+            // its targets to `stateWhileHidden`, so "not already at the value about to be
+            // written" reads here as "not already there" — and a target that is already there
+            // is one somebody else is holding, or one the user never had the other way. Either
+            // way this hide does not owe putting it back. See `hideOwnsRevert`.
+            if (before.isEnabled(target) == target.stateWhileHidden) continue
 
-            measured[id] = "1"
+            // The value it really holds, in the target's own vocabulary: "1"/"0" for the
+            // Global flags and a location mode for location. Written as a constant "1" it
+            // would have a memory revert restore a working GPS as sensors-only.
+            measured[id] = if (before.isEnabled(target)) target.valueOn else target.valueOff
         }
 
         if (measured.isEmpty()) return
@@ -453,7 +461,12 @@ class ApplySettingsToHideUseCase @Inject constructor(
         for (target in SettingsToHide.HideOrder.reversed()) {
             if (target !in switchedOffHere) continue
 
-            runCatching { setManualTargetUseCase(target = target, enabled = true) }
+            // Back to the state this run found, which for location is off — it is the one
+            // target a hide switches *on*, and leaving it on after a hide that never opened
+            // the app would be the opposite of undoing it.
+            runCatching {
+                setManualTargetUseCase(target = target, enabled = !target.stateWhileHidden)
+            }
         }
 
         // Before the overlay, not after: withdrawing it went through Shizuku, so putting it

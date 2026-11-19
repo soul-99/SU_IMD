@@ -328,6 +328,22 @@ internal fun RevertDefaultsDialog(
             },
             onCheckedChange = { toggle(ManualRevertTarget.DisplayOverOtherApps, it) },
         )
+
+        // ⚠ **The row that is on for a reason rather than off for one.** Everything above is a
+        // setting IMD switches off while a restrictive app is in front and puts back on the way
+        // out; location is the reverse — plenty of those apps refuse to run without it, and the
+        // usual reason to switch it on is a launch that is about to happen. So this row answers
+        // "is location on when the session ends", it is off on a fresh install, and a revert
+        // therefore switches location off. A user who keeps location on all day ticks it here
+        // once and every revert leaves it alone.
+        //
+        // No note and no greying: unlike the rows above it depends on nothing — not Shizuku, not
+        // a selection made elsewhere, not the fork in use.
+        RevertDefaultRow(
+            label = stringResource(R.string.revert_defaults_location),
+            checked = draft[ManualRevertTarget.Location] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.Location, it) },
+        )
     }
 }
 

@@ -239,6 +239,7 @@
     <string name="about_contributor_scope">（“显示在其他应用上层”的初始框架）</string>
     <string name="overlay_needs_shizuku_configured">使用此功能前，必须在 IMD 设置中正确配置 Shizuku</string>
     <string name="revert_defaults_display_over_other_apps">显示在其他应用的上层</string>
+    <string name="revert_defaults_location">位置信息</string>
     <string name="revert_defaults_overlay_note">仅恢复 IMD 先前停用的应用；必须在 IMD 设置中正确配置 Shizuku</string>
     <string name="settings_to_hide_overlay_note">当前允许显示在其他应用上层的所有应用都会被临时停用；必须在 IMD 设置中正确配置 Shizuku</string>
     <string name="settings_log_view">查看日志</string>
@@ -280,6 +281,7 @@
     <string name="system_settings_unavailable">此设备没有该设置的页面</string>
     <string name="settings_to_hide_accessibility_note">仅管理在 IMD 设置中选择的服务</string>
     <string name="settings_to_hide_shizuku_note">请确保已在 IMD 设置中正确配置 Shizuku（使用停止 intent），有助于避免 watchdog 错误</string>
+    <string name="settings_to_hide_location_note">应用打开期间会开启位置信息，撤销时恢复原状</string>
     <string name="shevery_notice_point_delay">因此在 IMD 中执行需要 Shizuku 权限的操作（如隐藏/取消隐藏「显示在其他应用上层」）时可能略有延迟。</string>
     <string name="shizuku_fork_shevery_caution">支持，但不推荐</string>
     <string name="shevery_notice_point_restart">要重新启动 Shevery 服务，需要将 IMD 配置为取消隐藏调试设置，Shevery 的 ErrorProtect 服务会再次启动它（每 10 秒扫描一次）</string>
