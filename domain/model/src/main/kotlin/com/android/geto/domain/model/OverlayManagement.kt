@@ -97,6 +97,18 @@ fun UserData.canHide(target: ManualRevertTarget): Boolean = when (target) {
 
     ManualRevertTarget.Shizuku -> manageShizukuEffective && shizukuForkMode.supportsIntents
 
+    /**
+     * ⚠ **Yes for location, and this is the row the inverted one is ticked for.** Every other
+     * refusal here is "not configured yet"; this one asks whether the hide would do what the
+     * user ticked, and for location that is switching it **on** for the length of a session -
+     * a great many banks and payment apps refuse to run without a position, and the point of
+     * the row is not to have to leave the app to grant one.
+     *
+     * Nothing gates it: unlike Shizuku, overlay access and accessibility services it depends on
+     * no service and no selection, so it can always do what it says.
+     */
+    ManualRevertTarget.Location -> true
+
     ManualRevertTarget.DeveloperSettings,
     ManualRevertTarget.UsbDebugging,
     ManualRevertTarget.WirelessDebugging,

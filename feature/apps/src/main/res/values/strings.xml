@@ -106,6 +106,7 @@
     <string name="revert_accessibility">Accessibility services</string>
     <string name="revert_shizuku">Shizuku service</string>
     <string name="revert_display_over_other_apps">Display over other apps</string>
+    <string name="revert_location">Location</string>
     <string name="applied_settings_no_permission">Grant WRITE_SECURE_SETTINGS first — see the setup screen</string>
     <string name="settings_manager_shizuku_failed">Failed to start shizuku service on last attempt, please check shizuku app settings and IMD shizuku configuration</string>
     <string name="settings_manager_shizuku_failed_open">Why the Shizuku service did not start</string>

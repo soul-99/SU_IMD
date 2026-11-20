@@ -392,6 +392,22 @@ fun SettingsToHideDialog(
             onCheckedChange = { toggle(ManualRevertTarget.DisplayOverOtherApps, it) },
         )
 
+        // ⚠ **The one row here that is ticked to switch something ON.** A hide drives every
+        // target in this list to its hidden state; for five of them that is "off" and for
+        // location it is "on", because the apps this list exists for are the ones that refuse
+        // to run without a position. The note says so in words, since a list headed "settings
+        // to hide" with a row that turns something on is otherwise a puzzle.
+        //
+        // Off on a fresh install like everything else here: this app does not switch a location
+        // service on for somebody who has not asked for it, and [Location] is already useful as
+        // a plain switch in the settings manager without it.
+        SettingToHideRow(
+            label = stringResource(R.string.revert_defaults_location),
+            note = stringResource(R.string.settings_to_hide_location_note),
+            checked = draft[ManualRevertTarget.Location] == true,
+            onCheckedChange = { toggle(ManualRevertTarget.Location, it) },
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
 
         // ⚠ **Two of the four survive, and the watchdog one is not among them.** The

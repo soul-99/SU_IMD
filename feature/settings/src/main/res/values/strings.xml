@@ -306,6 +306,7 @@
     <string name="settings_to_hide_info_per_app">If you want to hide different settings per individual app, please use memory function in IMD settings &gt; Advanced &gt; Notification function</string>
     <string name="settings_to_hide_info_all">Hiding only developer settings does not turn off USB and wireless debugging, and some apps might still detect that as developer settings turned on, so it is recommended to select all three</string>
     <string name="settings_to_hide_shizuku_note">ensure Shizuku values are properly configured in IMD settings</string>
+    <string name="settings_to_hide_location_note">Location is switched on while an app is open, and put back to how it was when you revert</string>
     <string name="settings_to_hide_info_shizuku">to hide Shizuku application (not service) use the Hide Shizuku from other apps function within the Shizuku app.</string>
     <string name="settings_to_hide_name_shizuku_hide">Hide Shizuku from other apps</string>
     <string name="settings_to_hide_info_watchdog">It is recommended to keep Shizuku\'s watchdog service off as if Shizuku restarts in the background it will also turn on ADB, when settings are hidden and your apps might be able to detect that.</string>
@@ -344,6 +345,7 @@
     <string name="revert_defaults_shevery">Shevery service</string>
     <string name="revert_defaults_shizuku_note">Depending on which method Shizuku uses to keep service alive, it will enable/disable USB or wireless debugging.</string>
     <string name="revert_defaults_display_over_other_apps">Display over other apps</string>
+    <string name="revert_defaults_location">Location</string>
     <string name="revert_defaults_overlay_note">Only apps selected in IMD settings</string>
     <string name="overlay_needs_shizuku_configured">Shizuku must be configured properly in IMD settings before this can be used</string>
 

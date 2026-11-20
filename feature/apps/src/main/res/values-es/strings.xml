@@ -95,6 +95,7 @@
     <string name="overlay_failure_point_configuration">Revisa tu configuración de Shizuku en los ajustes de la aplicación IMD</string>
     <string name="shizuku_starting_to_hide_overlay">Iniciando el servicio Shizuku para ocultar el permiso Mostrar sobre otras aplicaciones</string>
     <string name="revert_display_over_other_apps">Mostrar sobre otras aplicaciones</string>
+    <string name="revert_location">Ubicación</string>
     <string name="settings_manager_overlay_restore_failed">No se ha podido restaurar el permiso Mostrar sobre otras aplicaciones con Shizuku. Inicia el servicio Shizuku manualmente desde la aplicación Shizuku e inténtalo de nuevo</string>
     <string name="settings_manager_overlay_restore_failed_open">Por qué no se restauró Mostrar sobre otras aplicaciones</string>
     <string name="shizuku_starting_to_restore_overlay">Iniciando el servicio Shizuku para restaurar el permiso Mostrar sobre otras aplicaciones</string>

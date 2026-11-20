@@ -234,6 +234,7 @@
     <string name="about_contributor_scope">（「他のアプリの上に重ねて表示」の初期フレームワーク）</string>
     <string name="overlay_needs_shizuku_configured">これを使用するには、IMD の設定で Shizuku が正しく構成されている必要があります</string>
     <string name="revert_defaults_display_over_other_apps">他のアプリの上に重ねて表示</string>
+    <string name="revert_defaults_location">位置情報</string>
     <string name="revert_defaults_overlay_note">IMD が以前に無効にしたアプリのみを復元します。IMD の設定で Shizuku が正しく構成されている必要があります</string>
     <string name="settings_to_hide_overlay_note">現在他のアプリの上に表示することが許可されているすべてのアプリが一時的に無効になります。IMD の設定で Shizuku が正しく構成されている必要があります</string>
     <string name="settings_log_view">ログを表示</string>
@@ -275,6 +276,7 @@
     <string name="system_settings_unavailable">この端末にはその設定の画面がありません</string>
     <string name="settings_to_hide_accessibility_note">IMD の設定で選択したサービスのみが管理されます</string>
     <string name="settings_to_hide_shizuku_note">IMD の設定で Shizuku が正しく構成されていることを確認してください（停止インテントを使用します）。watchdog エラーの回避に役立ちます</string>
+    <string name="settings_to_hide_location_note">アプリを開いている間は位置情報がオンになり、元に戻すと元の状態に戻ります</string>
     <string name="shevery_notice_point_delay">そのため、Shizuku を必要とする操作（「他のアプリの上に重ねて表示」の非表示・再表示など）で IMD に多少の遅延が生じる場合があります。</string>
     <string name="shizuku_fork_shevery_caution">対応していますが、推奨されません</string>
     <string name="shevery_notice_point_restart">Shevery のサービスを再起動するには、IMD がデバッグ設定を再表示するよう構成する必要があります。Shevery の ErrorProtect サービスが再び起動します（10 秒ごとに確認）</string>

@@ -56,6 +56,11 @@ object SettingsToHide {
         ManualRevertTarget.AccessibilityServices,
         ManualRevertTarget.Shizuku,
         ManualRevertTarget.DisplayOverOtherApps,
+        // ⚠ **The one row that is not switched off on the way in.** A hide drives every target
+        // to [ManualRevertTarget.stateWhileHidden]; five of them that is "off" and for location
+        // it is "on". Its row in the dialog says so, and `HideOrder` puts it first on the way
+        // in because a position is what the app being opened wants first.
+        ManualRevertTarget.Location,
     )
 
     /**
@@ -87,7 +92,14 @@ object SettingsToHide {
      * changes again. Nothing reads this except that migration.
      */
     val LegacyDefault: Map<ManualRevertTarget, Boolean> = Targets.associateWith {
-        it != ManualRevertTarget.DisplayOverOtherApps && it != ManualRevertTarget.Shizuku
+        it != ManualRevertTarget.DisplayOverOtherApps &&
+            it != ManualRevertTarget.Shizuku &&
+            // ⚠ **And off for location, whatever the "four settings" above say.** This map is
+            // what an upgrading install is written as, so a true here would switch location on
+            // the next time somebody opens an app from a build they never configured it in — a
+            // privileged change nobody asked for, on the one row where being wrong is visible
+            // in the status bar.
+            it != ManualRevertTarget.Location
     }
 
     /**

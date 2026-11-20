@@ -116,6 +116,7 @@ private fun ManualRevertTarget.rowPosition(isShevery: Boolean): Int = if (isShev
         ManualRevertTarget.AccessibilityServices -> 3
         ManualRevertTarget.Shizuku -> 4
         ManualRevertTarget.DisplayOverOtherApps -> 5
+        ManualRevertTarget.Location -> 6
     }
 } else {
     // And his Shizuku order, flat.
@@ -126,6 +127,7 @@ private fun ManualRevertTarget.rowPosition(isShevery: Boolean): Int = if (isShev
         ManualRevertTarget.Shizuku -> 3
         ManualRevertTarget.AccessibilityServices -> 4
         ManualRevertTarget.DisplayOverOtherApps -> 5
+        ManualRevertTarget.Location -> 6
     }
 }
 
@@ -1929,14 +1931,15 @@ private val ManualRevertTarget.usesDebuggingTransport: Boolean
         this == ManualRevertTarget.UsbDebugging ||
         this == ManualRevertTarget.WirelessDebugging
 
-/** The three rows that have a system screen or an app behind them. */
+/** The rows that have a system screen or an app behind them. */
 private val ManualRevertTarget.opensSomewhere: Boolean
     get() = this == ManualRevertTarget.DeveloperSettings ||
         this == ManualRevertTarget.UsbDebugging ||
         this == ManualRevertTarget.WirelessDebugging ||
         this == ManualRevertTarget.AccessibilityServices ||
         this == ManualRevertTarget.DisplayOverOtherApps ||
-        this == ManualRevertTarget.Shizuku
+        this == ManualRevertTarget.Shizuku ||
+        this == ManualRevertTarget.Location
 
 @Composable
 internal fun ManualRevertTarget.getTitle(isShevery: Boolean = false): String = when (this) {
@@ -1950,6 +1953,9 @@ internal fun ManualRevertTarget.getTitle(isShevery: Boolean = false): String = w
         if (isShevery) R.string.revert_shevery else R.string.revert_shizuku,
     )
     ManualRevertTarget.DisplayOverOtherApps -> stringResource(R.string.revert_display_over_other_apps)
+    // The arrow out goes to Android's own location screen, which is where the switch's other
+    // half lives: app permissions, scanning, and which apps asked recently.
+    ManualRevertTarget.Location -> stringResource(R.string.revert_location)
 }
 
 /**

@@ -30,6 +30,7 @@ import com.android.geto.broadcastreceiver.DiagnosticStateReporter
 import com.android.geto.activity.hide.DrawerShortcuts
 import com.android.geto.common.AppLocale
 import com.android.geto.common.ApplicationScope
+import com.android.geto.common.AutoUnhideWatch
 import com.android.geto.diagnostics.DefaultDiagnosticLogStore
 import com.android.geto.domain.common.Diagnostics
 import com.android.geto.domain.common.IconStyleState
@@ -49,8 +50,10 @@ import com.android.geto.domain.usecase.SettingsWorkTracker
 import com.android.geto.framework.notificationmanager.AndroidNotificationManagerWrapper
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -59,6 +62,17 @@ import com.android.geto.framework.notificationmanager.R as notificationR
 
 @HiltAndroidApp
 class GetoApplication : Application() {
+    /**
+     * The stored auto unhide switch, or null until it has been read once.
+     *
+     * ⚠ **Nullable on purpose.** The arm hook below runs on a launch that is part-way through
+     * changing the device, and a launch can beat the first datastore read — a cold start with a
+     * shortcut is the ordinary case. A default of `false` there would make the hook silently do
+     * nothing on exactly the run it exists for, so the hook waits for the first real answer
+     * instead of reading a guess.
+     */
+    private val autoUnhideEnabled = MutableStateFlow<Boolean?>(null)
+
     @Inject
     lateinit var notificationManagerWrapper: AndroidNotificationManagerWrapper
 
@@ -207,6 +221,25 @@ class GetoApplication : Application() {
         // - there is no thread, no timer and no service behind it.
         Diagnostics.install(sink = diagnosticLogStore)
 
+        // ⚠ **The other half of the watcher's start rule.** The collector below starts the
+        // service when the stored state says something is hidden *and* the feature is on, which
+        // is right — but the service can get there before the launch that armed the watch entry,
+        // tick an empty map, take the session for a tile press and shut itself down. Arming an
+        // entry after a hide is therefore its own reason to make sure the watcher is up; see
+        // AutoUnhideWatch.onArmed, which carries the log of the run that found this.
+        //
+        // Suspends on the first read rather than reading a mirror: the hook can run before the
+        // datastore has been asked, and answering "off" there would leave the session unwatched.
+        // Gated on the stored switch so a device with auto unhide off never starts the service —
+        // a start that only stops itself is still a notification and a wake-up.
+        AutoUnhideWatch.onArmed = {
+            appScope.launch {
+                if (autoUnhideEnabled.filterNotNull().first()) {
+                    AutoUnhideService.start(this@GetoApplication)
+                }
+            }
+        }
+
         appScope.launch {
             userDataRepository.userData
                 .map { it.diagnosticsEnabled }
@@ -295,6 +328,15 @@ class GetoApplication : Application() {
                         AutoUnhideService.stop(this@GetoApplication)
                     }
                 }
+        }
+
+        // Read by the arm hook above, which runs on whichever thread armed the entry and must
+        // not wait on the repository to answer.
+        appScope.launch {
+            userDataRepository.userData
+                .map { it.autoUnhideEnabled }
+                .distinctUntilChanged()
+                .collect { enabled -> autoUnhideEnabled.value = enabled }
         }
 
         // ⚠ **Telling the system the Hide settings tile has something new to say.**

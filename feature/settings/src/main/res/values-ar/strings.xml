@@ -247,6 +247,7 @@
     <string name="about_contributor_scope">‏(الإطار الأولي لميزة العرض فوق التطبيقات الأخرى)</string>
     <string name="overlay_needs_shizuku_configured">يجب إعداد Shizuku بشكل صحيح في إعدادات IMD قبل إمكانية استخدام هذا</string>
     <string name="revert_defaults_display_over_other_apps">العرض فوق التطبيقات الأخرى</string>
+    <string name="revert_defaults_location">الموقع</string>
     <string name="revert_defaults_overlay_note">يستعيد فقط التطبيقات التي سبق أن عطّلها IMD؛ يجب إعداد Shizuku بشكل صحيح في إعدادات IMD</string>
     <string name="settings_to_hide_overlay_note">يتم تعطيل كل التطبيقات المسموح لها حاليًا بالعرض فوق التطبيقات الأخرى مؤقتًا؛ يجب إعداد Shizuku بشكل صحيح في إعدادات IMD</string>
     <string name="settings_log_view">عرض السجل</string>
@@ -288,6 +289,7 @@
     <string name="system_settings_unavailable">لا تتوفر في هذا الجهاز شاشة لهذا الإعداد</string>
     <string name="settings_to_hide_accessibility_note">تُدار الخدمات المحددة في إعدادات IMD فقط</string>
     <string name="settings_to_hide_shizuku_note">تأكد من ضبط Shizuku بشكل صحيح في إعدادات IMD (يستخدم أمر الإيقاف)، يساعد على تجنب خطأ خدمة المراقبة</string>
+    <string name="settings_to_hide_location_note">يتم تشغيل الموقع أثناء فتح أحد التطبيقات، ويُعاد إلى حالته السابقة عند الرجوع</string>
     <string name="shevery_notice_point_delay">لذا قد يضيف ذلك تأخيرًا بسيطًا داخل IMD للمهام التي تتطلب وصول Shizuku (مثل إخفاء/إظهار العرض فوق التطبيقات الأخرى).</string>
     <string name="shizuku_fork_shevery_caution">مدعوم، لكن غير مُوصى به</string>
     <string name="shevery_notice_point_restart">لإعادة تشغيل خدمة Shevery عليك ضبط IMD لإظهار إعدادات التصحيح، وستقوم خدمة ErrorProtect بتشغيلها مجددًا (تفحص كل 10 ثوانٍ)</string>

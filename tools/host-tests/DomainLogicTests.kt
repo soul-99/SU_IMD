@@ -841,7 +841,7 @@ private fun appListOrderingTests() {
 private fun manualRevertTests() {
     checkEquals(
         "default selection is every target",
-        6,
+        7,
         ManualRevertTarget.Default.size,
     )
     checkEquals(
@@ -856,7 +856,37 @@ private fun manualRevertTests() {
             ManualRevertTarget.Shizuku,
             ManualRevertTarget.DisplayOverOtherApps,
         ),
-        ManualRevertTarget.entries.filter { it.globalSettingKey == null },
+        ManualRevertTarget.entries.filter { it.settingKey == null },
+    )
+
+    // 37b. Location, which is neither of the two kinds above: one settings row, in the Secure
+    // table, holding a *mode* rather than a flag. All three facts are load-bearing - the table
+    // because `settings put global location_mode` writes a row nothing reads, and the pair
+    // because "1" would mean sensors-only and `== "1"` would report a working GPS as off.
+    checkEquals(
+        "location is the one target in the Secure table",
+        listOf(ManualRevertTarget.Location),
+        ManualRevertTarget.entries.filter { it.settingType == SettingType.SECURE },
+    )
+    checkEquals(
+        "and its key is Android's own mode row",
+        "location_mode",
+        ManualRevertTarget.Location.settingKey,
+    )
+    check(
+        "location writes high accuracy on and zero off",
+        ManualRevertTarget.Location.valueOn == "3" &&
+            ManualRevertTarget.Location.valueOff == "0",
+    )
+    check(
+        "location has a key but is not a Global row",
+        ManualRevertTarget.Location.globalSettingKey == null,
+    )
+    check(
+        "every other target still writes the flag pair",
+        ManualRevertTarget.entries.filterNot { it == ManualRevertTarget.Location }.all {
+            it.valueOn == "1" && it.valueOff == "0"
+        },
     )
 
     val some = setOf(ManualRevertTarget.UsbDebugging, ManualRevertTarget.Shizuku)
@@ -1493,6 +1523,7 @@ private fun revertDefaultsTests() {
         ManualRevertTarget.AccessibilityServices to true,
         ManualRevertTarget.Shizuku to false,
         ManualRevertTarget.DisplayOverOtherApps to true,
+        ManualRevertTarget.Location to false,
     )
     checkEquals(
         "encode writes one entry per target",
@@ -1544,7 +1575,8 @@ private fun revertDefaultsTests() {
     checkEquals(
         "the encoding has no cross-target rule left to enforce",
         listOf("DeveloperSettings=0", "UsbDebugging=1", "WirelessDebugging=0",
-               "AccessibilityServices=1", "Shizuku=0", "DisplayOverOtherApps=1"),
+               "AccessibilityServices=1", "Shizuku=0", "DisplayOverOtherApps=1",
+               "Location=0"),
         RevertDefaults.encode(
             mapOf(
                 ManualRevertTarget.DeveloperSettings to false,
@@ -1553,6 +1585,7 @@ private fun revertDefaultsTests() {
                 ManualRevertTarget.AccessibilityServices to true,
                 ManualRevertTarget.Shizuku to false,
                 ManualRevertTarget.DisplayOverOtherApps to true,
+                ManualRevertTarget.Location to false,
             ),
         ),
     )
@@ -1566,6 +1599,7 @@ private fun revertDefaultsTests() {
         ManualRevertTarget.AccessibilityServices to false,
         ManualRevertTarget.Shizuku to true,
         ManualRevertTarget.DisplayOverOtherApps to true,
+        ManualRevertTarget.Location to false,
     )
     checkEquals(
         "Shizuku on with USB debugging off round-trips",
@@ -1603,7 +1637,25 @@ private fun settingsToHideTests() {
         "Shizuku is one of the targets",
         ManualRevertTarget.Shizuku in SettingsToHide.Targets,
     )
-    checkEquals("there are exactly six targets", 6, SettingsToHide.Targets.size)
+    checkEquals("there are exactly seven targets", 7, SettingsToHide.Targets.size)
+    // 51b. Location is a hide target whose hidden state is **on**, which is what makes "switch
+    // location on when one of my selected apps opens" a tick in this dialog rather than a
+    // second configuration with its own defaults, migration and dialog.
+    check(
+        "location is hidden by being switched on",
+        ManualRevertTarget.Location in SettingsToHide.Targets &&
+            ManualRevertTarget.Location.stateWhileHidden &&
+            SettingsToHide.HideOrder.first() == ManualRevertTarget.Location,
+    )
+    check(
+        "and every other target is hidden by being switched off",
+        SettingsToHide.Targets.filterNot { it == ManualRevertTarget.Location }
+            .none { it.stateWhileHidden },
+    )
+    check(
+        "an upgrading install is not handed a location service it never asked for",
+        SettingsToHide.LegacyDefault[ManualRevertTarget.Location] == false,
+    )
     checkEquals(
         "Shizuku sits between accessibility services and overlay access",
         listOf(
@@ -1611,7 +1663,17 @@ private fun settingsToHideTests() {
             ManualRevertTarget.Shizuku,
             ManualRevertTarget.DisplayOverOtherApps,
         ),
-        SettingsToHide.Targets.takeLast(3),
+        SettingsToHide.Targets.filter {
+            it != ManualRevertTarget.DeveloperSettings &&
+                it != ManualRevertTarget.UsbDebugging &&
+                it != ManualRevertTarget.WirelessDebugging &&
+                it != ManualRevertTarget.Location
+        },
+    )
+    checkEquals(
+        "and location is listed last, so it is switched on first",
+        ManualRevertTarget.Location,
+        SettingsToHide.Targets.last(),
     )
 
     // 52. Nothing is hidden by default, as of v2.1: an install nobody has configured must
@@ -1679,6 +1741,7 @@ private fun settingsToHideTests() {
         ManualRevertTarget.AccessibilityServices to false,
         ManualRevertTarget.Shizuku to true,
         ManualRevertTarget.DisplayOverOtherApps to true,
+        ManualRevertTarget.Location to true,
     )
     checkEquals(
         "encode writes one entry per target",
@@ -1743,6 +1806,8 @@ private fun settingsToHideTests() {
     // the migration cannot disagree about what this install has been hiding all along.
     checkEquals(
         "an upgrading install that never configured reads the legacy default",
+        // The one addition is Location, which the legacy map predates and which is off there
+        // on purpose - see SettingsToHide.LegacyDefault.
         SettingsToHide.LegacyDefault,
         userData(
             ShizukuForkMode.Thedjchi,
@@ -1976,6 +2041,19 @@ private fun overlayMarkerVisibilityTests() {
     check(
         "an ordinary key names none",
         manualTargetForKey(key = "screen_brightness") == null,
+    )
+
+    // 65b. `location_mode` stays an ordinary row, even though it is now a managed target.
+    //
+    // ⚠ **Two different questions, deliberately answered differently.** This maps a per-app
+    // *profile* row to a manual target, and a profile writing `location_mode = "0"` is a profile
+    // switching location off — the opposite of what the managed row does, whose hidden state is
+    // *on*. Mapping it would have IMD+ treat "this profile turns location off" as coverage for a
+    // device-wide hide that turns location on, and skip its own write. Left unmapped, a profile
+    // row is written like any other Secure key and the IMD+ gate keeps its existing meaning.
+    check(
+        "a profile's location row is an ordinary key, not a manual target",
+        manualTargetForKey(key = AppSettingKeys.LOCATION_MODE) == null,
     )
 }
 
@@ -3129,13 +3207,22 @@ private fun frameworkSplitTests() {
 
     // The three keys a Revert to default drives are exactly the ones it must not be handed
     // back from memory afterwards — that is the double write, and adb_enabled is one of them.
+    //
+    // ⚠ **Ids, not bare keys.** The map this filters in production is a per-app record, whose
+    // keys are `SettingSnapshot.idOf` ids; a test written against bare keys passes whatever
+    // the filter does, which is how the filter came to compare two key spaces in the first
+    // place. Location's id is in the same set for the same reason: the revert drives it.
     check(
-        "the three driven keys are excluded from the extras",
+        "the driven keys are excluded from the extras",
         settingsOutsideRevertDefaults(
             mapOf(
-                AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED to "1",
-                AppSettingKeys.ADB_ENABLED to "1",
-                AppSettingKeys.ADB_WIFI_ENABLED to "1",
+                SettingSnapshot.idOf(
+                    SettingType.GLOBAL,
+                    AppSettingKeys.DEVELOPMENT_SETTINGS_ENABLED,
+                ) to "1",
+                SettingSnapshot.idOf(SettingType.GLOBAL, AppSettingKeys.ADB_ENABLED) to "1",
+                SettingSnapshot.idOf(SettingType.GLOBAL, AppSettingKeys.ADB_WIFI_ENABLED) to "1",
+                SettingSnapshot.idOf(SettingType.SECURE, AppSettingKeys.LOCATION_MODE) to "3",
             ),
         ).isEmpty(),
     )
@@ -3144,18 +3231,23 @@ private fun frameworkSplitTests() {
         "a setting the defaults cannot reach is kept",
         settingsOutsideRevertDefaults(
             mapOf(
-                AppSettingKeys.ADB_ENABLED to "1",
-                "some_other_secure_setting" to "0",
+                SettingSnapshot.idOf(SettingType.GLOBAL, AppSettingKeys.ADB_ENABLED) to "1",
+                SettingSnapshot.idOf(SettingType.SECURE, "some_other_secure_setting") to "0",
             ),
-        ) == mapOf<String, String?>("some_other_secure_setting" to "0"),
+        ) == mapOf<String, String?>(
+            SettingSnapshot.idOf(SettingType.SECURE, "some_other_secure_setting") to "0",
+        ),
     )
 
     // A target configured off is still driven off, so its key stays out of the extras
     // whatever the configuration says — the filter is on the key, not on the toggle.
     check(
         "the filter does not depend on how the defaults are configured",
-        settingsOutsideRevertDefaults(mapOf(AppSettingKeys.ADB_WIFI_ENABLED to null))
-            .isEmpty(),
+        settingsOutsideRevertDefaults(
+            mapOf(
+                SettingSnapshot.idOf(SettingType.GLOBAL, AppSettingKeys.ADB_WIFI_ENABLED) to null,
+            ),
+        ).isEmpty(),
     )
 
     check(
@@ -3442,8 +3534,20 @@ private fun frameworkSplitTests() {
     )
 
     check(
-        "on: wireless debugging last, after the Shizuku start that moves it",
-        pillOn.last() == ManualRevertTarget.WirelessDebugging,
+        "on: wireless debugging after the Shizuku start that moves it",
+        pillOn.indexOf(ManualRevertTarget.WirelessDebugging) >
+            pillOn.indexOf(ManualRevertTarget.Shizuku),
+    )
+
+    check(
+        "on: and last of the rows with an order to keep",
+        pillOn.filterNot { it == ManualRevertTarget.Location }.last() ==
+            ManualRevertTarget.WirelessDebugging,
+    )
+
+    check(
+        "on: location after everything, since nothing depends on it either way",
+        pillOn.last() == ManualRevertTarget.Location,
     )
 
     check("off is exactly the reverse of on", pillOff == pillOn.reversed())
@@ -3569,6 +3673,7 @@ fun main() {
     frameworkSplitTests()
     memoryRevertCoverageTests()
     firstOwnerTests()
+    locationTargetTests()
     hideGateTests()
 
     println("passed: $passed")
@@ -3671,6 +3776,29 @@ private fun memoryRevertCoverageTests() {
         "an explicit revert still drives the configured defaults",
         destination(defaults = defaults, override = null) == defaults,
     )
+
+    // 58b. An **empty** memory record is a real answer, and the difference between it and null is
+    // a setting the user keeps on. `RevertToDefaultRunner` used to fold an empty record to null on
+    // the reasoning that an empty destination has nothing to say — but null means "drive the
+    // configured defaults", so a hide that recorded nothing keyed (only accessibility services,
+    // say) switched location off under a user who had it on before the hide. Passing the empty
+    // map keeps the "leave every keyed target alone" branch and still drives the unkeyed ones.
+    val fromEmpty = destination(defaults = defaults, override = emptyMap())
+
+    check(
+        "an empty memory record drives no keyed target at all",
+        fromEmpty.keys.none { deviceWideSnapshotId(target = it) != null },
+    )
+
+    check(
+        "so a location the user had on before the hide is left on",
+        fromEmpty[ManualRevertTarget.Location] == null,
+    )
+
+    check(
+        "while the targets the record cannot measure are still driven",
+        fromEmpty[ManualRevertTarget.AccessibilityServices] == true,
+    )
 }
 
 // ---------------------------------------------------------------------------------
@@ -3689,6 +3817,326 @@ private fun memoryRevertCoverageTests() {
  * that hid it has greyed, or a user is left with settings down and no screen to raise them
  * from. A build that gates both directions passes the first three groups and fails this one.
  */
+// ---------------------------------------------------------------------------------
+// Location - the one managed row whose useful direction is on
+// ---------------------------------------------------------------------------------
+
+/**
+ * Location, and the rules that have to hold for it to be useful rather than surprising.
+ *
+ * The row exists because a restrictive app that wants a position refuses to run without one,
+ * and going out to Android's own screen to switch it on - and remembering to switch it off
+ * again - is the thing the settings manager is for. So: it is drawn and switchable like any
+ * other row, the hide leaves it alone, a revert switches it off, and a user who keeps location
+ * on has one switch to tick in the revert configuration.
+ */
+private fun locationTargetTests() {
+    // 1. Off after a revert, on both arrival paths: a fresh install, and an install that was
+    //    behaving as the frozen v1.6.6 default. The second matters because that map is what
+    //    MigrateRevertDefaultsUseCase writes over the stored answer - a target missing from it
+    //    would fall back to the default instead, which happens to agree today and is a
+    //    coincidence rather than a promise.
+    check(
+        "a revert switches location off on a fresh install",
+        RevertDefaults.Default[ManualRevertTarget.Location] == false,
+    )
+    check(
+        "and on an install that arrived from before the target existed",
+        RevertDefaults.NarrowedV166[ManualRevertTarget.Location] == false,
+    )
+
+    // 2. And it can be configured the other way, like every other row. Without this the users
+    //    who keep location on all day would have it switched off by every revert.
+    val keepOn = ManualRevertTarget.entries.associateWith {
+        it == ManualRevertTarget.Location
+    }
+
+    checkEquals(
+        "a configuration that keeps location on round-trips",
+        keepOn,
+        RevertDefaults.decode(RevertDefaults.encode(keepOn)),
+    )
+
+    // 3. The memory record measures it in its own vocabulary - a location mode, not a flag -
+    //    so a memory revert puts back exactly what was there: off if the user keeps location
+    //    off, high accuracy if they had it on. That is the difference between "location off
+    //    once the app is closed" and "location left on because nothing knew what to put back".
+    checkEquals(
+        "the memory record measures location in the Secure table",
+        SettingSnapshot.idOf(SettingType.SECURE, AppSettingKeys.LOCATION_MODE),
+        deviceWideSnapshotId(target = ManualRevertTarget.Location),
+    )
+
+    checkEquals(
+        "an off recording drives it off",
+        false,
+        deviceWideMemoryWanted(
+            recorded = mapOf(
+                SettingSnapshot.idOf(SettingType.SECURE, AppSettingKeys.LOCATION_MODE) to "0",
+            ),
+        )[ManualRevertTarget.Location],
+    )
+
+    checkEquals(
+        "and any mode it was on in counts as on",
+        true,
+        deviceWideMemoryWanted(
+            recorded = mapOf(
+                SettingSnapshot.idOf(SettingType.SECURE, AppSettingKeys.LOCATION_MODE) to "3",
+            ),
+        )[ManualRevertTarget.Location],
+    )
+
+    checkEquals(
+        "so a revert cannot mistake a device left on high accuracy for one that was off",
+        true,
+        deviceWideMemoryWanted(
+            recorded = mapOf(
+                SettingSnapshot.idOf(SettingType.SECURE, AppSettingKeys.LOCATION_MODE) to "2",
+            ),
+        )[ManualRevertTarget.Location],
+    )
+
+    // 4. The revert's own loop owns location, so a per-app record that happens to carry the row
+    //    is not restored as an extra and then overwritten inside the same revert.
+    check(
+        "a per-app location record is not restored twice",
+        settingsOutsideRevertDefaults(
+            mapOf(SettingSnapshot.idOf(SettingType.SECURE, "location_mode") to "0"),
+        ).isEmpty(),
+    )
+    check(
+        "while a row the revert cannot drive still is",
+        settingsOutsideRevertDefaults(
+            mapOf(SettingSnapshot.idOf(SettingType.SECURE, "mock_location") to "0"),
+        ).isNotEmpty(),
+    )
+
+    // 5. Drawn in the manager, moved by the pill, never hidden.
+    check(
+        "the manager draws the location row on a fresh install",
+        ManagerRows.Default[ManualRevertTarget.Location] == true,
+    )
+    check(
+        "the master pill moves it with everything else",
+        ManualRevertTarget.Location in masterPillOnOrder,
+    )
+    check(
+        "and a hide switches it on rather than off",
+        userData(
+            ShizukuForkMode.Thedjchi,
+            hideStates = ManualRevertTarget.entries.associateWith { true },
+        ).canHide(ManualRevertTarget.Location),
+    )
+
+    // 6. The write itself: the pair, the table, and the one row the app writes that is a mode.
+    check(
+        "location is written to the Secure table as a mode",
+        ManualRevertTarget.Location.settingType == SettingType.SECURE &&
+            ManualRevertTarget.Location.valueOn == "3" &&
+            ManualRevertTarget.Location.valueOff == "0",
+    )
+    check(
+        "high accuracy, not sensors-only, is what \"on\" means for it",
+        ManualRevertTarget.Location.valueOn != "1" && ManualRevertTarget.Location.valueOn != "2",
+    )
+    check(
+        "and it is not a Global row, whatever the manager does with it",
+        ManualRevertTarget.Location.settingKey == AppSettingKeys.LOCATION_MODE &&
+            ManualRevertTarget.Location.globalSettingKey == null,
+    )
+
+    // 7. `stateWhileHidden` is the whole of the inverted-polarity design, so pin both halves: the
+    //    one target that is true, and the fact that every other target is still false.
+    checkEquals(
+        "location is the only target a hide switches on",
+        listOf(ManualRevertTarget.Location),
+        ManualRevertTarget.entries.filter { it.stateWhileHidden },
+    )
+    check(
+        "every other target is still switched off by a hide",
+        ManualRevertTarget.entries.filterNot { it == ManualRevertTarget.Location }
+            .none { it.stateWhileHidden },
+    )
+
+    // 8. Storage edges: a map written before the target existed, a map that has never been saved,
+    //    and a map that has been saved with it off. All three have to read as "off" rather than
+    //    as "on" - the safe direction for a row that switches a location service on.
+    check(
+        "a stored configuration from before the target existed leaves it off",
+        SettingsToHide.decode(listOf("DeveloperSettings=1", "UsbDebugging=1"))[
+            ManualRevertTarget.Location,
+        ] == false,
+    )
+    check(
+        "an empty stored configuration leaves it off",
+        SettingsToHide.decode(emptyList())[ManualRevertTarget.Location] == false,
+    )
+    check(
+        "and it is written down even when it is off, so a later release cannot drift",
+        "Location=0" in SettingsToHide.encode(SettingsToHide.Targets.associateWith { false }) &&
+            "Location=1" in SettingsToHide.encode(
+                SettingsToHide.Targets.associateWith { it == ManualRevertTarget.Location },
+            ),
+    )
+    check(
+        "a stored \"on\" survives the round trip",
+        SettingsToHide.decode(
+            SettingsToHide.encode(
+                SettingsToHide.Default + (ManualRevertTarget.Location to true),
+            ),
+        )[ManualRevertTarget.Location] == true,
+    )
+    check(
+        "the revert configuration writes it down too",
+        "Location=1" in RevertDefaults.encode(
+            RevertDefaults.Default + (ManualRevertTarget.Location to true),
+        ),
+    )
+    check(
+        "and the manager's row preference covers it, even when it is hidden",
+        ManagerRows.encode(
+            ManagerRows.Default + (ManualRevertTarget.Location to false),
+        ).any { it.startsWith("Location=") } &&
+            "Location=0" in ManagerRows.encode(
+                ManagerRows.Default + (ManualRevertTarget.Location to false),
+            ),
+    )
+
+    // 9. Order: last in Targets, so first on the way in - a position is what the app being opened
+    //    wants before anything else, and nothing location does can disturb the debug surface.
+    checkEquals(
+        "location is hidden first, and last in the dialog that configures it",
+        ManualRevertTarget.Location,
+        SettingsToHide.HideOrder.first(),
+    )
+    checkEquals(
+        "and it is the last row the settings-to-hide dialog lists",
+        ManualRevertTarget.Location,
+        SettingsToHide.Targets.last(),
+    )
+    check(
+        "the pill moves it last on the way on, so first on the way off",
+        masterPillOrder(enabled = true, usable = ManualRevertTarget.entries.toList()).last() ==
+            ManualRevertTarget.Location &&
+            masterPillOrder(enabled = false, usable = ManualRevertTarget.entries.toList())
+                .first() == ManualRevertTarget.Location,
+    )
+
+    // 10. The filters that drop rows from the *other* configurations must not drop this one. A
+    //     revert that silently skipped location would leave it on for ever, and a hide that
+    //     silently skipped it would leave the app without a position.
+    val onlyLocation = mapOf(ManualRevertTarget.Location to true)
+
+    checkEquals(
+        "an unmanaged overlay configuration keeps the location row",
+        onlyLocation,
+        onlyLocation.withoutOverlayWhenUnmanaged(manageOverlay = false),
+    )
+    checkEquals(
+        "and a fork with no intents keeps it too",
+        onlyLocation,
+        onlyLocation.withoutShizukuWhenNoIntents(mode = ShizukuForkMode.Other),
+    )
+    check(
+        "the effective revert configuration never drops it",
+        userData(
+            ShizukuForkMode.Other,
+            manageOverlay = false,
+            revertStates = ManualRevertTarget.entries.associateWith { false },
+        ).effectiveRevertDefaults.containsKey(ManualRevertTarget.Location),
+    )
+    check(
+        "and the effective hide configuration reads the stored answer",
+        userData(
+            ShizukuForkMode.Other,
+            hideStates = SettingsToHide.Default + (ManualRevertTarget.Location to true),
+        ).effectiveSettingsToHide[ManualRevertTarget.Location] == true,
+    )
+
+    // 11. The manual manager switch, while a revert is pending: the reading taken is the state
+    //     *before* the press, in the target's own vocabulary. A press that records "1" would have
+    //     a revert put back sensors-only on a device that was off.
+    val locationId = SettingSnapshot.idOf(SettingType.SECURE, AppSettingKeys.LOCATION_MODE)
+
+    checkEquals(
+        "pressing the manager's location row records the mode it is replacing",
+        mapOf(locationId to "0"),
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.Location,
+            currentlyEnabled = false,
+            revertPending = true,
+        ),
+    )
+    checkEquals(
+        "and records the on value when it was already on",
+        mapOf(locationId to "3"),
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.Location,
+            currentlyEnabled = true,
+            revertPending = true,
+        ),
+    )
+    check(
+        "with no revert pending it records nothing at all",
+        manualChangeRecord(
+            settingStateBefore = emptyMap(),
+            target = ManualRevertTarget.Location,
+            currentlyEnabled = true,
+            revertPending = false,
+        ) == null,
+    )
+
+    // 12. The first-owner rule, in this target's terms: a hide drives location to "3", so a device
+    //     already at "3" is not this hide's to put back, and a device at "0" is.
+    check(
+        "a hide owns the revert of a location it switched on",
+        hideOwnsRevert(currentValue = "0", valueOnLaunch = ManualRevertTarget.Location.valueOn),
+    )
+    check(
+        "and not of one that was already on",
+        !hideOwnsRevert(currentValue = "3", valueOnLaunch = ManualRevertTarget.Location.valueOn),
+    )
+    check(
+        "an unset row is owned, since writing it is a change",
+        hideOwnsRevert(currentValue = null, valueOnLaunch = ManualRevertTarget.Location.valueOn),
+    )
+
+    // 13. The device-wide record is discharged for the location id once the revert has driven it,
+    //     and left behind when the write failed - the same rule as the Global rows, in the Secure
+    //     table.
+    val holder = AccessibilityServicePlan.DEVICE_WIDE_HOLD
+
+    check(
+        "a revert that drove location clears its record",
+        deviceWideRecordAfterRevert(
+            settingStateBefore = mapOf(holder to mapOf(locationId to "0")),
+            driven = setOf(ManualRevertTarget.Location),
+            failed = emptySet(),
+        ).isEmpty(),
+    )
+    check(
+        "a failed location write stays recorded for a retry",
+        deviceWideRecordAfterRevert(
+            settingStateBefore = mapOf(holder to mapOf(locationId to "0")),
+            driven = setOf(ManualRevertTarget.Location),
+            failed = setOf(ManualRevertTarget.Location),
+        ) == mapOf(holder to mapOf(locationId to "0")),
+    )
+
+    // 14. The device-wide holder is not an app, and its location row must stay out of the per-app
+    //     memory sweep for the same reason the Global ones do.
+    check(
+        "the device-wide location record is not mistaken for an app's",
+        holder !in memoryHeldComponents(
+            settingStateBefore = mapOf(holder to mapOf(locationId to "0")),
+            heldAccessibilityServices = emptyMap(),
+        ),
+    )
+}
+
 private fun hideGateTests() {
     val all = ManualRevertTarget.entries.associateWith { true }
 
@@ -3700,11 +4148,17 @@ private fun hideGateTests() {
         revertStates = all,
     )
 
-    // 1. Everything configured: the stored ticks come through untouched.
+    // 1. Everything configured: the stored ticks come through untouched, except the one row
+    //    the hide refuses whatever the stored map says.
     checkEquals(
         "a fully configured install hides every target it was told to",
-        ManualRevertTarget.entries.size,
+        SettingsToHide.Targets.size,
         ready.effectiveSettingsToHide.count { it.value },
+    )
+    checkEquals(
+        "and location is hidden with the rest of them",
+        true,
+        ready.effectiveSettingsToHide[ManualRevertTarget.Location],
     )
 
     // 2. Manage Shizuku off. The Shizuku row leaves the manager and greys elsewhere, and the
