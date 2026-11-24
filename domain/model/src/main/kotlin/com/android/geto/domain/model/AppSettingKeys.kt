@@ -27,6 +27,15 @@ object AppSettingKeys {
     const val ADB_ENABLED = "adb_enabled"
     const val ADB_WIFI_ENABLED = "adb_wifi_enabled"
 
+    /**
+     * Location services, switched on and off from the settings manager.
+     *
+     * Secure, and the one row this app manages whose *on* value is not "1": Android stores
+     * location as a mode rather than a flag, and 0 is the only value that means off. See
+     * [ManualRevertTarget.Location], which carries the pair.
+     */
+    const val LOCATION_MODE = "location_mode"
+
     /** Secure, not Global. Upstream Geto had this one in the wrong table. */
     const val ACCESSIBILITY_ENABLED = "accessibility_enabled"
 
@@ -72,6 +81,7 @@ object AppSettingKeys {
         ADB_WIFI_ENABLED,
         ACCESSIBILITY_ENABLED,
         ENABLED_ACCESSIBILITY_SERVICES,
+        LOCATION_MODE,
     )
 
     /**

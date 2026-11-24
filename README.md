@@ -27,7 +27,8 @@ IMD (It's My Device) is a **<mark>&nbsp;powerful settings/ services manager&nbsp
 3. Accessibility services
 4. Display over other apps (needs active Shizuku service)
 5. Shizuku service
-6. and many more (per app configuration - hiding framework, hint: use Settings observer for help)
+6. Location (switched **on** while one of your apps is open, and put back when you revert)
+7. and many more (per app configuration - hiding framework, hint: use Settings observer for help)
 
 ## How this works
 

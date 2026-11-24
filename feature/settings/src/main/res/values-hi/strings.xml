@@ -234,6 +234,7 @@
     <string name="about_contributor_scope">(‘अन्य ऐप्स के ऊपर दिखाएँ’ का प्रारंभिक ढाँचा)</string>
     <string name="overlay_needs_shizuku_configured">इसका इस्तेमाल करने से पहले IMD सेटिंग में Shizuku सही तरीके से कॉन्फ़िगर होना ज़रूरी है</string>
     <string name="revert_defaults_display_over_other_apps">दूसरे ऐप्लिकेशन के ऊपर दिखाएं</string>
+    <string name="revert_defaults_location">स्थान</string>
     <string name="revert_defaults_overlay_note">सिर्फ़ वे ऐप्लिकेशन वापस चालू होते हैं जिन्हें IMD ने पहले बंद किया था; IMD सेटिंग में Shizuku सही तरीके से कॉन्फ़िगर होना ज़रूरी है</string>
     <string name="settings_to_hide_overlay_note">फ़िलहाल जिन ऐप्लिकेशन को दूसरे ऐप्लिकेशन के ऊपर दिखने की अनुमति है, वे सभी कुछ समय के लिए बंद कर दिए जाते हैं; IMD सेटिंग में Shizuku सही तरीके से कॉन्फ़िगर होना ज़रूरी है</string>
     <string name="settings_log_view">लॉग देखें</string>
@@ -275,6 +276,7 @@
     <string name="system_settings_unavailable">इस डिवाइस पर उस सेटिंग के लिए कोई स्क्रीन नहीं है</string>
     <string name="settings_to_hide_accessibility_note">सिर्फ़ IMD सेटिंग में चुनी गई सेवाएँ ही मैनेज की जाती हैं</string>
     <string name="settings_to_hide_shizuku_note">सुनिश्चित करें कि IMD सेटिंग्स में Shizuku सही ढंग से कॉन्फ़िगर है (स्टॉप इंटेंट का उपयोग करता है), watchdog त्रुटि से बचने में मदद करता है</string>
+    <string name="settings_to_hide_location_note">किसी ऐप के खुला रहने के दौरान स्थान चालू रहता है और वापस लौटने पर पहले जैसा कर दिया जाता है</string>
     <string name="shevery_notice_point_delay">इसलिए IMD में उन कामों में थोड़ी देरी हो सकती है जिनके लिए Shizuku की ज़रूरत होती है (जैसे \'दूसरे ऐप के ऊपर दिखाएँ\' छिपाना/दिखाना)।</string>
     <string name="shizuku_fork_shevery_caution">समर्थित, लेकिन अनुशंसित नहीं</string>
     <string name="shevery_notice_point_restart">Shevery की सेवा फिर से चालू करने के लिए आपको IMD को डिबगिंग सेटिंग दिखाने के लिए कॉन्फ़िगर करना होगा, Shevery की ErrorProtect सेवा उसे फिर से शुरू कर देगी (हर 10s में जाँचती है)</string>

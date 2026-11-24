@@ -27,7 +27,6 @@ import com.android.geto.domain.framework.ShizukuWrapper
 import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.ManualRevertTarget
 import com.android.geto.domain.model.ManualTargetStates
-import com.android.geto.domain.model.SettingType
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.model.overlayManageableInManager
 import com.android.geto.domain.repository.UserDataRepository
@@ -35,8 +34,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-private const val ON = "1"
 
 /**
  * What each row of the settings manager is actually set to, right now.
@@ -150,14 +147,20 @@ class GetManualTargetStatesUseCase @Inject constructor(
                 }
 
                 else -> {
-                    val key = target.globalSettingKey ?: return@associateWith false
+                    val key = target.settingKey ?: return@associateWith false
 
+                    // ⚠ **"Anything but off", not `== valueOn`.** Location is a mode rather
+                    // than a flag: 3 is what this app writes, but the system itself writes 1
+                    // or 2 when a battery saver takes the accuracy down, and a row that read
+                    // those as off would offer to switch on a location service that is already
+                    // running. "0 is the only off" is true of every row this app manages, so
+                    // one comparison answers all of them.
                     runCatching {
                         secureSettingsWrapper.getSecureSettingValue(
-                            settingType = SettingType.GLOBAL,
+                            settingType = target.settingType,
                             key = key,
-                        ) == ON
-                    }.getOrDefault(false)
+                        )
+                    }.getOrNull()?.let { it != target.valueOff } ?: false
                 }
             }
         }

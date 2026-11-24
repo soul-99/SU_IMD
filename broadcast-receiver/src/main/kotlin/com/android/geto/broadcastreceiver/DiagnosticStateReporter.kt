@@ -43,7 +43,7 @@ import javax.inject.Singleton
 /** The `state` lines' own tag, so a reader can filter the log down to configuration alone. */
 private const val TAG = "state"
 
-/** Short names for the six targets, so one line holds all of them. */
+/** Short names for every target, so one line holds all of them. */
 private val SHORT_NAMES = mapOf(
     ManualRevertTarget.DeveloperSettings to "dev",
     ManualRevertTarget.UsbDebugging to "usb",
@@ -51,6 +51,9 @@ private val SHORT_NAMES = mapOf(
     ManualRevertTarget.AccessibilityServices to "a11y",
     ManualRevertTarget.Shizuku to "shizuku",
     ManualRevertTarget.DisplayOverOtherApps to "overlay",
+    // Added with the target. Without an entry this line printed `=on` with no name in front of
+    // it, and the two configuration lines above stopped listing a row that had been ticked.
+    ManualRevertTarget.Location to "location",
 )
 
 /**

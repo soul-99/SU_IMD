@@ -239,6 +239,7 @@
     <string name="about_contributor_scope">(Erstes Grundgerüst für „Über anderen Apps anzeigen“)</string>
     <string name="overlay_needs_shizuku_configured">Shizuku muss in den IMD-Einstellungen korrekt konfiguriert sein, bevor dies verwendet werden kann</string>
     <string name="revert_defaults_display_over_other_apps">Über anderen Apps einblenden</string>
+    <string name="revert_defaults_location">Standort</string>
     <string name="revert_defaults_overlay_note">stellt nur die Apps wieder her, die IMD zuvor deaktiviert hat; Shizuku muss in den IMD-Einstellungen korrekt konfiguriert sein</string>
     <string name="settings_to_hide_overlay_note">alle Apps, die derzeit über anderen Apps eingeblendet werden dürfen, werden vorübergehend deaktiviert; Shizuku muss in den IMD-Einstellungen korrekt konfiguriert sein</string>
     <string name="settings_log_view">Protokoll ansehen</string>
@@ -280,6 +281,7 @@
     <string name="system_settings_unavailable">Dieses Gerät hat keinen Bildschirm für diese Einstellung</string>
     <string name="settings_to_hide_accessibility_note">Es werden nur die in den IMD-Einstellungen ausgewählten Dienste verwaltet</string>
     <string name="settings_to_hide_shizuku_note">stelle sicher, dass Shizuku in den IMD-Einstellungen korrekt konfiguriert ist (nutzt den Stopp-Intent), hilft, Watchdog-Fehler zu vermeiden</string>
+    <string name="settings_to_hide_location_note">Der Standort wird eingeschaltet, solange eine App geöffnet ist, und beim Zurücksetzen wiederhergestellt</string>
     <string name="shevery_notice_point_delay">Deshalb kann es in IMD zu einer leichten Verzögerung bei Aufgaben kommen, die Shizuku brauchen (etwa „Über anderen Apps anzeigen“ aus- und wieder einblenden).</string>
     <string name="shizuku_fork_shevery_caution">unterstützt, aber nicht empfohlen</string>
     <string name="shevery_notice_point_restart">Um den Shevery-Dienst neu starten zu lassen, musst du IMD so einstellen, dass es die Debugging-Einstellungen wieder einblendet - Shevery\'s ErrorProtect-Dienst startet ihn dann erneut (prüft alle 10s)</string>

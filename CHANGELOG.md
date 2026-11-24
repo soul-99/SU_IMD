@@ -5,6 +5,22 @@ What changed in each release, newest first, in terms of what it does for you.
 The full technical history - every bug found in the original Geto, what caused it and the reasoning
 behind each fix - is in [SUIMD.md § 3](SUIMD.md).
 
+## Unreleased
+
+**New**
+
+- **Location, as a managed setting.** Banking and payment apps are the usual reason to need one, and
+  most of them refuse to run without a position fix. Tick **Location** in *Settings to hide* and IMD
+  switches location **on** when one of your apps opens - from the apps list, Favourites, a generated
+  shortcut or IMD+ - and puts it back when you revert, so it is off again the moment you are done.
+  Under the memory framework "puts it back" means exactly that: if you had location on before the
+  launch, it stays on. It is off on a fresh install and off after an upgrade: nothing switches a
+  location service on for somebody who has not asked for it.
+- **A Location row in the settings manager**, showing live state, with one switch and an arrow out to
+  Android's own location screen. That is also the way to turn location on for a one-off app without
+  configuring anything - press the row, use the app, revert.
+- **Location in *Revert to default*.** Off by default, which is what makes the revert switch it back
+  off. Tick it if you keep location on all day and want a revert to leave it alone.
 ## v3 - 3 September 2026
 
 The largest release since the fork, and the one that stops IMD being a thing you drive by hand.

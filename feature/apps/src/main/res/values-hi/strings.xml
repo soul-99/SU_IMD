@@ -95,6 +95,7 @@
     <string name="overlay_failure_point_configuration">IMD ऐप्लिकेशन की सेटिंग में अपना Shizuku कॉन्फ़िगरेशन दोबारा जाँचें</string>
     <string name="shizuku_starting_to_hide_overlay">दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति छिपाने के लिए Shizuku सेवा शुरू की जा रही है</string>
     <string name="revert_display_over_other_apps">दूसरे ऐप्लिकेशन के ऊपर दिखाएं</string>
+    <string name="revert_location">स्थान</string>
     <string name="settings_manager_overlay_restore_failed">Shizuku की मदद से दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस नहीं दी जा सकी. कृपया Shizuku ऐप्लिकेशन से Shizuku सेवा मैन्युअल रूप से शुरू करें और दोबारा कोशिश करें</string>
     <string name="settings_manager_overlay_restore_failed_open">दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति क्यों वापस नहीं दी गई</string>
     <string name="shizuku_starting_to_restore_overlay">दूसरे ऐप्लिकेशन के ऊपर दिखाएं की अनुमति वापस देने के लिए Shizuku सेवा शुरू की जा रही है</string>

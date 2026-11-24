@@ -265,6 +265,8 @@ private fun ManualRevertTarget.managerRowLabel(shizukuForkMode: ShizukuForkMode)
 
     ManualRevertTarget.DisplayOverOtherApps ->
         stringResource(R.string.revert_defaults_display_over_other_apps)
+
+    ManualRevertTarget.Location -> stringResource(R.string.revert_defaults_location)
 }
 
 /**
@@ -294,6 +296,7 @@ private fun managerRowOrder(isShevery: Boolean): List<Pair<ManualRevertTarget, I
         ManualRevertTarget.AccessibilityServices to 0,
         ManualRevertTarget.Shizuku to 0,
         ManualRevertTarget.DisplayOverOtherApps to 1,
+        ManualRevertTarget.Location to 0,
     )
 } else {
     listOf(
@@ -303,6 +306,7 @@ private fun managerRowOrder(isShevery: Boolean): List<Pair<ManualRevertTarget, I
         ManualRevertTarget.Shizuku to 0,
         ManualRevertTarget.AccessibilityServices to 0,
         ManualRevertTarget.DisplayOverOtherApps to 0,
+        ManualRevertTarget.Location to 0,
     )
 }
 

@@ -235,6 +235,7 @@
     <string name="about_contributor_scope">(Estrutura inicial de sobreposição a outros apps)</string>
     <string name="overlay_needs_shizuku_configured">O Shizuku precisa estar configurado corretamente nas configurações do IMD antes que isso possa ser usado</string>
     <string name="revert_defaults_display_over_other_apps">Sobreposição a outros apps</string>
+    <string name="revert_defaults_location">Localização</string>
     <string name="revert_defaults_overlay_note">restaura apenas os apps que o IMD desativou antes; o Shizuku precisa estar configurado corretamente nas configurações do IMD</string>
     <string name="settings_to_hide_overlay_note">todos os apps atualmente autorizados a se sobrepor a outros apps são desativados temporariamente; o Shizuku precisa estar configurado corretamente nas configurações do IMD</string>
     <string name="settings_log_view">Ver registro</string>
@@ -276,6 +277,7 @@
     <string name="system_settings_unavailable">Este dispositivo não tem tela para essa configuração</string>
     <string name="settings_to_hide_accessibility_note">Somente os serviços selecionados nas configurações do IMD são gerenciados</string>
     <string name="settings_to_hide_shizuku_note">verifique se o Shizuku está configurado corretamente nas configurações do IMD (usa a intent de parada), ajuda a evitar o erro do watchdog</string>
+    <string name="settings_to_hide_location_note">A localização é ativada enquanto um app está aberto e restaurada quando você reverte</string>
     <string name="shevery_notice_point_delay">Por isso, pode acrescentar um pequeno atraso no IMD para tarefas que exigem acesso ao Shizuku (como ocultar/reexibir Sobrepor a outros apps).</string>
     <string name="shizuku_fork_shevery_caution">compatível, mas não recomendado</string>
     <string name="shevery_notice_point_restart">Para reiniciar o serviço do Shevery, configure o IMD para reexibir as configurações de depuração; o serviço ErrorProtect do Shevery o iniciará de novo (verifica a cada 10s)</string>

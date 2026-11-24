@@ -121,7 +121,7 @@ class RevertToDefaultUseCase @Inject constructor(
         // `overlayEnabled` that skips the overlay block *and* its `unchanged` branch, and a
         // `wanted[Shizuku]?.let` that never runs. The author's log: a device-wide memory revert
         // reporting `changed=[DeveloperSettings, UsbDebugging, WirelessDebugging]` and nothing
-        // else, on a device that had all six hidden.
+        // else, on a device that had every target hidden.
         //
         // ⚠ **Filtered by "can this target be recorded at all", not by "was it recorded this
         // time".** A keyed target absent from the record is a setting the hide never touched,
@@ -231,6 +231,17 @@ class RevertToDefaultUseCase @Inject constructor(
             ManualRevertTarget.UsbDebugging,
             ManualRevertTarget.WirelessDebugging,
             ManualRevertTarget.AccessibilityServices,
+            // ⚠ **Location, driven like the four above it and for the mirror reason.** Every
+            // other row in this list is being put *back on* — the hide switched it off. This
+            // one is being put *back off*: the user switched it on in the manager so the app
+            // in front would work, and a revert is the moment that session ends. Its
+            // configured default is off for exactly that reason, and a user who keeps location
+            // on always can tick it in the same dialog and have the revert leave it alone.
+            //
+            // Driven rather than released from some record of "IMD turned this on": IMD is not
+            // the only thing that may have switched it on, and a row that only moved when it
+            // had its own receipt would sit there reading a state nobody could get it out of.
+            ManualRevertTarget.Location,
         )
 
         val overlayTarget = ManualRevertTarget.DisplayOverOtherApps
@@ -478,7 +489,7 @@ class RevertToDefaultUseCase @Inject constructor(
      * Puts back the recorded settings this revert's own targets cannot reach.
      *
      * Walks every per-app record, keeps the ids [settingsOutsideRevertDefaults] says are
-     * outside the six targets, and writes each one back to the value the hide measured.
+     * outside the targets, and writes each one back to the value the hide measured.
      *
      * ⚠ **The ids that survive the filter are dropped from the record, and only those.** The
      * rest of each record is left exactly as it was, because it describes settings this revert

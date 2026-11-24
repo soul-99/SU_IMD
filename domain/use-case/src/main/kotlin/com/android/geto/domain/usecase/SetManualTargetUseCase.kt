@@ -26,7 +26,6 @@ import com.android.geto.domain.framework.SecureSettingsWrapper
 import com.android.geto.domain.framework.ShizukuWrapper
 import com.android.geto.domain.model.AccessibilityServicePlan
 import com.android.geto.domain.model.ManualRevertTarget
-import com.android.geto.domain.model.SettingType
 import com.android.geto.domain.model.ShizukuForkDefaults
 import com.android.geto.domain.model.isShizukuConfigured
 import com.android.geto.domain.model.settingsHidden
@@ -36,10 +35,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-private const val ON = "1"
-
-private const val OFF = "0"
 
 /**
  * Switches one row of the settings manager on or off.
@@ -114,12 +109,17 @@ class SetManualTargetUseCase @Inject constructor(
         enabled: Boolean,
         manual: Boolean,
     ): Boolean {
-        target.globalSettingKey?.let { key ->
+        // ⚠ **The target's own table and its own pair of values.** Three of these are Global
+        // flags written "1"/"0"; location is a Secure *mode* written 3/0, and a shared
+        // "1"/"0" here would write `LOCATION_MODE_SENSORS_ONLY` on the way on and read as
+        // nothing at all. Asking the target rather than assuming is what lets one line be
+        // right for both, and there is nothing left over for a second branch to get wrong.
+        target.settingKey?.let { key ->
             return runCatching {
                 secureSettingsWrapper.canWriteSecureSettings(
-                    settingType = SettingType.GLOBAL,
+                    settingType = target.settingType,
                     key = key,
-                    value = if (enabled) ON else OFF,
+                    value = if (enabled) target.valueOn else target.valueOff,
                 )
             }.getOrDefault(false)
         }

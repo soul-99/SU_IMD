@@ -77,6 +77,11 @@ object RevertDefaults {
         ManualRevertTarget.AccessibilityServices to true,
         ManualRevertTarget.Shizuku to false,
         ManualRevertTarget.DisplayOverOtherApps to false,
+        // Added with the target, and off for the reason every other row of this map is off:
+        // an install from before location was manageable was not keeping location on after a
+        // revert, because nothing was touching it at all. Off here keeps that true - a revert
+        // switches location off, which is also the answer a fresh install gets from [Default].
+        ManualRevertTarget.Location to false,
     )
 
     fun encode(states: Map<ManualRevertTarget, Boolean>): List<String> =

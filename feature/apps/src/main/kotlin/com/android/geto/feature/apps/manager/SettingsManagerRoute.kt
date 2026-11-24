@@ -329,6 +329,14 @@ internal fun Context.openTarget(
             listOfNotNull(shizukuPackage?.let(packageManager::getLaunchIntentForPackage))
         }
 
+        // ⚠ **The one row whose system screen is not a rescue hatch.** Every other arrow here
+        // exists because the setting cannot be switched from inside IMD; location can, and
+        // this is for the half of location that is not a switch — which apps may use it, and
+        // the recent-requests list that answers "who turned this on".
+        ManualRevertTarget.Location -> {
+            listOf(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+        }
+
         else -> emptyList()
     }
 

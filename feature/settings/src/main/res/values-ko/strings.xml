@@ -235,6 +235,7 @@
     <string name="about_contributor_scope">(‘다른 앱 위에 표시’ 초기 프레임워크)</string>
     <string name="overlay_needs_shizuku_configured">이 기능을 사용하려면 먼저 IMD 설정에서 Shizuku가 올바르게 구성되어 있어야 합니다</string>
     <string name="revert_defaults_display_over_other_apps">다른 앱 위에 표시</string>
+    <string name="revert_defaults_location">위치</string>
     <string name="revert_defaults_overlay_note">IMD가 이전에 사용 중지한 앱만 복원합니다. IMD 설정에서 Shizuku가 올바르게 구성되어 있어야 합니다</string>
     <string name="settings_to_hide_overlay_note">현재 다른 앱 위에 표시할 수 있는 모든 앱이 일시적으로 사용 중지됩니다. IMD 설정에서 Shizuku가 올바르게 구성되어 있어야 합니다</string>
     <string name="settings_log_view">로그 보기</string>
@@ -276,6 +277,7 @@
     <string name="system_settings_unavailable">이 기기에는 해당 설정 화면이 없습니다</string>
     <string name="settings_to_hide_accessibility_note">IMD 설정에서 선택한 서비스만 관리됩니다</string>
     <string name="settings_to_hide_shizuku_note">IMD 설정에서 Shizuku가 올바르게 구성되어 있는지 확인하세요(중지 인텐트 사용). watchdog 오류를 방지하는 데 도움이 됩니다</string>
+    <string name="settings_to_hide_location_note">앱이 열려 있는 동안 위치가 켜지고, 되돌리면 원래대로 돌아갑니다</string>
     <string name="shevery_notice_point_delay">따라서 Shizuku 접근이 필요한 작업(예: \'다른 앱 위에 표시\' 숨기기/해제)에서 IMD에 약간의 지연이 생길 수 있습니다.</string>
     <string name="shizuku_fork_shevery_caution">지원되지만 권장하지 않음</string>
     <string name="shevery_notice_point_restart">Shevery 서비스를 다시 시작하려면 IMD가 디버깅 설정을 다시 표시하도록 구성해야 하며, Shevery의 ErrorProtect 서비스가 이를 다시 시작합니다(10초마다 검사)</string>

@@ -96,6 +96,7 @@
     <string name="overlay_failure_point_configuration">أعد التحقق من إعداد Shizuku في إعدادات تطبيق IMD</string>
     <string name="shizuku_starting_to_hide_overlay">جارٍ تشغيل خدمة Shizuku لإخفاء إذن العرض فوق التطبيقات الأخرى</string>
     <string name="revert_display_over_other_apps">العرض فوق التطبيقات الأخرى</string>
+    <string name="revert_location">الموقع</string>
     <string name="settings_manager_overlay_restore_failed">تعذّرت استعادة إذن العرض فوق التطبيقات الأخرى باستخدام Shizuku. يُرجى تشغيل خدمة Shizuku يدويًا من تطبيق Shizuku ثم المحاولة مرة أخرى</string>
     <string name="settings_manager_overlay_restore_failed_open">لماذا لم تتم استعادة إذن العرض فوق التطبيقات الأخرى</string>
     <string name="shizuku_starting_to_restore_overlay">جارٍ تشغيل خدمة Shizuku لاستعادة إذن العرض فوق التطبيقات الأخرى</string>
